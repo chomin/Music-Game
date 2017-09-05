@@ -9,7 +9,7 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene {
+class GameScene: SKScene {//音ゲーをするシーン
 	
     
     override func didMove(to view: SKView) {
