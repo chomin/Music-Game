@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F746F471F5EEDB000C1D040 /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F746F461F5EEDB000C1D040 /* Images.swift */; };
+		0F746F491F5EEDC200C1D040 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F746F481F5EEDC200C1D040 /* Buttons.swift */; };
+		0F746F4B1F5EEEFF00C1D040 /* Sounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F746F4A1F5EEEFF00C1D040 /* Sounds.swift */; };
+		0F746F4F1F5EFF0A00C1D040 /* シュガビタ.ogg in Resources */ = {isa = PBXBuildFile; fileRef = 0F746F4C1F5EFF0A00C1D040 /* シュガビタ.ogg */; };
+		0F746F501F5EFF0A00C1D040 /* タップ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0F746F4D1F5EFF0A00C1D040 /* タップ.mp3 */; };
+		0F746F511F5EFF0A00C1D040 /* フリック.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0F746F4E1F5EFF0A00C1D040 /* フリック.mp3 */; };
 		0FFD1B441F5E6D2B0007E555 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B431F5E6D2B0007E555 /* AppDelegate.swift */; };
 		0FFD1B4A1F5E6D2B0007E555 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B491F5E6D2B0007E555 /* GameScene.swift */; };
 		0FFD1B4C1F5E6D2B0007E555 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B4B1F5E6D2B0007E555 /* GameViewController.swift */; };
@@ -15,6 +21,7 @@
 		0FFD1B6A1F5E6D2B0007E555 /* _______UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B691F5E6D2B0007E555 /* _______UITests.swift */; };
 		0FFD1B781F5E71410007E555 /* ChooseSoundScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B771F5E71410007E555 /* ChooseSoundScene.swift */; };
 		0FFD1B7A1F5E71810007E555 /* TitleScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B791F5E71810007E555 /* TitleScene.swift */; };
+		0FFD1B7C1F5E7C1D0007E555 /* ReadBMS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B7B1F5E7C1D0007E555 /* ReadBMS.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +42,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0F746F461F5EEDB000C1D040 /* Images.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Images.swift; sourceTree = "<group>"; };
+		0F746F481F5EEDC200C1D040 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
+		0F746F4A1F5EEEFF00C1D040 /* Sounds.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sounds.swift; sourceTree = "<group>"; };
+		0F746F4C1F5EFF0A00C1D040 /* シュガビタ.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = "シュガビタ.ogg"; sourceTree = "<group>"; };
+		0F746F4D1F5EFF0A00C1D040 /* タップ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "タップ.mp3"; sourceTree = "<group>"; };
+		0F746F4E1F5EFF0A00C1D040 /* フリック.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "フリック.mp3"; sourceTree = "<group>"; };
 		0FFD1B401F5E6D2B0007E555 /* 音ゲー（仮）.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "音ゲー（仮）.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0FFD1B431F5E6D2B0007E555 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0FFD1B491F5E6D2B0007E555 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -49,6 +62,7 @@
 		0FFD1B6B1F5E6D2B0007E555 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0FFD1B771F5E71410007E555 /* ChooseSoundScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseSoundScene.swift; sourceTree = "<group>"; };
 		0FFD1B791F5E71810007E555 /* TitleScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TitleScene.swift; sourceTree = "<group>"; };
+		0FFD1B7B1F5E7C1D0007E555 /* ReadBMS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadBMS.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,7 +115,14 @@
 			children = (
 				0FFD1B431F5E6D2B0007E555 /* AppDelegate.swift */,
 				0FFD1B491F5E6D2B0007E555 /* GameScene.swift */,
+				0F746F481F5EEDC200C1D040 /* Buttons.swift */,
+				0F746F4A1F5EEEFF00C1D040 /* Sounds.swift */,
+				0F746F461F5EEDB000C1D040 /* Images.swift */,
+				0FFD1B7B1F5E7C1D0007E555 /* ReadBMS.swift */,
 				0FFD1B771F5E71410007E555 /* ChooseSoundScene.swift */,
+				0F746F4C1F5EFF0A00C1D040 /* シュガビタ.ogg */,
+				0F746F4D1F5EFF0A00C1D040 /* タップ.mp3 */,
+				0F746F4E1F5EFF0A00C1D040 /* フリック.mp3 */,
 				0FFD1B791F5E71810007E555 /* TitleScene.swift */,
 				0FFD1B4B1F5E6D2B0007E555 /* GameViewController.swift */,
 				0FFD1B501F5E6D2B0007E555 /* Assets.xcassets */,
@@ -238,7 +259,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0F746F4F1F5EFF0A00C1D040 /* シュガビタ.ogg in Resources */,
 				0FFD1B511F5E6D2B0007E555 /* Assets.xcassets in Resources */,
+				0F746F501F5EFF0A00C1D040 /* タップ.mp3 in Resources */,
+				0F746F511F5EFF0A00C1D040 /* フリック.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,11 +287,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0F746F471F5EEDB000C1D040 /* Images.swift in Sources */,
 				0FFD1B4A1F5E6D2B0007E555 /* GameScene.swift in Sources */,
 				0FFD1B781F5E71410007E555 /* ChooseSoundScene.swift in Sources */,
+				0FFD1B7C1F5E7C1D0007E555 /* ReadBMS.swift in Sources */,
 				0FFD1B4C1F5E6D2B0007E555 /* GameViewController.swift in Sources */,
 				0FFD1B441F5E6D2B0007E555 /* AppDelegate.swift in Sources */,
+				0F746F4B1F5EEEFF00C1D040 /* Sounds.swift in Sources */,
 				0FFD1B7A1F5E71810007E555 /* TitleScene.swift in Sources */,
+				0F746F491F5EEDC200C1D040 /* Buttons.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -501,6 +529,7 @@
 				0FFD1B701F5E6D2B0007E555 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0FFD1B711F5E6D2B0007E555 /* Build configuration list for PBXNativeTarget "音ゲー（仮）Tests" */ = {
 			isa = XCConfigurationList;
@@ -509,6 +538,7 @@
 				0FFD1B731F5E6D2B0007E555 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0FFD1B741F5E6D2B0007E555 /* Build configuration list for PBXNativeTarget "音ゲー（仮）UITests" */ = {
 			isa = XCConfigurationList;
@@ -517,6 +547,7 @@
 				0FFD1B761F5E6D2B0007E555 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
