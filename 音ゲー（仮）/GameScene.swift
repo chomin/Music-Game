@@ -21,25 +21,37 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	
 	//画像
-	var noteImage:[SKSpriteNode] = []
+	var noteImage:[SKShapeNode] = []
+	var longImages:[SKShapeNode] = []
+//	//確認用
+//	var triangle:SKShapeNode? = nil
+//	var line:SKShapeNode? = nil
+//	var circle:SKShapeNode? = nil
+//	var gcircle:SKShapeNode? = nil
+//	var long:SKShapeNode? = nil
+
+	
 	
 	//ボタン
 	let buttons = [UIButton(),UIButton(),UIButton(),UIButton(),UIButton(),UIButton(),UIButton()]
 	
 	static var notes:[Note] = []
 	var start:TimeInterval!	  //シーン移動した時の時間
-	let playSpeed = 10.0
 	static var BPM = 0.0
 	static var offset = 0.0	  //BGM開始の小節
 	
 	override func didMove(to view: SKView) {
 		
+		//スピードの設定(設定より前)
+		speed = 5.0
+		
 		//notesにノーツを入れる(nobuの仕事)
 		
 		//画像、音楽、ボタン、ラベルの設定
 		setAllSounds()
+		setButtons()
+		setImages()
 		
-		//
 		
 		
 		
@@ -51,6 +63,19 @@ class GameScene: SKScene {//音ゲーをするシーン
 			start = currentTime
 		}
 		
+		//引き算ではなく、時間で位置を設定する
+		for (index,value) in noteImage.enumerated(){
+			var ypos =  self.frame.width/9
+			ypos += (CGFloat(GameScene.BPM*15*GameScene.notes[index].pos)-CGFloat(currentTime))*CGFloat(speed)
+			value.position.y = ypos
+		}
+		
+		//確認用
+//		triangle?.position.y = self.frame.width/9
+//		circle?.position.y = self.frame.width/9
+//		gcircle?.position.y = self.frame.width/9
+//		line?.position.y = self.frame.width/9
+
 		
 		
 	}
@@ -64,5 +89,5 @@ class Note{
 }
 
 enum NoteType{
-	case Tap,Flick,Start,Middle,TapEnd,FlickEnd
+	case Tap,Flick,Middle,TapEnd,FlickEnd
 }
