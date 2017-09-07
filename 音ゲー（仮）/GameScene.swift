@@ -23,6 +23,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	//画像
 	var noteImage:[SKShapeNode] = []
 	var longImages:[SKShapeNode] = []
+	var judgeLine:SKShapeNode!
 //	//確認用
 //	var triangle:SKShapeNode? = nil
 //	var line:SKShapeNode? = nil
@@ -37,36 +38,66 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	static var notes:[Note] = []
 	var start:TimeInterval!	  //シーン移動した時の時間
-	static var BPM = 0.0
-	static var offset = 0.0	  //BGM開始の小節
+	static var BPM = 132.0
+	static var offset = 1.0	  //BGM開始の小節
 	
 	override func didMove(to view: SKView) {
 		
-		//スピードの設定(設定より前)
-		speed = 5.0
+		//スピードの設定
+		speed = 500.0
 		
 		//notesにノーツを入れる(nobuの仕事)
+		
+		//確認用
+		let anote=Note()
+		let bnote=Note()
+		let cnote=Note()
+		let dnote=Note()
+		
+		anote.lane=2
+		anote.next=bnote
+		anote.pos=4
+		anote.type = .Tap
+		GameScene.notes.append(anote)
+		
+		
+		bnote.lane=2
+		bnote.next=cnote
+		bnote.pos=4.25
+		bnote.type = .Middle
+		GameScene.notes.append(bnote)
+		
+		cnote.lane=1
+		cnote.next=nil
+		cnote.pos=4.5
+		cnote.type = .FlickEnd
+		GameScene.notes.append(cnote)
+		
+		dnote.lane=6
+		dnote.next=nil
+		dnote.pos=4.125
+		dnote.type = .Tap
+		GameScene.notes.append(dnote)
 		
 		//画像、音楽、ボタン、ラベルの設定
 		setAllSounds()
 		setButtons()
 		setImages()
 		
-		
+		//BGMの再生(時間指定)
+		start = CACurrentMediaTime()
+		BGM!.play(atTime: start + GameScene.offset/GameScene.BPM/240)
 		
 		
 	}
 	
 	
 	override func update(_ currentTime: TimeInterval) {
-		if start == nil{
-			start = currentTime
-		}
-		
+
 		//引き算ではなく、時間で位置を設定する
 		for (index,value) in noteImage.enumerated(){
 			var ypos =  self.frame.width/9
-			ypos += (CGFloat(GameScene.BPM*15*GameScene.notes[index].pos)-CGFloat(currentTime))*CGFloat(speed)
+			ypos += (CGFloat(240*GameScene.notes[index].pos/GameScene.BPM)-CGFloat(currentTime - start))*CGFloat(speed)
 			value.position.y = ypos
 		}
 		

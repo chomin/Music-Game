@@ -10,6 +10,15 @@ import SpriteKit
 
 extension GameScene{
 	func setImages(){
+		var jlPoint = [CGPoint(x:0.0 ,y:0.0) ,CGPoint(x:self.frame.width/9*7 ,y:0.0)]
+		judgeLine = SKShapeNode(points: &jlPoint, count: jlPoint.count)
+		judgeLine.lineWidth = 3.0
+		judgeLine.strokeColor = UIColor.white
+		judgeLine.position = CGPoint(x:self.frame.width/9, y:self.frame.width/9)
+		self.addChild(judgeLine)
+
+		
+		
 		for i in GameScene.notes{
 			var note:SKShapeNode
 			
@@ -18,10 +27,10 @@ extension GameScene{
 				let length = self.frame.width/18 //一辺の長さの半分
 				
 				// 始点から終点までの４点を指定.
-				var points = [CGPoint(x:length, y:-length / 2.0),
-				              CGPoint(x:-length, y:-length / 2.0),
+				var points = [CGPoint(x:length, y:0),
+				              CGPoint(x:-length, y:0),
 				              CGPoint(x: 0.0, y: length),
-				              CGPoint(x:length, y:-length / 2.0)]
+				              CGPoint(x:length, y:0)]
 				
 				note = SKShapeNode(points: &points, count: points.count)
 				
@@ -43,14 +52,16 @@ extension GameScene{
 				note.fillColor = UIColor.white
 			}
 			
-			//位置
-			var xpos = (self.frame.width/9)+(self.frame.width/9)*CGFloat(i.lane-1)
+			//位置(ロングノーツに必要なため、ここでyも設定)
+			var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(i.lane-1)
 			if i.type == .Middle{ //線だけずらす(開始点がposition)
-				xpos -= (self.frame.width/9)
+				xpos -= (self.frame.width/18)
 			}
 			
-			var ypos = self.frame.width/6
-			ypos += CGFloat(GameScene.BPM*i.pos*Double(speed)*60/4)    //複雑すぎるので分ける
+			var ypos =  self.frame.width/9
+			ypos += (CGFloat(240*i.pos/GameScene.BPM))*CGFloat(speed)
+
+			
 			note.position = CGPoint(x:xpos ,y:ypos)
 			
 			self.addChild(note)
@@ -64,15 +75,16 @@ extension GameScene{
 				let nextIndex = GameScene.notes.index(where: {$0 === value.next!})
 				
 				let path = CGMutablePath()
+				let path2 = CGMutablePath()//剛体用（重なると変になるため）
 				
 				//まず、始点&終点ノーツが円か線かで中心座標が異なるため場合分け
 				var startNotepos:CGPoint =  noteImage[index].position //中心座標
 				if value.type == .Middle{//線だけずらす
-					startNotepos.x += (self.frame.width/9)
+					startNotepos.x += (self.frame.width/18)
 				}
 				var endNotepos:CGPoint =  noteImage[nextIndex!].position //中心座標
 				if value.next!.type == .Middle{//線だけずらす
-					endNotepos.x += (self.frame.width/9)
+					endNotepos.x += (self.frame.width/18)
 				}
 				
 				
@@ -81,6 +93,12 @@ extension GameScene{
 				path.addLine(to: CGPoint(x:endNotepos.x+self.frame.width/22, y:endNotepos.y))
 				path.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y))
 				path.closeSubpath()
+				
+				path2.move(to: CGPoint(x:startNotepos.x-self.frame.width/22, y:startNotepos.y+40))  //始点
+				path2.addLine(to: CGPoint(x:startNotepos.x+self.frame.width/22, y:startNotepos.y+40))
+				path2.addLine(to: CGPoint(x:endNotepos.x+self.frame.width/22, y:endNotepos.y-40))
+				path2.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y-40))
+				path2.closeSubpath()
 				
 				
 				
@@ -91,9 +109,12 @@ extension GameScene{
 				tmplong.alpha = 0.8
 				tmplong.zPosition = -1
 				
-				tmplong.physicsBody = SKPhysicsBody(polygonFrom :path)	  //物理演算してしまうが、固定してるから動かない。逆に物理演算しないと連動して動かない！
+				tmplong.physicsBody = SKPhysicsBody(polygonFrom :path2)	  //物理演算してしまうが、固定してるから動かない。逆に物理演算しないと連動して動かない！
+//				tmplong.physicsBody?.isDynamic=false
+				
 				
 				self.addChild(tmplong)
+				
 				
 				//終点ノーツに物理体を追加
 				noteImage[nextIndex!].physicsBody = SKPhysicsBody(circleOfRadius: self.frame.width/18)  //とりあえず円の剛体

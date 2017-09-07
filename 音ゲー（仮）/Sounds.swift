@@ -12,18 +12,20 @@ import AVFoundation
 extension GameScene{
 	
 	func setAllSounds(){
-		BGM = setSound(fileName: "シュガビタ", typeName: "mp3")
-		tapSound1 = setSound(fileName: "タップ", typeName: "mp3")
-		tapSound2 = setSound(fileName: "タップ", typeName: "mp3")
-		flickSound1 = setSound(fileName: "フリック", typeName: "mp3")
-		flickSound2 = setSound(fileName: "フリック", typeName: "mp3")
+		BGM = setSound(fileName: "シュガビタ")
+		tapSound1 = setSound(fileName: "タップ")
+		tapSound2 = setSound(fileName: "タップ")
+		flickSound1 = setSound(fileName: "フリック")
+		flickSound2 = setSound(fileName: "フリック")
+		
+		BGM!.numberOfLoops = 0	//１度だけ再生
 	}
 	
-	func setSound(fileName:String,typeName:String) -> AVAudioPlayer!{//効果音を設定する関数
+	func setSound(fileName:String) -> AVAudioPlayer!{//効果音を設定する関数
 		var sound:AVAudioPlayer!
 		
 		// サウンドファイルのパスを生成
-		let Path = Bundle.main.path(forResource: fileName, ofType: typeName)!    //m4aは不可?
+		let Path = Bundle.main.path(forResource: fileName, ofType: "mp3")!    //m4a,oggは不可
 		let soundURL:URL = URL(fileURLWithPath: Path)
 		// AVAudioPlayerのインスタンスを作成
 		do {
