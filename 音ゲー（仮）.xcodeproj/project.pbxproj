@@ -16,7 +16,6 @@
 		0F746F5D1F5F950E00C1D040 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0F746F591F5F950E00C1D040 /* LaunchScreen.storyboard */; };
 		0F746F5E1F5F950E00C1D040 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0F746F5B1F5F950E00C1D040 /* Main.storyboard */; };
 		0F746F601F5F95F700C1D040 /* シュガビタ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0F746F5F1F5F95F700C1D040 /* シュガビタ.mp3 */; };
-		0FBB24981F6154730053C68B /* 空打ち.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0FBB24971F6154730053C68B /* 空打ち.mp3 */; };
 		0FFD1B441F5E6D2B0007E555 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B431F5E6D2B0007E555 /* AppDelegate.swift */; };
 		0FFD1B4A1F5E6D2B0007E555 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B491F5E6D2B0007E555 /* GameScene.swift */; };
 		0FFD1B4C1F5E6D2B0007E555 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B4B1F5E6D2B0007E555 /* GameViewController.swift */; };
@@ -55,7 +54,6 @@
 		0F746F5A1F5F950E00C1D040 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0F746F5C1F5F950E00C1D040 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0F746F5F1F5F95F700C1D040 /* シュガビタ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "シュガビタ.mp3"; path = "../../../Downloads/シュガビタ.mp3"; sourceTree = "<group>"; };
-		0FBB24971F6154730053C68B /* 空打ち.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "空打ち.mp3"; path = "../../../Downloads/空打ち.mp3"; sourceTree = "<group>"; };
 		0FFD1B401F5E6D2B0007E555 /* 音ゲー（仮）.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "音ゲー（仮）.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0FFD1B431F5E6D2B0007E555 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0FFD1B491F5E6D2B0007E555 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -141,7 +139,6 @@
 				0FFD1B7B1F5E7C1D0007E555 /* ReadBMS.swift */,
 				0FFD1B771F5E71410007E555 /* ChooseSoundScene.swift */,
 				0F746F4D1F5EFF0A00C1D040 /* タップ.mp3 */,
-				0FBB24971F6154730053C68B /* 空打ち.mp3 */,
 				0F746F5F1F5F95F700C1D040 /* シュガビタ.mp3 */,
 				0F746F4E1F5EFF0A00C1D040 /* フリック.mp3 */,
 				0FFD1B791F5E71810007E555 /* TitleScene.swift */,
@@ -286,7 +283,6 @@
 				0F746F5E1F5F950E00C1D040 /* Main.storyboard in Resources */,
 				0F746F601F5F95F700C1D040 /* シュガビタ.mp3 in Resources */,
 				0F746F5D1F5F950E00C1D040 /* LaunchScreen.storyboard in Resources */,
-				0FBB24981F6154730053C68B /* 空打ち.mp3 in Resources */,
 				0F746F511F5EFF0A00C1D040 /* フリック.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
