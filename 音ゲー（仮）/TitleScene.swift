@@ -6,6 +6,8 @@
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
 //
 
+//（9/11の成果が残っている？）
+
 import SpriteKit
 import GameplayKit
 
