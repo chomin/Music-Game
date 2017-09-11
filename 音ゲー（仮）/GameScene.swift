@@ -18,10 +18,16 @@ class GameScene: SKScene {//音ゲーをするシーン
 	var flickSound2:AVAudioPlayer?
 	var tapSound1:AVAudioPlayer?
 	var tapSound2:AVAudioPlayer?
+	var tapSound3:AVAudioPlayer?
+	var tapSound4:AVAudioPlayer?
+	var kara1:AVAudioPlayer?
+	var kara2:AVAudioPlayer?
+	var kara3:AVAudioPlayer?
+	var kara4:AVAudioPlayer?
 	
 	
 	//画像
-	var noteImage:[SKShapeNode] = []
+//	var noteImage:[SKShapeNode] = []  //notesとの対応は失われた→notesの中に
 	var longImages:[SKShapeNode] = []
 	var judgeLine:SKShapeNode!
 //	//確認用
@@ -36,7 +42,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	//ボタン
 	let buttons = [UIButton(),UIButton(),UIButton(),UIButton(),UIButton(),UIButton(),UIButton()]
 	
-	static var notes:[Note] = []
+	static var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	var start:TimeInterval!	  //シーン移動した時の時間
 	static var BPM = 132.0
 	static var offset = 1.0	  //BGM開始の小節
@@ -46,7 +52,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		//スピードの設定
 		speed = 500.0
 		
-		//notesにノーツを入れる(nobuの仕事)
+		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		
 		//確認用
 		let anote=Note()
@@ -65,13 +71,13 @@ class GameScene: SKScene {//音ゲーをするシーン
 		bnote.next=cnote
 		bnote.pos=4.25
 		bnote.type = .Middle
-		GameScene.notes.append(bnote)
+//		GameScene.notes.append(bnote)
 		
 		cnote.lane=1
 		cnote.next=nil
 		cnote.pos=4.5
 		cnote.type = .FlickEnd
-		GameScene.notes.append(cnote)
+//		GameScene.notes.append(cnote)
 		
 		dnote.lane=6
 		dnote.next=nil
@@ -94,29 +100,30 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	override func update(_ currentTime: TimeInterval) {
 
-		//引き算ではなく、時間で位置を設定する
-		for (index,value) in noteImage.enumerated(){
-			var ypos =  self.frame.width/9
-			ypos += (CGFloat(240*GameScene.notes[index].pos/GameScene.BPM)-CGFloat(currentTime - start))*CGFloat(speed)
-			value.position.y = ypos
+		//引き算ではなく、時間で位置を設定する(ノーツが多いと重くなるかも？)
+		for i in GameScene.notes{
+			
+			setYPos(note: i, currentTime: currentTime)
+
+			var note:Note? = i
+			while note?.next != nil{
+				setYPos(note: (note?.next)!, currentTime: currentTime)
+				
+				note = note?.next
+			}
 		}
 		
-		//確認用
-//		triangle?.position.y = self.frame.width/9
-//		circle?.position.y = self.frame.width/9
-//		gcircle?.position.y = self.frame.width/9
-//		line?.position.y = self.frame.width/9
-
-		
-		
+	
 	}
 }
 
 class Note{
 	var type:NoteType = .Tap
-	var next:Note? = nil  //ロングノーツの場合、次のノーツ
+	var next:Note?   //ロングノーツの場合、次のノーツ
 	var pos:Double = 0.0  //何小節目か
 	var lane:Int = 0
+	
+	var image:SKShapeNode!	  //ノーツの画像
 }
 
 enum NoteType{
