@@ -16,14 +16,8 @@ extension GameScene{
 		BGM = setSound(fileName: "シュガビタ")
 		tapSound1 = setSound(fileName: "タップ")
 		tapSound2 = setSound(fileName: "タップ")
-		tapSound3 = setSound(fileName: "タップ")
-		tapSound4 = setSound(fileName: "タップ")
 		flickSound1 = setSound(fileName: "フリック")
 		flickSound2 = setSound(fileName: "フリック")
-		kara1 = setSound(fileName: "空打ち")
-		kara2 = setSound(fileName: "空打ち")
-		kara3 = setSound(fileName: "空打ち")
-		kara4 = setSound(fileName: "空打ち")
 		
 		BGM!.numberOfLoops = 0	//１度だけ再生
 	}
