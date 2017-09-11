@@ -43,6 +43,7 @@ class Note {
 	var pos: Double
 	var lane: Int
 	var next: Note?
+	// var image:SKShapeNode!	  //ノーツの画像
 
 	init(type: NoteType, position pos: Double, lane: Int) {
 	    self.type = type
@@ -195,7 +196,7 @@ for mainData in processedMainData {
 			longNotes1.append(
 				Note(
 				type: NoteType.tap,
-				position: mainData.bar * 4 + unitBeat * index,
+				position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
 				lane: laneMap[mainData.channel]
 				)
 			)
@@ -203,7 +204,7 @@ for mainData in processedMainData {
 			longNotes1.append(
 				Note(
 				type: NoteType.middle,
-				position: mainData.bar * 4 + unitBeat * index,
+				position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
 				lane: laneMap[mainData.channel]
 				)
 			)
