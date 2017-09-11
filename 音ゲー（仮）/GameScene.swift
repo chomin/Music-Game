@@ -12,7 +12,7 @@ import AVFoundation
 
 class GameScene: SKScene {//音ゲーをするシーン
 	
-	//音楽プレイヤー（9/11の成果が残っている？）
+	//音楽プレイヤー（成功したんじゃね？）
 	var BGM:AVAudioPlayer?
 	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る
 	var flickSound2:AVAudioPlayer?
