@@ -40,7 +40,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	
 	//ボタン
-	let buttons = [UIButton(),UIButton(),UIButton(),UIButton(),UIButton(),UIButton(),UIButton()]
+	let buttons = [ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton()]
 	
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	var start:TimeInterval!	  //シーン移動した時の時間
@@ -60,7 +60,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	override func didMove(to view: SKView) {
 		
 		//スピードの設定
-		speed = 500.0
+		speed = 700.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {

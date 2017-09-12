@@ -22,6 +22,7 @@ extension GameScene{
 			value.layer.borderColor = UIColor.red.cgColor
 			value.layer.borderWidth = 2.0
 			value.layer.cornerRadius = width/18
+			value.insets = UIEdgeInsetsMake(50, 50, 50, 50)	  //認識領域のみを広げる
 			self.view!.addSubview(value)
 			
 
@@ -69,4 +70,19 @@ extension GameScene{
 	}
 }
 
+class ExpansionButton: UIButton {	//認識領域のみを広げる下準備
+	
+	var insets = UIEdgeInsetsMake(0, 0, 0, 0)
+	
+	override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+		var rect = bounds
+		rect.origin.x -= insets.left
+		rect.origin.y -= insets.top
+		rect.size.width += insets.left + insets.right
+		rect.size.height += insets.top + insets.bottom
+		
+		// 拡大したViewサイズがタップ領域に含まれているかどうかを返します
+		return rect.contains(point)
+	}
+}
 
