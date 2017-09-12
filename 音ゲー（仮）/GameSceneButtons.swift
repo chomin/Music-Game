@@ -24,6 +24,25 @@ extension GameScene{
 			value.layer.cornerRadius = width/18
 			self.view!.addSubview(value)
 			
+
+			//スワイプした時の動作
+			let swipeUp = UISwipeGestureRecognizer()
+			swipeUp.direction = UISwipeGestureRecognizerDirection.up
+			swipeUp.addTarget(self, action:#selector(GameScene.flick(_:)))
+			value.addGestureRecognizer(swipeUp)	  //ボタンをviewとして...
+			let swipeRight = UISwipeGestureRecognizer()
+			swipeRight.direction = UISwipeGestureRecognizerDirection.right
+			swipeRight.addTarget(self, action:#selector(GameScene.flick(_:)))
+			value.addGestureRecognizer(swipeRight)
+			let swipeDown = UISwipeGestureRecognizer()
+			swipeDown.direction = UISwipeGestureRecognizerDirection.down
+			swipeDown.addTarget(self, action:#selector(GameScene.flick(_:)))
+			value.addGestureRecognizer(swipeDown)
+			let swipeLeft = UISwipeGestureRecognizer()
+			swipeLeft.direction = UISwipeGestureRecognizerDirection.left
+			swipeLeft.addTarget(self, action:#selector(GameScene.flick(_:)))
+			value.addGestureRecognizer(swipeLeft)
+			
 			value.addTarget(self, action: #selector(GameScene.touchDown(_:)), for: .touchDown)
 		}
 	}
@@ -41,4 +60,13 @@ extension GameScene{
 		}
 	}
 
+	func flick(_ sender:UISwipeGestureRecognizer){
+		print("フリック！")
+		
+		if let button = sender.view as? UIButton{	  //viewをUIButtonとして...
+			print(button.tag)
+		}
+	}
 }
+
+
