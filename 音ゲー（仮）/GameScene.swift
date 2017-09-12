@@ -53,6 +53,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		speed = 500.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
+		parse(fineName: "シュガーソングとビターステップ")
 		
 		//確認用
 		let anote=Note()

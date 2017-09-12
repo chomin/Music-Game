@@ -8,12 +8,9 @@
 //（9/11の成果が残っている？）
 
 
-class ReadBMS{//bmsファイルを読み込む(nobu-gがつくってくれる)
-	static var bmsName = ""
-	
-	
-	
-	func setFumen(){
+extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれる)
+
+	func parse(fineName:String){
 		
 	}
 	
