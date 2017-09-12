@@ -65,8 +65,16 @@ class GameScene: SKScene {//音ゲーをするシーン
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
 			try parse(fileName: "シュガーソングとビターステップ.bms")
-		}catch {
-			
+		}
+		catch FileError.invalidName     (let msg) { print(msg) }
+		catch FileError.notFound        (let msg) { print(msg) }
+		catch FileError.readFailed      (let msg) { print(msg) }
+		catch ParseError.lackOfData     (let msg) { print(msg) }
+		catch ParseError.invalidValue   (let msg) { print(msg) }
+		catch ParseError.noLongNoteStart(let msg) { print(msg) }
+		catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
+		catch {
+			print("未知のエラー")
 		}
 		
 		bpm *= 4.0	//拍を小節だと勘違いしてましたすみません

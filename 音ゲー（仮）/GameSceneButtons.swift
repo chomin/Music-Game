@@ -66,6 +66,7 @@ extension GameScene{
 		
 		if let button = sender.view as? UIButton{	  //viewをUIButtonとして...
 			print(button.tag)
+			//1フリックでも1か2、2フリックでも2か3...などと表示（認識）される！
 		}
 	}
 }
