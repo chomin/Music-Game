@@ -27,25 +27,30 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	
 	//画像
-//	var noteImage:[SKShapeNode] = []  //notesとの対応は失われた→notesの中に
+	//	var noteImage:[SKShapeNode] = []  //notesとの対応は失われた→notesの中に
 	var longImages:[SKShapeNode] = []
 	var judgeLine:SKShapeNode!
-//	//確認用
-//	var triangle:SKShapeNode? = nil
-//	var line:SKShapeNode? = nil
-//	var circle:SKShapeNode? = nil
-//	var gcircle:SKShapeNode? = nil
-//	var long:SKShapeNode? = nil
-
+	//	//確認用
+	//	var triangle:SKShapeNode? = nil
+	//	var line:SKShapeNode? = nil
+	//	var circle:SKShapeNode? = nil
+	//	var gcircle:SKShapeNode? = nil
+	//	var long:SKShapeNode? = nil
+	
 	
 	
 	//ボタン
 	let buttons = [UIButton(),UIButton(),UIButton(),UIButton(),UIButton(),UIButton(),UIButton()]
 	
-	static var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
+	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	var start:TimeInterval!	  //シーン移動した時の時間
-	static var BPM = 132.0
-	static var offset = 1.0	  //BGM開始の小節
+	var BPM = 132.0
+	var musicStartPos = 1.0	  //BGM開始の小節
+	var ganre = ""
+	var title = ""
+	var artist = ""
+	var playLebel = 0
+	
 	
 	override func didMove(to view: SKView) {
 		
@@ -65,7 +70,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		anote.next=bnote
 		anote.pos=4
 		anote.type = .Tap
-		GameScene.notes.append(anote)
+		notes.append(anote)
 		
 		
 		bnote.lane=2
@@ -84,7 +89,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		dnote.next=nil
 		dnote.pos=4.125
 		dnote.type = .Tap
-		GameScene.notes.append(dnote)
+		notes.append(dnote)
 		
 		//画像、音楽、ボタン、ラベルの設定
 		setAllSounds()
@@ -93,7 +98,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		//BGMの再生(時間指定)
 		start = CACurrentMediaTime()
-		BGM!.play(atTime: start + GameScene.offset/GameScene.BPM/240)
+		BGM!.play(atTime: start + musicStartPos/BPM/240)
 		
 		
 	}
@@ -102,7 +107,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	override func update(_ currentTime: TimeInterval) {
 
 		//引き算ではなく、時間で位置を設定する(ノーツが多いと重くなるかも？)
-		for i in GameScene.notes{
+		for i in notes{
 			
 			setYPos(note: i, currentTime: currentTime)
 
