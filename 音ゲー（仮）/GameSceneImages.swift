@@ -146,7 +146,7 @@ extension GameScene{
 		}
 		
 		var ypos =  self.frame.width/9
-		ypos += (CGFloat(240*i.pos/BPM))*CGFloat(speed)
+		ypos += (CGFloat(240*i.pos/bpm))*CGFloat(speed)
 		
 		note.position = CGPoint(x:xpos ,y:ypos)
 		
@@ -159,7 +159,7 @@ extension GameScene{
 	
 	func setYPos (note:Note ,currentTime:TimeInterval)  {
 		var ypos =  self.frame.width/9
-		ypos += (CGFloat(240*note.pos/BPM)-CGFloat(currentTime - start))*CGFloat(speed)
+		ypos += (CGFloat(240*note.pos/bpm)-CGFloat(currentTime - start))*CGFloat(speed)
 		note.image?.position.y = ypos
 	}
 }

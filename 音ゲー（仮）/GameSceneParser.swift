@@ -23,6 +23,8 @@ catch ParseError.noLongNoteStart(let msg) { print(msg) }
 catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
 */
 
+import SpriteKit
+
 extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれる)
 
 	// ファイルエラー定義列挙体
@@ -40,14 +42,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		case noLongNoteEnd(String)
 	}
 
-	// 楽曲データ
-	var genre = ""				// ジャンル
-	var title = ""				// タイトル
-	var artist = ""				// アーティスト
-	var bpm = 130				// Beats per Minute
-	var playLevel = 0			// 難易度
-	var volWav = 100			// 音量を現段階のn%として出力するか
-	var musicStartPos = 0.0		// 楽曲演奏を開始するタイミング(拍単位)
+
 
 	// 譜面データ(NoteTypeとNoteの定義はおそらくほかのファイルでもするだろうから統合してほしい)
 	enum NoteType {
@@ -56,10 +51,10 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 
 	class Note {
 		let type: NoteType
-		let pos: Double
+		let pos: Double //"拍"単位！小節ではない！！！
 		let lane: Int
 		var next: Note?
-		// var image:SKShapeNode!	  //ノーツの画像
+		var image:SKShapeNode!	  //ノーツの画像
 
 		init(type: NoteType, position pos: Double, lane: Int) {
 		    self.type = type
@@ -69,8 +64,8 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		}
 	}
 
-	// ノーツの始点の集合
-	var notes: [Note] = []
+//	// ノーツの始点の集合
+//	var notes: [Note] = []
 
 
 	// ファイルの読み込み
@@ -86,7 +81,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 
 		// 譜面データファイルのパスを取得
 		// iPhone内のパスを指定するように変えてね
-		if let path: String = Bundle.main.path(forResource: dataFileName, ofType: dataFileType) {
+		if let path = Bundle.main.path(forResource: dataFileName, ofType: dataFileType) {
 			do {
 		        // ファイルの内容を取得する
 		        let content = try String(contentsOfFile: path, encoding: String.Encoding.shiftJIS)
@@ -133,12 +128,12 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 
 		// コマンド文字列を命令と結びつける辞書
 		let headerInstructionTable: [String: (String) -> ()] = [
-			"GENRE":     { value in genre     = value },
-			"TITLE":     { value in title     = value },
-			"ARTIST":    { value in artist    = value },
-			"BPM":       { value in if let num = Int(value) { bpm       = num } },
-			"PLAYLEVEL": { value in if let num = Int(value) { playLevel = num } },
-			"VOLWAV":    { value in if let num = Int(value) { volWav    = num } }
+			"GENRE":     { value in self.genre     = value },
+			"TITLE":     { value in self.title     = value },
+			"ARTIST":    { value in self.artist    = value },
+			"BPM":       { value in if let num = Double(value) { self.bpm    = num } },
+			"PLAYLEVEL": { value in if let num = Int(value) { self.playLevel = num } },
+			"VOLWAV":    { value in if let num = Int(value) { self.volWav    = num } }
 		]
 
 		// 1行ずつ処理

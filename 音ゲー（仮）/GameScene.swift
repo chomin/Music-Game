@@ -44,12 +44,17 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	var start:TimeInterval!	  //シーン移動した時の時間
-	var BPM = 132.0
-	var musicStartPos = 1.0	  //BGM開始の小節
-	var ganre = ""
-	var title = ""
-	var artist = ""
+//	var BPM = 132.0
+	var musicStartPos = 1.0	  //BGM開始の"拍"！
 	var playLebel = 0
+	// 楽曲データ
+	var genre = ""				// ジャンル
+	var title = ""				// タイトル
+	var artist = ""				// アーティスト
+	var bpm = 132.0				// Beats per Minute
+	var playLevel = 0			// 難易度
+	var volWav = 100			// 音量を現段階のn%として出力するか
+//	var musicStartPos = 0.0		// 楽曲演奏を開始するタイミング(拍単位)
 	
 	
 	override func didMove(to view: SKView) {
@@ -58,38 +63,15 @@ class GameScene: SKScene {//音ゲーをするシーン
 		speed = 500.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
-		parse(fineName: "シュガーソングとビターステップ")
+		do {
+			try parse(fileName: "シュガーソングとビターステップ.bms")
+		}catch {
+			
+		}
 		
-		//確認用
-		let anote=Note()
-		let bnote=Note()
-		let cnote=Note()
-		let dnote=Note()
+		bpm *= 4.0	//拍を小節だと勘違いしてましたすみません
 		
-		anote.lane=2
-		anote.next=bnote
-		anote.pos=4
-		anote.type = .tap
-		notes.append(anote)
-		
-		
-		bnote.lane=2
-		bnote.next=cnote
-		bnote.pos=4.25
-		bnote.type = .middle
-//		GameScene.notes.append(bnote)
-		
-		cnote.lane=1
-		cnote.next=nil
-		cnote.pos=4.5
-		cnote.type = .flickEnd
-//		GameScene.notes.append(cnote)
-		
-		dnote.lane=6
-		dnote.next=nil
-		dnote.pos=4.125
-		dnote.type = .tap
-		notes.append(dnote)
+
 		
 		//画像、音楽、ボタン、ラベルの設定
 		setAllSounds()
@@ -98,7 +80,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		//BGMの再生(時間指定)
 		start = CACurrentMediaTime()
-		BGM!.play(atTime: start + musicStartPos/BPM/240)
+		BGM!.play(atTime: start + (musicStartPos/bpm)*240)
 		
 		
 	}
@@ -123,15 +105,15 @@ class GameScene: SKScene {//音ゲーをするシーン
 	}
 }
 
-class Note{
-	var type:NoteType = .tap
-	var next:Note?   //ロングノーツの場合、次のノーツ
-	var pos:Double = 0.0  //何小節目か
-	var lane:Int = 0
-	
-	var image:SKShapeNode!	  //ノーツの画像
-}
-
-enum NoteType{
-	case tap,flick,middle,tapEnd,flickEnd
-}
+//class Note{
+//	var type:NoteType = .tap
+//	var next:Note?   //ロングノーツの場合、次のノーツ
+//	var pos:Double = 0.0  //何小節目か
+//	var lane:Int = 0
+//	
+//	var image:SKShapeNode!	  //ノーツの画像
+//}
+//
+//enum NoteType{
+//	case tap,flick,middle,tapEnd,flickEnd
+//}
