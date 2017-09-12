@@ -69,26 +69,26 @@ class GameScene: SKScene {//音ゲーをするシーン
 		anote.lane=2
 		anote.next=bnote
 		anote.pos=4
-		anote.type = .Tap
+		anote.type = .tap
 		notes.append(anote)
 		
 		
 		bnote.lane=2
 		bnote.next=cnote
 		bnote.pos=4.25
-		bnote.type = .Middle
+		bnote.type = .middle
 //		GameScene.notes.append(bnote)
 		
 		cnote.lane=1
 		cnote.next=nil
 		cnote.pos=4.5
-		cnote.type = .FlickEnd
+		cnote.type = .flickEnd
 //		GameScene.notes.append(cnote)
 		
 		dnote.lane=6
 		dnote.next=nil
 		dnote.pos=4.125
-		dnote.type = .Tap
+		dnote.type = .tap
 		notes.append(dnote)
 		
 		//画像、音楽、ボタン、ラベルの設定
@@ -124,7 +124,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 }
 
 class Note{
-	var type:NoteType = .Tap
+	var type:NoteType = .tap
 	var next:Note?   //ロングノーツの場合、次のノーツ
 	var pos:Double = 0.0  //何小節目か
 	var lane:Int = 0
@@ -133,5 +133,5 @@ class Note{
 }
 
 enum NoteType{
-	case Tap,Flick,Middle,TapEnd,FlickEnd
+	case tap,flick,middle,tapEnd,flickEnd
 }

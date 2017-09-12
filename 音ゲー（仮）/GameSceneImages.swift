@@ -39,11 +39,11 @@ extension GameScene{
 				
 				//まず、始点&終点ノーツが円か線かで中心座標が異なるため場合分け
 				var startNotepos:CGPoint =  (note?.image.position)! //中心座標
-				if note?.type == .Middle{//線だけずらす
+				if note?.type == .middle{//線だけずらす
 					startNotepos.x += (self.frame.width/18)
 				}
 				var endNotepos:CGPoint =  (note?.next?.image?.position)! //中心座標
-				if note?.next!.type == .Middle{//線だけずらす
+				if note?.next!.type == .middle{//線だけずらす
 					endNotepos.x += (self.frame.width/18)
 				}
 				
@@ -109,7 +109,7 @@ extension GameScene{
 		var note:SKShapeNode
 		
 		//形と色
-		if i.type == .Flick || i.type == .FlickEnd{//三角形(endはnotesに入らないから不要)
+		if i.type == .flick || i.type == .flickEnd{//三角形(endはnotesに入らないから不要)
 			let length = self.frame.width/18 //一辺の長さの半分
 			
 			// 始点から終点までの４点を指定.
@@ -122,7 +122,7 @@ extension GameScene{
 			
 			note.fillColor = UIColor.magenta
 			
-		}else if i.type == .Middle{//線(notesに入らないから不要)
+		}else if i.type == .middle{//線(notesに入らないから不要)
 			var points = [CGPoint(x:0.0 ,y:0.0) ,CGPoint(x:self.frame.width/9 ,y:0.0)]
 			note = SKShapeNode(points: &points, count: points.count)
 			
@@ -130,7 +130,7 @@ extension GameScene{
 			
 			note.strokeColor = UIColor.green
 			
-		}else if i.type == .TapEnd || i.next != nil{//緑円(middleもnextがnilにならないことに注意！)(notesに入らないから不要)
+		}else if i.type == .tapEnd || i.next != nil{//緑円(middleもnextがnilにならないことに注意！)(notesに入らないから不要)
 			note = SKShapeNode(circleOfRadius: self.frame.width/18)
 			note.fillColor = UIColor.green
 		}else{//白円
@@ -141,7 +141,7 @@ extension GameScene{
 		
 		//位置(ロングノーツに必要なため、ここでyも設定)
 		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(i.lane-1)
-		if i.type == .Middle{ //線だけずらす(開始点がposition)
+		if i.type == .middle{ //線だけずらす(開始点がposition)
 			xpos -= (self.frame.width/18)
 		}
 		
