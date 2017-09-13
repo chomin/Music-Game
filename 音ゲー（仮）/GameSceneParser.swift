@@ -64,7 +64,8 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			do {
 		        // ファイルの内容を取得する
 		        let content = try String(contentsOfFile: path, encoding: String.Encoding.shiftJIS)
-		        return content.components(separatedBy: "\r\n")
+
+		        return content.components(separatedBy: .newlines)
 		    } catch  {
 				throw FileError.readFailed("ファイルの内容取得に失敗")
 		    }

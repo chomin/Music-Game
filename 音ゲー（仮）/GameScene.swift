@@ -35,7 +35,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	let buttons = [ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton()]
 	
 	// 楽曲データ
-	let bmsName = "シュガーソングとビターステップ.bms"
+	let bmsName = "ようこそジャパリパークへ.bms"
 	let bgmName = "ようこそジャパリパークへ"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
@@ -69,6 +69,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		catch                                     { print("未知のエラー") }
 
 		print(notes.count)
+		print(GameScene.bpm)
 		
 		//画像、音楽、ボタン、ラベルの設定
 		setAllSounds()
