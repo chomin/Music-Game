@@ -44,28 +44,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 
 
 
-	// 譜面データ(NoteTypeとNoteの定義はおそらくほかのファイルでもするだろうから統合してほしい)
-	enum NoteType {
-		case tap, flick, middle, tapEnd, flickEnd
-	}
-
-	class Note {
-		let type: NoteType
-		let pos: Double //"拍"単位！小節ではない！！！
-		let lane: Int
-		var next: Note?
-		var image:SKShapeNode!	  //ノーツの画像
-
-		init(type: NoteType, position pos: Double, lane: Int) {
-		    self.type = type
-			self.pos = pos
-			self.lane = lane
-			self.next = nil
-		}
-	}
-
-//	// ノーツの始点の集合
-//	var notes: [Note] = []
+	
 
 
 	// ファイルの読み込み
@@ -131,7 +110,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			"GENRE":     { value in self.genre     = value },
 			"TITLE":     { value in self.title     = value },
 			"ARTIST":    { value in self.artist    = value },
-			"BPM":       { value in if let num = Double(value) { self.bpm    = num } },
+			"BPM":       { value in if let num = Double(value) { GameScene.bpm    = num } },
 			"PLAYLEVEL": { value in if let num = Int(value) { self.playLevel = num } },
 			"VOLWAV":    { value in if let num = Int(value) { self.volWav    = num } }
 		]

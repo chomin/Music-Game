@@ -92,14 +92,6 @@ extension GameScene{
 			}
 			
 		}
-		
-//		//ロングノーツをつなげる（つなげる先のノーツの位置が決まっている必要があるためこの位置）
-//		for (index,value) in GameScene.notes.enumerated(){
-//			if value.next != nil{
-//				
-//				
-//			}
-//		}
 
 
 	}
@@ -146,7 +138,7 @@ extension GameScene{
 		}
 		
 		var ypos =  self.frame.width/9
-		ypos += (CGFloat(240*i.pos/bpm))*CGFloat(speed)
+		ypos += (CGFloat(60*i.pos/bpm))*CGFloat(speed)
 		
 		note.position = CGPoint(x:xpos ,y:ypos)
 		
@@ -159,7 +151,7 @@ extension GameScene{
 	
 	func setYPos (note:Note ,currentTime:TimeInterval)  {
 		var ypos =  self.frame.width/9
-		ypos += (CGFloat(240*note.pos/bpm)-CGFloat(currentTime - start))*CGFloat(speed)
+		ypos += (CGFloat(60*note.pos/bpm)-CGFloat(currentTime - start))*CGFloat(speed)
 		note.image?.position.y = ypos
 	}
 }

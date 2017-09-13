@@ -22,7 +22,7 @@ extension GameScene{
 			value.layer.borderColor = UIColor.red.cgColor
 			value.layer.borderWidth = 2.0
 			value.layer.cornerRadius = width/18
-			value.insets = UIEdgeInsetsMake(50, 50, 50, 50)	  //認識領域のみを広げる
+			value.insets = UIEdgeInsetsMake(100, 0, 100 ,0)  //認識領域のみを広げる(top,left,bottom,right)
 			self.view!.addSubview(value)
 			
 
@@ -66,7 +66,6 @@ extension GameScene{
 		
 		if let button = sender.view as? UIButton{	  //viewをUIButtonとして...
 			print(button.tag)
-			//1フリックでも1か2、2フリックでも2か3...などと表示（認識）される！
 		}
 	}
 }
