@@ -35,8 +35,10 @@ class GameScene: SKScene {//音ゲーをするシーン
 	let buttons = [ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton()]
 	
 	// 楽曲データ
+	let bmsName = "シュガーソングとビターステップ.bms"
+	let bgmName = "ようこそジャパリパークへ"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
-	static var start:TimeInterval!	  //シーン移動した時の時間
+	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
 	var musicStartPos = 1.0	  //BGM開始の"拍"！
 	var playLebel = 0
 	var genre = ""				// ジャンル
@@ -55,7 +57,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
-			try parse(fileName: "シュガーソングとビターステップ.bms")
+			try parse(fileName: bmsName)
 		}
 		catch FileError.invalidName     (let msg) { print(msg) }
 		catch FileError.notFound        (let msg) { print(msg) }
@@ -66,6 +68,8 @@ class GameScene: SKScene {//音ゲーをするシーン
 		catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
 		catch                                     { print("未知のエラー") }
 
+		print(notes.count)
+		
 		//画像、音楽、ボタン、ラベルの設定
 		setAllSounds()
 		setButtons()
@@ -76,24 +80,24 @@ class GameScene: SKScene {//音ゲーをするシーン
 		BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
 		
 		//各レーンに最初の判定対象ノーツをセット
-		for (index,_) in lanes.enumerated(){
-			first: for i in notes{
-				if i.lane == index+1 {
-					lanes[index].nextNote = i
-					break
-				}
-				
-				var note:Note! = i.next
-				
-				while note != nil {
-					if note.next.lane == index+1 {
-						lanes[index].nextNote = note.next
-						break first
-					}
-					note = note.next
-				}
-			}
-		}
+//		for (index,_) in lanes.enumerated(){
+//			first: for i in notes{
+//				if i.lane == index+1 {
+//					lanes[index].nextNote = i
+//					break
+//				}
+//				
+//				var note:Note! = i.next
+//				
+//				while note != nil {
+//					if note.next.lane == index+1 {
+//						lanes[index].nextNote = note.next
+//						break first
+//					}
+//					note = note.next
+//				}
+//			}
+//		}
 		
 		
 	}
@@ -103,6 +107,8 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		//時間でノーツの位置を設定する(ノーツが多いと重くなるかも？)
 		for i in notes{
+			
+			
 			
 			setYPos(note: i, currentTime: currentTime)
 			
@@ -115,20 +121,20 @@ class GameScene: SKScene {//音ゲーをするシーン
 			}
 		}
 		
-		//レーンの監視(過ぎて行ってないか)
-		for (index,value) in lanes.enumerated(){
-			lanes[index].currentTime = currentTime
-			if value.timeState == .passed {
-				print("miss!")
-				lanes[index].nextNote.image.isHidden = true
-				
-				//次のノーツを格納
-				var note:Note! = value.nextNote
-				while note != nil {
-					break
-				}
-			}
-		}
+//		//レーンの監視(過ぎて行ってないか)
+//		for (index,value) in lanes.enumerated(){
+//			lanes[index].currentTime = currentTime
+//			if value.timeState == .passed {
+//				print("miss!")
+//				lanes[index].nextNote.image.isHidden = true
+//				
+//				//次のノーツを格納
+//				var note:Note! = value.nextNote
+//				while note != nil {
+//					break
+//				}
+//			}
+//		}
 		
 		
 	}
@@ -160,7 +166,7 @@ enum TimeState {
 struct Lane {
 	var timeState:TimeState{
 		get{
-			let timeLag = nextNote.pos*60/GameScene.bpm + GameScene.start! - currentTime
+			let timeLag = nextNote.pos*60/GameScene.bpm + GameScene.start - currentTime
 			
 			switch timeLag>0 ? timeLag : -timeLag {
 			case 0..<0.07:

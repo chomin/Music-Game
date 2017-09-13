@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F4C89EB1F696FD5004843A5 /* ようこそジャパリパークへ.bms in Resources */ = {isa = PBXBuildFile; fileRef = 0F4C89E91F696FD5004843A5 /* ようこそジャパリパークへ.bms */; };
+		0F4C89EC1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0F4C89EA1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 */; };
 		0F5EE8D71F67F92E00E56B36 /* シュガーソングとビターステップ.bms in Resources */ = {isa = PBXBuildFile; fileRef = 0F5EE8D61F67F92E00E56B36 /* シュガーソングとビターステップ.bms */; };
 		0F746F471F5EEDB000C1D040 /* GameSceneImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F746F461F5EEDB000C1D040 /* GameSceneImages.swift */; };
 		0F746F491F5EEDC200C1D040 /* GameSceneButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F746F481F5EEDC200C1D040 /* GameSceneButtons.swift */; };
@@ -47,6 +49,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0F4C89E91F696FD5004843A5 /* ようこそジャパリパークへ.bms */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ようこそジャパリパークへ.bms"; sourceTree = "<group>"; };
+		0F4C89EA1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ようこそジャパリパークへ.mp3"; sourceTree = "<group>"; };
 		0F5EE8D61F67F92E00E56B36 /* シュガーソングとビターステップ.bms */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "シュガーソングとビターステップ.bms"; sourceTree = "<group>"; };
 		0F746F461F5EEDB000C1D040 /* GameSceneImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameSceneImages.swift; sourceTree = "<group>"; };
 		0F746F481F5EEDC200C1D040 /* GameSceneButtons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameSceneButtons.swift; sourceTree = "<group>"; };
@@ -149,6 +153,8 @@
 				0FFD1B791F5E71810007E555 /* TitleScene.swift */,
 				0FFD1B4B1F5E6D2B0007E555 /* GameViewController.swift */,
 				0F5EE8D61F67F92E00E56B36 /* シュガーソングとビターステップ.bms */,
+				0F4C89E91F696FD5004843A5 /* ようこそジャパリパークへ.bms */,
+				0F4C89EA1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 */,
 				0FFD1B501F5E6D2B0007E555 /* Assets.xcassets */,
 				0FFD1B551F5E6D2B0007E555 /* Info.plist */,
 			);
@@ -290,6 +296,8 @@
 				0F746F5E1F5F950E00C1D040 /* Main.storyboard in Resources */,
 				0F746F601F5F95F700C1D040 /* シュガビタ.mp3 in Resources */,
 				0F746F5D1F5F950E00C1D040 /* LaunchScreen.storyboard in Resources */,
+				0F4C89EB1F696FD5004843A5 /* ようこそジャパリパークへ.bms in Resources */,
+				0F4C89EC1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 in Resources */,
 				0FBB24981F6154730053C68B /* 空打ち.mp3 in Resources */,
 				0F746F511F5EFF0A00C1D040 /* フリック.mp3 in Resources */,
 			);

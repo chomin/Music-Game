@@ -13,7 +13,7 @@ import AVFoundation
 extension GameScene{
 	
 	func setAllSounds(){
-		BGM = setSound(fileName: "シュガビタ")
+		BGM = setSound(fileName: bgmName)
 		tapSound1 = setSound(fileName: "タップ")
 		tapSound2 = setSound(fileName: "タップ")
 		tapSound3 = setSound(fileName: "タップ")
