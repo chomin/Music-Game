@@ -81,24 +81,24 @@ class GameScene: SKScene {//音ゲーをするシーン
 		BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
 		
 		//各レーンに最初の判定対象ノーツをセット
-//		for (index,_) in lanes.enumerated(){
-//			first: for i in notes{
-//				if i.lane == index+1 {
-//					lanes[index].nextNote = i
-//					break
-//				}
-//				
-//				var note:Note! = i.next
-//				
-//				while note != nil {
-//					if note.next.lane == index+1 {
-//						lanes[index].nextNote = note.next
-//						break first
-//					}
-//					note = note.next
-//				}
-//			}
-//		}
+		for (index,_) in lanes.enumerated(){
+			first: for i in notes{
+				if i.lane == index+1 {
+					lanes[index].nextNote = i
+					break
+				}
+				
+				var note:Note! = i.next
+				
+				while note != nil {
+					if note.next.lane == index+1 {
+						lanes[index].nextNote = note.next
+						break first
+					}
+					note = note.next
+				}
+			}
+		}
 		
 		
 	}
@@ -190,6 +190,6 @@ struct Lane {
 		}
 	}
 	var nextNote:Note!
-	var currentTime:TimeInterval!
+	var currentTime:TimeInterval = 0.0
 	
 }
