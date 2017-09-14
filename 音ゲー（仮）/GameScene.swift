@@ -12,6 +12,8 @@ import AVFoundation
 
 class GameScene: SKScene {//音ゲーをするシーン
 	
+	//判定ラベル
+	var judgeLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
 	
 	//音楽プレイヤー
 	var BGM:AVAudioPlayer?
@@ -52,8 +54,23 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	override func didMove(to view: SKView) {
 		
+		//ラベルの設定
+		judgeLabel = {() -> SKLabelNode in
+			let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+			
+			Label.fontSize = self.frame.width/36
+			Label.horizontalAlignmentMode = .center	//中央寄せ
+				Label.position = CGPoint(x:self.frame.midX, y:self.frame.width/9*2)
+				Label.fontColor=SKColor.yellow
+			
+			self.addChild(Label)
+			return Label
+		}()
+		
+
+		
 		//スピードの設定
-		speed = 700.0
+		speed = 800.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
@@ -80,26 +97,16 @@ class GameScene: SKScene {//音ゲーをするシーン
 		GameScene.start = CACurrentMediaTime()
 		BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
 		
-		//各レーンに最初の判定対象ノーツをセット
-		for (index,_) in lanes.enumerated(){
-			first: for i in notes{
-				if i.lane == index+1 {
-					lanes[index].nextNote = i
-					break
-				}
-				
-				var note:Note! = i.next
-				
-				while note != nil {
-					if note.next.lane == index+1 {
-						lanes[index].nextNote = note.next
-						break first
-					}
-					note = note.next
-				}
+		//各レーンにノーツをセット
+		for i in notes{
+			lanes[i.lane-1].laneNotes.append(i)
+			
+			var note:Note! = i
+			while note.next != nil {
+				lanes[note.next.lane-1].laneNotes.append(note.next)
+				note = note.next
 			}
 		}
-		
 		
 	}
 	
@@ -108,9 +115,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		//時間でノーツの位置を設定する(ノーツが多いと重くなるかも？)
 		for i in notes{
-			
-			
-			
+
 			setYPos(note: i, currentTime: currentTime)
 			
 			var note:Note? = i
@@ -122,20 +127,18 @@ class GameScene: SKScene {//音ゲーをするシーン
 			}
 		}
 		
-//		//レーンの監視(過ぎて行ってないか)
-//		for (index,value) in lanes.enumerated(){
-//			lanes[index].currentTime = currentTime
-//			if value.timeState == .passed {
-//				print("miss!")
-//				lanes[index].nextNote.image.isHidden = true
-//				
-//				//次のノーツを格納
-//				var note:Note! = value.nextNote
-//				while note != nil {
-//					break
-//				}
-//			}
-//		}
+		//レーンの監視(過ぎて行ってないか)
+		for (index,value) in lanes.enumerated(){
+			lanes[index].currentTime = currentTime
+			if value.timeState == .passed {
+				print("miss!")
+				judgeLabel.text = "miss!"
+				lanes[index].laneNotes[value.nextNoteIndex].image.position.x = 1000
+				
+				//次のノーツを格納
+				lanes[index].nextNoteIndex += 1
+			}
+		}
 		
 		
 	}
@@ -167,29 +170,34 @@ enum TimeState {
 struct Lane {
 	var timeState:TimeState{
 		get{
-			let timeLag = nextNote.pos*60/GameScene.bpm + GameScene.start - currentTime
-			
-			switch timeLag>0 ? timeLag : -timeLag {
-			case 0..<0.07:
-				return .parfect
-			case 0.07..<0.1:
-				return .great
-			case 0.1..<0.15:
-				return .good
-			case 0.15..<0.2:
-				return .bad
-			case 0.2..<0.25:
-				return .miss
-			default:
-				if timeLag > 0{
-					return .still
-				}else{
-					return .passed
+			if laneNotes.count > 0{
+				
+				let timeLag = laneNotes[nextNoteIndex].pos*60/GameScene.bpm + GameScene.start - currentTime
+				
+				switch timeLag>0 ? timeLag : -timeLag {
+				case 0..<0.07:
+					return .parfect
+				case 0.07..<0.1:
+					return .great
+				case 0.1..<0.15:
+					return .good
+				case 0.15..<0.2:
+					return .bad
+				case 0.2..<0.25:
+					return .miss
+				default:
+					if timeLag > 0{
+						return .still
+					}else{
+						return .passed
+					}
 				}
+			}else{
+				return .still
 			}
 		}
 	}
-	var nextNote:Note!
+	var nextNoteIndex = 0
 	var currentTime:TimeInterval = 0.0
-	
+	var laneNotes:[Note] = [] //最初に全部格納する！
 }

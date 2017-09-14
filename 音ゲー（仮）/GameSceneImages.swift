@@ -54,10 +54,10 @@ extension GameScene{
 				path.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y))
 				path.closeSubpath()
 				
-				path2.move(to: CGPoint(x:startNotepos.x-self.frame.width/22, y:startNotepos.y+40))  //始点
-				path2.addLine(to: CGPoint(x:startNotepos.x+self.frame.width/22, y:startNotepos.y+40))
-				path2.addLine(to: CGPoint(x:endNotepos.x+self.frame.width/22, y:endNotepos.y-40))
-				path2.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y-40))
+				path2.move(to: CGPoint(x:startNotepos.x-self.frame.width/22, y:startNotepos.y+speed/70*5))  //始点
+				path2.addLine(to: CGPoint(x:startNotepos.x+self.frame.width/22, y:startNotepos.y+speed/70*5))
+				path2.addLine(to: CGPoint(x:endNotepos.x+self.frame.width/22, y:endNotepos.y-speed/70*5))
+				path2.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y-speed/70*5))
 				path2.closeSubpath()
 	
 				let tmplong = SKShapeNode(path:path)
@@ -69,13 +69,14 @@ extension GameScene{
 				
 				tmplong.physicsBody = SKPhysicsBody(polygonFrom :path2)	  //物理演算してしまうが、固定してるから動かない。逆に物理演算しないと連動して動かない！
 				//				tmplong.physicsBody?.isDynamic=false
-				
+//				tmplong.physicsBody?.allowsRotation = false
+//				tmplong.physicsBody?.isResting = true
 				
 				self.addChild(tmplong)
 				
 				
 				//終点ノーツに物理体を追加
-				note?.next?.image?.physicsBody = SKPhysicsBody(circleOfRadius: self.frame.width/18)  //とりあえず円の剛体
+				note?.next?.image?.physicsBody = SKPhysicsBody(circleOfRadius: self.frame.width/300)  //とりあえず円の剛体
 				note?.next?.image?.physicsBody!.isDynamic = false	  //物理演算させない
 				
 				
