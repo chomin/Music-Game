@@ -19,6 +19,8 @@ class GameScene: SKScene {//音ゲーをするシーン
 	var BGM:AVAudioPlayer?
 	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る
 	var flickSound2:AVAudioPlayer?
+	var flickSound3:AVAudioPlayer?    //同時に鳴らせるように2つ作る
+	var flickSound4:AVAudioPlayer?
 	var tapSound1:AVAudioPlayer?
 	var tapSound2:AVAudioPlayer?
 	var tapSound3:AVAudioPlayer?

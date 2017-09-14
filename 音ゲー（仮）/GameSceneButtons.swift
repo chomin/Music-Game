@@ -26,25 +26,28 @@ extension GameScene{
 			self.view!.addSubview(value)
 			
 
-			//スワイプした時の動作
-			let swipeUp = UISwipeGestureRecognizer()
-			swipeUp.direction = UISwipeGestureRecognizerDirection.up
-			swipeUp.addTarget(self, action:#selector(GameScene.flick(_:)))
-			value.addGestureRecognizer(swipeUp)	  //ボタンをviewとして...
-			let swipeRight = UISwipeGestureRecognizer()
-			swipeRight.direction = UISwipeGestureRecognizerDirection.right
-			swipeRight.addTarget(self, action:#selector(GameScene.flick(_:)))
-			value.addGestureRecognizer(swipeRight)
-			let swipeDown = UISwipeGestureRecognizer()
-			swipeDown.direction = UISwipeGestureRecognizerDirection.down
-			swipeDown.addTarget(self, action:#selector(GameScene.flick(_:)))
-			value.addGestureRecognizer(swipeDown)
-			let swipeLeft = UISwipeGestureRecognizer()
-			swipeLeft.direction = UISwipeGestureRecognizerDirection.left
-			swipeLeft.addTarget(self, action:#selector(GameScene.flick(_:)))
-			value.addGestureRecognizer(swipeLeft)
+//			//スワイプした時の動作
+//			let swipeUp = UISwipeGestureRecognizer()
+//			swipeUp.direction = UISwipeGestureRecognizerDirection.up
+//			swipeUp.addTarget(self, action:#selector(GameScene.flick(_:)))
+//			value.addGestureRecognizer(swipeUp)	  //ボタンをviewとして...
+//			let swipeRight = UISwipeGestureRecognizer()
+//			swipeRight.direction = UISwipeGestureRecognizerDirection.right
+//			swipeRight.addTarget(self, action:#selector(GameScene.flick(_:)))
+//			value.addGestureRecognizer(swipeRight)
+//			let swipeDown = UISwipeGestureRecognizer()
+//			swipeDown.direction = UISwipeGestureRecognizerDirection.down
+//			swipeDown.addTarget(self, action:#selector(GameScene.flick(_:)))
+//			value.addGestureRecognizer(swipeDown)
+//			let swipeLeft = UISwipeGestureRecognizer()
+//			swipeLeft.direction = UISwipeGestureRecognizerDirection.left
+//			swipeLeft.addTarget(self, action:#selector(GameScene.flick(_:)))
+//			value.addGestureRecognizer(swipeLeft)
 			
 			value.addTarget(self, action: #selector(GameScene.touchDown(_:)), for: .touchDown)
+			value.addTarget(self, action: #selector(GameScene.touchDragExit(_:)), for: .touchDragExit)//...Insideはタップでも反応する
+//			value.addTarget(self, action: #selector(GameScene.touchDragExit(_:)), for: .touchDragInside)//縦長押しmiddleにしようとしたけど、保留
+
 		}
 	}
 	
@@ -61,7 +64,7 @@ extension GameScene{
 			}else if tapSound4?.isPlaying == false{
 				tapSound4?.play()
 			}
-		}else{
+		}else if lanes[sender.tag-1].timeState == .still{//他の種類の判定対象にもなってない場合
 			if kara1?.isPlaying == false{
 				kara1?.play()
 			}else if kara2?.isPlaying == false{
@@ -75,19 +78,61 @@ extension GameScene{
 		
 		
 	}
-
-	func flick(_ sender:UISwipeGestureRecognizer){
-		print("フリック！")
+	
+	func touchDragExit(_ sender: UIButton){
 		
-		if let button = sender.view as? UIButton{	  //viewをUIButtonとして...
-			print(button.tag)
+		if judge(laneNum: sender.tag, type: .flick) == true{
+			if flickSound1?.isPlaying == false{
+				flickSound1?.play()
+			}else if flickSound2?.isPlaying == false{
+				flickSound2?.play()
+			}else if flickSound3?.isPlaying == false{
+				flickSound3?.play()
+			}else if flickSound4?.isPlaying == false{
+				flickSound4?.play()
+			}
+		}else
+			
+			if judge(laneNum: sender.tag, type: .flickEnd) == true{
+				if flickSound1?.isPlaying == false{
+					flickSound1?.play()
+				}else if flickSound2?.isPlaying == false{
+					flickSound2?.play()
+				}else if flickSound3?.isPlaying == false{
+					flickSound3?.play()
+				}else if flickSound4?.isPlaying == false{
+					flickSound4?.play()
+				}
 		}
+		
 	}
+	
+	func touchDragInside(_ sender: UIButton){
+		
+//		if parfectMiddleJudge(laneNum: sender.tag) == true{
+//			if tapSound1?.isPlaying == false{
+//				tapSound1?.play()
+//			}else if tapSound2?.isPlaying == false{
+//				tapSound2?.play()
+//			}else if tapSound3?.isPlaying == false{
+//				tapSound3?.play()
+//			}else if tapSound4?.isPlaying == false{
+//				tapSound4?.play()
+//			}
+//		}
+		
+	}
+
+
+
 	
 	func judge(laneNum:Int,type:NoteType) -> Bool{	  //対象ノーツが実在し、判定したかを返す
 		
 		let nextIndex = lanes[laneNum-1].nextNoteIndex
-		if lanes[laneNum-1].laneNotes[nextIndex].type != type{//種類が違う
+		
+		if nextIndex >= lanes[laneNum-1].laneNotes.count{//最後まで判定が終わってる
+			return false
+		}else if lanes[laneNum-1].laneNotes[nextIndex].type != type{//種類が違う
 			return false
 		}
 		
@@ -114,6 +159,29 @@ extension GameScene{
 			return true
 		case .miss:
 			judgeLabel.text = "miss!"
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].nextNoteIndex += 1
+			return true
+		default: break
+		}
+		
+		return false
+		
+	}
+	
+	func parfectMiddleJudge(laneNum:Int) -> Bool{	  //対象ノーツが実在し、判定したかを返す(middleのparfect専用)
+		
+		let nextIndex = lanes[laneNum-1].nextNoteIndex
+		
+		if nextIndex >= lanes[laneNum-1].laneNotes.count{//最後まで判定が終わってる
+			return false
+		}else if lanes[laneNum-1].laneNotes[nextIndex].type != .middle{//種類が違う
+			return false
+		}
+		
+		switch lanes[laneNum-1].timeState {
+		case .parfect:
+			judgeLabel.text = "parfect!!"
 			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true

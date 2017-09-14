@@ -20,6 +20,9 @@ extension GameScene{
 		tapSound4 = setSound(fileName: "タップ")
 		flickSound1 = setSound(fileName: "フリック")
 		flickSound2 = setSound(fileName: "フリック")
+		flickSound3 = setSound(fileName: "フリック")
+		flickSound4 = setSound(fileName: "フリック")
+
 		kara1 = setSound(fileName: "空打ち")
 		kara2 = setSound(fileName: "空打ち")
 		kara3 = setSound(fileName: "空打ち")
