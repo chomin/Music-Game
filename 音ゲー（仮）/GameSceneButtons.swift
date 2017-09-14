@@ -50,15 +50,30 @@ extension GameScene{
 	
 	
 	func touchDown(_ sender: UIButton){
-		if kara1?.isPlaying == false{
-			kara1?.play()
-		}else if kara2?.isPlaying == false{
-			kara2?.play()
-		}else if kara3?.isPlaying == false{
-			kara3?.play()
-		}else if kara4?.isPlaying == false{
-			kara4?.play()
+		
+		if judge(laneNum: sender.tag, type: .tap) == true{
+			if tapSound1?.isPlaying == false{
+				tapSound1?.play()
+			}else if tapSound2?.isPlaying == false{
+				tapSound2?.play()
+			}else if tapSound3?.isPlaying == false{
+				tapSound3?.play()
+			}else if tapSound4?.isPlaying == false{
+				tapSound4?.play()
+			}
+		}else{
+			if kara1?.isPlaying == false{
+				kara1?.play()
+			}else if kara2?.isPlaying == false{
+				kara2?.play()
+			}else if kara3?.isPlaying == false{
+				kara3?.play()
+			}else if kara4?.isPlaying == false{
+				kara4?.play()
+			}
 		}
+		
+		
 	}
 
 	func flick(_ sender:UISwipeGestureRecognizer){
@@ -67,6 +82,46 @@ extension GameScene{
 		if let button = sender.view as? UIButton{	  //viewをUIButtonとして...
 			print(button.tag)
 		}
+	}
+	
+	func judge(laneNum:Int,type:NoteType) -> Bool{	  //対象ノーツが実在し、判定したかを返す
+		
+		let nextIndex = lanes[laneNum-1].nextNoteIndex
+		if lanes[laneNum-1].laneNotes[nextIndex].type != type{//種類が違う
+			return false
+		}
+		
+		switch lanes[laneNum-1].timeState {
+		case .parfect:
+			judgeLabel.text = "parfect!!"
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].nextNoteIndex += 1
+			return true
+		case .great:
+			judgeLabel.text = "great!"
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].nextNoteIndex += 1
+			return true
+		case .good:
+			judgeLabel.text = "good"
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].nextNoteIndex += 1
+			return true
+		case .bad:
+			judgeLabel.text = "bad"
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].nextNoteIndex += 1
+			return true
+		case .miss:
+			judgeLabel.text = "miss!"
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].nextNoteIndex += 1
+			return true
+		default: break
+		}
+		
+		return false
+		
 	}
 }
 

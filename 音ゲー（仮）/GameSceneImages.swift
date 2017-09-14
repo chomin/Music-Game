@@ -144,6 +144,7 @@ extension GameScene{
 			              CGPoint(x:length, y:0)]
 			
 			note = SKShapeNode(points: &points, count: points.count)
+			note.lineWidth = 3.0
 			
 			note.fillColor = UIColor.magenta
 			
@@ -195,7 +196,7 @@ extension GameScene{
 		line.lineWidth = 3.0
 		line.strokeColor = UIColor.white
 		line.position.x = i.image.position.x
-
+		line.zPosition = -1
 		self.addChild(line)
 		sameLines.append((i,line))
 

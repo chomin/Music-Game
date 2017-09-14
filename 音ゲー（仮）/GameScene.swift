@@ -38,7 +38,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	let buttons = [ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton()]
 	
 	// 楽曲データ
-	let bmsName = "シュガーソングとビターステップ.bms"
+	let bmsName = "ようこそジャパリパークへ.bms"
 	let bgmName = "ようこそジャパリパークへ"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	var fNotes:[Note] = []
@@ -74,7 +74,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		
 		//スピードの設定
-		speed = 800.0
+		speed = 500.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
@@ -106,9 +106,6 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		//lnotesをposの早い順にソート(してもらう)
 		lNotes = lNotes.sorted{$0.pos < $1.pos}
-//		for i in lNotes{
-//			print(i.pos)
-//		}
 		
 		
 		//画像、音楽、ボタン、ラベルの設定
