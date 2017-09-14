@@ -32,8 +32,6 @@ extension GameScene{
 				
 //				let nextIndex = GameScene.notes.index(where: {$0 === value.next!})
 				
-				
-				
 				let path = CGMutablePath()
 				let path2 = CGMutablePath()//剛体用（重なると変になるため）
 				
@@ -68,9 +66,6 @@ extension GameScene{
 				tmplong.zPosition = -1
 				
 				tmplong.physicsBody = SKPhysicsBody(polygonFrom :path2)	  //物理演算してしまうが、固定してるから動かない。逆に物理演算しないと連動して動かない！
-				//				tmplong.physicsBody?.isDynamic=false
-//				tmplong.physicsBody?.allowsRotation = false
-//				tmplong.physicsBody?.isResting = true
 				
 				self.addChild(tmplong)
 				
@@ -87,13 +82,50 @@ extension GameScene{
 					anchor: endNotepos)      // 繋がる点.
 				self.physicsWorld.add(Joint)
 
-				
-				
+	
 				note = note!.next	  //進める
 			}
 			
 		}
+		
+		//同時押し線の描写
+		var i = 0
+		while(i+1 < fNotes.count){  //iとi+1を見るため...
+			if fNotes[i].pos == fNotes[i+1].pos {//まず始点同士
+				paintSameLine(i: fNotes[i], j: fNotes[i+1])
+				fNotes.removeSubrange(i...i+1)
+				continue
+			}
+			
+			i += 1
+		}
+		
+		i=0
+		while i+1 < lNotes.count {
+			if lNotes[i].pos == lNotes[i+1].pos {//次に終点同士
+				paintSameLine(i: lNotes[i], j: lNotes[i+1])
+				lNotes.removeSubrange(i...i+1)
+				continue
+			}
+			
+			i += 1
 
+		}
+		
+		
+		for j in fNotes{	  //最後に始点と終点
+			i=0
+			while i < lNotes.count{
+				if j.pos == lNotes[i].pos{
+					paintSameLine(i: j, j: lNotes[i])
+					break
+				}else if j.pos < lNotes[i].pos{
+					break
+				}
+				
+				i+=1
+			}
+		}
 
 	}
 	
@@ -154,5 +186,18 @@ extension GameScene{
 		var ypos =  self.frame.width/9
 		ypos += (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)
 		note.image?.position.y = ypos
+	}
+	
+	func paintSameLine(i:Note,j:Note){
+		//同時押しラインの描写
+		var lPoint = [CGPoint(x:0,y:0) ,CGPoint(x:j.image.position.x-i.image.position.x, y:0)]
+		let line = SKShapeNode(points: &lPoint, count: lPoint.count)
+		line.lineWidth = 3.0
+		line.strokeColor = UIColor.white
+		line.position.x = i.image.position.x
+
+		self.addChild(line)
+		sameLines.append((i,line))
+
 	}
 }

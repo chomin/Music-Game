@@ -32,14 +32,17 @@ class GameScene: SKScene {//音ゲーをするシーン
 	//画像(ノーツ以外)
 	var longImages:[SKShapeNode] = []
 	var judgeLine:SKShapeNode!
+	var sameLines:[(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
 	
 	//ボタン
 	let buttons = [ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton()]
 	
 	// 楽曲データ
-	let bmsName = "ようこそジャパリパークへ.bms"
+	let bmsName = "シュガーソングとビターステップ.bms"
 	let bgmName = "ようこそジャパリパークへ"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
+	var fNotes:[Note] = []
+	var lNotes:[Note] = []
 	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
 	var musicStartPos = 1.0	  //BGM開始の"拍"！
 	var playLebel = 0
@@ -52,6 +55,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		//レーン
 	
 	
+	
 	override func didMove(to view: SKView) {
 		
 		//ラベルの設定
@@ -60,14 +64,14 @@ class GameScene: SKScene {//音ゲーをするシーン
 			
 			Label.fontSize = self.frame.width/36
 			Label.horizontalAlignmentMode = .center	//中央寄せ
-				Label.position = CGPoint(x:self.frame.midX, y:self.frame.width/9*2)
-				Label.fontColor=SKColor.yellow
+			Label.position = CGPoint(x:self.frame.midX, y:self.frame.width/9*2)
+			Label.fontColor=SKColor.yellow
 			
 			self.addChild(Label)
 			return Label
 		}()
 		
-
+		
 		
 		//スピードの設定
 		speed = 800.0
@@ -85,8 +89,27 @@ class GameScene: SKScene {//音ゲーをするシーン
 		catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
 		catch                                     { print("未知のエラー") }
 
-		print(notes.count)
-		print(GameScene.bpm)
+		//同時押し探索用
+		fNotes=notes
+		for i in notes{
+			
+			if i.next == nil{	//終点なしなら飛ばす
+				continue
+			}
+			
+			var note:Note! = i
+			while note.next != nil {
+				note = note.next
+			}
+			lNotes.append(note)
+		}
+		
+		//lnotesをposの早い順にソート(してもらう)
+		lNotes = lNotes.sorted{$0.pos < $1.pos}
+//		for i in lNotes{
+//			print(i.pos)
+//		}
+		
 		
 		//画像、音楽、ボタン、ラベルの設定
 		setAllSounds()
@@ -127,11 +150,15 @@ class GameScene: SKScene {//音ゲーをするシーン
 			}
 		}
 		
+		for i in sameLines{ //同時押しラインも移動
+			i.line.position.y = i.note.image.position.y
+		}
+		
 		//レーンの監視(過ぎて行ってないか)
 		for (index,value) in lanes.enumerated(){
 			lanes[index].currentTime = currentTime
 			if value.timeState == .passed {
-				print("miss!")
+//				print("miss!")
 				judgeLabel.text = "miss!"
 				lanes[index].laneNotes[value.nextNoteIndex].image.position.x = 1000
 				
@@ -170,7 +197,7 @@ enum TimeState {
 struct Lane {
 	var timeState:TimeState{
 		get{
-			if laneNotes.count > 0{
+			if laneNotes.count > 0 && nextNoteIndex < laneNotes.count{
 				
 				let timeLag = laneNotes[nextNoteIndex].pos*60/GameScene.bpm + GameScene.start - currentTime
 				
