@@ -150,7 +150,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		}
 		
 		for i in sameLines{ //同時押しラインも移動
-			i.line.position.y = i.note.image.position.y
+			i.line.position = i.note.image.position
 		}
 		
 		//レーンの監視(過ぎて行ってないか)
