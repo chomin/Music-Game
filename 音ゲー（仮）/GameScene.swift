@@ -32,7 +32,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	
 	//画像(ノーツ以外)
-	var longImages:[SKShapeNode] = []
+	var longImages:[(note:Note,longImage:SKShapeNode)] = []
 	var judgeLine:SKShapeNode!
 	var sameLines:[(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
 	
@@ -56,9 +56,17 @@ class GameScene: SKScene {//音ゲーをするシーン
 	var volWav = 100			// 音量を現段階のn%として出力するか
 	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		//レーン
 	
+	//立体感を出すための定数
+	let horizontalDistance:CGFloat = 10000	//画面から目までの水平距離a
+	let verticalDistance:CGFloat = 300	//画面を垂直に見たとき、判定線から目までの高さh
+	var horizon:CGFloat!  //水平線の長さ
+	
+	
 	
 	
 	override func didMove(to view: SKView) {
+		
+		horizon = self.frame.width/4
 		
 		//ラベルの設定
 		judgeLabel = {() -> SKLabelNode in
@@ -76,7 +84,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		
 		//スピードの設定
-		speed = 500.0
+		speed = 20000.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
@@ -130,42 +138,101 @@ class GameScene: SKScene {//音ゲーをするシーン
 			}
 		}
 		
+		
+		
 	}
 	
 	
 	override func update(_ currentTime: TimeInterval) {
 		
-		//時間でノーツの位置を設定する(ノーツが多いと重くなるかも？)
+		//時間でノーツの位置を設定する(重くなるので近場のみ！)
 		for i in notes{
 
-			setYPos(note: i, currentTime: currentTime)
+			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
 			
+			if remainingBeat < 16 && remainingBeat > -4{//-4拍以上16拍以内
+				i.image.isHidden = false
+				setPos(note: i, currentTime: currentTime)
+				if i.image.position.y > self.frame.height*7/8{//水平線より上は隠す
+					i.image.isHidden = true
+				}
+			}
+			
+			//つながっているノーツ
 			var note:Note? = i
 			while note?.next != nil{
-				
-				setYPos(note: (note?.next)!, currentTime: currentTime)
+				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
+				if remainingBeat2 < 16 && remainingBeat2 > -4{//-4拍以上16拍以内
+					note?.next.image.isHidden = false
+					setPos(note: (note?.next)!, currentTime: currentTime)
+					if (note?.next.image.position.y)! > self.frame.height*7/8{
+						note?.next.image.isHidden = true
+					}
+				}
 				
 				note = note?.next
 			}
 		}
 		
+		
+		
+		for (index,i) in longImages.enumerated(){	//根が隠れているなら緑太線も隠す
+			
+			if i.note.image.position.x > 2000{
+				self.removeChildren(in: [i.longImage])
+				longImages.remove(at: index)
+				break
+			}
+			
+		}
+		
 		for i in sameLines{ //同時押しラインも移動
 			i.line.position = i.note.image.position
+			i.line.isHidden = i.note.image.isHidden
 		}
 		
 		//レーンの監視(過ぎて行ってないか)
 		for (index,value) in lanes.enumerated(){
 			lanes[index].currentTime = currentTime
 			if value.timeState == .passed {
-//				print("miss!")
+				//				print("miss!")
 				judgeLabel.text = "miss!"
-				lanes[index].laneNotes[value.nextNoteIndex].image.position.x = 1000
+				lanes[index].laneNotes[value.nextNoteIndex].image.position.x = 3000
+				lanes[index].laneNotes[value.nextNoteIndex].image.isHidden = true
 				
 				//次のノーツを格納
 				lanes[index].nextNoteIndex += 1
 			}
 		}
 		
+		
+	}
+	
+	func setPos (note:Note ,currentTime:TimeInterval)  {	//
+		//		var ypos =  self.frame.width/9
+		
+		if note.image.position.x<0{
+			var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(note.lane-1)
+			if note.type == .middle{ //線だけずらす(開始点がposition)
+				xpos -= (self.frame.width/18)
+			}
+			let ypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離
+			
+			note.image.position = CGPoint(x:xpos ,y:(verticalDistance * ypos / (horizontalDistance + ypos)) + self.frame.width/9)
+			
+		}else{
+			let ypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離
+			
+			note.image.position.y = (verticalDistance * ypos / (horizontalDistance + ypos)) + self.frame.width/9
+			
+		}
+		
+		//		if note.image.position.y < self.frame.height/2{
+		//			note.image.isHidden = true
+		//		}else{
+		//			note.image.isHidden = false
+		//		}
+		//		note.image?.position.y = ypos
 		
 	}
 }

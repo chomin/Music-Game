@@ -22,7 +22,7 @@ extension GameScene{
 			value.layer.borderColor = UIColor.red.cgColor
 			value.layer.borderWidth = 2.0
 			value.layer.cornerRadius = width/18
-			value.insets = UIEdgeInsetsMake(100, 0, 100 ,0)  //認識領域のみを広げる(top,left,bottom,right)
+			value.insets = UIEdgeInsetsMake(50, 0, 50 ,0)  //認識領域のみを広げる(top,left,bottom,right)
 			self.view!.addSubview(value)
 			
 
@@ -107,19 +107,21 @@ extension GameScene{
 		
 	}
 	
-	func touchDragInside(_ sender: UIButton){
-		
-//		if parfectMiddleJudge(laneNum: sender.tag) == true{
-//			if tapSound1?.isPlaying == false{
-//				tapSound1?.play()
-//			}else if tapSound2?.isPlaying == false{
-//				tapSound2?.play()
-//			}else if tapSound3?.isPlaying == false{
-//				tapSound3?.play()
-//			}else if tapSound4?.isPlaying == false{
-//				tapSound4?.play()
-//			}
-//		}
+	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+		// 最初にタッチした指のみ取得
+		if let touch = touches.first {
+			// タッチしたビューをviewプロパティで取得する
+			if let touchedView = touch.view as? ExpansionButton{
+				// tagでおじさんかそうでないかを判断する
+				if touchedView.tag == 1 {
+					// 指の位置にビューの中心を持っていく
+					touchedView.center = touch.location(in: view)
+				}
+			}
+		}
+	}
+	
+	override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
 		
 	}
 

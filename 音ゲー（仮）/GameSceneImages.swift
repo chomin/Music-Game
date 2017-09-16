@@ -31,56 +31,57 @@ extension GameScene{
 				note?.next?.image = paintNote(i: (note?.next)!)
 				
 //				let nextIndex = GameScene.notes.index(where: {$0 === value.next!})
-				
-				let path = CGMutablePath()
-				let path2 = CGMutablePath()//剛体用（重なると変になるため）
-				
-				//まず、始点&終点ノーツが円か線かで中心座標が異なるため場合分け
-				var startNotepos:CGPoint =  (note?.image.position)! //中心座標
-				if note?.type == .middle{//線だけずらす
-					startNotepos.x += (self.frame.width/18)
-				}
-				var endNotepos:CGPoint =  (note?.next?.image?.position)! //中心座標
-				if note?.next!.type == .middle{//線だけずらす
-					endNotepos.x += (self.frame.width/18)
-				}
-				
-				
-				path.move(to: CGPoint(x:startNotepos.x-self.frame.width/22, y:startNotepos.y))  //始点
-				path.addLine(to: CGPoint(x:startNotepos.x+self.frame.width/22, y:startNotepos.y))
-				path.addLine(to: CGPoint(x:endNotepos.x+self.frame.width/22, y:endNotepos.y))
-				path.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y))
-				path.closeSubpath()
-				
-				path2.move(to: CGPoint(x:startNotepos.x-self.frame.width/22, y:startNotepos.y+speed/70*5))  //始点
-				path2.addLine(to: CGPoint(x:startNotepos.x+self.frame.width/22, y:startNotepos.y+speed/70*5))
-				path2.addLine(to: CGPoint(x:endNotepos.x+self.frame.width/22, y:endNotepos.y-speed/70*5))
-				path2.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y-speed/70*5))
-				path2.closeSubpath()
-	
-				let tmplong = SKShapeNode(path:path)
-				
-				tmplong.fillColor = UIColor.green
-				
-				tmplong.alpha = 0.8
-				tmplong.zPosition = -1
-				
-				tmplong.physicsBody = SKPhysicsBody(polygonFrom :path2)	  //物理演算してしまうが、固定してるから動かない。逆に物理演算しないと連動して動かない！
-				
-				self.addChild(tmplong)
-				
-				
-				//終点ノーツに物理体を追加
-				note?.next?.image?.physicsBody = SKPhysicsBody(circleOfRadius: self.frame.width/300)  //とりあえず円の剛体
-				note?.next?.image?.physicsBody!.isDynamic = false	  //物理演算させない
-				
-				
-				// ２つのNodeを繋げるジョイントを生成.
-				let Joint = SKPhysicsJointFixed.joint(
-					withBodyA: (tmplong.physicsBody)!,            // BodyA.
-					bodyB: (note?.next?.image?.physicsBody)!,    // BodyB.
-					anchor: endNotepos)      // 繋がる点.
-				self.physicsWorld.add(Joint)
+//				
+//				let path = CGMutablePath()
+//				let path2 = CGMutablePath()//剛体用（重なると変になるため）
+//				
+//				//まず、始点&終点ノーツが円か線かで中心座標が異なるため場合分け
+//				var startNotepos:CGPoint =  (note?.image.position)! //中心座標
+//				if note?.type == .middle{//線だけずらす
+//					startNotepos.x += (self.frame.width/18)
+//				}
+//				var endNotepos:CGPoint =  (note?.next?.image?.position)! //中心座標
+//				if note?.next!.type == .middle{//線だけずらす
+//					endNotepos.x += (self.frame.width/18)
+//				}
+//				
+//				
+//				path.move(to: CGPoint(x:startNotepos.x-self.frame.width/22, y:startNotepos.y))  //始点
+//				path.addLine(to: CGPoint(x:startNotepos.x+self.frame.width/22, y:startNotepos.y))
+//				path.addLine(to: CGPoint(x:endNotepos.x+self.frame.width/22, y:endNotepos.y))
+//				path.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y))
+//				path.closeSubpath()
+//				
+//				path2.move(to: CGPoint(x:startNotepos.x-self.frame.width/22, y:startNotepos.y+speed/70*5))  //始点
+//				path2.addLine(to: CGPoint(x:startNotepos.x+self.frame.width/22, y:startNotepos.y+speed/70*5))
+//				path2.addLine(to: CGPoint(x:endNotepos.x+self.frame.width/22, y:endNotepos.y-speed/70*5))
+//				path2.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y-speed/70*5))
+//				path2.closeSubpath()
+//	
+//				let tmplong = SKShapeNode(path:path)
+//				
+//				tmplong.fillColor = UIColor.green
+//				
+//				tmplong.alpha = 0.8
+//				tmplong.zPosition = -1
+//				
+//				tmplong.physicsBody = SKPhysicsBody(polygonFrom :path2)	  //物理演算してしまうが、固定してるから動かない。逆に物理演算しないと連動して動かない！
+//				
+//				self.addChild(tmplong)
+//				longImages.append(((note?.next)!,tmplong))
+//				
+//				
+//				//終点ノーツに物理体を追加
+//				note?.next?.image?.physicsBody = SKPhysicsBody(circleOfRadius: self.frame.width/300)  //とりあえず円の剛体
+//				note?.next?.image?.physicsBody!.isDynamic = false	  //物理演算させない
+//				
+//				
+//				// ２つのNodeを繋げるジョイントを生成.
+//				let Joint = SKPhysicsJointFixed.joint(
+//					withBodyA: (tmplong.physicsBody)!,            // BodyA.
+//					bodyB: (note?.next?.image?.physicsBody)!,    // BodyB.
+//					anchor: endNotepos)      // 繋がる点.
+//				self.physicsWorld.add(Joint)
 
 	
 				note = note!.next	  //進める
@@ -165,7 +166,7 @@ extension GameScene{
 		}
 		
 		
-		//位置(ロングノーツに必要なため、ここでyも設定)
+		//位置(ロングノーツに必要なため、ここでyも設定(ただし画面外))
 		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(i.lane-1)
 		if i.type == .middle{ //線だけずらす(開始点がposition)
 			xpos -= (self.frame.width/18)
@@ -174,8 +175,10 @@ extension GameScene{
 		var ypos =  self.frame.width/9
 		ypos += (CGFloat(60*i.pos/GameScene.bpm))*CGFloat(speed)
 		
-		note.position = CGPoint(x:xpos ,y:ypos)
+		note.position = CGPoint(x:xpos-1000 ,y:ypos-100000)
+		print(note.position)
 		
+		note.isHidden = true	//初期状態では隠しておく
 		
 		self.addChild(note)
 		
@@ -183,11 +186,7 @@ extension GameScene{
 
 	}
 	
-	func setYPos (note:Note ,currentTime:TimeInterval)  {
-		var ypos =  self.frame.width/9
-		ypos += (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)
-		note.image?.position.y = ypos
-	}
+
 	
 	func paintSameLine(i:Note,j:Note){
 		//同時押しラインの描写
