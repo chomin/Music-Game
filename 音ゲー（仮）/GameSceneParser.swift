@@ -44,7 +44,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 
 
 
-	
+
 
 
 	// ファイルの読み込み
@@ -121,7 +121,12 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			let components = headerLine.components(separatedBy: " ")
 			if components.count >= 2 {
 				if let headerInstruction = headerInstructionTable[components[0]] {
-					headerInstruction(components[1])
+					var value = components[1]
+					let splittedValue = components.dropFirst(2)
+					for str in splittedValue {
+						value += (" " + str)
+					}
+					headerInstruction(value)
 				}
 			}
 		}
