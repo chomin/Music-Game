@@ -40,8 +40,8 @@ class GameScene: SKScene {//音ゲーをするシーン
 	let buttons = [ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton()]
 	
 	// 楽曲データ
-	let bmsName = "ようこそジャパリパークへ.bms"
-	let bgmName = "ようこそジャパリパークへ"
+	let bmsName = "オラシオン.bms"
+	let bgmName = "オラシオン"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	var fNotes:[Note] = []
 	var lNotes:[Note] = []
@@ -60,13 +60,14 @@ class GameScene: SKScene {//音ゲーをするシーン
 	let horizontalDistance:CGFloat = 10000	//画面から目までの水平距離a
 	let verticalDistance:CGFloat = 300	//画面を垂直に見たとき、判定線から目までの高さh
 	var horizon:CGFloat!  //水平線の長さ
-	
+	var horizonY:CGFloat! //水平線のy座標
 	
 	
 	
 	override func didMove(to view: SKView) {
 		
-		horizon = self.frame.width/4
+		horizon = self.frame.width/3
+		horizonY = self.frame.height*7/8
 		
 		//ラベルの設定
 		judgeLabel = {() -> SKLabelNode in
@@ -153,7 +154,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 			if remainingBeat < 16 && remainingBeat > -4{//-4拍以上16拍以内
 				i.image.isHidden = false
 				setPos(note: i, currentTime: currentTime)
-				if i.image.position.y > self.frame.height*7/8{//水平線より上は隠す
+				if i.image.position.y > horizonY{//水平線より上は隠す
 					i.image.isHidden = true
 				}
 			}
@@ -165,7 +166,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 				if remainingBeat2 < 16 && remainingBeat2 > -4{//-4拍以上16拍以内
 					note?.next.image.isHidden = false
 					setPos(note: (note?.next)!, currentTime: currentTime)
-					if (note?.next.image.position.y)! > self.frame.height*7/8{
+					if (note?.next.image.position.y)! > horizonY{
 						note?.next.image.isHidden = true
 					}
 				}
@@ -211,21 +212,32 @@ class GameScene: SKScene {//音ゲーをするシーン
 	func setPos (note:Note ,currentTime:TimeInterval)  {	//
 		//		var ypos =  self.frame.width/9
 		
-		if note.image.position.x<0{
-			var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(note.lane-1)
-			if note.type == .middle{ //線だけずらす(開始点がposition)
-				xpos -= (self.frame.width/18)
-			}
-			let ypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離
-			
-			note.image.position = CGPoint(x:xpos ,y:(verticalDistance * ypos / (horizontalDistance + ypos)) + self.frame.width/9)
-			
-		}else{
-			let ypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離
-			
-			note.image.position.y = (verticalDistance * ypos / (horizontalDistance + ypos)) + self.frame.width/9
-			
+		let fypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離
+		let y = (verticalDistance * fypos / (horizontalDistance + fypos)) + self.frame.width/9
+		
+		var xpos:CGFloat
+		
+		if note.lane != 4{  //傾き無限大防止
+			var b = (horizonY-self.frame.width/9)   //傾き
+			var c = CGFloat(4-note.lane)*self.frame.width/9
+			c += CGFloat(note.lane-4)*horizon/7
+			b /= c
+			xpos = (y - self.frame.width/9)/b
+			xpos += self.frame.width/18 + CGFloat(note.lane)*self.frame.width/9
+		} else {
+			xpos = self.frame.width/2
 		}
+		
+		
+		
+		//		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(note.lane-1)
+		
+		if note.type == .middle{ //線だけずらす(開始点がposition)→長さの半分だけずらすように！
+			xpos -= (self.frame.width/18)
+		}
+		
+		note.image.position = CGPoint(x:xpos ,y:y)
+		
 		
 		//		if note.image.position.y < self.frame.height/2{
 		//			note.image.isHidden = true
