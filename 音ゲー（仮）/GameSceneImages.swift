@@ -12,6 +12,18 @@ import SpriteKit
 extension GameScene{
 	func setImages(){
 		
+		//レーンの境目の線
+		for i in 0...7{
+			var points = [CGPoint(x:self.frame.width*CGFloat(i+1)/9 ,y:self.frame.width/9) ,CGPoint(x:self.frame.width/2 - horizon/2 + CGFloat(i)*horizon/7 ,y:horizonY)]
+			let line = SKShapeNode(points: &points, count: points.count)
+			
+			line.lineWidth = 1.0
+			line.alpha = 0.9
+			
+			self.addChild(line)
+
+		}
+		
 		//判定ラインの描写
 		var jlPoint = [CGPoint(x:0.0 ,y:0.0) ,CGPoint(x:self.frame.width/9*7 ,y:0.0)]
 		judgeLine = SKShapeNode(points: &jlPoint, count: jlPoint.count)
@@ -166,6 +178,8 @@ extension GameScene{
 		}
 		
 		
+		
+		
 		//位置(ロングノーツに必要なため、ここでyも設定(ただし画面外))
 		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(i.lane-1)
 		if i.type == .middle{ //線だけずらす(開始点がposition)
@@ -201,3 +215,5 @@ extension GameScene{
 
 	}
 }
+
+

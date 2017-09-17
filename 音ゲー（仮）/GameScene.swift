@@ -61,12 +61,14 @@ class GameScene: SKScene {//音ゲーをするシーン
 	let verticalDistance:CGFloat = 300	//画面を垂直に見たとき、判定線から目までの高さh
 	var horizon:CGFloat!  //水平線の長さ
 	var horizonY:CGFloat! //水平線のy座標
-	
+	var firstDiameter:CGFloat!	//最初の(判定線での)ノーツの直径
 	
 	
 	override func didMove(to view: SKView) {
 		
-		horizon = self.frame.width/3
+		firstDiameter = self.frame.width/9
+		
+		horizon = self.frame.width/8
 		horizonY = self.frame.height*7/8
 		
 		//ラベルの設定
@@ -85,7 +87,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		
 		//スピードの設定
-		speed = 20000.0
+		speed = 40000.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
@@ -190,6 +192,11 @@ class GameScene: SKScene {//音ゲーをするシーン
 		for i in sameLines{ //同時押しラインも移動
 			i.line.position = i.note.image.position
 			i.line.isHidden = i.note.image.isHidden
+			//大きさの変更
+			let a = (horizon/7-self.frame.width/9)/(horizonY - self.frame.width/9)
+			let diameter = a*(i.line.position.y-horizonY) + horizon/7
+			
+			i.line.setScale(diameter/firstDiameter)
 		}
 		
 		//レーンの監視(過ぎて行ってないか)
@@ -215,30 +222,43 @@ class GameScene: SKScene {//音ゲーをするシーン
 		let fypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離
 		let y = (verticalDistance * fypos / (horizontalDistance + fypos)) + self.frame.width/9
 		
-		var xpos:CGFloat
-		
-		if note.lane != 4{  //傾き無限大防止
-			var b = (horizonY-self.frame.width/9)   //傾き
-			var c = CGFloat(4-note.lane)*self.frame.width/9
-			c += CGFloat(note.lane-4)*horizon/7
-			b /= c
-			xpos = (y - self.frame.width/9)/b
-			xpos += self.frame.width/18 + CGFloat(note.lane)*self.frame.width/9
-		} else {
-			xpos = self.frame.width/2
-		}
 		
 		
 		
 		//		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(note.lane-1)
 		
-		if note.type == .middle{ //線だけずらす(開始点がposition)→長さの半分だけずらすように！
-			xpos -= (self.frame.width/18)
+		
+		
+		//大きさの変更
+		let a = (horizon/7-self.frame.width/9)/(horizonY - self.frame.width/9)
+		let diameter = a*(y-horizonY) + horizon/7
+		
+		note.image.setScale(diameter/firstDiameter)
+		
+		if note.image.position.x < 1000{	//消えてない
+			var xpos:CGFloat
+			
+			if note.lane != 4{  //傾き無限大防止
+				var b = (horizonY-self.frame.width/9)   //傾き
+				var c = CGFloat(4-note.lane)*self.frame.width/9
+				c += CGFloat(note.lane-4)*horizon/7
+				b /= c
+				xpos = (y - self.frame.width/9)/b
+				xpos += self.frame.width/18 + CGFloat(note.lane)*self.frame.width/9
+			} else {
+				xpos = self.frame.width/2
+			}
+			
+			
+			if note.type == .middle{ //線だけずらす(開始点がposition)→長さの半分だけずらすように！
+				xpos -= diameter/2
+			}
+			
+			note.image.position = CGPoint(x:xpos ,y:y)
+			
+		}else{
+			note.image.position.y = y
 		}
-		
-		note.image.position = CGPoint(x:xpos ,y:y)
-		
-		
 		//		if note.image.position.y < self.frame.height/2{
 		//			note.image.isHidden = true
 		//		}else{
