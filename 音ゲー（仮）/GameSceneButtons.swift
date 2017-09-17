@@ -19,8 +19,8 @@ extension GameScene{
 			
 			value.tag = index + 1 //1~7
 			
-			value.layer.borderColor = UIColor.red.cgColor
-			value.layer.borderWidth = 2.0
+//			value.layer.borderColor = UIColor.red.cgColor
+//			value.layer.borderWidth = 2.0
 			value.layer.cornerRadius = width/18
 			value.insets = UIEdgeInsetsMake(50, 0, 50 ,0)  //認識領域のみを広げる(top,left,bottom,right)
 			self.view!.addSubview(value)
@@ -141,27 +141,27 @@ extension GameScene{
 		switch lanes[laneNum-1].timeState {
 		case .parfect:
 			judgeLabel.text = "parfect!!"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .great:
 			judgeLabel.text = "great!"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .good:
 			judgeLabel.text = "good"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .bad:
 			judgeLabel.text = "bad"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .miss:
 			judgeLabel.text = "miss!"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		default: break
@@ -184,7 +184,7 @@ extension GameScene{
 		switch lanes[laneNum-1].timeState {
 		case .parfect:
 			judgeLabel.text = "parfect!!"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 1000
+			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		default: break

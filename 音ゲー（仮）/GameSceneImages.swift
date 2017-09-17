@@ -170,10 +170,10 @@ extension GameScene{
 			note.strokeColor = UIColor.green
 			
 		}else if i.type == .tapEnd || i.next != nil{//緑円(middleもnextがnilにならないことに注意！)(notesに入らないから不要)
-			note = SKShapeNode(circleOfRadius: self.frame.width/18)
+			note = SKShapeNode(ellipseOf: CGSize(width:self.frame.width/9, height:self.frame.width/18))
 			note.fillColor = UIColor.green
 		}else{//白円
-			note = SKShapeNode(circleOfRadius: self.frame.width/18)
+			note = SKShapeNode(ellipseOf: CGSize(width:self.frame.width/9, height:self.frame.width/18))
 			note.fillColor = UIColor.white
 		}
 		
