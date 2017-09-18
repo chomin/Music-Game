@@ -48,6 +48,47 @@ extension GameScene{
 		
 		return sound
 	}
+	
+	func playSound(type:SoundType){
+		switch type {
+		case .tap:
+			if tapSound1?.isPlaying == false{
+				tapSound1?.play()
+			}else if tapSound2?.isPlaying == false{
+				tapSound2?.play()
+			}else if tapSound3?.isPlaying == false{
+				tapSound3?.play()
+			}else if tapSound4?.isPlaying == false{
+				tapSound4?.play()
+			}
+			
+		case .flick:
+			if flickSound1?.isPlaying == false{
+				flickSound1?.play()
+			}else if flickSound2?.isPlaying == false{
+				flickSound2?.play()
+			}else if flickSound3?.isPlaying == false{
+				flickSound3?.play()
+			}else if flickSound4?.isPlaying == false{
+				flickSound4?.play()
+			}
+			
+		case .kara:
+			if kara1?.isPlaying == false{
+				kara1?.play()
+			}else if kara2?.isPlaying == false{
+				kara2?.play()
+			}else if kara3?.isPlaying == false{
+				kara3?.play()
+			}else if kara4?.isPlaying == false{
+				kara4?.play()
+			}
 
+		}
+	}
+	
+	enum SoundType{
+		case tap,flick,kara
+	}
 	
 }

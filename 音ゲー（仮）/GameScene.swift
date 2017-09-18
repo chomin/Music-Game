@@ -36,8 +36,8 @@ class GameScene: SKScene {//音ゲーをするシーン
 	var judgeLine:SKShapeNode!
 	var sameLines:[(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
 	
-	//ボタン
-	let buttons = [ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton()]
+//	//ボタン
+//	let buttons = [ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton()]
 	
 	// 楽曲データ
 	let bmsName = "オラシオン.bms"
@@ -63,13 +63,18 @@ class GameScene: SKScene {//音ゲーをするシーン
 	var horizonY:CGFloat! //水平線のy座標
 	var firstDiameter:CGFloat!	//最初の(判定線での)ノーツの直径
 	
+	var halfBound:CGFloat! //判定を汲み取る、ボタン中心からの距離
+	
+	
 	
 	override func didMove(to view: SKView) {
 		
+		halfBound = self.frame.width/18
+		
 		firstDiameter = self.frame.width/9
 		
-		horizon = self.frame.width/8
-		horizonY = self.frame.height*7/8
+		horizon = self.frame.width/16
+		horizonY = self.frame.height*15/16
 		
 		//ラベルの設定
 		judgeLabel = {() -> SKLabelNode in
@@ -87,7 +92,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		
 		//スピードの設定
-		speed = 40000.0
+		speed = 60000.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
@@ -123,7 +128,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		//画像、音楽、ボタン、ラベルの設定
 		setAllSounds()
-		setButtons()
+//		setButtons()
 		setImages()
 		
 		//BGMの再生(時間指定)
@@ -153,25 +158,25 @@ class GameScene: SKScene {//音ゲーをするシーン
 
 			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
 			
-			if remainingBeat < 16 && remainingBeat > -4{//-4拍以上16拍以内
+			//if remainingBeat < 16 && remainingBeat > -4{//-4拍以上16拍以内
 				i.image.isHidden = false
 				setPos(note: i, currentTime: currentTime)
 				if i.image.position.y > horizonY{//水平線より上は隠す
 					i.image.isHidden = true
 				}
-			}
+			//}
 			
 			//つながっているノーツ
 			var note:Note? = i
 			while note?.next != nil{
 				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
-				if remainingBeat2 < 16 && remainingBeat2 > -4{//-4拍以上16拍以内
+				//if remainingBeat2 < 16 && remainingBeat2 > -4{//-4拍以上16拍以内
 					note?.next.image.isHidden = false
 					setPos(note: (note?.next)!, currentTime: currentTime)
 					if (note?.next.image.position.y)! > horizonY{
 						note?.next.image.isHidden = true
 					}
-				}
+				//}
 				
 				note = note?.next
 			}
@@ -198,6 +203,13 @@ class GameScene: SKScene {//音ゲーをするシーン
 			
 			i.line.setScale(diameter/firstDiameter)
 		}
+		
+		
+		//判定関係
+		//middleの判定
+//		for i in buttons{
+//			
+//		}
 		
 		//レーンの監視(過ぎて行ってないか)
 		for (index,value) in lanes.enumerated(){
@@ -233,7 +245,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		let a = (horizon/7-self.frame.width/9)/(horizonY - self.frame.width/9)
 		let diameter = a*(y-horizonY) + horizon/7
 		
-		note.image.setScale(diameter/firstDiameter)
+		note.image.setScale(1.3*diameter/firstDiameter)
 		
 		if note.image.position.x < 1000{	//消えてない
 			var xpos:CGFloat
@@ -251,7 +263,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 			
 			
 			if note.type == .middle{ //線だけずらす(開始点がposition)→長さの半分だけずらすように！
-				xpos -= diameter/2
+				xpos -= 1.3*diameter/2
 			}
 			
 			note.image.position = CGPoint(x:xpos ,y:y)
@@ -265,6 +277,10 @@ class GameScene: SKScene {//音ゲーをするシーン
 		//			note.image.isHidden = false
 		//		}
 		//		note.image?.position.y = ypos
+		
+	}
+	
+	func rotate3D(){
 		
 	}
 }
@@ -300,15 +316,15 @@ struct Lane {
 				let timeLag = laneNotes[nextNoteIndex].pos*60/GameScene.bpm + GameScene.start - currentTime
 				
 				switch timeLag>0 ? timeLag : -timeLag {
-				case 0..<0.07:
+				case 0..<0.03:
 					return .parfect
-				case 0.07..<0.1:
+				case 0.03..<0.07:
 					return .great
-				case 0.1..<0.15:
+				case 0.07..<0.1:
 					return .good
-				case 0.15..<0.2:
+				case 0.1..<0.125:
 					return .bad
-				case 0.2..<0.25:
+				case 0.125..<0.15:
 					return .miss
 				default:
 					if timeLag > 0{
