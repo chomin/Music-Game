@@ -40,8 +40,8 @@ class GameScene: SKScene {//音ゲーをするシーン
 //	let buttons = [ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton()]
 	
 	// 楽曲データ
-	let bmsName = "オラシオン.bms"
-	let bgmName = "オラシオン"
+	let bmsName = "ようこそジャパリパークへ.bms"
+	let bgmName = "ようこそジャパリパークへ"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	var fNotes:[Note] = []
 	var lNotes:[Note] = []
@@ -156,12 +156,12 @@ class GameScene: SKScene {//音ゲーをするシーン
 		//時間でノーツの位置を設定する(重くなるので近場のみ！)
 		for i in notes{
 
-//			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
+			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
 			
 			//if remainingBeat < 16 && remainingBeat > -4{//-4拍以上16拍以内
 				i.image.isHidden = false
 				setPos(note: i, currentTime: currentTime)
-				if i.image.position.y > horizonY{//水平線より上は隠す
+				if i.image.position.y > horizonY || remainingBeat > 12{//水平線より上は隠す
 					i.image.isHidden = true
 				}
 			//}
@@ -169,11 +169,11 @@ class GameScene: SKScene {//音ゲーをするシーン
 			//つながっているノーツ
 			var note:Note? = i
 			while note?.next != nil{
-//				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
+				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
 				//if remainingBeat2 < 16 && remainingBeat2 > -4{//-4拍以上16拍以内
 					note?.next.image.isHidden = false
 					setPos(note: (note?.next)!, currentTime: currentTime)
-					if (note?.next.image.position.y)! > horizonY{
+					if (note?.next.image.position.y)! > horizonY || remainingBeat2 > 12{
 						note?.next.image.isHidden = true
 					}
 				//}

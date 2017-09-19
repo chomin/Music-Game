@@ -125,7 +125,10 @@ extension GameScene{
 			note.fillColor = UIColor.white
 		}
 		
-		
+		//視点辺りを向くようにする(horizontalDistanceが大きいのでほぼわからないw)
+		let point = CGPoint(x:self.frame.midX ,y:-horizontalDistance)
+		let cons = SKConstraint.orient(to: point,offset: SKRange(constantValue: CGFloat(1/(M_1_PI*2)))) // 姿勢へのConstraintsを作成.
+		note.constraints = [cons]   // Constraintsを適用.
 		
 		
 		//位置(ロングノーツに必要なため、ここでyも設定(ただし画面外))
