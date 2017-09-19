@@ -156,7 +156,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		//時間でノーツの位置を設定する(重くなるので近場のみ！)
 		for i in notes{
 
-			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
+//			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
 			
 			//if remainingBeat < 16 && remainingBeat > -4{//-4拍以上16拍以内
 				i.image.isHidden = false
@@ -169,7 +169,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 			//つながっているノーツ
 			var note:Note? = i
 			while note?.next != nil{
-				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
+//				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
 				//if remainingBeat2 < 16 && remainingBeat2 > -4{//-4拍以上16拍以内
 					note?.next.image.isHidden = false
 					setPos(note: (note?.next)!, currentTime: currentTime)
@@ -182,17 +182,73 @@ class GameScene: SKScene {//音ゲーをするシーン
 			}
 		}
 		
-		
-		
-		for (index,i) in longImages.enumerated(){	//根が隠れているなら緑太線も隠す
+		//緑太線の描写
+		for i in notes{
 			
-			if i.note.image.position.x > 2000{
-				self.removeChildren(in: [i.longImage])
-				longImages.remove(at: index)
-				break
+			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
+			
+			if i.next != nil{
+				
+				if i.next.image.position.y < self.frame.width/9 && i.longImage != nil{//先ノーツが判定線を通過したあと
+					self.removeChildren(in: [i.longImage])
+					i.longImage = nil
+				}else if remainingBeat < 4 && i.next.image.position.y > self.frame.width/9{
+					
+					//毎フレーム描き直す
+					setLong(firstNote: i)
+					
+				}
 			}
+//			else if i.longImage != nil{
+//				
+			//				//位置の変更
+			//				i.longImage.position = i.image.position
+			//				i.longImage.position.x -= i.size/2
+			//				if i.type == .middle{
+			//					i.longImage.position.x += i.size*1.3/2
+			//				}
+			//
+			//				//大きさの変更
+			//				i.longImage.setScale(i.size/i.firstLongSize)
+			//				i.longImage.yScale = pow(i.size/i.firstLongSize,1.5)
+			//
+			//			}
 			
+			//つながっているノーツ
+			var note:Note? = i
+			while note?.next != nil{
+				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
+				
+				if note?.next.next != nil {
+					if (note?.next.next.image.position.y)! < self.frame.width/9 && note?.next.longImage != nil{//先ノーツが判定線を通過したあと
+						self.removeChildren(in: [(note?.next.longImage)!])
+						note?.next.longImage = nil
+					}else if remainingBeat2 < 4 && (note?.next.next.image.position.y)! > self.frame.width/9{
+						
+						//毎フレーム描き直す
+						setLong(firstNote: (note?.next)!)
+						
+						
+					}
+				}
+//				else if note?.next.longImage != nil{
+//					
+//					//位置の変更
+//					note?.next.longImage.position = (note?.next.image.position)!
+//					note?.next.longImage.position.x -= (note?.next.size)!/2
+//					if note?.next.type == .middle{
+//						note?.next.longImage.position.x += (note?.next.size)!*1.3/2
+//					}
+//					
+//					//大きさの変更
+//					note?.next.longImage.setScale((note?.next.size)!/(note?.next.firstLongSize)!)
+//					note?.next.longImage.yScale = pow((note?.next.size)!/(note?.next.firstLongSize)!, 1.5)
+//				}
+				
+				note = note?.next
+			}
 		}
+		
 		
 		for i in sameLines{ //同時押しラインも移動
 			i.line.position = i.note.image.position
@@ -217,7 +273,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 			if value.timeState == .passed {
 				//				print("miss!")
 				judgeLabel.text = "miss!"
-				lanes[index].laneNotes[value.nextNoteIndex].image.position.x = 3000
+//				lanes[index].laneNotes[value.nextNoteIndex].image.position.x = 3000
 				lanes[index].laneNotes[value.nextNoteIndex].image.isHidden = true
 				
 				//次のノーツを格納
@@ -231,7 +287,12 @@ class GameScene: SKScene {//音ゲーをするシーン
 	func setPos (note:Note ,currentTime:TimeInterval)  {	//
 		//		var ypos =  self.frame.width/9
 		
-		let fypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離
+		var fypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離
+		
+		if fypos <= -horizontalDistance{
+			fypos = -horizontalDistance+1
+		}
+		
 		let y = (verticalDistance * fypos / (horizontalDistance + fypos)) + self.frame.width/9
 		
 		
@@ -246,6 +307,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		let diameter = a*(y-horizonY) + horizon/7
 		
 		note.image.setScale(1.3*diameter/firstDiameter)
+		note.size = diameter
 		
 		if note.image.position.x < 1000{	//消えてない
 			var xpos:CGFloat
@@ -296,6 +358,9 @@ class Note {
 	let lane: Int
 	var next: Note!
 	var image:SKShapeNode!	  //ノーツの画像
+	var longImage:SKShapeNode!	//このノーツを始点とする緑太線の画像
+	var size:CGFloat = 0
+	var firstLongSize:CGFloat = 0
 	
 	init(type: NoteType, position pos: Double, lane: Int) {
 		self.type = type

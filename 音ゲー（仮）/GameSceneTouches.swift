@@ -216,27 +216,32 @@ extension GameScene{
 		switch lanes[laneNum-1].timeState {
 		case .parfect:
 			judgeLabel.text = "parfect!!"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .great:
 			judgeLabel.text = "great!"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .good:
 			judgeLabel.text = "good"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .bad:
 			judgeLabel.text = "bad"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .miss:
 			judgeLabel.text = "miss!"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		default: break

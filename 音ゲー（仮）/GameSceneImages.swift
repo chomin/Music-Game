@@ -38,63 +38,11 @@ extension GameScene{
 			
 			var note:Note? = i
 			
-			while note?.next != nil {  //つながっている先のノーツを描き、格納→つなげる(noteが始点)
+			while note?.next != nil {  //つながっている先のノーツを描き、格納→つなげる(noteが始点)(ここではつなげない！)
 				
 				note?.next?.image = paintNote(i: (note?.next)!)
 				
-//				let nextIndex = GameScene.notes.index(where: {$0 === value.next!})
-//				
-//				let path = CGMutablePath()
-//				let path2 = CGMutablePath()//剛体用（重なると変になるため）
-//				
-//				//まず、始点&終点ノーツが円か線かで中心座標が異なるため場合分け
-//				var startNotepos:CGPoint =  (note?.image.position)! //中心座標
-//				if note?.type == .middle{//線だけずらす
-//					startNotepos.x += (self.frame.width/18)
-//				}
-//				var endNotepos:CGPoint =  (note?.next?.image?.position)! //中心座標
-//				if note?.next!.type == .middle{//線だけずらす
-//					endNotepos.x += (self.frame.width/18)
-//				}
-//				
-//				
-//				path.move(to: CGPoint(x:startNotepos.x-self.frame.width/22, y:startNotepos.y))  //始点
-//				path.addLine(to: CGPoint(x:startNotepos.x+self.frame.width/22, y:startNotepos.y))
-//				path.addLine(to: CGPoint(x:endNotepos.x+self.frame.width/22, y:endNotepos.y))
-//				path.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y))
-//				path.closeSubpath()
-//				
-//				path2.move(to: CGPoint(x:startNotepos.x-self.frame.width/22, y:startNotepos.y+speed/70*5))  //始点
-//				path2.addLine(to: CGPoint(x:startNotepos.x+self.frame.width/22, y:startNotepos.y+speed/70*5))
-//				path2.addLine(to: CGPoint(x:endNotepos.x+self.frame.width/22, y:endNotepos.y-speed/70*5))
-//				path2.addLine(to: CGPoint(x:endNotepos.x-self.frame.width/22, y:endNotepos.y-speed/70*5))
-//				path2.closeSubpath()
-//	
-//				let tmplong = SKShapeNode(path:path)
-//				
-//				tmplong.fillColor = UIColor.green
-//				
-//				tmplong.alpha = 0.8
-//				tmplong.zPosition = -1
-//				
-//				tmplong.physicsBody = SKPhysicsBody(polygonFrom :path2)	  //物理演算してしまうが、固定してるから動かない。逆に物理演算しないと連動して動かない！
-//				
-//				self.addChild(tmplong)
-//				longImages.append(((note?.next)!,tmplong))
-//				
-//				
-//				//終点ノーツに物理体を追加
-//				note?.next?.image?.physicsBody = SKPhysicsBody(circleOfRadius: self.frame.width/300)  //とりあえず円の剛体
-//				note?.next?.image?.physicsBody!.isDynamic = false	  //物理演算させない
-//				
-//				
-//				// ２つのNodeを繋げるジョイントを生成.
-//				let Joint = SKPhysicsJointFixed.joint(
-//					withBodyA: (tmplong.physicsBody)!,            // BodyA.
-//					bodyB: (note?.next?.image?.physicsBody)!,    // BodyB.
-//					anchor: endNotepos)      // 繋がる点.
-//				self.physicsWorld.add(Joint)
-
+//
 	
 				note = note!.next	  //進める
 			}
@@ -122,7 +70,7 @@ extension GameScene{
 			}
 			
 			i += 1
-
+			
 		}
 		
 		
@@ -139,7 +87,7 @@ extension GameScene{
 				i+=1
 			}
 		}
-
+		
 	}
 	
 	func paintNote(i:Note) -> SKShapeNode{
@@ -190,17 +138,14 @@ extension GameScene{
 		ypos += (CGFloat(60*i.pos/GameScene.bpm))*CGFloat(speed)
 		
 		note.position = CGPoint(x:xpos-1000 ,y:ypos-100000)
-		print(note.position)
 		
 		note.isHidden = true	//初期状態では隠しておく
 		
 		self.addChild(note)
 		
 		return note
-
+		
 	}
-	
-
 	
 	func paintSameLine(i:Note,j:Note){
 		//同時押しラインの描写
@@ -212,7 +157,66 @@ extension GameScene{
 		line.zPosition = -1
 		self.addChild(line)
 		sameLines.append((i,line))
-
+		
+	}
+	
+	func setLong(firstNote:Note)  {
+		if firstNote.longImage != nil{
+			self.removeChildren(in: [firstNote.longImage])
+		}else if firstNote.next == nil{
+			return
+		}
+		
+		
+		let path = CGMutablePath()
+		
+		
+		//まず、始点&終点ノーツが円か線かで中心座標が異なるため場合分け
+		var startNotepos:CGPoint =  (firstNote.image.position) //中心座標
+		if firstNote.type == .middle{//線だけずらす
+			startNotepos.x += 1.3*firstNote.size/2
+		}
+		var endNotepos:CGPoint =  (firstNote.next?.image?.position)! //中心座標
+		if firstNote.next!.type == .middle{//線だけずらす
+			endNotepos.x += 1.3*firstNote.next.size/2
+		}
+		
+		if startNotepos.y > self.frame.width/9{//始点ノーツが判定線を通過する前
+			path.move(to: CGPoint(x:startNotepos.x-firstNote.size/2, y:startNotepos.y))  //始点
+			path.addLine(to: CGPoint(x:startNotepos.x+firstNote.size/2, y:startNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2, y:endNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2, y:endNotepos.y))
+			path.closeSubpath()
+		}else{
+			path.move(to: CGPoint(x:CGFloat(firstNote.lane)*self.frame.width/9, y:self.frame.width/9))  //始点
+			path.addLine(to: CGPoint(x:CGFloat(firstNote.lane + 1)*self.frame.width/9, y:self.frame.width/9))
+			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2, y:endNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2, y:endNotepos.y))
+			path.closeSubpath()
+		}
+		
+		let tmplong = SKShapeNode(path:path)
+		
+		tmplong.fillColor = UIColor.green
+		
+		tmplong.alpha = 0.8
+		tmplong.zPosition = -1
+		
+		
+		
+		
+		self.addChild(tmplong)
+		firstNote.longImage = tmplong
+//		firstNote.firstLongSize = firstNote.size
+		
+//		//		位置の変更
+//		firstNote.longImage.position = firstNote.image.position
+//		firstNote.longImage.position.x -= firstNote.size/2
+//		if firstNote.type == .middle{
+//			firstNote.longImage.position.x += firstNote.size*1.3/2
+//		}
+		
+	
 	}
 }
 
