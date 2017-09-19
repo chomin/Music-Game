@@ -69,7 +69,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	override func didMove(to view: SKView) {
 		
-		halfBound = self.frame.width/18
+		halfBound = self.frame.width/12
 		
 		firstDiameter = self.frame.width/9
 		

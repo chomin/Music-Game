@@ -123,6 +123,8 @@ extension GameScene{
 			
 			if pos.y < self.frame.width/3{    //上界
 				
+				var dokara = false
+				
 				for i in 0...6{
 					
 					let buttonPos = self.frame.width/6 + CGFloat(i)*self.frame.width/9
@@ -135,9 +137,12 @@ extension GameScene{
 							break
 							
 						}else if lanes[i].timeState == .still{
-						
-							playSound(type: .kara)
-							break
+							if dokara == true{
+								playSound(type: .kara)
+								break
+							} else {  //次のレーンまで確認
+								dokara = true
+							}
 						}
 					}
 				}
@@ -264,7 +269,8 @@ extension GameScene{
 		switch lanes[laneNum-1].timeState {
 		case .parfect:
 			judgeLabel.text = "parfect!!"
-			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
+			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		default: break
