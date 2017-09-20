@@ -131,13 +131,15 @@ extension GameScene{
 					
 					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
 						
+						print(i)
+						
 						if judge(laneNum: i+1, type: .tap){//タップの判定
 							
 							playSound(type: .tap)
 							break
 							
 						}else if lanes[i].timeState == .still{
-							if dokara == true{
+							if dokara == true || i == 6{
 								playSound(type: .kara)
 								break
 							} else {  //次のレーンまで確認

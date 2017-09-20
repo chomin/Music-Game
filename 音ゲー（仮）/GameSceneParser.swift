@@ -91,11 +91,12 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		// 先頭が'#'であるものだけを抽出し、'#'を削除
 		bmsData = bmsData
 			.filter { $0.hasPrefix("#") }
-			.map { str in str.substring(from: str.index(after: str.startIndex)) }
+			.map { str in String(str[str.index(after: str.startIndex)...])}	//swift4の書き方
+//				str.substring(from: str.index(after: str.startIndex)) }	//エラー（修正済み）
 
 		// ヘッダとメインデータに分割
 		for bmsLine in bmsData {
-			if Int(bmsLine.substring(to: bmsLine.index(after: bmsLine.startIndex))) == nil {
+			if Int(bmsLine.substring(to: bmsLine.index(after: bmsLine.startIndex))) == nil {//'substring(to:)' is deprecated: Please use String slicing subscript with a 'partial range upto' operator.
 				header.append(bmsLine)
 			}
 			else {
@@ -166,12 +167,12 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				throw ParseError.lackOfData("データが欠損しています: #\(str)")
 			}
 			else {
-				if let num = Int(components[0].substring(to: str.index(str.startIndex, offsetBy: 3))) {
+				if let num = Int(components[0].substring(to: str.index(str.startIndex, offsetBy: 3))) {//'substring(to:)' is deprecated: Please use String slicing subscript with a 'partial range upto' operator.
 					ret.bar = num
 				} else {
 					throw ParseError.invalidValue("小節番号指定が不正です: #\(str)")
 				}
-				if let num = Int(components[0].substring(from: str.index(str.startIndex, offsetBy: 3))) {
+				if let num = Int(components[0].substring(from: str.index(str.startIndex, offsetBy: 3))) {//'substring(from:)' is deprecated: Please use String slicing subscript with a 'partial range from' operator.
 					ret.channel = num
 				} else {
 					throw ParseError.invalidValue("チャンネル指定が不正です: #\(str)")
@@ -180,7 +181,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				for i in stride(from: 0, to: components[1].characters.count, by: 2) {
 					let headIndex = str.index(str.startIndex, offsetBy: i)
 					let tailIndex = str.index(str.startIndex, offsetBy: i + 2)
-					ret.body.append(components[1].substring(with: headIndex..<tailIndex))
+					ret.body.append(components[1].substring(with: headIndex..<tailIndex))//'substring(with:)' is deprecated: Please use String slicing subscript.
 				}
 			}
 			return ret

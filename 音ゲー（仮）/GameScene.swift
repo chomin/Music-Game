@@ -1,3 +1,4 @@
+
 //
 //  GameScene.swift
 //  音ゲー（仮）
@@ -57,24 +58,27 @@ class GameScene: SKScene {//音ゲーをするシーン
 	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		//レーン
 	
 	//立体感を出すための定数
-	let horizontalDistance:CGFloat = 10000	//画面から目までの水平距離a
-	let verticalDistance:CGFloat = 300	//画面を垂直に見たとき、判定線から目までの高さh
+	let horizontalDistance:CGFloat = 10000	//画面から目までの水平距離a（約5000で10cmほど）
+	var verticalDistance:CGFloat!	//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
 	var horizon:CGFloat!  //水平線の長さ
 	var horizonY:CGFloat! //水平線のy座標
-	var firstDiameter:CGFloat!	//最初の(判定線での)ノーツの直径
+	var firstDiameter:CGFloat!	//最初の(判定線での)ノーツの直径2r（iphone7で74くらい）
 	
 	var halfBound:CGFloat! //判定を汲み取る、ボタン中心からの距離
 	
 	
 	
 	override func didMove(to view: SKView) {
-		
 		halfBound = self.frame.width/12
 		
 		firstDiameter = self.frame.width/9
 		
-		horizon = self.frame.width/16
-		horizonY = self.frame.height*15/16
+		horizon = self.frame.width*3/32	  //水平線の長さ。iphone7で83くらい
+		horizonY = self.frame.height*15/16	//
+		
+		verticalDistance = self.frame.width/9 + (horizonY-self.frame.width/9)*1.1
+		
+		print(horizonY-self.frame.width/9)	//判定線から水平線までの画面上での幅。277くらい
 		
 		//ラベルの設定
 		judgeLabel = {() -> SKLabelNode in
@@ -92,7 +96,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		
 		//スピードの設定
-		speed = 60000.0
+		speed = 20000.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
@@ -192,7 +196,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 				if i.next.image.position.y < self.frame.width/9 && i.longImage != nil{//先ノーツが判定線を通過したあと
 					self.removeChildren(in: [i.longImage])
 					i.longImage = nil
-				}else if remainingBeat < 4 && i.next.image.position.y > self.frame.width/9{
+				}else if remainingBeat < 4 && i.next.image.position.y > self.frame.width/9 && i.image.position.y < horizonY{
 					
 					//毎フレーム描き直す
 					setLong(firstNote: i)
@@ -223,9 +227,11 @@ class GameScene: SKScene {//音ゲーをするシーン
 					if (note?.next.next.image.position.y)! < self.frame.width/9 && note?.next.longImage != nil{//先ノーツが判定線を通過したあと
 						self.removeChildren(in: [(note?.next.longImage)!])
 						note?.next.longImage = nil
-					}else if remainingBeat2 < 4 && (note?.next.next.image.position.y)! > self.frame.width/9{
+					}else if remainingBeat2 < 4 && (note?.next.next.image.position.y)! > self.frame.width/9 &&
+						(note?.next.image.position.y)! < horizonY!{
 						
 						//毎フレーム描き直す
+						
 						setLong(firstNote: (note?.next)!)
 						
 						
