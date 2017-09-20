@@ -66,7 +66,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		        let content = try String(contentsOfFile: path, encoding: String.Encoding.shiftJIS)
 
 		        return content.components(separatedBy: .newlines)
-		    } catch  {
+		    } catch {
 				throw FileError.readFailed("ファイルの内容取得に失敗")
 		    }
 		} else {
@@ -91,15 +91,13 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		// 先頭が'#'であるものだけを抽出し、'#'を削除
 		bmsData = bmsData
 			.filter { $0.hasPrefix("#") }
-			.map { str in String(str[str.index(after: str.startIndex)...])}	//swift4の書き方
-//				str.substring(from: str.index(after: str.startIndex)) }	//エラー（修正済み）
+			.map { str in String(str.suffix(str.characters.count - 1)) }
 
 		// ヘッダとメインデータに分割
 		for bmsLine in bmsData {
-			if Int(bmsLine.substring(to: bmsLine.index(after: bmsLine.startIndex))) == nil {//'substring(to:)' is deprecated: Please use String slicing subscript with a 'partial range upto' operator.
+			if Int(bmsLine.prefix(1)) == nil {
 				header.append(bmsLine)
-			}
-			else {
+			} else {
 				rawMainData.append(bmsLine)
 			}
 		}
@@ -154,6 +152,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			case middle2   = "08"
 			case end2      = "09"
 			case flickEnd2 = "0A"
+			case bgm       = "10"
 		}
 
 		// メインデータ1行を小節番号・チャンネル・データのタプルに分解
@@ -163,26 +162,25 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			var ret = (bar: 0, channel: 0, body: [String]())
 
 			let components = str.components(separatedBy: ":")
-			if components.count < 2 {
+			guard components.count >= 2 && components[0].characters.count == 5 else {
 				throw ParseError.lackOfData("データが欠損しています: #\(str)")
 			}
-			else {
-				if let num = Int(components[0].substring(to: str.index(str.startIndex, offsetBy: 3))) {//'substring(to:)' is deprecated: Please use String slicing subscript with a 'partial range upto' operator.
-					ret.bar = num
-				} else {
-					throw ParseError.invalidValue("小節番号指定が不正です: #\(str)")
-				}
-				if let num = Int(components[0].substring(from: str.index(str.startIndex, offsetBy: 3))) {//'substring(from:)' is deprecated: Please use String slicing subscript with a 'partial range from' operator.
-					ret.channel = num
-				} else {
-					throw ParseError.invalidValue("チャンネル指定が不正です: #\(str)")
-				}
-				// オブジェクト配列を2文字ずつに分けてdataに格納
-				for i in stride(from: 0, to: components[1].characters.count, by: 2) {
-					let headIndex = str.index(str.startIndex, offsetBy: i)
-					let tailIndex = str.index(str.startIndex, offsetBy: i + 2)
-					ret.body.append(components[1].substring(with: headIndex..<tailIndex))//'substring(with:)' is deprecated: Please use String slicing subscript.
-				}
+
+			if let num = Int(components[0].prefix(3)) {
+				ret.bar = num
+			} else {
+				throw ParseError.invalidValue("小節番号指定が不正です: #\(str)")
+			}
+			if let num = Int(components[0].suffix(2)) {
+				ret.channel = num
+			} else {
+				throw ParseError.invalidValue("チャンネル指定が不正です: #\(str)")
+			}
+			// オブジェクト配列を2文字ずつに分けてdataに格納
+			for i in stride(from: 0, to: components[1].characters.count, by: 2) {
+				let headIndex = str.index(str.startIndex, offsetBy: i)
+				let tailIndex = str.index(str.startIndex, offsetBy: i + 2)
+				ret.body.append(String(components[1][headIndex..<tailIndex]))
 			}
 			return ret
 		}.filter {
@@ -196,6 +194,8 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			let unitBeat = 4.0 / Double(mainData.body.count)	// 1オブジェクトの長さ(拍単位)
 			for (index, ob) in mainData.body.enumerated() {
 				switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
+				case .rest:
+					break
 				case .tap:
 					notes.append(
 						Note(
@@ -276,9 +276,9 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 							lane: laneMap[mainData.channel] ?? 0
 						)
 					)
-				default:
+				case .bgm:
 					// 楽曲開始命令の処理
-					if ob == "10" && mainData.channel == 1 {
+					if mainData.channel == 1 {
 						musicStartPos = Double(mainData.bar) * 4.0 + unitBeat * Double(index)
 					}
 				}
