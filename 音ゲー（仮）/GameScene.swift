@@ -216,7 +216,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				if (i.next.image.position.y < self.frame.width/9 || i.next.isJudged == true) && i.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
 					self.removeChildren(in: [i.longImage])
 					i.longImage = nil
-				}else if remainingBeat < 4 && i.next.image.position.y > self.frame.width/9 && i.image.position.y < horizonY{
+				}else if remainingBeat < 4 && i.next.image.position.y > self.frame.width/9 && i.next.isJudged == false && i.image.position.y < horizonY{
 					
 					//毎フレーム描き直す
 					setLong(firstNote: i)
@@ -233,8 +233,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 					if (note?.next.next.image.position.y)! < self.frame.width/9 && note?.next.longImage != nil{//先ノーツが判定線を通過したあと
 						self.removeChildren(in: [(note?.next.longImage)!])
 						note?.next.longImage = nil
-					}else if remainingBeat2 < 4 && (note?.next.next.image.position.y)! > self.frame.width/9 &&
-						(note?.next.image.position.y)! < horizonY!{
+					}else if remainingBeat2 < 4 && (note?.next.next.image.position.y)! > self.frame.width/9 && note?.next.next.isJudged == false && (note?.next.image.position.y)! < horizonY!{
 						
 						//毎フレーム描き直す
 						
@@ -293,12 +292,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		}
 		
 		let y = (verticalDistance * fypos / (horizontalDistance + fypos)) + self.frame.width/9
-		
-		
-		
-		
-		//		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(note.lane-1)
-		
 		
 		
 		//大きさの変更

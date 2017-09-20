@@ -26,13 +26,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.008954"
+            timestampString = "527606982.804979"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "150"
             endingLineNumber = "150"
-            landmarkName = "didMove(to:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -74,13 +74,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.010143"
+            timestampString = "527606982.806147"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "389"
-            endingLineNumber = "389"
-            landmarkName = "timeState"
-            landmarkType = "24">
+            startingLineNumber = "382"
+            endingLineNumber = "382"
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -90,13 +90,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.011027"
+            timestampString = "527606982.807052"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "177"
             endingLineNumber = "177"
-            landmarkName = "update(_:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -106,13 +106,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.011901"
+            timestampString = "527606982.807969"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "256"
-            endingLineNumber = "256"
-            landmarkName = "update(_:)"
-            landmarkType = "7">
+            startingLineNumber = "255"
+            endingLineNumber = "255"
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -122,13 +122,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.012772"
+            timestampString = "527606982.80889"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "133"
             endingLineNumber = "133"
-            landmarkName = "didMove(to:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -138,13 +138,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.013634"
+            timestampString = "527606982.809801"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "151"
             endingLineNumber = "151"
-            landmarkName = "didMove(to:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -154,13 +154,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.014566"
+            timestampString = "527606982.81072"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "152"
             endingLineNumber = "152"
-            landmarkName = "didMove(to:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -170,13 +170,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.015494"
+            timestampString = "527606982.811627"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "168"
             endingLineNumber = "168"
-            landmarkName = "didMove(to:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -186,13 +186,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.016404"
+            timestampString = "527606982.812539"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "168"
             endingLineNumber = "168"
-            landmarkName = "didMove(to:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -202,7 +202,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameSceneParser.swift"
-            timestampString = "527603964.017281"
+            timestampString = "527606982.813457"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "341"
@@ -218,7 +218,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameSceneParser.swift"
-            timestampString = "527603964.017337"
+            timestampString = "527606982.813516"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "68"
@@ -298,13 +298,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.017431"
+            timestampString = "527606982.813616"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "153"
             endingLineNumber = "153"
-            landmarkName = "didMove(to:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -314,13 +314,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.018302"
+            timestampString = "527606982.814522"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "255"
-            endingLineNumber = "255"
-            landmarkName = "update(_:)"
-            landmarkType = "7">
+            startingLineNumber = "254"
+            endingLineNumber = "254"
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -330,13 +330,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.019165"
+            timestampString = "527606982.815425"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "274"
-            endingLineNumber = "274"
-            landmarkName = "update(_:)"
-            landmarkType = "7">
+            startingLineNumber = "273"
+            endingLineNumber = "273"
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -346,13 +346,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.020218"
+            timestampString = "527606982.816336"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "287"
-            endingLineNumber = "287"
-            landmarkName = "setPos(note:currentTime:)"
-            landmarkType = "7">
+            startingLineNumber = "286"
+            endingLineNumber = "286"
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -362,13 +362,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.02112"
+            timestampString = "527606982.817266"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "86"
             endingLineNumber = "86"
-            landmarkName = "didMove(to:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -474,13 +474,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.022102"
+            timestampString = "527606982.818292"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "326"
-            endingLineNumber = "326"
-            landmarkName = "setPos(note:currentTime:)"
-            landmarkType = "7">
+            startingLineNumber = "319"
+            endingLineNumber = "319"
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -490,13 +490,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/GameScene.swift"
-            timestampString = "527603964.022989"
+            timestampString = "527606982.819225"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "194"
             endingLineNumber = "194"
-            landmarkName = "update(_:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
