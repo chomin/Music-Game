@@ -202,6 +202,10 @@ extension GameScene{
 		case .parfect:
 			judgeLabel.text = "parfect!!"
 			ResultScene.parfect += 1
+			ResultScene.combo += 1
+			if ResultScene.combo > ResultScene.maxCombo{
+				ResultScene.maxCombo += 1
+			}
 			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
 			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
 			lanes[laneNum-1].nextNoteIndex += 1
