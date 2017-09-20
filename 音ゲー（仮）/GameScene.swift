@@ -37,12 +37,9 @@ class GameScene: SKScene {//音ゲーをするシーン
 	var judgeLine:SKShapeNode!
 	var sameLines:[(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
 	
-//	//ボタン
-//	let buttons = [ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton(),ExpansionButton()]
-	
 	// 楽曲データ
-	let bmsName = "ようこそジャパリパークへ.bms"
-	let bgmName = "ようこそジャパリパークへ"
+	let bmsName = "オラシオン.bms"
+	let bgmName = "オラシオン"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	var fNotes:[Note] = []
 	var lNotes:[Note] = []
@@ -69,6 +66,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	
 	override func didMove(to view: SKView) {
+	
 		halfBound = self.frame.width/12
 		
 		firstDiameter = self.frame.width/9
@@ -96,7 +94,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		
 		//スピードの設定
-		speed = 20000.0
+		speed = 27500.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
@@ -130,9 +128,8 @@ class GameScene: SKScene {//音ゲーをするシーン
 		lNotes = lNotes.sorted{$0.pos < $1.pos}
 		
 		
-		//画像、音楽、ボタン、ラベルの設定
+		//画像、音楽、ラベルの設定
 		setAllSounds()
-//		setButtons()
 		setImages()
 		
 		//BGMの再生(時間指定)
@@ -159,28 +156,32 @@ class GameScene: SKScene {//音ゲーをするシーン
 		
 		//時間でノーツの位置を設定する(重くなるので近場のみ！)
 		for i in notes{
-
+			
 			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
 			
-			//if remainingBeat < 16 && remainingBeat > -4{//-4拍以上16拍以内
-				i.image.isHidden = false
+			if remainingBeat > -4{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
 				setPos(note: i, currentTime: currentTime)
-				if i.image.position.y > horizonY || remainingBeat > 12{//水平線より上は隠す
-					i.image.isHidden = true
-				}
-			//}
+			}
+			if i.image.position.y > horizonY || remainingBeat > 12 || i.isJudged == true{//水平線より上、12拍以上残っている、判定済みのものは隠す
+				i.image.isHidden = true
+			}else{
+				i.image.isHidden = false
+			}
+			
 			
 			//つながっているノーツ
 			var note:Note? = i
 			while note?.next != nil{
 				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
-				//if remainingBeat2 < 16 && remainingBeat2 > -4{//-4拍以上16拍以内
-					note?.next.image.isHidden = false
+				if remainingBeat2 > -4{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
 					setPos(note: (note?.next)!, currentTime: currentTime)
-					if (note?.next.image.position.y)! > horizonY || remainingBeat2 > 12{
-						note?.next.image.isHidden = true
-					}
-				//}
+				}
+				
+				if (note?.next.image.position.y)! > horizonY || remainingBeat2 > 12 || note?.next.isJudged == true{//水平線より上、12拍以上残っている、判定済みのものは隠す
+					note?.next.image.isHidden = true
+				}else{
+					note?.next.image.isHidden = false
+				}
 				
 				note = note?.next
 			}
@@ -203,20 +204,6 @@ class GameScene: SKScene {//音ゲーをするシーン
 					
 				}
 			}
-//			else if i.longImage != nil{
-//				
-			//				//位置の変更
-			//				i.longImage.position = i.image.position
-			//				i.longImage.position.x -= i.size/2
-			//				if i.type == .middle{
-			//					i.longImage.position.x += i.size*1.3/2
-			//				}
-			//
-			//				//大きさの変更
-			//				i.longImage.setScale(i.size/i.firstLongSize)
-			//				i.longImage.yScale = pow(i.size/i.firstLongSize,1.5)
-			//
-			//			}
 			
 			//つながっているノーツ
 			var note:Note? = i
@@ -280,7 +267,9 @@ class GameScene: SKScene {//音ゲーをするシーン
 				//				print("miss!")
 				judgeLabel.text = "miss!"
 //				lanes[index].laneNotes[value.nextNoteIndex].image.position.x = 3000
-				lanes[index].laneNotes[value.nextNoteIndex].image.isHidden = true
+//				lanes[index].laneNotes[value.nextNoteIndex].image.isHidden = true
+				self.removeChildren(in: [lanes[index].laneNotes[value.nextNoteIndex].image])
+				lanes[index].laneNotes[value.nextNoteIndex].isJudged = true
 				
 				//次のノーツを格納
 				lanes[index].nextNoteIndex += 1
@@ -367,6 +356,7 @@ class Note {
 	var longImage:SKShapeNode!	//このノーツを始点とする緑太線の画像
 	var size:CGFloat = 0
 	var firstLongSize:CGFloat = 0
+	var isJudged = false
 	
 	init(type: NoteType, position pos: Double, lane: Int) {
 		self.type = type
