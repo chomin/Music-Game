@@ -51,10 +51,11 @@ extension GameScene{
 		for i in touches{
 			
 			var pos = i.location(in: self.view)
-			let ppos = i.previousLocation(in: self.view)
+			var ppos = i.previousLocation(in: self.view)
 			let moveDistance = sqrt(pow(pos.x-ppos.x, 2) + pow(pos.y-ppos.y, 2))
 			
 			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+			ppos.y = self.frame.height - ppos.y
 			
 			if pos.y < self.frame.width/3{    //上界
 				
@@ -68,8 +69,10 @@ extension GameScene{
 							
 							playSound(type: .tap)
 							break
-							
-						}else if moveDistance > 10{	//フリックの判定
+						}
+					}
+					if ppos.x > buttonPos - halfBound && ppos.x < buttonPos + halfBound{
+						if moveDistance > 10{	//フリックの判定
 							
 							if judge(laneNum: j+1, type: .flick) || judge(laneNum: j+1, type: .flickEnd){
 								
@@ -77,8 +80,6 @@ extension GameScene{
 								break
 							}
 						}
-						
-						
 					}
 				}
 			}
@@ -136,40 +137,46 @@ extension GameScene{
 		switch lanes[laneNum-1].timeState {
 		case .parfect:
 			judgeLabel.text = "parfect!!"
-//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
-//			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
+			ResultScene.parfect += 1
+			ResultScene.combo += 1
+			if ResultScene.combo > ResultScene.maxCombo{
+				ResultScene.maxCombo += 1
+			}
 			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
 			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .great:
 			judgeLabel.text = "great!"
-//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
-//			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
+			ResultScene.great += 1
+			ResultScene.combo += 1
+			if ResultScene.combo > ResultScene.maxCombo{
+				ResultScene.maxCombo += 1
+			}
 			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
 			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .good:
 			judgeLabel.text = "good"
-//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
-//			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
+			ResultScene.good += 1
+			ResultScene.combo = 0
 			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
 			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .bad:
 			judgeLabel.text = "bad"
-//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
-//			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
+			ResultScene.bad += 1
+			ResultScene.combo = 0
 			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
 			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
 			lanes[laneNum-1].nextNoteIndex += 1
 			return true
 		case .miss:
 			judgeLabel.text = "miss!"
-//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
-//			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
+			ResultScene.miss += 1
+			ResultScene.combo = 0
 			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
 			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
 			lanes[laneNum-1].nextNoteIndex += 1
@@ -194,8 +201,7 @@ extension GameScene{
 		switch lanes[laneNum-1].timeState {
 		case .parfect:
 			judgeLabel.text = "parfect!!"
-//			lanes[laneNum-1].laneNotes[nextIndex].image.position.x = 2000
-//			lanes[laneNum-1].laneNotes[nextIndex].image.isHidden = true
+			ResultScene.parfect += 1
 			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
 			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
 			lanes[laneNum-1].nextNoteIndex += 1

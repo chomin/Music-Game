@@ -11,10 +11,11 @@ import SpriteKit
 import GameplayKit
 import AVFoundation
 
-class GameScene: SKScene {//音ゲーをするシーン
+class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
-	//判定ラベル
+	//ラベル
 	var judgeLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
+	var comboLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
 	
 	//音楽プレイヤー
 	var BGM:AVAudioPlayer?
@@ -33,7 +34,6 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	
 	//画像(ノーツ以外)
-	var longImages:[(note:Note,longImage:SKShapeNode)] = []
 	var judgeLine:SKShapeNode!
 	var sameLines:[(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
 	
@@ -64,9 +64,16 @@ class GameScene: SKScene {//音ゲーをするシーン
 	var halfBound:CGFloat! //判定を汲み取る、ボタン中心からの距離
 	
 	
-	
 	override func didMove(to view: SKView) {
-	
+		//リザルトの初期化
+		ResultScene.parfect = 0
+		ResultScene.great = 0
+		ResultScene.good = 0
+		ResultScene.bad = 0
+		ResultScene.miss = 0
+		ResultScene.combo = 0
+		ResultScene.maxCombo = 0
+		
 		halfBound = self.frame.width/12
 		
 		firstDiameter = self.frame.width/9
@@ -90,8 +97,17 @@ class GameScene: SKScene {//音ゲーをするシーン
 			self.addChild(Label)
 			return Label
 		}()
-		
-		
+		comboLabel = {() -> SKLabelNode in
+			let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+			
+			Label.fontSize = self.frame.width/18
+			Label.horizontalAlignmentMode = .center	//中央寄せ
+			Label.position = CGPoint(x:self.frame.width - Label.fontSize*2, y:self.frame.height*3/4)
+			Label.fontColor=SKColor.white
+			
+			self.addChild(Label)
+			return Label
+		}()
 		
 		//スピードの設定
 		speed = 27500.0
@@ -135,6 +151,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 		//BGMの再生(時間指定)
 		GameScene.start = CACurrentMediaTime()
 		BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
+		BGM?.delegate = self
 		
 		//各レーンにノーツをセット
 		for i in notes{
@@ -153,6 +170,9 @@ class GameScene: SKScene {//音ゲーをするシーン
 	
 	
 	override func update(_ currentTime: TimeInterval) {
+		
+		//ラベルの更新
+		comboLabel.text = String(ResultScene.combo)
 		
 		//時間でノーツの位置を設定する(重くなるので近場のみ！)
 		for i in notes{
@@ -193,8 +213,7 @@ class GameScene: SKScene {//音ゲーをするシーン
 			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
 			
 			if i.next != nil{
-				
-				if i.next.image.position.y < self.frame.width/9 && i.longImage != nil{//先ノーツが判定線を通過したあと
+				if (i.next.image.position.y < self.frame.width/9 || i.next.isJudged == true) && i.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
 					self.removeChildren(in: [i.longImage])
 					i.longImage = nil
 				}else if remainingBeat < 4 && i.next.image.position.y > self.frame.width/9 && i.image.position.y < horizonY{
@@ -220,23 +239,8 @@ class GameScene: SKScene {//音ゲーをするシーン
 						//毎フレーム描き直す
 						
 						setLong(firstNote: (note?.next)!)
-						
-						
 					}
 				}
-//				else if note?.next.longImage != nil{
-//					
-//					//位置の変更
-//					note?.next.longImage.position = (note?.next.image.position)!
-//					note?.next.longImage.position.x -= (note?.next.size)!/2
-//					if note?.next.type == .middle{
-//						note?.next.longImage.position.x += (note?.next.size)!*1.3/2
-//					}
-//					
-//					//大きさの変更
-//					note?.next.longImage.setScale((note?.next.size)!/(note?.next.firstLongSize)!)
-//					note?.next.longImage.yScale = pow((note?.next.size)!/(note?.next.firstLongSize)!, 1.5)
-//				}
 				
 				note = note?.next
 			}
@@ -266,8 +270,8 @@ class GameScene: SKScene {//音ゲーをするシーン
 			if value.timeState == .passed {
 				//				print("miss!")
 				judgeLabel.text = "miss!"
-//				lanes[index].laneNotes[value.nextNoteIndex].image.position.x = 3000
-//				lanes[index].laneNotes[value.nextNoteIndex].image.isHidden = true
+				ResultScene.miss += 1
+				ResultScene.combo = 0
 				self.removeChildren(in: [lanes[index].laneNotes[value.nextNoteIndex].image])
 				lanes[index].laneNotes[value.nextNoteIndex].isJudged = true
 				
@@ -328,17 +332,19 @@ class GameScene: SKScene {//音ゲーをするシーン
 		}else{
 			note.image.position.y = y
 		}
-		//		if note.image.position.y < self.frame.height/2{
-		//			note.image.isHidden = true
-		//		}else{
-		//			note.image.isHidden = false
-		//		}
-		//		note.image?.position.y = ypos
-		
 	}
 	
-	func rotate3D(){
-		
+	//再生終了時の呼び出しメソッド
+	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {//playしたクラスと同じクラスに入れる必要あり？
+		if player == BGM!{
+			let scene = ResultScene(size: (view?.bounds.size)!)
+			let skView = view as! SKView
+			skView.showsFPS = true
+			skView.showsNodeCount = true
+			skView.ignoresSiblingOrder = true
+			scene.scaleMode = .resizeFill
+			skView.presentScene(scene)  //ResultSceneに移動
+		}
 	}
 }
 
@@ -355,7 +361,7 @@ class Note {
 	var image:SKShapeNode!	  //ノーツの画像
 	var longImage:SKShapeNode!	//このノーツを始点とする緑太線の画像
 	var size:CGFloat = 0
-	var firstLongSize:CGFloat = 0
+//	var firstLongSize:CGFloat = 0
 	var isJudged = false
 	
 	init(type: NoteType, position pos: Double, lane: Int) {
@@ -377,15 +383,15 @@ struct Lane {
 				let timeLag = laneNotes[nextNoteIndex].pos*60/GameScene.bpm + GameScene.start - currentTime
 				
 				switch timeLag>0 ? timeLag : -timeLag {
-				case 0..<0.03:
+				case 0..<0.05:
 					return .parfect
-				case 0.03..<0.07:
+				case 0.05..<0.1:
 					return .great
-				case 0.07..<0.1:
-					return .good
 				case 0.1..<0.125:
-					return .bad
+					return .good
 				case 0.125..<0.15:
+					return .bad
+				case 0.15..<0.175:
 					return .miss
 				default:
 					if timeLag > 0{

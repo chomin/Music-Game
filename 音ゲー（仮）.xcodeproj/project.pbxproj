@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0F1CE3891F70F93F00EE4359 /* ロングノーツ追加.mov in Resources */ = {isa = PBXBuildFile; fileRef = 0F1CE3881F70F93F00EE4359 /* ロングノーツ追加.mov */; };
+		0F41C8DF1F7275C2007C6A38 /* ResultScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F41C8DE1F7275C2007C6A38 /* ResultScene.swift */; };
 		0F4C89EB1F696FD5004843A5 /* ようこそジャパリパークへ.bms in Resources */ = {isa = PBXBuildFile; fileRef = 0F4C89E91F696FD5004843A5 /* ようこそジャパリパークへ.bms */; };
 		0F4C89EC1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0F4C89EA1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 */; };
 		0F4C89F31F6D6A77004843A5 /* オラシオン.bms in Resources */ = {isa = PBXBuildFile; fileRef = 0F4C89F11F6D6A77004843A5 /* オラシオン.bms */; };
@@ -53,6 +54,7 @@
 
 /* Begin PBXFileReference section */
 		0F1CE3881F70F93F00EE4359 /* ロングノーツ追加.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "ロングノーツ追加.mov"; sourceTree = "<group>"; };
+		0F41C8DE1F7275C2007C6A38 /* ResultScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultScene.swift; sourceTree = "<group>"; };
 		0F4C89E91F696FD5004843A5 /* ようこそジャパリパークへ.bms */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ようこそジャパリパークへ.bms"; sourceTree = "<group>"; };
 		0F4C89EA1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ようこそジャパリパークへ.mp3"; sourceTree = "<group>"; };
 		0F4C89F11F6D6A77004843A5 /* オラシオン.bms */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "オラシオン.bms"; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				0F746F5F1F5F95F700C1D040 /* シュガビタ.mp3 */,
 				0F746F4E1F5EFF0A00C1D040 /* フリック.mp3 */,
 				0FFD1B791F5E71810007E555 /* TitleScene.swift */,
+				0F41C8DE1F7275C2007C6A38 /* ResultScene.swift */,
 				0FFD1B4B1F5E6D2B0007E555 /* GameViewController.swift */,
 				0F5EE8D61F67F92E00E56B36 /* シュガーソングとビターステップ.bms */,
 				0F4C89E91F696FD5004843A5 /* ようこそジャパリパークへ.bms */,
@@ -342,6 +345,7 @@
 				0F746F471F5EEDB000C1D040 /* GameSceneImages.swift in Sources */,
 				0FFD1B4A1F5E6D2B0007E555 /* GameScene.swift in Sources */,
 				0FFD1B781F5E71410007E555 /* ChooseSoundScene.swift in Sources */,
+				0F41C8DF1F7275C2007C6A38 /* ResultScene.swift in Sources */,
 				0FFD1B7C1F5E7C1D0007E555 /* GameSceneParser.swift in Sources */,
 				0FFD1B4C1F5E6D2B0007E555 /* GameViewController.swift in Sources */,
 				0FFD1B441F5E6D2B0007E555 /* AppDelegate.swift in Sources */,
