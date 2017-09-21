@@ -91,11 +91,11 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		// 先頭が'#'であるものだけを抽出し、'#'を削除
 		bmsData = bmsData
 			.filter { $0.hasPrefix("#") }
-			.map { str in String(str.suffix(str.characters.count - 1)) }
+			.map { str in String(str.suffix(str.characters.count - 1)) }//後ろ...文字
 
 		// ヘッダとメインデータに分割
 		for bmsLine in bmsData {
-			if Int(bmsLine.prefix(1)) == nil {
+			if Int(bmsLine.prefix(1)) == nil {//1文字目が数字じゃないならヘッダ
 				header.append(bmsLine)
 			} else {
 				rawMainData.append(bmsLine)
@@ -119,9 +119,9 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		for headerLine in header {
 			let components = headerLine.components(separatedBy: " ")
 			if components.count >= 2 {
-				if let headerInstruction = headerInstructionTable[components[0]] {
+				if let headerInstruction = headerInstructionTable[components[0]] {//辞書に該当する命令がある場合
 					var value = components[1]
-					let splittedValue = components.dropFirst(2)
+					let splittedValue = components.dropFirst(2)//3つ目以降（名前の中に半角スペースがある場合）
 					for str in splittedValue {
 						value += (" " + str)
 					}
@@ -162,7 +162,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			var ret = (bar: 0, channel: 0, body: [String]())
 
 			let components = str.components(separatedBy: ":")
-			guard components.count >= 2 && components[0].characters.count == 5 else {
+			guard components.count >= 2 && components[0].characters.count == 5 else {//条件に合わない場合に処理を抜けるコードをシンプルに記述するために用意された構文(falseのときにelse以下が実行される。return、break、throwのいずれかを必ず記述しなければならない。)
 				throw ParseError.lackOfData("データが欠損しています: #\(str)")
 			}
 

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0F1CE3891F70F93F00EE4359 /* ロングノーツ追加.mov in Resources */ = {isa = PBXBuildFile; fileRef = 0F1CE3881F70F93F00EE4359 /* ロングノーツ追加.mov */; };
+		0F3BC4C41F73D83800A1E891 /* PickerKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F3BC4C31F73D83500A1E891 /* PickerKeyboard.swift */; };
 		0F41C8DF1F7275C2007C6A38 /* ResultScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F41C8DE1F7275C2007C6A38 /* ResultScene.swift */; };
 		0F4C89EB1F696FD5004843A5 /* ようこそジャパリパークへ.bms in Resources */ = {isa = PBXBuildFile; fileRef = 0F4C89E91F696FD5004843A5 /* ようこそジャパリパークへ.bms */; };
 		0F4C89EC1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0F4C89EA1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 */; };
@@ -54,6 +55,7 @@
 
 /* Begin PBXFileReference section */
 		0F1CE3881F70F93F00EE4359 /* ロングノーツ追加.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "ロングノーツ追加.mov"; sourceTree = "<group>"; };
+		0F3BC4C31F73D83500A1E891 /* PickerKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PickerKeyboard.swift; path = "/Users/NakaiKohei/Desktop/音ゲー（仮）/音ゲー（仮）/PickerKeyboard.swift"; sourceTree = "<absolute>"; };
 		0F41C8DE1F7275C2007C6A38 /* ResultScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultScene.swift; sourceTree = "<group>"; };
 		0F4C89E91F696FD5004843A5 /* ようこそジャパリパークへ.bms */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ようこそジャパリパークへ.bms"; sourceTree = "<group>"; };
 		0F4C89EA1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ようこそジャパリパークへ.mp3"; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 		0FFD1B421F5E6D2B0007E555 /* 音ゲー（仮） */ = {
 			isa = PBXGroup;
 			children = (
+				0F3BC4C31F73D83500A1E891 /* PickerKeyboard.swift */,
 				0F746F591F5F950E00C1D040 /* LaunchScreen.storyboard */,
 				0F746F5B1F5F950E00C1D040 /* Main.storyboard */,
 				0FFD1B431F5E6D2B0007E555 /* AppDelegate.swift */,
@@ -351,6 +354,7 @@
 				0FFD1B441F5E6D2B0007E555 /* AppDelegate.swift in Sources */,
 				0F746F4B1F5EEEFF00C1D040 /* GameSceneSounds.swift in Sources */,
 				0FFD1B7A1F5E71810007E555 /* TitleScene.swift in Sources */,
+				0F3BC4C41F73D83800A1E891 /* PickerKeyboard.swift in Sources */,
 				0F746F491F5EEDC200C1D040 /* GameSceneTouches.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

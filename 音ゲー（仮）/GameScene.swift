@@ -38,8 +38,32 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var sameLines:[(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
 	
 	// 楽曲データ
-	let bmsName = "オラシオン.bms"
-	let bgmName = "オラシオン"
+	init(musicName:String ,size:CGSize) {
+		super.init(size:size)
+		
+		switch musicName {
+		case "シュガーソングとビターステップ":
+			bmsName = "シュガーソングとビターステップ.bms"
+			bgmName = "シュガビタ"
+		case "ようこそジャパリパークへ":
+			bmsName = "ようこそジャパリパークへ.bms"
+			bgmName = "ようこそジャパリパークへ"
+		case "オラシオン":
+			bmsName = "オラシオン.bms"
+			bgmName = "オラシオン"
+		default:
+			break
+		}
+	}
+	
+	
+	
+	required init?(coder aDecoder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+	
+	var bmsName = "オラシオン.bms"
+	var bgmName = "オラシオン"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	var fNotes:[Note] = []
 	var lNotes:[Note] = []
@@ -230,7 +254,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
 				
 				if note?.next.next != nil {
-					if (note?.next.next.image.position.y)! < self.frame.width/9 && note?.next.longImage != nil{//先ノーツが判定線を通過したあと
+					if (note?.next.next.image.position.y)! < self.frame.width/9 && note?.next.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
 						self.removeChildren(in: [(note?.next.longImage)!])
 						note?.next.longImage = nil
 					}else if remainingBeat2 < 4 && (note?.next.next.image.position.y)! > self.frame.width/9 && note?.next.next.isJudged == false && (note?.next.image.position.y)! < horizonY!{
@@ -267,7 +291,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		for (index,value) in lanes.enumerated(){
 			lanes[index].currentTime = currentTime
 			if value.timeState == .passed {
-				//				print("miss!")
 				judgeLabel.text = "miss!"
 				ResultScene.miss += 1
 				ResultScene.combo = 0
@@ -282,12 +305,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 	}
 	
-	func setPos (note:Note ,currentTime:TimeInterval)  {	//
-		//		var ypos =  self.frame.width/9
-		
+	func setPos (note:Note ,currentTime:TimeInterval)  {
 		var fypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離
 		
-		if fypos <= -horizontalDistance{
+		if fypos <= -horizontalDistance{//分母が0になるのを防止
 			fypos = -horizontalDistance+1
 		}
 		
