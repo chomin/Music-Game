@@ -91,7 +91,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		// 先頭が'#'であるものだけを抽出し、'#'を削除
 		bmsData = bmsData
 			.filter { $0.hasPrefix("#") }
-			.map { str in String(str.suffix(str.characters.count - 1)) }
+			.map { str in String(str.suffix(str.count - 1)) }
 
 		// ヘッダとメインデータに分割
 		for bmsLine in bmsData {
@@ -162,7 +162,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			var ret = (bar: 0, channel: 0, body: [String]())
 
 			let components = str.components(separatedBy: ":")
-			guard components.count >= 2 && components[0].characters.count == 5 else {
+			guard components.count >= 2 && components[0].count == 5 else {
 				throw ParseError.lackOfData("データが欠損しています: #\(str)")
 			}
 
@@ -177,7 +177,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				throw ParseError.invalidValue("チャンネル指定が不正です: #\(str)")
 			}
 			// オブジェクト配列を2文字ずつに分けてdataに格納
-			for i in stride(from: 0, to: components[1].characters.count, by: 2) {
+			for i in stride(from: 0, to: components[1].count, by: 2) {
 				let headIndex = str.index(str.startIndex, offsetBy: i)
 				let tailIndex = str.index(str.startIndex, offsetBy: i + 2)
 				ret.body.append(String(components[1][headIndex..<tailIndex]))
