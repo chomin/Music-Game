@@ -79,11 +79,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		//レーン
 	
 	//立体感を出すための定数
-	let horizontalDistance:CGFloat = 10000	//画面から目までの水平距離a（約5000で10cmほど）
+	let horizontalDistance:CGFloat = 25000	//画面から目までの水平距離a（約5000で10cmほど）
 	var verticalDistance:CGFloat!	//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
 	var horizon:CGFloat!  //水平線の長さ
 	var horizonY:CGFloat! //水平線のy座標
-	var firstDiameter:CGFloat!	//最初の(判定線での)ノーツの直径2r（iphone7で74くらい）
+	var laneWidth:CGFloat!	//最初の(判定線での)ノーツの直径2r（iphone7で74くらい）
 	
 	var halfBound:CGFloat! //判定を汲み取る、ボタン中心からの距離
 	
@@ -100,13 +100,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		halfBound = self.frame.width/12
 		
-		firstDiameter = self.frame.width/9
+		laneWidth = self.frame.width/9
 		
-		horizon = self.frame.width*3/32	  //水平線の長さ。iphone7で83くらい
+		horizon = self.frame.width/16	  //水平線の長さ。iphone7で83くらい
 		horizonY = self.frame.height*15/16	//
 		
-		verticalDistance = self.frame.width/9 + (horizonY-self.frame.width/9)*1.1
-		
+//		verticalDistance = self.frame.width/9 + (horizonY-self.frame.width/9)*1.1
+//		verticalDistance = horizonY - self.frame.width/24
+		verticalDistance = horizonY * 50
 		print(horizonY-self.frame.width/9)	//判定線から水平線までの画面上での幅。277くらい
 		
 		//ラベルの設定
@@ -134,7 +135,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		}()
 		
 		//スピードの設定
-		speed = 27500.0
+		speed = 1000.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
@@ -203,10 +204,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			
 			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
 			
-			if remainingBeat > -4{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
+			if i.isJudged == false && remainingBeat < 8{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
 				setPos(note: i, currentTime: currentTime)
+				if i.next != nil{	//つながっている1つ先までは描く
+					setPos(note: i.next, currentTime: currentTime)
+				}
+//				if i.type == .flickEnd || i.type == .tapEnd || i.type == .middle{//先ノーツになりうるものは無条件に描く
+//					setPos(note: i, currentTime: currentTime)
+//				}else if remainingBeat < 8{
+//					setPos(note: i, currentTime: currentTime)
+//				}
 			}
-			if i.image.position.y > horizonY || remainingBeat > 12 || i.isJudged == true{//水平線より上、12拍以上残っている、判定済みのものは隠す
+			if i.image.position.y > horizonY || remainingBeat > 8 || i.isJudged == true{//水平線より上、8拍以上残っている、判定済みのものは隠す
 				i.image.isHidden = true
 			}else{
 				i.image.isHidden = false
@@ -217,8 +226,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			var note:Note? = i
 			while note?.next != nil{
 				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
-				if remainingBeat2 > -4{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
+				if note?.next.isJudged == false && remainingBeat2 < 8{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
+					
 					setPos(note: (note?.next)!, currentTime: currentTime)
+					
+					if note?.next.next != nil{
+						setPos(note: (note?.next?.next)!, currentTime: currentTime)
+					}
+//					if note?.next.type == .flickEnd || note?.next.type == .tapEnd || note?.next.type == .middle{//先ノーツになりうるものは無条件に描く
+//						setPos(note: (note?.next)!, currentTime: currentTime)
+//					}else if remainingBeat2 < 8{
+//						setPos(note: (note?.next)!, currentTime: currentTime)
+//					}
 				}
 				
 				if (note?.next.image.position.y)! > horizonY || remainingBeat2 > 12 || note?.next.isJudged == true{//水平線より上、12拍以上残っている、判定済みのものは隠す
@@ -244,7 +263,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 					
 					//毎フレーム描き直す
 					setLong(firstNote: i)
-					
 				}
 			}
 			
@@ -277,15 +295,24 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			let a = (horizon/7-self.frame.width/9)/(horizonY - self.frame.width/9)
 			let diameter = a*(i.line.position.y-horizonY) + horizon/7
 			
-			i.line.setScale(diameter/firstDiameter)
+			i.line.setScale(diameter/laneWidth)
 		}
 		
 		
 		//判定関係
-		//middleの判定
-//		for i in buttons{
-//			
-//		}
+		//middleの判定（同じところで長押しのやつ）
+		//		for i in 0...6{
+		//
+		//
+		//
+		//			let nextIndex = lanes[i].nextNoteIndex
+		//
+		//			if lanes[i].timeState == .parfect && lanes[i].laneNotes[nextIndex].type == .middle{
+		//
+		//			}
+		//
+		//		}
+		
 		
 		//レーンの監視(過ぎて行ってないか)
 		for (index,value) in lanes.enumerated(){
@@ -306,46 +333,69 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	}
 	
 	func setPos (note:Note ,currentTime:TimeInterval)  {
-		var fypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離
 		
-		if fypos <= -horizontalDistance{//分母が0になるのを防止
-			fypos = -horizontalDistance+1
+		//y座標の計算
+		var fypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離x
+		
+		guard fypos > -horizontalDistance else {//分母が0になるのを防止
+			return
 		}
 		
 		let y = (verticalDistance * fypos / (horizontalDistance + fypos)) + self.frame.width/9
 		
 		
-		//大きさの変更
-		let a = (horizon/7-self.frame.width/9)/(horizonY - self.frame.width/9)
-		let diameter = a*(y-horizonY) + horizon/7
+		//大きさと形の変更(楕円は描き直し,その他は拡大のみ)
 		
-		note.image.setScale(1.3*diameter/firstDiameter)
+		let grad = (horizon/7-laneWidth)/(horizonY - self.frame.width/9)//傾き
+		let diameter = 1.3*(grad*(y-horizonY) + horizon/7)
+		
+//
 		note.size = diameter
 		
-		if note.image.position.x < 1000{	//消えてない
-			var xpos:CGFloat
-			
-			if note.lane != 4{  //傾き無限大防止
-				var b = (horizonY-self.frame.width/9)   //傾き
-				var c = CGFloat(4-note.lane)*self.frame.width/9
-				c += CGFloat(note.lane-4)*horizon/7
-				b /= c
-				xpos = (y - self.frame.width/9)/b
-				xpos += self.frame.width/18 + CGFloat(note.lane)*self.frame.width/9
-			} else {
-				xpos = self.frame.width/2
-			}
-			
-			
-			if note.type == .middle{ //線だけずらす(開始点がposition)→長さの半分だけずらすように！
-				xpos -= 1.3*diameter/2
-			}
-			
-			note.image.position = CGPoint(x:xpos ,y:y)
-			
+		
+		//楕円の縦幅を計算
+		let l = sqrt(pow(horizontalDistance + fypos, 2) + pow(laneWidth*CGFloat(4-note.lane), 2))
+		let aPrime = horizontalDistance * l / (horizontalDistance + fypos)
+		let xPrime = fypos * l / (horizontalDistance + fypos)
+		let deltaY = 1.3 * laneWidth * aPrime * verticalDistance / (pow(aPrime + xPrime, 2) - pow(1.3 * laneWidth, 2))
+		
+		if note.type == .tap && note.next == nil{
+			self.removeChildren(in: [note.image])
+			note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
+			note.image.fillColor = .white
+			self.addChild(note.image)
+		}else if note.type == .tapEnd || note.type == .tap{
+			self.removeChildren(in: [note.image])
+			note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
+			note.image.fillColor = .green
+			self.addChild(note.image)
 		}else{
-			note.image.position.y = y
+			note.image.setScale(diameter/laneWidth)
 		}
+		
+		//向きの変更
+		
+		
+		//座標の設定
+		var xpos:CGFloat
+		
+		if note.lane != 4{  //傾き無限大防止
+			var b = (horizonY-self.frame.width/9)   //傾き
+			var c = CGFloat(4-note.lane)*self.frame.width/9
+			c += CGFloat(note.lane-4)*horizon/7
+			b /= c
+			xpos = (y - self.frame.width/9)/b
+			xpos += self.frame.width/18 + CGFloat(note.lane)*self.frame.width/9
+		} else {
+			xpos = self.frame.width/2
+		}
+		
+		
+		if note.type == .middle{ //線だけずらす(開始点がposition)→長さの半分だけずらすように！
+			xpos -= diameter/2
+		}
+		
+		note.image.position = CGPoint(x:xpos ,y:y)
 	}
 	
 	//再生終了時の呼び出しメソッド
@@ -374,7 +424,7 @@ class Note {
 	var next: Note!
 	var image:SKShapeNode!	  //ノーツの画像
 	var longImage:SKShapeNode!	//このノーツを始点とする緑太線の画像
-	var size:CGFloat = 0
+	var size:CGFloat = 0	//線の座標をずらすのに必要
 //	var firstLongSize:CGFloat = 0
 	var isJudged = false
 	

@@ -5,7 +5,7 @@
 //  Created by Kohei Nakai on 2017/09/05.
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
 //
-//（9/11の成果が残っている？）
+
 
 import SpriteKit
 
@@ -18,7 +18,7 @@ extension GameScene{
 			let line = SKShapeNode(points: &points, count: points.count)
 			
 			line.lineWidth = 1.0
-			line.alpha = 0.9
+			line.alpha = 0.3
 			
 			self.addChild(line)
 
@@ -38,12 +38,9 @@ extension GameScene{
 			
 			var note:Note? = i
 			
-			while note?.next != nil {  //つながっている先のノーツを描き、格納→つなげる(noteが始点)(ここではつなげない！)
+			while note?.next != nil {  //つながっている先のノーツを描き、格納
 				
 				note?.next?.image = paintNote(i: (note?.next)!)
-				
-//
-	
 				note = note!.next	  //進める
 			}
 			
@@ -70,7 +67,6 @@ extension GameScene{
 			}
 			
 			i += 1
-			
 		}
 		
 		
@@ -109,7 +105,7 @@ extension GameScene{
 			
 			note.fillColor = UIColor.magenta
 			
-		}else if i.type == .middle{//線(notesに入らないから不要)
+		}else if i.type == .middle{//線
 			var points = [CGPoint(x:0.0 ,y:0.0) ,CGPoint(x:self.frame.width/9 ,y:0.0)]
 			note = SKShapeNode(points: &points, count: points.count)
 			
@@ -118,10 +114,10 @@ extension GameScene{
 			note.strokeColor = UIColor.green
 			
 		}else if i.type == .tapEnd || i.next != nil{//緑楕円(middleもnextがnilにならないことに注意！)
-			note = SKShapeNode(ellipseOf: CGSize(width:self.frame.width/9, height:self.frame.width/18))
+			note = SKShapeNode(ellipseOf: CGSize(width:self.frame.width/9, height:self.frame.width/20))
 			note.fillColor = UIColor.green
 		}else{//白楕円
-			note = SKShapeNode(ellipseOf: CGSize(width:self.frame.width/9, height:self.frame.width/18))
+			note = SKShapeNode(ellipseOf: CGSize(width:self.frame.width/9, height:self.frame.width/20))
 			note.fillColor = UIColor.white
 		}
 		
@@ -177,24 +173,24 @@ extension GameScene{
 		//まず、始点&終点ノーツが円か線かで中心座標が異なるため場合分け
 		var startNotepos:CGPoint =  (firstNote.image.position) //中心座標
 		if firstNote.type == .middle{//線だけずらす
-			startNotepos.x += 1.3*firstNote.size/2
+			startNotepos.x += firstNote.size/2
 		}
 		var endNotepos:CGPoint =  (firstNote.next?.image?.position)! //中心座標
 		if firstNote.next!.type == .middle{//線だけずらす
-			endNotepos.x += 1.3*firstNote.next.size/2
+			endNotepos.x += firstNote.next.size/2
 		}
 		
 		if startNotepos.y > self.frame.width/9{//始点ノーツが判定線を通過する前
-			path.move(to: CGPoint(x:startNotepos.x-firstNote.size/2, y:startNotepos.y))  //始点
-			path.addLine(to: CGPoint(x:startNotepos.x+firstNote.size/2, y:startNotepos.y))
-			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2, y:endNotepos.y))
-			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2, y:endNotepos.y))
+			path.move(to: CGPoint(x:startNotepos.x-firstNote.size/2/1.3, y:startNotepos.y))  //始点
+			path.addLine(to: CGPoint(x:startNotepos.x+firstNote.size/2/1.3, y:startNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/1.3, y:endNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/1.3, y:endNotepos.y))
 			path.closeSubpath()
 		}else{
 			path.move(to: CGPoint(x:CGFloat(firstNote.lane)*self.frame.width/9, y:self.frame.width/9))  //始点
 			path.addLine(to: CGPoint(x:CGFloat(firstNote.lane + 1)*self.frame.width/9, y:self.frame.width/9))
-			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2, y:endNotepos.y))
-			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2, y:endNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/1.3, y:endNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/1.3, y:endNotepos.y))
 			path.closeSubpath()
 		}
 		
@@ -216,7 +212,7 @@ extension GameScene{
 //		firstNote.longImage.position = firstNote.image.position
 //		firstNote.longImage.position.x -= firstNote.size/2
 //		if firstNote.type == .middle{
-//			firstNote.longImage.position.x += firstNote.size*1.3/2
+//			firstNote.longImage.position.x += firstNote.size/2
 //		}
 		
 	
