@@ -47,7 +47,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		switch musicName {
 		case "シュガーソングとビターステップ":
 			bmsName = "シュガーソングとビターステップ.bms"
-			bgmName = "シュガビタ"
+			bgmName = "シュガビタ"
 		case "ようこそジャパリパークへ":
 			bmsName = "ようこそジャパリパークへ.bms"
 			bgmName = "ようこそジャパリパークへ"

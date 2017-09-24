@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:/Users/NakaiKohei/Desktop/&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;/&#x30b7;&#x30e5;&#x30ab;&#x3099;&#x30d2;&#x3099;&#x30bf;.mp3">
+   </FileRef>
+   <FileRef
       location = "self:">
    </FileRef>
 </Workspace>

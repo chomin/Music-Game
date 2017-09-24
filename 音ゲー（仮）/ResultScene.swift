@@ -19,6 +19,8 @@ class ResultScene: SKScene {
 	var label:SKLabelNode!
 	var resultFontSize:CGFloat!
 	
+	let replayButton = UIButton()
+	
 	override func didMove(to view: SKView) {
 		
 		resultFontSize = self.frame.width/24
@@ -47,10 +49,38 @@ class ResultScene: SKScene {
 			return Label
 		}()
 		
+		
+		//ボタンの設定
+		replayButton.addTarget(self, action: #selector(onClickReplayButton(_:)), for: .touchUpInside)
+		replayButton.frame = CGRect(x: 0,y: 0,width:self.frame.width/5 ,height: 50)
+		replayButton.backgroundColor = UIColor.red
+		replayButton.layer.masksToBounds = true
+		replayButton.setTitle("曲選択に戻る", for: UIControlState())
+		replayButton.setTitleColor(UIColor.white, for: UIControlState())
+		replayButton.setTitle("曲選択に戻る", for: UIControlState.highlighted)
+		replayButton.setTitleColor(UIColor.black, for: UIControlState.highlighted)
+		replayButton.isHidden = false
+		replayButton.layer.cornerRadius = 20.0
+		replayButton.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:50)
+		self.view?.addSubview(replayButton)
 	}
 	
 	
 	override func update(_ currentTime: TimeInterval) {
 		// Called before each frame is rendered
+	}
+	
+	@objc func onClickReplayButton(_ sender : UIButton){
+		
+		replayButton.isHidden = true
+		
+		let scene = ChooseMusicScene(size: (view?.bounds.size)!)
+		let skView = view as! SKView
+		skView.showsFPS = true
+		skView.showsNodeCount = true
+		skView.ignoresSiblingOrder = true
+		scene.scaleMode = .resizeFill
+		skView.presentScene(scene)  //ChooseMusicSceneに移動
+		
 	}
 }
