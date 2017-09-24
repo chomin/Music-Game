@@ -181,16 +181,16 @@ extension GameScene{
 		}
 		
 		if startNotepos.y > self.frame.width/9{//始点ノーツが判定線を通過する前
-			path.move(to: CGPoint(x:startNotepos.x-firstNote.size/2/1.3, y:startNotepos.y))  //始点
-			path.addLine(to: CGPoint(x:startNotepos.x+firstNote.size/2/1.3, y:startNotepos.y))
-			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/1.3, y:endNotepos.y))
-			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/1.3, y:endNotepos.y))
+			path.move(to: CGPoint(x:startNotepos.x-firstNote.size/2/CGFloat(noteScale), y:startNotepos.y))  //始点
+			path.addLine(to: CGPoint(x:startNotepos.x+firstNote.size/2/CGFloat(noteScale), y:startNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/CGFloat(noteScale), y:endNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/CGFloat(noteScale), y:endNotepos.y))
 			path.closeSubpath()
 		}else{
 			path.move(to: CGPoint(x:CGFloat(firstNote.lane)*self.frame.width/9, y:self.frame.width/9))  //始点
 			path.addLine(to: CGPoint(x:CGFloat(firstNote.lane + 1)*self.frame.width/9, y:self.frame.width/9))
-			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/1.3, y:endNotepos.y))
-			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/1.3, y:endNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/CGFloat(noteScale), y:endNotepos.y))
+			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/CGFloat(noteScale), y:endNotepos.y))
 			path.closeSubpath()
 		}
 		

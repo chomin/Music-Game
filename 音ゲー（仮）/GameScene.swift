@@ -79,13 +79,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		//レーン
 	
 	//立体感を出すための定数
-	let horizontalDistance:CGFloat = 25000	//画面から目までの水平距離a（約5000で10cmほど）
+	let horizontalDistance:CGFloat = 220	//画面から目までの水平距離a（約5000で10cmほど）
 	var verticalDistance:CGFloat!	//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
 	var horizon:CGFloat!  //水平線の長さ
 	var horizonY:CGFloat! //水平線のy座標
 	var laneWidth:CGFloat!	//最初の(判定線での)ノーツの直径2r（iphone7で74くらい）
 	
 	var halfBound:CGFloat! //判定を汲み取る、ボタン中心からの距離
+	
+	let noteScale = 1.3	//レーン幅に対するノーツの幅の倍率
 	
 	
 	override func didMove(to view: SKView) {
@@ -107,7 +109,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 //		verticalDistance = self.frame.width/9 + (horizonY-self.frame.width/9)*1.1
 //		verticalDistance = horizonY - self.frame.width/24
-		verticalDistance = horizonY * 50
+		verticalDistance = horizonY //モデルに合わせるなら水平線は画面上端辺りが丁度いい？
 		print(horizonY-self.frame.width/9)	//判定線から水平線までの画面上での幅。277くらい
 		
 		//ラベルの設定
@@ -135,7 +137,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		}()
 		
 		//スピードの設定
-		speed = 1000.0
+		speed = 1700.0
 		
 		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
 		do {
@@ -335,29 +337,37 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	func setPos (note:Note ,currentTime:TimeInterval)  {
 		
 		//y座標の計算
-		var fypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離x
+		let fypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離x
 		
-		guard fypos > -horizontalDistance else {//分母が0になるのを防止
+		//鉛直面に投写
+//		guard fypos > -horizontalDistance else {//分母が0になるのを防止
+//			return
+//		}
+//
+//		let y = (verticalDistance * fypos / (horizontalDistance + fypos)) + self.frame.width/9
+		
+		//球面？に投写
+		guard fypos > -(pow(horizontalDistance, 2) + pow(verticalDistance, 2)) / horizontalDistance else {//atan内の分母が0になるのを防止
 			return
 		}
-		
-		let y = (verticalDistance * fypos / (horizontalDistance + fypos)) + self.frame.width/9
+		let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
+		let y = R * atan(verticalDistance * fypos / (pow(R, 2) + fypos*horizontalDistance))
 		
 		
 		//大きさと形の変更(楕円は描き直し,その他は拡大のみ)
 		
 		let grad = (horizon/7-laneWidth)/(horizonY - self.frame.width/9)//傾き
-		let diameter = 1.3*(grad*(y-horizonY) + horizon/7)
+		let diameter = CGFloat(noteScale)*(grad*(y-horizonY) + horizon/7)
 		
-//
 		note.size = diameter
-		
 		
 		//楕円の縦幅を計算
 		let l = sqrt(pow(horizontalDistance + fypos, 2) + pow(laneWidth*CGFloat(4-note.lane), 2))
-		let aPrime = horizontalDistance * l / (horizontalDistance + fypos)
-		let xPrime = fypos * l / (horizontalDistance + fypos)
-		let deltaY = 1.3 * laneWidth * aPrime * verticalDistance / (pow(aPrime + xPrime, 2) - pow(1.3 * laneWidth, 2))
+//		let aPrime = horizontalDistance * l / (horizontalDistance + fypos)
+//		let xPrime = fypos * l / (horizontalDistance + fypos)
+//		let deltaY = 1.3 * laneWidth * aPrime * verticalDistance / (pow(aPrime + xPrime, 2) - pow(1.3 * laneWidth, 2))
+		let deltaY = R * atan(1.3*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(1.3*laneWidth/2, 2)))
+		
 		
 		if note.type == .tap && note.next == nil{
 			self.removeChildren(in: [note.image])
