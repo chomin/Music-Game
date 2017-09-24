@@ -12,11 +12,15 @@ extension GameScene{
 	
 	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 		
+		
 		for i in touches {//すべてのタッチに対して処理する（同時押しなどもあるため）
+			
 			
 			var pos = i.location(in: self.view)
 			
 			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+			
+			allTouchesLocation.append(pos)
 			
 			if pos.y < self.frame.width/3{    //上界
 				
@@ -48,6 +52,9 @@ extension GameScene{
 	}
 	
 	override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {//ボタン外でスタートした時にしか起動しない
+		
+		
+		
 		for i in touches{
 			
 			var pos = i.location(in: self.view)
@@ -57,6 +64,11 @@ extension GameScene{
 			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
 			ppos.y = self.frame.height - ppos.y
 			
+			allTouchesLocation[allTouchesLocation.index(of: ppos)!] = pos
+		
+			
+	
+			
 			if pos.y < self.frame.width/3{    //上界
 				
 				for j in 0...6{
@@ -65,11 +77,11 @@ extension GameScene{
 					
 					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
 						
-						if parfectMiddleJudge(laneNum: j+1){//途中線の判定
-							
-							playSound(type: .tap)
-							break
-						}
+//						if parfectMiddleJudge(laneNum: j+1){//途中線の判定
+//							
+//							playSound(type: .tap)
+//							break
+//						}
 					}
 					if ppos.x > buttonPos - halfBound && ppos.x < buttonPos + halfBound{
 						if moveDistance > 10{	//フリックの判定
@@ -91,8 +103,12 @@ extension GameScene{
 		for i in touches {
 			
 			var pos = i.location(in: self.view)
+			var ppos = i.previousLocation(in: self.view)
 			
 			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+			ppos.y = self.frame.height - ppos.y
+			
+			allTouchesLocation.remove(at: allTouchesLocation.index(of: ppos)!)
 			
 			if pos.y < self.frame.width/3{    //上界
 				

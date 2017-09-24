@@ -13,6 +13,9 @@ import AVFoundation
 
 class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
+	//タッチ情報
+	var allTouchesLocation:[CGPoint] = []
+	
 	//ラベル
 	var judgeLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
 	var comboLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
@@ -91,6 +94,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	
 	override func didMove(to view: SKView) {
+		
+		
 		//リザルトの初期化
 		ResultScene.parfect = 0
 		ResultScene.great = 0
@@ -104,12 +109,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		laneWidth = self.frame.width/9
 		
-		horizon = self.frame.width/16	  //水平線の長さ。iphone7で83くらい
+		horizon = self.frame.width/16	  //
 		horizonY = self.frame.height*15/16	//
 		
 //		verticalDistance = self.frame.width/9 + (horizonY-self.frame.width/9)*1.1
 //		verticalDistance = horizonY - self.frame.width/24
-		verticalDistance = horizonY //モデルに合わせるなら水平線は画面上端辺りが丁度いい？
+		verticalDistance = horizonY //モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
 		print(horizonY-self.frame.width/9)	//判定線から水平線までの画面上での幅。277くらい
 		
 		//ラベルの設定
@@ -198,6 +203,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	override func update(_ currentTime: TimeInterval) {
 		
+		for i in allTouchesLocation{
+			print(i)
+		}
+		
 		//ラベルの更新
 		comboLabel.text = String(ResultScene.combo)
 		
@@ -206,7 +215,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			
 			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
 			
-			if i.isJudged == false && remainingBeat < 8{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
+			if (i.isJudged == false || remainingBeat > 0) && remainingBeat < 8{//位置を設定(水平線より上でもロング先に必要、判定後でもロング初めに必要、判定線過ぎても普通に必要)
 				setPos(note: i, currentTime: currentTime)
 				if i.next != nil{	//つながっている1つ先までは描く
 					setPos(note: i.next, currentTime: currentTime)
@@ -228,7 +237,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			var note:Note? = i
 			while note?.next != nil{
 				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
-				if note?.next.isJudged == false && remainingBeat2 < 8{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
+				if (note?.next.isJudged == false || remainingBeat2 > 0) && remainingBeat2 < 8{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
 					
 					setPos(note: (note?.next)!, currentTime: currentTime)
 					
@@ -274,7 +283,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
 				
 				if note?.next.next != nil {
-					if (note?.next.next.image.position.y)! < self.frame.width/9 && note?.next.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
+					if ((note?.next.next.image.position.y)! < self.frame.width/9 || note?.next.next.isJudged == true) && note?.next.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
 						self.removeChildren(in: [(note?.next.longImage)!])
 						note?.next.longImage = nil
 					}else if remainingBeat2 < 4 && (note?.next.next.image.position.y)! > self.frame.width/9 && note?.next.next.isJudged == false && (note?.next.image.position.y)! < horizonY!{
@@ -303,6 +312,25 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		//判定関係
 		//middleの判定（同じところで長押しのやつ）
+		for i in allTouchesLocation{
+			if i.y < self.frame.width/3{    //上界
+				
+				for j in 0...6{
+					
+					let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
+					
+					if i.x > buttonPos - halfBound && i.x < buttonPos + halfBound {//ボタンの範囲
+						
+						if parfectMiddleJudge(laneNum: j+1){//離しの判定
+							
+							playSound(type: .tap)
+							break
+						}
+					}
+				}
+			}
+		}
+		
 		//		for i in 0...6{
 		//
 		//
@@ -323,7 +351,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				judgeLabel.text = "miss!"
 				ResultScene.miss += 1
 				ResultScene.combo = 0
-				self.removeChildren(in: [lanes[index].laneNotes[value.nextNoteIndex].image])
+//				self.removeChildren(in: [lanes[index].laneNotes[value.nextNoteIndex].image])	//ロングを描くのに必要なため、ここではまずい
 				lanes[index].laneNotes[value.nextNoteIndex].isJudged = true
 				
 				//次のノーツを格納
