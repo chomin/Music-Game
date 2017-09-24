@@ -78,7 +78,7 @@ extension GameScene{
 					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
 						
 //						if parfectMiddleJudge(laneNum: j+1){//途中線の判定
-//							
+//
 //							playSound(type: .tap)
 //							break
 //						}
