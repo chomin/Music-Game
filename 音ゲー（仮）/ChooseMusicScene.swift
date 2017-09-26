@@ -59,7 +59,7 @@ class ChooseMusicScene: SKScene {
 		skView.showsNodeCount = true
 		skView.ignoresSiblingOrder = true
 		scene.scaleMode = .resizeFill
-		skView.presentScene(scene)  //ChooseMusicSceneに移動
+		skView.presentScene(scene)  // GameSceneに移動
 
 	}
 	
