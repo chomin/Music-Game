@@ -452,14 +452,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//再生終了時の呼び出しメソッド
 	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {//playしたクラスと同じクラスに入れる必要あり？
-		if player == BGM!{
+		if player as AVAudioPlayer! == BGM{
 			let scene = ResultScene(size: (view?.bounds.size)!)
-			let skView = view as! SKView
-			skView.showsFPS = true
-			skView.showsNodeCount = true
-			skView.ignoresSiblingOrder = true
+			let skView = view as SKView!
+			skView?.showsFPS = true
+			skView?.showsNodeCount = true
+			skView?.ignoresSiblingOrder = true
 			scene.scaleMode = .resizeFill
-			skView.presentScene(scene)  //ResultSceneに移動
+			skView?.presentScene(scene)  //ResultSceneに移動
 		}
 	}
 }
