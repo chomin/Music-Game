@@ -28,19 +28,19 @@ extension GameScene{
 		kara3 = setSound(fileName: "空打ち", type: "wav")
 		kara4 = setSound(fileName: "空打ち", type: "wav")
 		
-		tapSound5 = setSound(fileName: "タップ")
-		tapSound6 = setSound(fileName: "タップ")
-		tapSound7 = setSound(fileName: "タップ")
-		tapSound8 = setSound(fileName: "タップ")
-		flickSound5 = setSound(fileName: "フリック")
-		flickSound6 = setSound(fileName: "フリック")
-		flickSound7 = setSound(fileName: "フリック")
-		flickSound8 = setSound(fileName: "フリック")
+		tapSound5 = setSound(fileName: "タップ", type: "wav")
+		tapSound6 = setSound(fileName: "タップ", type: "wav")
+		tapSound7 = setSound(fileName: "タップ", type: "wav")
+		tapSound8 = setSound(fileName: "タップ", type: "wav")
+		flickSound5 = setSound(fileName: "フリック", type: "wav")
+		flickSound6 = setSound(fileName: "フリック", type: "wav")
+		flickSound7 = setSound(fileName: "フリック", type: "wav")
+		flickSound8 = setSound(fileName: "フリック", type: "wav")
 		
-		kara5 = setSound(fileName: "空打ち")
-		kara6 = setSound(fileName: "空打ち")
-		kara7 = setSound(fileName: "空打ち")
-		kara8 = setSound(fileName: "空打ち")
+		kara5 = setSound(fileName: "空打ち", type: "wav")
+		kara6 = setSound(fileName: "空打ち", type: "wav")
+		kara7 = setSound(fileName: "空打ち", type: "wav")
+		kara8 = setSound(fileName: "空打ち", type: "wav")
 		
 		BGM!.numberOfLoops = 0	//１度だけ再生
 	}
