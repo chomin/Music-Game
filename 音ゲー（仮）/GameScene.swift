@@ -54,6 +54,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		case "オラシオン":
 			bmsName = "オラシオン.bms"
 			bgmName = "オラシオン"
+		case "This game":
+			bmsName = "This game.bms"
+			bgmName = "This game"
 		default:
 			break
 		}
@@ -203,9 +206,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	override func update(_ currentTime: TimeInterval) {
 		
-		for i in allTouchesLocation{
-			print(i)
-		}
 		
 		//ラベルの更新
 		comboLabel.text = String(ResultScene.combo)
