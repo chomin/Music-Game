@@ -112,7 +112,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		laneWidth = self.frame.width/9
 		
-		horizon = self.frame.width/16	  //
+        horizon = self.frame.width/16	  // TODO: 厳密な公式あり
 		horizonY = self.frame.height*15/16	//
 		
 //		verticalDistance = self.frame.width/9 + (horizonY-self.frame.width/9)*1.1
@@ -384,6 +384,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		//大きさと形の変更(楕円は描き直し,その他は拡大のみ)
 		
+        // 楕円の横幅を計算
 		let grad = (horizon/7-laneWidth)/(horizonY - self.frame.width/9)//傾き
 		let diameter = CGFloat(noteScale)*(grad*(y-horizonY) + horizon/7)
 		
@@ -397,6 +398,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		let deltaY = R * atan(1.3*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(1.3*laneWidth/2, 2)))
 		
 		
+        // ノーツイメージをセット
 		if note.type == .tap && note.next == nil{
 			self.removeChildren(in: [note.image])
 			note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
