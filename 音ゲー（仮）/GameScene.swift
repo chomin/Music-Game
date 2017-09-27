@@ -71,8 +71,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var bmsName = "オラシオン.bms"
 	var bgmName = "オラシオン"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
-	var fNotes:[Note] = []
-	var lNotes:[Note] = []
+	var fNotes:[Note] = []  // firstNotes(最終的にロングノーツの始点の集合)
+    var lNotes:[Note] = []  // lastNotes(ロングノーツの終点の集合)
 	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
 	var musicStartPos = 1.0	  //BGM開始の"拍"！
 	var playLebel = 0
