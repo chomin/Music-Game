@@ -32,20 +32,20 @@ extension GameScene{
 					
 					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
 						
-						if judge(laneNum: j+1, type: .tap){//タップの判定
+						if judge(laneIndex: j, type: .tap){//タップの判定
 							
 							playSound(type: .tap)
+							doKara = false
 							break
 							
 						}else if lanes[j].timeState == .still{
-							if doKara == true || j == 6{
-								playSound(type: .kara)
-								break
-							} else {  //次のレーンまで確認
 								doKara = true
-							}
 						}
 					}
+				}
+				
+				if doKara == true{//
+					playSound(type: .kara)
 				}
 			}
 		}
@@ -86,7 +86,7 @@ extension GameScene{
 					if ppos.x > buttonPos - halfBound && ppos.x < buttonPos + halfBound{
 						if moveDistance > 10{	//フリックの判定
 							
-							if judge(laneNum: j+1, type: .flick) || judge(laneNum: j+1, type: .flickEnd){
+							if judge(laneIndex: j, type: .flick) || judge(laneIndex: j, type: .flickEnd){
 								
 								playSound(type: .flick)
 								break
@@ -118,7 +118,7 @@ extension GameScene{
 					
 					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
 						
-						if judge(laneNum: j+1, type: .tapEnd){//離しの判定
+						if judge(laneIndex: j, type: .tapEnd){//離しの判定
 							
 							playSound(type: .tap)
 							break
@@ -140,17 +140,17 @@ extension GameScene{
 
 
 	
-	func judge(laneNum:Int,type:NoteType) -> Bool{	  //対象ノーツが実在し、判定したかを返す
+	func judge(laneIndex:Int,type:NoteType) -> Bool{	  //対象ノーツが実在し、判定したかを返す
 		
-		let nextIndex = lanes[laneNum-1].nextNoteIndex
+		let nextIndex = lanes[laneIndex].nextNoteIndex
 		
-		if nextIndex >= lanes[laneNum-1].laneNotes.count{//最後まで判定が終わってる
+		if nextIndex >= lanes[laneIndex].laneNotes.count{//最後まで判定が終わってる
 			return false
-		}else if lanes[laneNum-1].laneNotes[nextIndex].type != type{//種類が違う
+		}else if lanes[laneIndex].laneNotes[nextIndex].type != type{//種類が違う
 			return false
 		}
 		
-		switch lanes[laneNum-1].timeState {
+		switch lanes[laneIndex].timeState {
 		case .parfect:
 			judgeLabel.text = "parfect!!"
 			ResultScene.parfect += 1
@@ -158,9 +158,9 @@ extension GameScene{
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
-			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
-			lanes[laneNum-1].nextNoteIndex += 1
+			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
+			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .great:
 			judgeLabel.text = "great!"
@@ -169,33 +169,33 @@ extension GameScene{
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
-			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
-			lanes[laneNum-1].nextNoteIndex += 1
+			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
+			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .good:
 			judgeLabel.text = "good"
 			ResultScene.good += 1
 			ResultScene.combo = 0
-			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
-			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
-			lanes[laneNum-1].nextNoteIndex += 1
+			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
+			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .bad:
 			judgeLabel.text = "bad"
 			ResultScene.bad += 1
 			ResultScene.combo = 0
-			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
-			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
-			lanes[laneNum-1].nextNoteIndex += 1
+			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
+			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .miss:
 			judgeLabel.text = "miss!"
 			ResultScene.miss += 1
 			ResultScene.combo = 0
-			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
-			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
-			lanes[laneNum-1].nextNoteIndex += 1
+			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
+			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		default: break
 		}
@@ -204,17 +204,17 @@ extension GameScene{
 		
 	}
 	
-	func parfectMiddleJudge(laneNum:Int) -> Bool{	  //対象ノーツが実在し、判定したかを返す(middleのparfect専用)
+	func parfectMiddleJudge(laneIndex:Int) -> Bool{	  //対象ノーツが実在し、判定したかを返す(middleのparfect専用)
 		
-		let nextIndex = lanes[laneNum-1].nextNoteIndex
+		let nextIndex = lanes[laneIndex].nextNoteIndex
 		
-		if nextIndex >= lanes[laneNum-1].laneNotes.count{//最後まで判定が終わってる
+		if nextIndex >= lanes[laneIndex].laneNotes.count{//最後まで判定が終わってる
 			return false
-		}else if lanes[laneNum-1].laneNotes[nextIndex].type != .middle{//種類が違う
+		}else if lanes[laneIndex].laneNotes[nextIndex].type != .middle{//種類が違う
 			return false
 		}
 		
-		switch lanes[laneNum-1].timeState {
+		switch lanes[laneIndex].timeState {
 		case .parfect:
 			judgeLabel.text = "parfect!!"
 			ResultScene.parfect += 1
@@ -222,9 +222,9 @@ extension GameScene{
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-			self.removeChildren(in: [lanes[laneNum-1].laneNotes[nextIndex].image])
-			lanes[laneNum-1].laneNotes[nextIndex].isJudged = true
-			lanes[laneNum-1].nextNoteIndex += 1
+			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
+			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		default: break
 		}

@@ -26,14 +26,26 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var flickSound2:AVAudioPlayer?
 	var flickSound3:AVAudioPlayer?    //同時に鳴らせるように2つ作る
 	var flickSound4:AVAudioPlayer?
+	var flickSound5:AVAudioPlayer?    //同時に鳴らせるように2つ作る
+	var flickSound6:AVAudioPlayer?
+	var flickSound7:AVAudioPlayer?    //同時に鳴らせるように2つ作る
+	var flickSound8:AVAudioPlayer?
 	var tapSound1:AVAudioPlayer?
 	var tapSound2:AVAudioPlayer?
 	var tapSound3:AVAudioPlayer?
 	var tapSound4:AVAudioPlayer?
+	var tapSound5:AVAudioPlayer?
+	var tapSound6:AVAudioPlayer?
+	var tapSound7:AVAudioPlayer?
+	var tapSound8:AVAudioPlayer?
 	var kara1:AVAudioPlayer?
 	var kara2:AVAudioPlayer?
 	var kara3:AVAudioPlayer?
 	var kara4:AVAudioPlayer?
+	var kara5:AVAudioPlayer?
+	var kara6:AVAudioPlayer?
+	var kara7:AVAudioPlayer?
+	var kara8:AVAudioPlayer?
 	
 	
 	//画像(ノーツ以外)
@@ -161,7 +173,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		catch                                     { print("未知のエラー") }
 
 		//同時押し探索用
-		fNotes=notes
+		fNotes = notes
 		for i in notes{
 			
 			if i.next == nil{	//終点なしなら飛ばす
@@ -190,11 +202,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		//各レーンにノーツをセット
 		for i in notes{
-			lanes[i.lane-1].laneNotes.append(i)
+			lanes[i.lane].laneNotes.append(i)
 			
 			var note:Note! = i
 			while note.next != nil {
-				lanes[note.next.lane-1].laneNotes.append(note.next)
+				lanes[note.next.lane].laneNotes.append(note.next)
 				note = note.next
 			}
 		}
@@ -321,7 +333,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 					
 					if i.x > buttonPos - halfBound && i.x < buttonPos + halfBound {//ボタンの範囲
 						
-						if parfectMiddleJudge(laneNum: j+1){//離しの判定
+						if parfectMiddleJudge(laneIndex: j){//離しの判定
 							
 							playSound(type: .tap)
 							break
@@ -351,7 +363,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				judgeLabel.text = "miss!"
 				ResultScene.miss += 1
 				ResultScene.combo = 0
-//				self.removeChildren(in: [lanes[index].laneNotes[value.nextNoteIndex].image])	//ロングを描くのに必要なため、ここではまずい
+				self.removeChildren(in: [lanes[index].laneNotes[value.nextNoteIndex].image])	//ここで消しても大丈夫なはず
 				lanes[index].laneNotes[value.nextNoteIndex].isJudged = true
 				
 				//次のノーツを格納
@@ -391,7 +403,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		note.size = diameter
 		
 		//楕円の縦幅を計算
-		let l = sqrt(pow(horizontalDistance + fypos, 2) + pow(laneWidth*CGFloat(4-note.lane), 2))
+		let l = sqrt(pow(horizontalDistance + fypos, 2) + pow(laneWidth*CGFloat(3-note.lane), 2))
 //		let aPrime = horizontalDistance * l / (horizontalDistance + fypos)
 //		let xPrime = fypos * l / (horizontalDistance + fypos)
 //		let deltaY = 1.3 * laneWidth * aPrime * verticalDistance / (pow(aPrime + xPrime, 2) - pow(1.3 * laneWidth, 2))
@@ -419,13 +431,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		//座標の設定
 		var xpos:CGFloat
 		
-		if note.lane != 4{  //傾き無限大防止
+		if note.lane != 3{  //傾き無限大防止
 			var b = (horizonY-self.frame.width/9)   //傾き
-			var c = CGFloat(4-note.lane)*self.frame.width/9
-			c += CGFloat(note.lane-4)*horizon/7
+			var c = CGFloat(3-note.lane)*self.frame.width/9
+			c += CGFloat(note.lane-3)*horizon/7
 			b /= c
 			xpos = (y - self.frame.width/9)/b
-			xpos += self.frame.width/18 + CGFloat(note.lane)*self.frame.width/9
+			xpos += self.frame.width/6 + CGFloat(note.lane)*self.frame.width/9
 		} else {
 			xpos = self.frame.width/2
 		}
@@ -440,14 +452,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//再生終了時の呼び出しメソッド
 	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {//playしたクラスと同じクラスに入れる必要あり？
-		if player == BGM!{
+		if player as AVAudioPlayer! == BGM{
 			let scene = ResultScene(size: (view?.bounds.size)!)
-			let skView = view as! SKView
-			skView.showsFPS = true
-			skView.showsNodeCount = true
-			skView.ignoresSiblingOrder = true
+			let skView = view as SKView!
+			skView?.showsFPS = true
+			skView?.showsNodeCount = true
+			skView?.ignoresSiblingOrder = true
 			scene.scaleMode = .resizeFill
-			skView.presentScene(scene)  //ResultSceneに移動
+			skView?.presentScene(scene)  //ResultSceneに移動
 		}
 	}
 }

@@ -54,12 +54,12 @@ class ChooseMusicScene: SKScene {
 		playButton.isHidden = true
 		
 		let scene = GameScene(musicName:picker.textStore ,size: (view?.bounds.size)!)
-		let skView = view as! SKView
-		skView.showsFPS = true
-		skView.showsNodeCount = true
-		skView.ignoresSiblingOrder = true
+		let skView = view as SKView!
+		skView?.showsFPS = true
+		skView?.showsNodeCount = true
+		skView?.ignoresSiblingOrder = true
 		scene.scaleMode = .resizeFill
-		skView.presentScene(scene)  // GameSceneに移動
+		skView?.presentScene(scene)  // GameSceneに移動
 
 	}
 	

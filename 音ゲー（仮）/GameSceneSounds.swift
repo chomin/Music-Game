@@ -28,6 +28,20 @@ extension GameScene{
 		kara3 = setSound(fileName: "空打ち", type: "wav")
 		kara4 = setSound(fileName: "空打ち", type: "wav")
 		
+		tapSound5 = setSound(fileName: "タップ", type: "wav")
+		tapSound6 = setSound(fileName: "タップ", type: "wav")
+		tapSound7 = setSound(fileName: "タップ", type: "wav")
+		tapSound8 = setSound(fileName: "タップ", type: "wav")
+		flickSound5 = setSound(fileName: "フリック", type: "wav")
+		flickSound6 = setSound(fileName: "フリック", type: "wav")
+		flickSound7 = setSound(fileName: "フリック", type: "wav")
+		flickSound8 = setSound(fileName: "フリック", type: "wav")
+		
+		kara5 = setSound(fileName: "空打ち", type: "wav")
+		kara6 = setSound(fileName: "空打ち", type: "wav")
+		kara7 = setSound(fileName: "空打ち", type: "wav")
+		kara8 = setSound(fileName: "空打ち", type: "wav")
+		
 		BGM!.numberOfLoops = 0	//１度だけ再生
 	}
 	
@@ -60,6 +74,16 @@ extension GameScene{
 				tapSound3?.play()
 			}else if tapSound4?.isPlaying == false{
 				tapSound4?.play()
+			}else if tapSound5?.isPlaying == false{
+				tapSound5?.play()
+			}else if tapSound6?.isPlaying == false{
+				tapSound6?.play()
+			}else if tapSound7?.isPlaying == false{
+				tapSound7?.play()
+			}else if tapSound8?.isPlaying == false{
+				tapSound8?.play()
+			}else{
+				print("タップを鳴らせませんでした")
 			}
 			
 		case .flick:
@@ -71,6 +95,16 @@ extension GameScene{
 				flickSound3?.play()
 			}else if flickSound4?.isPlaying == false{
 				flickSound4?.play()
+			}else if flickSound5?.isPlaying == false{
+				flickSound5?.play()
+			}else if flickSound6?.isPlaying == false{
+				flickSound6?.play()
+			}else if flickSound7?.isPlaying == false{
+				flickSound7?.play()
+			}else if flickSound8?.isPlaying == false{
+				flickSound8?.play()
+			}else{
+				print("フリックを鳴らせませんでした")
 			}
 			
 		case .kara:
@@ -82,6 +116,16 @@ extension GameScene{
 				kara3?.play()
 			}else if kara4?.isPlaying == false{
 				kara4?.play()
+			}else if kara5?.isPlaying == false{
+				kara5?.play()
+			}else if kara6?.isPlaying == false{
+				kara6?.play()
+			}else if kara7?.isPlaying == false{
+				kara7?.play()
+			}else if kara8?.isPlaying == false{
+				kara8?.play()
+			}else{
+				print("空を鳴らせませんでした")
 			}
 
 		}

@@ -75,12 +75,12 @@ class ResultScene: SKScene {
 		replayButton.isHidden = true
 		
 		let scene = ChooseMusicScene(size: (view?.bounds.size)!)
-		let skView = view as! SKView
-		skView.showsFPS = true
-		skView.showsNodeCount = true
-		skView.ignoresSiblingOrder = true
+		let skView = view as SKView!
+		skView?.showsFPS = true
+		skView?.showsNodeCount = true
+		skView?.ignoresSiblingOrder = true
 		scene.scaleMode = .resizeFill
-		skView.presentScene(scene)  //ChooseMusicSceneに移動
+		skView?.presentScene(scene)  //ChooseMusicSceneに移動
 		
 	}
 }

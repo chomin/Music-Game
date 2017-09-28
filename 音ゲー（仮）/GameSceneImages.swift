@@ -128,15 +128,15 @@ extension GameScene{
 		
 		
 		//位置(ロングノーツに必要なため、ここでyも設定(ただし画面外))
-		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(i.lane-1)
-		if i.type == .middle{ //線だけずらす(開始点がposition)
-			xpos -= (self.frame.width/18)
-		}
-		
-		var ypos =  self.frame.width/9
-		ypos += (CGFloat(60*i.pos/GameScene.bpm))*CGFloat(speed)
-		
-		note.position = CGPoint(x:xpos-1000 ,y:ypos-100000)
+//		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(i.lane)
+//		if i.type == .middle{ //線だけずらす(開始点がposition)
+//			xpos -= (self.frame.width/18)
+//		}
+//
+//		var ypos =  self.frame.width/9
+//		ypos += (CGFloat(60*i.pos/GameScene.bpm))*CGFloat(speed)
+//
+//		note.position = CGPoint(x:xpos-1000 ,y:ypos-100000)
 		
 		note.isHidden = true	//初期状態では隠しておく
 		
@@ -187,8 +187,8 @@ extension GameScene{
 			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/CGFloat(noteScale), y:endNotepos.y))
 			path.closeSubpath()
 		}else{
-			path.move(to: CGPoint(x:CGFloat(firstNote.lane)*self.frame.width/9, y:self.frame.width/9))  //始点
-			path.addLine(to: CGPoint(x:CGFloat(firstNote.lane + 1)*self.frame.width/9, y:self.frame.width/9))
+			path.move(to: CGPoint(x:CGFloat(firstNote.lane + 1)*self.frame.width/9, y:self.frame.width/9))  //始点
+			path.addLine(to: CGPoint(x:CGFloat(firstNote.lane + 2)*self.frame.width/9, y:self.frame.width/9))
 			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/CGFloat(noteScale), y:endNotepos.y))
 			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/CGFloat(noteScale), y:endNotepos.y))
 			path.closeSubpath()
