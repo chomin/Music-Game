@@ -139,7 +139,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 
 		// チャンネルとレーンの対応付け
 		let laneMap = [11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6]
-
+        
 		// ファイル上のノーツ定義
 		enum NoteExpression: String {
 			case rest      = "00"
