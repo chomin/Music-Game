@@ -35,17 +35,17 @@ extension GameScene{
 						if judge(laneNum: j+1, type: .tap){//タップの判定
 							
 							playSound(type: .tap)
+							doKara = false
 							break
 							
 						}else if lanes[j].timeState == .still{
-							if doKara == true || j == 6{
-								playSound(type: .kara)
-								break
-							} else {  //次のレーンまで確認
 								doKara = true
-							}
 						}
 					}
+				}
+				
+				if doKara == true{//
+					playSound(type: .kara)
 				}
 			}
 		}
