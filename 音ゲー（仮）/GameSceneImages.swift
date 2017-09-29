@@ -127,17 +127,17 @@ extension GameScene{
 //		note.constraints = [cons]   // Constraintsを適用.
 		
 		
-		//位置(ロングノーツに必要なため、ここでyも設定(ただし画面外))
-//		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(i.lane)
-//		if i.type == .middle{ //線だけずらす(開始点がposition)
-//			xpos -= (self.frame.width/18)
-//		}
-//
+		//位置(同時押し線にに必要なため、設定(画面外))（yは現状不要）
+		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(i.lane)
+		if i.type == .middle{ //線だけずらす(開始点がposition)
+			xpos -= (self.frame.width/18)
+		}
+
 //		var ypos =  self.frame.width/9
 //		ypos += (CGFloat(60*i.pos/GameScene.bpm))*CGFloat(speed)
-//
-//		note.position = CGPoint(x:xpos-1000 ,y:ypos-100000)
-		
+
+		note.position = CGPoint(x:xpos-1000 ,y:-1000)	//同時押し線の描写に必要！また、後で位置が変わるが、これを消すと途中で隠れなくなり、左下に表示される
+
 		note.isHidden = true	//初期状態では隠しておく
 		
 		self.addChild(note)
