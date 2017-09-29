@@ -149,9 +149,6 @@
 		0FFD1B421F5E6D2B0007E555 /* 音ゲー（仮） */ = {
 			isa = PBXGroup;
 			children = (
-				F189BEBA1F7C1818008EB222 /* 空打ち.wav */,
-				F189BEB81F7C1810008EB222 /* フリック.wav */,
-				F189BEB61F7C1807008EB222 /* タップ.wav */,
 				0F3BC4C31F73D83500A1E891 /* PickerKeyboard.swift */,
 				0F746F591F5F950E00C1D040 /* LaunchScreen.storyboard */,
 				0F746F5B1F5F950E00C1D040 /* Main.storyboard */,
@@ -173,6 +170,9 @@
 				0F4C89F21F6D6A77004843A5 /* オラシオン.mp3 */,
 				0F4C89E91F696FD5004843A5 /* ようこそジャパリパークへ.bms */,
 				0F4C89EA1F696FD5004843A5 /* ようこそジャパリパークへ.mp3 */,
+				F189BEBA1F7C1818008EB222 /* 空打ち.wav */,
+				F189BEB81F7C1810008EB222 /* フリック.wav */,
+				F189BEB61F7C1807008EB222 /* タップ.wav */,
 				0FFD1B501F5E6D2B0007E555 /* Assets.xcassets */,
 				0FFD1B551F5E6D2B0007E555 /* Info.plist */,
 			);
