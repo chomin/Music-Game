@@ -127,7 +127,7 @@ extension GameScene{
 //		note.constraints = [cons]   // Constraintsを適用.
 		
 		
-		//位置(同時押し線にに必要なため、設定(画面外))（yは現状不要）
+		//位置(同時押し線にに必要なため、設定(画面外))（yは現状不要!）
 		var xpos = (self.frame.width/6)+(self.frame.width/9)*CGFloat(i.lane)
 		if i.type == .middle{ //線だけずらす(開始点がposition)
 			xpos -= (self.frame.width/18)
