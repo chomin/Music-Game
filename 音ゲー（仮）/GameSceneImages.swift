@@ -32,6 +32,7 @@ extension GameScene{
 		judgeLine.position = CGPoint(x:self.frame.width/9, y:self.frame.width/9)
 		self.addChild(judgeLine)
 
+        // 全ノートを描画し、各Noteのimageメンバに格納する
 		for i in notes{   //始点を描く
 
 			 i.image = paintNote(i: i)	//描き、格納
