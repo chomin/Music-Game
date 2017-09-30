@@ -22,30 +22,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//音楽プレイヤー
 	var BGM:AVAudioPlayer?
-	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る
+	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると重いので２つにしておく。
 	var flickSound2:AVAudioPlayer?
-	var flickSound3:AVAudioPlayer?    //同時に鳴らせるように2つ作る
-	var flickSound4:AVAudioPlayer?
-	var flickSound5:AVAudioPlayer?    //同時に鳴らせるように2つ作る
-	var flickSound6:AVAudioPlayer?
-	var flickSound7:AVAudioPlayer?    //同時に鳴らせるように2つ作る
-	var flickSound8:AVAudioPlayer?
 	var tapSound1:AVAudioPlayer?
 	var tapSound2:AVAudioPlayer?
-	var tapSound3:AVAudioPlayer?
-	var tapSound4:AVAudioPlayer?
-	var tapSound5:AVAudioPlayer?
-	var tapSound6:AVAudioPlayer?
-	var tapSound7:AVAudioPlayer?
-	var tapSound8:AVAudioPlayer?
 	var kara1:AVAudioPlayer?
 	var kara2:AVAudioPlayer?
-	var kara3:AVAudioPlayer?
-	var kara4:AVAudioPlayer?
-	var kara5:AVAudioPlayer?
-	var kara6:AVAudioPlayer?
-	var kara7:AVAudioPlayer?
-	var kara8:AVAudioPlayer?
+	var lastPlayingTapSound:tapPlayer?
+	var lastPlayingFlickSound:flickPlayer?
+	var lastPlayingKaraSound:karaPlayer?
+
 	
 	
 	//画像(ノーツ以外)
@@ -124,7 +110,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		ResultScene.miss = 0
 		ResultScene.combo = 0
 		ResultScene.maxCombo = 0
-		
 		halfBound = self.frame.width/12	//1/18~1/9の値にすること
 		
 		laneWidth = self.frame.width/9
@@ -529,4 +514,14 @@ struct Lane {
 	var nextNoteIndex = 0
 	var currentTime:TimeInterval = 0.0
 	var laneNotes:[Note] = [] //最初に全部格納する！
+}
+
+enum tapPlayer{
+	case tap1,tap2
+}
+enum flickPlayer{
+	case flick1,flick2
+}
+enum karaPlayer{
+	case kara1,kara2
 }
