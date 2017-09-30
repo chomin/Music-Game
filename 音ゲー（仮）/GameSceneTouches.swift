@@ -11,11 +11,9 @@ import SpriteKit
 extension GameScene{
 	
 	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-		
-		
+
 		for i in touches {//すべてのタッチに対して処理する（同時押しなどもあるため）
-			
-			
+	
 			var pos = i.location(in: self.view)
 			
 			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
@@ -26,19 +24,22 @@ extension GameScene{
 				
 				var doKara = false
 				
-				for j in 0...6{
-					
-					let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
+//				switch pos.x{
+//				case self.frame.width/6 - halfBound ... self.frame.width*5/18 - halfBound:
+//
+//				}
+				
+				for (index,buttonPos) in buttonX.enumerated(){
 					
 					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
 						
-						if judge(laneIndex: j, type: .tap){//タップの判定
+						if judge(laneIndex: index, type: .tap){//タップの判定
 							
 							playSound(type: .tap)
 							doKara = false
 							break
 							
-						}else if lanes[j].timeState == .still{
+						}else if lanes[index].timeState == .still{
 								doKara = true
 						}
 					}
@@ -51,10 +52,9 @@ extension GameScene{
 		}
 	}
 	
-	override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {//ボタン外でスタートした時にしか起動しない
+	override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
 		
-		
-		
+
 		for i in touches{
 			
 			var pos = i.location(in: self.view)
@@ -66,14 +66,9 @@ extension GameScene{
 			
 			allTouchesLocation[allTouchesLocation.index(of: ppos)!] = pos
 		
-			
-	
-			
 			if pos.y < self.frame.width/3{    //上界
 				
-				for j in 0...6{
-					
-					let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
+				for (index,buttonPos) in buttonX.enumerated(){
 					
 					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
 						
@@ -86,7 +81,7 @@ extension GameScene{
 					if ppos.x > buttonPos - halfBound && ppos.x < buttonPos + halfBound{
 						if moveDistance > 10{	//フリックの判定
 							
-							if judge(laneIndex: j, type: .flick) || judge(laneIndex: j, type: .flickEnd){
+							if judge(laneIndex: index, type: .flick) || judge(laneIndex: index, type: .flickEnd){
 								
 								playSound(type: .flick)
 								break
@@ -98,7 +93,7 @@ extension GameScene{
 		}
 	}
 	
-	override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {//ボタン外でスタートした時にしか起動しない
+	override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
 		
 		for i in touches {
 			
@@ -112,13 +107,11 @@ extension GameScene{
 			
 			if pos.y < self.frame.width/3{    //上界
 				
-				for j in 0...6{
-					
-					let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
+				for (index,buttonPos) in buttonX.enumerated(){
 					
 					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
 						
-						if judge(laneIndex: j, type: .tapEnd){//離しの判定
+						if judge(laneIndex: index, type: .tapEnd){//離しの判定
 							
 							playSound(type: .tap)
 							break

@@ -22,30 +22,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//音楽プレイヤー
 	var BGM:AVAudioPlayer?
-	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る
+	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると重いので２つにしておく。
 	var flickSound2:AVAudioPlayer?
-	var flickSound3:AVAudioPlayer?    //同時に鳴らせるように2つ作る
-	var flickSound4:AVAudioPlayer?
-	var flickSound5:AVAudioPlayer?    //同時に鳴らせるように2つ作る
-	var flickSound6:AVAudioPlayer?
-	var flickSound7:AVAudioPlayer?    //同時に鳴らせるように2つ作る
-	var flickSound8:AVAudioPlayer?
 	var tapSound1:AVAudioPlayer?
 	var tapSound2:AVAudioPlayer?
-	var tapSound3:AVAudioPlayer?
-	var tapSound4:AVAudioPlayer?
-	var tapSound5:AVAudioPlayer?
-	var tapSound6:AVAudioPlayer?
-	var tapSound7:AVAudioPlayer?
-	var tapSound8:AVAudioPlayer?
 	var kara1:AVAudioPlayer?
 	var kara2:AVAudioPlayer?
-	var kara3:AVAudioPlayer?
-	var kara4:AVAudioPlayer?
-	var kara5:AVAudioPlayer?
-	var kara6:AVAudioPlayer?
-	var kara7:AVAudioPlayer?
-	var kara8:AVAudioPlayer?
+	var lastPlayingTapSound:tapPlayer?
+	var lastPlayingFlickSound:flickPlayer?
+	var lastPlayingKaraSound:karaPlayer?
+
 	
 	
 	//画像(ノーツ以外)
@@ -84,7 +70,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var bgmName = "オラシオン"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	var fNotes:[Note] = []  // firstNotes(最終的にロングノーツの始点の集合)
-    var lNotes:[Note] = []  // lastNotes(ロングノーツの終点の集合)
+	var lNotes:[Note] = []  // lastNotes(ロングノーツの終点の集合)
 	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
 	var musicStartPos = 1.0	  //BGM開始の"拍"！
 	var playLebel = 0
@@ -103,13 +89,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var horizonY:CGFloat! //水平線のy座標
 	var laneWidth:CGFloat!	//最初の(判定線での)ノーツの直径2r（iphone7で74くらい）
 	
-	var halfBound:CGFloat! //判定を汲み取る、ボタン中心からの距離
+	var halfBound:CGFloat! //判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
 	
-	let noteScale = 1.3	//レーン幅に対するノーツの幅の倍率
+	let noteScale:CGFloat = 1.3	//レーン幅に対するノーツの幅の倍率
 	
+	var buttonX:[CGFloat] = []
 	
 	override func didMove(to view: SKView) {
 		
+		//ボタンの位置をセット
+		for i in 0...6{
+			buttonX.append(self.frame.width/6 + CGFloat(i)*self.frame.width/9)
+		}
 		
 		//リザルトの初期化
 		ResultScene.parfect = 0
@@ -119,16 +110,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		ResultScene.miss = 0
 		ResultScene.combo = 0
 		ResultScene.maxCombo = 0
-		
-		halfBound = self.frame.width/12
+		halfBound = self.frame.width/12	//1/18~1/9の値にすること
 		
 		laneWidth = self.frame.width/9
 		
-        horizon = self.frame.width/16	  // TODO: 厳密な公式あり
-		horizonY = self.frame.height*15/16	//
+		horizon = self.frame.width/16	  // TODO: 厳密な公式あり
+		horizonY = self.frame.height*15/16	//モデル値
 		
-//		verticalDistance = self.frame.width/9 + (horizonY-self.frame.width/9)*1.1
-//		verticalDistance = horizonY - self.frame.width/24
+		//		verticalDistance = self.frame.width/9 + (horizonY-self.frame.width/9)*1.1
+		//		verticalDistance = horizonY - self.frame.width/24
 		verticalDistance = horizonY //モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
 		print(horizonY-self.frame.width/9)	//判定線から水平線までの画面上での幅。277くらい
 		
@@ -171,7 +161,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		catch ParseError.noLongNoteStart(let msg) { print(msg) }
 		catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
 		catch                                     { print("未知のエラー") }
-
+		
 		//同時押し探索用
 		fNotes = notes
 		for i in notes{
@@ -227,16 +217,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			
 			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
 			
-			if (i.isJudged == false || remainingBeat > 0) && remainingBeat < 8{//位置を設定(水平線より上でもロング先に必要、判定後でもロング初めに必要、判定線過ぎても普通に必要)
+			if (i.isJudged == false || remainingBeat > 0) && remainingBeat < 8{//位置を設定(水平線より上でもロング先に必要、判定後でもロング初めに必要、判定線過ぎても判定前なら普通に必要)
 				setPos(note: i, currentTime: currentTime)
 				if i.next != nil{	//つながっている1つ先までは描く
 					setPos(note: i.next, currentTime: currentTime)
 				}
-//				if i.type == .flickEnd || i.type == .tapEnd || i.type == .middle{//先ノーツになりうるものは無条件に描く
-//					setPos(note: i, currentTime: currentTime)
-//				}else if remainingBeat < 8{
-//					setPos(note: i, currentTime: currentTime)
-//				}
+				//				if i.type == .flickEnd || i.type == .tapEnd || i.type == .middle{//先ノーツになりうるものは無条件に描く
+				//					setPos(note: i, currentTime: currentTime)
+				//				}else if remainingBeat < 8{
+				//					setPos(note: i, currentTime: currentTime)
+				//				}
 			}
 			if i.image.position.y > horizonY || remainingBeat > 8 || i.isJudged == true{//水平線より上、8拍以上残っている、判定済みのものは隠す
 				i.image.isHidden = true
@@ -256,11 +246,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 					if note?.next.next != nil{
 						setPos(note: (note?.next?.next)!, currentTime: currentTime)
 					}
-//					if note?.next.type == .flickEnd || note?.next.type == .tapEnd || note?.next.type == .middle{//先ノーツになりうるものは無条件に描く
-//						setPos(note: (note?.next)!, currentTime: currentTime)
-//					}else if remainingBeat2 < 8{
-//						setPos(note: (note?.next)!, currentTime: currentTime)
-//					}
+					//					if note?.next.type == .flickEnd || note?.next.type == .tapEnd || note?.next.type == .middle{//先ノーツになりうるものは無条件に描く
+					//						setPos(note: (note?.next)!, currentTime: currentTime)
+					//					}else if remainingBeat2 < 8{
+					//						setPos(note: (note?.next)!, currentTime: currentTime)
+					//					}
 				}
 				
 				if (note?.next.image.position.y)! > horizonY || remainingBeat2 > 12 || note?.next.isJudged == true{//水平線より上、12拍以上残っている、判定済みのものは隠す
@@ -380,11 +370,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		let fypos = (CGFloat(60*note.pos/GameScene.bpm)-CGFloat(currentTime - GameScene.start))*CGFloat(speed)	  //判定線からの水平距離x
 		
 		//鉛直面に投写
-//		guard fypos > -horizontalDistance else {//分母が0になるのを防止
-//			return
-//		}
-//
-//		let y = (verticalDistance * fypos / (horizontalDistance + fypos)) + self.frame.width/9
+		//		guard fypos > -horizontalDistance else {//分母が0になるのを防止
+		//			return
+		//		}
+		//
+		//		let y = (verticalDistance * fypos / (horizontalDistance + fypos)) + self.frame.width/9
 		
 		//球面？に投写
 		guard fypos > -(pow(horizontalDistance, 2) + pow(verticalDistance, 2)) / horizontalDistance else {//atan内の分母が0になるのを防止
@@ -396,21 +386,21 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		//大きさと形の変更(楕円は描き直し,その他は拡大のみ)
 		
-        // 楕円の横幅を計算
+		// 楕円の横幅を計算
 		let grad = (horizon/7-laneWidth)/(horizonY - self.frame.width/9)//傾き
-		let diameter = CGFloat(noteScale)*(grad*(y-horizonY) + horizon/7)
+		let diameter = noteScale*(grad*(y-horizonY) + horizon/7)
 		
 		note.size = diameter
 		
 		//楕円の縦幅を計算
 		let l = sqrt(pow(horizontalDistance + fypos, 2) + pow(laneWidth*CGFloat(3-note.lane), 2))
-//		let aPrime = horizontalDistance * l / (horizontalDistance + fypos)
-//		let xPrime = fypos * l / (horizontalDistance + fypos)
-//		let deltaY = 1.3 * laneWidth * aPrime * verticalDistance / (pow(aPrime + xPrime, 2) - pow(1.3 * laneWidth, 2))
-		let deltaY = R * atan(1.3*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(1.3*laneWidth/2, 2)))
+		//		let aPrime = horizontalDistance * l / (horizontalDistance + fypos)
+		//		let xPrime = fypos * l / (horizontalDistance + fypos)
+		//		let deltaY = 1.3 * laneWidth * aPrime * verticalDistance / (pow(aPrime + xPrime, 2) - pow(1.3 * laneWidth, 2))
+		let deltaY = R * atan(noteScale*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(noteScale*laneWidth/2, 2)))
 		
 		
-        // ノーツイメージをセット
+		// ノーツイメージをセット
 		if note.type == .tap && note.next == nil{
 			self.removeChildren(in: [note.image])
 			note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
@@ -524,4 +514,14 @@ struct Lane {
 	var nextNoteIndex = 0
 	var currentTime:TimeInterval = 0.0
 	var laneNotes:[Note] = [] //最初に全部格納する！
+}
+
+enum tapPlayer{
+	case tap1,tap2
+}
+enum flickPlayer{
+	case flick1,flick2
+}
+enum karaPlayer{
+	case kara1,kara2
 }
