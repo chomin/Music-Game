@@ -71,8 +71,10 @@ fastlane/test_output
 音ゲー（仮）.xcodeproj/
 
 xcuserdata/
-音ゲー（仮）.xcodeproj/xcuserdata/
+音ゲー（仮）.xcodeproj/xcuserdata
 
 .DS_Store
 音ゲー（仮）/.DS_Store
 
+音ゲー（仮）.xcodeproj/project.pbxproj
+音ゲー（仮）.xcodeproj/project.xcworkspace
