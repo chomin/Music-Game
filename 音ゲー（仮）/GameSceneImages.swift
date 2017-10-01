@@ -10,9 +10,10 @@
 import SpriteKit
 
 extension GameScene{
+    // GameScene初期化時に呼ばれる画像設定用関数
 	func setImages(){
 		
-		//レーンの境目の線
+		//レーンの境目の線の描写
 		for i in 0...7{
 			var points = [CGPoint(x:self.frame.width*CGFloat(i+1)/9 ,y:self.frame.width/9) ,CGPoint(x:self.frame.width/2 - horizon/2 + CGFloat(i)*horizon/7 ,y:horizonY)]
 			let line = SKShapeNode(points: &points, count: points.count)
@@ -33,19 +34,19 @@ extension GameScene{
 		self.addChild(judgeLine)
 
         // 全ノートを描画し、各Noteのimageメンバに格納する
-		for i in notes{   //始点を描く
+        for i in notes{   //始点を描く
 
-			 i.image = paintNote(i: i)	//描き、格納
-			
-			var note:Note? = i
-			
-			while note?.next != nil {  //つながっている先のノーツを描き、格納
-				
-				note?.next?.image = paintNote(i: (note?.next)!)
-				note = note!.next	  //進める
-			}
-			
-		}
+             i.image = paintNote(i: i)    //描き、格納
+
+            var note:Note? = i
+
+            while note?.next != nil {  //つながっている先のノーツを描き、格納
+
+                note?.next?.image = paintNote(i: (note?.next)!)
+                note = note!.next      //進める
+            }
+
+        }
 		
 		//同時押し線の描写
 		var i = 0
@@ -160,6 +161,7 @@ extension GameScene{
 		
 	}
 	
+    // firstNoteから始まるロングノーツを表す緑太線を描く(毎フレーム呼ばれる)
 	func setLong(firstNote:Note)  {
 		if firstNote.longImage != nil{
 			self.removeChildren(in: [firstNote.longImage])
@@ -172,7 +174,7 @@ extension GameScene{
 		
 		
 		//まず、始点&終点ノーツが円か線かで中心座標が異なるため場合分け
-		var startNotepos:CGPoint =  (firstNote.image.position) //中心座標
+		var startNotepos:CGPoint = firstNote.image.position //中心座標
 		if firstNote.type == .middle{//線だけずらす
 			startNotepos.x += firstNote.size/2
 		}

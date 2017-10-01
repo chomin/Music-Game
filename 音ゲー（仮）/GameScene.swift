@@ -230,9 +230,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		//時間でノーツの位置を設定する(重くなるので近場のみ！)
 		for i in notes{
 			
-			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
-			
-			if (i.isJudged == false || remainingBeat > 0) && remainingBeat < 8{//位置を設定(水平線より上でもロング先に必要、判定後でもロング初めに必要、判定線過ぎても判定前なら普通に必要)
+            // 単ノーツと始点を描画
+            
+			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // あと何拍で判定ラインに乗るか
+            //位置を設定(水平線より上でもロング先に必要、判定後でもロング初めに必要、判定線過ぎても判定前なら普通に必要)
+			if (i.isJudged == false || remainingBeat > 0) && remainingBeat < 8{
 				setPos(note: i, currentTime: currentTime)
 				if i.next != nil{	//つながっている1つ先までは描く
 					setPos(note: i.next, currentTime: currentTime)
@@ -250,16 +252,19 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			}
 			
 			
-			//つながっているノーツ
-			var note:Note? = i
-			while note?.next != nil{
-				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
-				if (note?.next.isJudged == false || remainingBeat2 > 0) && remainingBeat2 < 8{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
+			// 始点につながっているノーツを描画
+            
+			var note:Note = i
+			while note.next != nil{
+                note = note.next
+                
+				let remainingBeat2 = note.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
+				if (note.isJudged == false || remainingBeat2 > 0) && remainingBeat2 < 8{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
 					
-					setPos(note: (note?.next)!, currentTime: currentTime)
+					setPos(note: note, currentTime: currentTime)
 					
-					if note?.next.next != nil{
-						setPos(note: (note?.next?.next)!, currentTime: currentTime)
+					if note.next != nil{
+						setPos(note: note.next!, currentTime: currentTime)
 					}
 					//					if note?.next.type == .flickEnd || note?.next.type == .tapEnd || note?.next.type == .middle{//先ノーツになりうるものは無条件に描く
 					//						setPos(note: (note?.next)!, currentTime: currentTime)
@@ -268,13 +273,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 					//					}
 				}
 				
-				if (note?.next.image.position.y)! > horizonY || remainingBeat2 > 12 || note?.next.isJudged == true{//水平線より上、12拍以上残っている、判定済みのものは隠す
-					note?.next.image.isHidden = true
+				if note.image.position.y > horizonY || remainingBeat2 > 12 || note.isJudged == true{//水平線より上、12拍以上残っている、判定済みのものは隠す
+					note.image.isHidden = true
 				}else{
-					note?.next.image.isHidden = false
+					note.image.isHidden = false
 				}
-				
-				note = note?.next
 			}
 		}
 		
@@ -295,31 +298,33 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			}
 			
 			//つながっているノーツ
-			var note:Note? = i
-			while note?.next != nil{
-				let remainingBeat2 = (note?.next.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
-				
-				if note?.next.next != nil {
-					if ((note?.next.next.image.position.y)! < self.frame.width/9 || note?.next.next.isJudged == true) && note?.next.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
-						self.removeChildren(in: [(note?.next.longImage)!])
-						note?.next.longImage = nil
-					}else if remainingBeat2 < 4 && (note?.next.next.image.position.y)! > self.frame.width/9 && note?.next.next.isJudged == false && (note?.next.image.position.y)! < horizonY!{
+			var note:Note = i
+			while note.next != nil{
+                note = note.next
+                
+				let remainingBeat2 = note.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
+                
+				if note.next != nil {
+					if (note.next.image.position.y < self.frame.width/9 || note.next.isJudged == true) && note.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
+						self.removeChildren(in: [note.longImage])
+						note.longImage = nil
+					}else if remainingBeat2 < 4 && note.next.image.position.y > self.frame.width/9 && note.next.isJudged == false && note.image.position.y < horizonY!{
 						
 						//毎フレーム描き直す
 						
-						setLong(firstNote: (note?.next)!)
+						setLong(firstNote: note)
 					}
 				}
-				
-				note = note?.next
 			}
 		}
 		
-		
-		for i in sameLines{ //同時押しラインも移動
+		// 同時押しラインの更新
+		for i in sameLines{
+            // 同時押しラインを移動
 			i.line.position = i.note.image.position
 			i.line.isHidden = i.note.image.isHidden
-			//大きさの変更
+            
+			// 大きさも変更
 			let a = (horizon/7-self.frame.width/9)/(horizonY - self.frame.width/9)
 			let diameter = a*(i.line.position.y-horizonY) + horizon/7
 			
@@ -379,6 +384,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 	}
 	
+    // 各noteの座標と画像をセット
 	func setPos (note:Note ,currentTime:TimeInterval)  {
 		
 		//y座標の計算
