@@ -452,7 +452,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			xpos -= diameter/2
 		}
 		
-		note.image.position = CGPoint(x:xpos ,y:y)
+		note.image.position = CGPoint(x:xpos ,y:y)//描写した後でないと反映されない
 	}
 	
 	
