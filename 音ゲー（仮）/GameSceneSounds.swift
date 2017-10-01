@@ -48,56 +48,32 @@ extension GameScene{
 		switch type {
 		case .tap:
 			if tapSound1?.isPlaying == false{
-				tapSound1?.play()
-				lastPlayingTapSound = .tap1
-			}else if tapSound2?.isPlaying == false{
-				tapSound2?.play()
-				lastPlayingTapSound = .tap2
-			}else if lastPlayingTapSound == .tap1{
-				tapSound2?.currentTime = 0
-				tapSound2?.play()
-				lastPlayingTapSound = .tap2
-				
-			}else if lastPlayingTapSound == .tap2{
 				tapSound1?.currentTime = 0
 				tapSound1?.play()
-				lastPlayingTapSound = .tap1
+			}else if tapSound2?.isPlaying == false{
+				tapSound2?.currentTime = 0
+				tapSound2?.play()
+			}else{
+				tapSoundResevation += 1
+				print("tap予約")
 			}
 			
 		case .flick:
 			if flickSound1?.isPlaying == false{
 				flickSound1?.play()
-				lastPlayingFlickSound = .flick1
 			}else if flickSound2?.isPlaying == false{
 				flickSound2?.play()
-				lastPlayingFlickSound = .flick2
-			}else if lastPlayingFlickSound == .flick1{
-				flickSound2?.currentTime = 0
-				flickSound2?.play()
-				lastPlayingFlickSound = .flick2
-				
-			}else if lastPlayingFlickSound == .flick2{
-				flickSound1?.currentTime = 0
-				flickSound1?.play()
-				lastPlayingFlickSound = .flick1
+			}else{
+				flickSoundResevation += 1
 			}
 			
 		case .kara:
 			if kara1?.isPlaying == false{
 				kara1?.play()
-				lastPlayingKaraSound = .kara1
 			}else if kara2?.isPlaying == false{
 				kara2?.play()
-				lastPlayingKaraSound = .kara2
-			}else if lastPlayingKaraSound == .kara1{
-				kara2?.currentTime = 0
-				kara2?.play()
-				lastPlayingKaraSound = .kara2
-				
-			}else if lastPlayingKaraSound == .kara2{
-				kara1?.currentTime = 0
-				kara1?.play()
-				lastPlayingKaraSound = .kara1
+			}else{
+				karaSoundResevation += 1
 			}
 			
 		}

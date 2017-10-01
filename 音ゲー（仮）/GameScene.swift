@@ -22,15 +22,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//音楽プレイヤー
 	var BGM:AVAudioPlayer?
-	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると重いので２つにしておく。
+	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。
 	var flickSound2:AVAudioPlayer?
 	var tapSound1:AVAudioPlayer?
 	var tapSound2:AVAudioPlayer?
 	var kara1:AVAudioPlayer?
 	var kara2:AVAudioPlayer?
-	var lastPlayingTapSound:tapPlayer?
-	var lastPlayingFlickSound:flickPlayer?
-	var lastPlayingKaraSound:karaPlayer?
+	var tapSoundResevation = 0
+	var flickSoundResevation = 0
+	var karaSoundResevation = 0
 
 	
 	
@@ -208,6 +208,21 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	override func update(_ currentTime: TimeInterval) {
 		
+		//鳴らしそびれた音があれば鳴らす
+		if tapSoundResevation > 0{
+			print("tap予約発動")
+			playSound(type: .tap)
+			
+			tapSoundResevation -= 1
+		}
+		if flickSoundResevation > 0{
+			playSound(type: .flick)
+			flickSoundResevation -= 1
+		}
+		if karaSoundResevation > 0{
+			playSound(type: .kara)
+			karaSoundResevation -= 1
+		}
 		
 		//ラベルの更新
 		comboLabel.text = String(ResultScene.combo)
@@ -440,6 +455,119 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		note.image.position = CGPoint(x:xpos ,y:y)
 	}
 	
+	
+	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+		
+		for i in touches {//すべてのタッチに対して処理する（同時押しなどもあるため）
+			
+			var pos = i.location(in: self.view)
+			
+			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+			
+			allTouchesLocation.append(pos)
+			
+			if pos.y < self.frame.width/3{    //上界
+				
+				var doKara = false
+				
+				//				switch pos.x{
+				//				case self.frame.width/6 - halfBound ... self.frame.width*5/18 - halfBound:
+				//
+				//				}
+				
+				for (index,buttonPos) in buttonX.enumerated(){
+					
+					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
+						
+						if judge(laneIndex: index, type: .tap){//タップの判定
+							
+							playSound(type: .tap)
+							doKara = false
+							break
+							
+						}else if lanes[index].timeState == .still{
+							doKara = true
+						}
+					}
+				}
+				
+				if doKara == true{//
+					playSound(type: .kara)
+				}
+			}
+		}
+	}
+	
+	override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+		
+		for i in touches{
+			
+			var pos = i.location(in: self.view)
+			var ppos = i.previousLocation(in: self.view)
+			let moveDistance = sqrt(pow(pos.x-ppos.x, 2) + pow(pos.y-ppos.y, 2))
+			
+			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+			ppos.y = self.frame.height - ppos.y
+			
+			allTouchesLocation[allTouchesLocation.index(of: ppos)!] = pos
+			
+			if pos.y < self.frame.width/3{    //上界
+				
+				for (index,buttonPos) in buttonX.enumerated(){
+					
+					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
+						
+						//						if parfectMiddleJudge(laneNum: j+1){//途中線の判定
+						//
+						//							playSound(type: .tap)
+						//							break
+						//						}
+					}
+					if ppos.x > buttonPos - halfBound && ppos.x < buttonPos + halfBound{
+						if moveDistance > 10{	//フリックの判定
+							
+							if judge(laneIndex: index, type: .flick) || judge(laneIndex: index, type: .flickEnd){
+								
+								playSound(type: .flick)
+								break
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+		
+		for i in touches {
+			
+			var pos = i.location(in: self.view)
+			var ppos = i.previousLocation(in: self.view)
+			
+			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+			ppos.y = self.frame.height - ppos.y
+			
+			allTouchesLocation.remove(at: allTouchesLocation.index(of: ppos)!)
+			
+			if pos.y < self.frame.width/3{    //上界
+				
+				for (index,buttonPos) in buttonX.enumerated(){
+					
+					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
+						
+						if judge(laneIndex: index, type: .tapEnd){//離しの判定
+							
+							playSound(type: .tap)
+							break
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	
 	//再生終了時の呼び出しメソッド
 	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {//playしたクラスと同じクラスに入れる必要あり？
 		if player as AVAudioPlayer! == BGM{
@@ -452,6 +580,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			skView?.presentScene(scene)  //ResultSceneに移動
 		}
 	}
+	
+	func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
+		print("\(player)で\(String(describing: error))")
+	}
+	
 }
 
 // 譜面データ(NoteTypeとNoteの定義はおそらくほかのファイルでもするだろうから統合してほしい)
@@ -516,12 +649,13 @@ struct Lane {
 	var laneNotes:[Note] = [] //最初に全部格納する！
 }
 
-enum tapPlayer{
-	case tap1,tap2
-}
-enum flickPlayer{
-	case flick1,flick2
-}
-enum karaPlayer{
-	case kara1,kara2
-}
+//enum tapPlayer{
+//	case tap1,tap2
+//}
+//enum flickPlayer{
+//	case flick1,flick2
+//}
+//enum karaPlayer{
+//	case kara1,kara2
+//}
+
