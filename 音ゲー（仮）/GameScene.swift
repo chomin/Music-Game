@@ -384,7 +384,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 	}
 	
-    // 各noteの座標と画像をセット
+	// 各noteの座標と画像をセット
 	func setPos (note:Note ,currentTime:TimeInterval)  {
 		
 		//y座標の計算
@@ -413,27 +413,32 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		note.size = diameter
 		
-		//楕円の縦幅を計算
-		let l = sqrt(pow(horizontalDistance + fypos, 2) + pow(laneWidth*CGFloat(3-note.lane), 2))
-		//		let aPrime = horizontalDistance * l / (horizontalDistance + fypos)
-		//		let xPrime = fypos * l / (horizontalDistance + fypos)
-		//		let deltaY = 1.3 * laneWidth * aPrime * verticalDistance / (pow(aPrime + xPrime, 2) - pow(1.3 * laneWidth, 2))
-		let deltaY = R * atan(noteScale*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(noteScale*laneWidth/2, 2)))
-		
-		
-		// ノーツイメージをセット
-		if note.type == .tap && note.next == nil{
-			self.removeChildren(in: [note.image])
-			note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
-			note.image.fillColor = .white
-			self.addChild(note.image)
-		}else if note.type == .tapEnd || note.type == .tap{
-			self.removeChildren(in: [note.image])
-			note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
-			note.image.fillColor = .green
-			self.addChild(note.image)
-		}else{
-			note.image.setScale(diameter/laneWidth)
+		//画面に現れるノーツの、描き直し（楕円）及び拡大（線、三角形）
+		if y < horizonY{
+			if note.type == .tap || note.type == .tapEnd {//楕円
+				//楕円の縦幅を計算
+				let l = sqrt(pow(horizontalDistance + fypos, 2) + pow(laneWidth*CGFloat(3-note.lane), 2))
+				//		let aPrime = horizontalDistance * l / (horizontalDistance + fypos)
+				//		let xPrime = fypos * l / (horizontalDistance + fypos)
+				//		let deltaY = 1.3 * laneWidth * aPrime * verticalDistance / (pow(aPrime + xPrime, 2) - pow(1.3 * laneWidth, 2))
+				let deltaY = R * atan(noteScale*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(noteScale*laneWidth/2, 2)))
+				
+				
+				// ノーツイメージをセット
+				if note.type == .tap && note.next == nil{
+					self.removeChildren(in: [note.image])
+					note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
+					note.image.fillColor = .white
+					self.addChild(note.image)
+				}else if note.type == .tapEnd || note.type == .tap{
+					self.removeChildren(in: [note.image])
+					note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
+					note.image.fillColor = .green
+					self.addChild(note.image)
+				}
+			}else{//線と三角形
+				note.image.setScale(diameter/laneWidth)
+			}
 		}
 		
 		//向きの変更
