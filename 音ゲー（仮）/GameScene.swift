@@ -593,21 +593,20 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 }
 
-// 譜面データ(NoteTypeとNoteの定義はおそらくほかのファイルでもするだろうから統合してほしい)
 enum NoteType {
 	case tap, flick, middle, tapEnd, flickEnd
 }
 
 class Note {
-	let type: NoteType
-	let pos: Double //"拍"単位！小節ではない！！！
-	let lane: Int
-	var next: Note!
-	var image:SKShapeNode!	  //ノーツの画像
-	var longImage:SKShapeNode!	//このノーツを始点とする緑太線の画像
-	var size:CGFloat = 0	//線の座標をずらすのに必要
+	let type: NoteType			// ノートの種類(タップかフリックかなど)
+	let pos: Double				// "拍"単位！小節ではない！！！
+	let lane: Int				// レーンのインデックス(0始まり)
+	var next: Note!				// 次のノーツ(単ノーツの場合はnil)
+	var image:SKShapeNode!		// ノーツの画像
+	var longImage:SKShapeNode!	// このノーツを始点とする緑太線の画像
+	var size:CGFloat = 0		// 線の座標をずらすのに必要
 //	var firstLongSize:CGFloat = 0
-	var isJudged = false
+	var isJudged = false		// 
 	
 	init(type: NoteType, position pos: Double, lane: Int) {
 		self.type = type
