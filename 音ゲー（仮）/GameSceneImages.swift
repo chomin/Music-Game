@@ -148,11 +148,11 @@ extension GameScene{
 	
 	func paintSameLine(i:Note,j:Note){
 		//同時押しラインの描写
-		var lPoint = [CGPoint(x:0,y:0) ,CGPoint(x:j.image.position.x-i.image.position.x, y:0)]
+		var lPoint = [CGPoint(x:0,y:0) ,CGPoint(x:j.image.position.x-i.image.position.x, y:0)]	//lane情報からも書ける
 		let line = SKShapeNode(points: &lPoint, count: lPoint.count)
 		line.lineWidth = 3.0
 		line.strokeColor = UIColor.white
-		line.position.x = i.image.position.x
+		line.position.x = i.image.position.x	//ここでは不要？
 		line.zPosition = -1
 		self.addChild(line)
 		sameLines.append((i,line))
