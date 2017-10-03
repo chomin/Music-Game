@@ -38,14 +38,12 @@ extension GameScene{
 
              i.image = paintNote(i: i)    //描き、格納
 
-            var note:Note? = i
-
-            while note?.next != nil {  //つながっている先のノーツを描き、格納
-
-                note?.next?.image = paintNote(i: (note?.next)!)
-                note = note!.next      //進める
+            var note:Note = i
+            while note.next != nil {	//つながっている先のノーツを描き、格納
+				note = note.next		// 進める
+				
+                note.image = paintNote(i: note)
             }
-
         }
 		
 		//同時押し線の描写
@@ -96,7 +94,7 @@ extension GameScene{
 		if i.type == .flick || i.type == .flickEnd{//三角形(endはnotesに入らないから不要)
 			let length = self.frame.width/18 //一辺の長さの半分
 			
-			// 始点から終点までの４点を指定.
+			// 始点から終点までの４点を指定(2点を一致させ三角形に).
 			var points = [CGPoint(x:length, y:0),
 			              CGPoint(x:-length, y:0),
 			              CGPoint(x: 0.0, y: length),
@@ -161,8 +159,10 @@ extension GameScene{
 		
 	}
 	
-    // firstNoteから始まるロングノーツを表す緑太線を描く(毎フレーム呼ばれる)
+
+    // firstNoteから始まるロングノーツを表す緑太線を描き、firstNoteにlongImageを格納(毎フレーム呼ばれる)
 	func setLong(firstNote:Note ,currentTime:TimeInterval)  {
+
 		if firstNote.longImage != nil{
 			self.removeChildren(in: [firstNote.longImage])
 		}else if firstNote.next == nil{
@@ -171,27 +171,27 @@ extension GameScene{
 		}
 		
 		
-		let path = CGMutablePath()
+		let path = CGMutablePath()      // 台形の外周
 		
 		
 		//まず、始点&終点ノーツが円か線かで中心座標が異なるため場合分け
 		var startNotepos:CGPoint = firstNote.image.position //中心座標
-		if firstNote.type == .middle{//線だけずらす
+		if firstNote.type == .middle{	// 線だけずらす(.positionが左端を指すから)
 			startNotepos.x += firstNote.size/2
 		}
 		var endNotepos:CGPoint =  (firstNote.next?.image?.position)! //中心座標
-		if firstNote.next!.type == .middle{//線だけずらす
+		if firstNote.next!.type == .middle{	//線だけずらす
 			endNotepos.x += firstNote.next.size/2
 		}
 		
-		
+
 		
 		
 		if startNotepos.y > self.frame.width/9{//始点ノーツが判定線を通過する前
-			path.move(to: CGPoint(x:startNotepos.x-firstNote.size/2/noteScale, y:startNotepos.y))  //始点
-			path.addLine(to: CGPoint(x:startNotepos.x+firstNote.size/2/noteScale, y:startNotepos.y))
-			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/noteScale, y:endNotepos.y))
-			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/noteScale, y:endNotepos.y))
+			path.move(to: CGPoint(x:startNotepos.x-firstNote.size/2/noteScale, y:startNotepos.y))  	//始点、台形の左下
+			path.addLine(to: CGPoint(x:startNotepos.x+firstNote.size/2/noteScale, y:startNotepos.y))	//右下
+			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/noteScale, y:endNotepos.y))	//右上
+			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/noteScale, y:endNotepos.y))	//左上
 			path.closeSubpath()
 		}else{
 			
@@ -210,6 +210,7 @@ extension GameScene{
 			path.addLine(to: CGPoint(x:longStartPos.x + laneWidth/2, y:longStartPos.y))
 			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/noteScale, y:endNotepos.y))
 			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/noteScale, y:endNotepos.y))
+
 			path.closeSubpath()
 		}
 		
