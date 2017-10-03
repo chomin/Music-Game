@@ -187,7 +187,7 @@ extension GameScene{
 
 		
 		
-		if startNotepos.y > self.frame.width/9{//始点ノーツが判定線を通過する前
+		if startNotepos.y > self.frame.width/9 && firstNote.isJudged == false{//始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
 			path.move(to: CGPoint(x:startNotepos.x-firstNote.size/2/noteScale, y:startNotepos.y))  	//始点、台形の左下
 			path.addLine(to: CGPoint(x:startNotepos.x+firstNote.size/2/noteScale, y:startNotepos.y))	//右下
 			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/noteScale, y:endNotepos.y))	//右上
