@@ -343,7 +343,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 					
 					if i.x > buttonPos - halfBound && i.x < buttonPos + halfBound {//ボタンの範囲
 						
-						if parfectMiddleJudge(laneIndex: j){//離しの判定
+						if parfectMiddleJudge(laneIndex: j){//離しの判定(←コメントミス？)
 							
 							playSound(type: .tap)
 							break

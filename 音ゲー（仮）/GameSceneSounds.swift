@@ -50,9 +50,11 @@ extension GameScene{
 			if tapSound1?.isPlaying == false{
 				tapSound1?.currentTime = 0
 				tapSound1?.play()
+				print("tap1")
 			}else if tapSound2?.isPlaying == false{
 				tapSound2?.currentTime = 0
 				tapSound2?.play()
+				print("tap2")
 			}else{
 				tapSoundResevation += 1
 				print("tap予約")
