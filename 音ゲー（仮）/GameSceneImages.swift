@@ -162,10 +162,11 @@ extension GameScene{
 	}
 	
     // firstNoteから始まるロングノーツを表す緑太線を描く(毎フレーム呼ばれる)
-	func setLong(firstNote:Note)  {
+	func setLong(firstNote:Note ,currentTime:TimeInterval)  {
 		if firstNote.longImage != nil{
 			self.removeChildren(in: [firstNote.longImage])
 		}else if firstNote.next == nil{
+			print("先ノーツが無いので描けません")
 			return
 		}
 		
@@ -183,6 +184,9 @@ extension GameScene{
 			endNotepos.x += firstNote.next.size/2
 		}
 		
+		
+		
+		
 		if startNotepos.y > self.frame.width/9{//始点ノーツが判定線を通過する前
 			path.move(to: CGPoint(x:startNotepos.x-firstNote.size/2/noteScale, y:startNotepos.y))  //始点
 			path.addLine(to: CGPoint(x:startNotepos.x+firstNote.size/2/noteScale, y:startNotepos.y))
@@ -190,12 +194,26 @@ extension GameScene{
 			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/noteScale, y:endNotepos.y))
 			path.closeSubpath()
 		}else{
-			path.move(to: CGPoint(x:CGFloat(firstNote.lane + 1)*self.frame.width/9, y:self.frame.width/9))  //始点
-			path.addLine(to: CGPoint(x:CGFloat(firstNote.lane + 2)*self.frame.width/9, y:self.frame.width/9))
+			
+			//ロングの始点の中心位置を計算
+			var longStartPos = CGPoint(x:0 ,y:self.frame.width/9)
+			
+			let nowPos = (currentTime - GameScene.start) * GameScene.bpm/60	//y座標で比をとると、途中で発散するためposから比を求める
+			let laneDifference:CGFloat = CGFloat(firstNote.lane - firstNote.next.lane)	//レーン差(符号込み)
+			let way1 = laneWidth * laneDifference	//判定線でのレーン差分のx座標の差(符号込み)
+			let way2:CGFloat = CGFloat((nowPos - firstNote.pos)/(firstNote.next.pos - firstNote.pos))
+			let way3 = (CGFloat(firstNote.lane) + 1.5)*self.frame.width/9	//始点レーンの中心のx座標
+			longStartPos.x = way3 - way1 * way2
+			
+			
+			path.move(to: CGPoint(x:longStartPos.x - laneWidth/2, y:longStartPos.y))  //始点
+			path.addLine(to: CGPoint(x:longStartPos.x + laneWidth/2, y:longStartPos.y))
 			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/noteScale, y:endNotepos.y))
 			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/noteScale, y:endNotepos.y))
 			path.closeSubpath()
 		}
+		
+		
 		
 		let tmplong = SKShapeNode(path:path)
 		

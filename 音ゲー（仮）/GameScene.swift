@@ -83,7 +83,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		//レーン
 	
 	//立体感を出すための定数
-	let horizontalDistance:CGFloat = 220	//画面から目までの水平距離a（約5000で10cmほど）
+	let horizontalDistance:CGFloat = 470	//画面から目までの水平距離a（約5000で10cmほど）
 	var verticalDistance:CGFloat!	//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
 	var horizon:CGFloat!  //水平線の長さ
 	var horizonY:CGFloat! //水平線のy座標
@@ -289,11 +289,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			if i.next != nil{
 				if (i.next.image.position.y < self.frame.width/9 || i.next.isJudged == true) && i.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
 					self.removeChildren(in: [i.longImage])
-					i.longImage = nil
+					i.longImage = nil	//複数回removeされるのを防ぐため、nilにする
 				}else if remainingBeat < 4 && i.next.image.position.y > self.frame.width/9 && i.next.isJudged == false && i.image.position.y < horizonY{
 					
 					//毎フレーム描き直す
-					setLong(firstNote: i)
+					setLong(firstNote: i, currentTime: currentTime)
 				}
 			}
 			
@@ -312,7 +312,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						
 						//毎フレーム描き直す
 						
-						setLong(firstNote: note)
+						setLong(firstNote: note, currentTime: currentTime)
 					}
 				}
 			}
@@ -402,7 +402,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			return
 		}
 		let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
-		let y = R * atan(verticalDistance * fypos / (pow(R, 2) + fypos*horizontalDistance))
+		let y = R * atan(verticalDistance * fypos / (pow(R, 2) + fypos*horizontalDistance)) + self.frame.width/9	//self.frame.width/9を足し忘れ？
 		
 		
 		//大きさと形の変更(楕円は描き直し,その他は拡大のみ)
@@ -414,7 +414,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		note.size = diameter
 		
 		//画面に現れるノーツの、描き直し（楕円）及び拡大（線、三角形）
-		if y < horizonY{
+		if y < horizonY && note.isJudged == false{//判定後はremoveされている(エラーになる)。その後もlongImageの計算に位置だけ必要なので、呼び出されうる。
 			if note.type == .tap || note.type == .tapEnd {//楕円
 				//楕円の縦幅を計算
 				let l = sqrt(pow(horizontalDistance + fypos, 2) + pow(laneWidth*CGFloat(3-note.lane), 2))
@@ -426,6 +426,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				
 				// ノーツイメージをセット
 				if note.type == .tap && note.next == nil{
+					
 					self.removeChildren(in: [note.image])
 					note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
 					note.image.fillColor = .white
@@ -608,8 +609,8 @@ class Note {
 	let pos: Double //"拍"単位！小節ではない！！！
 	let lane: Int
 	var next: Note!
-	var image:SKShapeNode!	  //ノーツの画像
-	var longImage:SKShapeNode!	//このノーツを始点とする緑太線の画像
+	var image:SKShapeNode!	  //ノーツの画像（removeしてもnilにはしていない？）
+	var longImage:SKShapeNode!	//このノーツを始点とする緑太線の画像（remove後はnilに）
 	var size:CGFloat = 0	//線の座標をずらすのに必要
 //	var firstLongSize:CGFloat = 0
 	var isJudged = false
