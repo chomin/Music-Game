@@ -1,6 +1,6 @@
 //
 //  Sounds.swift
-//  音ゲー（仮）
+//  音ゲー（仮）
 //
 //  Created by Kohei Nakai on 2017/09/05.
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
@@ -9,6 +9,7 @@
 
 import SpriteKit
 import AVFoundation
+
 
 extension GameScene{
 	
@@ -21,6 +22,7 @@ extension GameScene{
 		flickSound2 = setSound(fileName: "フリック", type: "wav")
 		
 		kara1 = setSound(fileName: "空打ち", type: "wav")
+		
 		kara2 = setSound(fileName: "空打ち", type: "wav")
 		
 		BGM!.numberOfLoops = 0	//１度だけ再生
@@ -44,16 +46,23 @@ extension GameScene{
 		return sound
 	}
 	
+	
+
 	func playSound(type:SoundType){
 		switch type {
 		case .tap:
 			if tapSound1?.isPlaying == false{
 				tapSound1?.currentTime = 0
-				tapSound1?.play()
+				if !tapSound1?.play(){
+					tapSoundResevation += 1
+				}
+				
 				print("tap1")
 			}else if tapSound2?.isPlaying == false{
 				tapSound2?.currentTime = 0
-				tapSound2?.play()
+				if !tapSound2?.play(){
+					tapSoundResevation += 1
+				}
 				print("tap2")
 			}else{
 				tapSoundResevation += 1
@@ -62,18 +71,27 @@ extension GameScene{
 			
 		case .flick:
 			if flickSound1?.isPlaying == false{
-				flickSound1?.play()
+				if !flickSound1?.play(){
+					flickSoundResevation += 1
+				}
+
 			}else if flickSound2?.isPlaying == false{
-				flickSound2?.play()
+				if !flickSound2?.play(){
+					flickSoundResevation += 1
+				}
 			}else{
 				flickSoundResevation += 1
 			}
 			
 		case .kara:
 			if kara1?.isPlaying == false{
-				kara1?.play()
+				if !kara1?.play(){
+					karaSoundResevation += 1
+				}
 			}else if kara2?.isPlaying == false{
-				kara2?.play()
+				if !kara2?.play(){
+					karaSoundResevation += 1
+				}
 			}else{
 				karaSoundResevation += 1
 			}
