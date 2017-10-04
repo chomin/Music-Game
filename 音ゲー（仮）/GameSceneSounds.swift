@@ -53,17 +53,21 @@ extension GameScene{
 		case .tap:
 			if tapSound1?.isPlaying == false{
 				tapSound1?.currentTime = 0
-				if !tapSound1?.play(){
+				if !(tapSound1?.play())!{
+					print("tap1でfalse")
 					tapSoundResevation += 1
+				}else{
+					print("tap1")
 				}
 				
-				print("tap1")
 			}else if tapSound2?.isPlaying == false{
 				tapSound2?.currentTime = 0
-				if !tapSound2?.play(){
+				if !(tapSound2?.play())!{
+					print("tap2でfalse")
 					tapSoundResevation += 1
+				}else{
+					print("tap2")
 				}
-				print("tap2")
 			}else{
 				tapSoundResevation += 1
 				print("tap予約")
@@ -71,12 +75,12 @@ extension GameScene{
 			
 		case .flick:
 			if flickSound1?.isPlaying == false{
-				if !flickSound1?.play(){
+				if !(flickSound1?.play())!{
 					flickSoundResevation += 1
 				}
 
 			}else if flickSound2?.isPlaying == false{
-				if !flickSound2?.play(){
+				if !(flickSound2?.play())!{
 					flickSoundResevation += 1
 				}
 			}else{
@@ -85,11 +89,11 @@ extension GameScene{
 			
 		case .kara:
 			if kara1?.isPlaying == false{
-				if !kara1?.play(){
+				if !(kara1?.play())!{
 					karaSoundResevation += 1
 				}
 			}else if kara2?.isPlaying == false{
-				if !kara2?.play(){
+				if !(kara2?.play())!{
 					karaSoundResevation += 1
 				}
 			}else{

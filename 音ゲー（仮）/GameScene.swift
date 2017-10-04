@@ -590,6 +590,30 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			skView?.ignoresSiblingOrder = true
 			scene.scaleMode = .resizeFill
 			skView?.presentScene(scene)  //ResultSceneに移動
+		}else if player as AVAudioPlayer! == tapSound1{
+			while !(tapSound1?.prepareToPlay())!{
+				print("tap1の準備に失敗")
+			}
+		}else if player as AVAudioPlayer! == tapSound2{
+			while !(tapSound2?.prepareToPlay())!{
+				print("tap1の準備に失敗")
+			}
+		}
+		else if player as AVAudioPlayer! == flickSound1{
+			while !(flickSound1?.prepareToPlay())!{
+			}
+		}
+		else if player as AVAudioPlayer! == flickSound2{
+			while !(flickSound2?.prepareToPlay())!{
+			}
+		}
+		else if player as AVAudioPlayer! == kara1{
+			while !(kara1?.prepareToPlay())!{
+			}
+		}
+		else if player as AVAudioPlayer! == kara2{
+			while !(kara2?.prepareToPlay())!{
+			}
 		}
 	}
 	
