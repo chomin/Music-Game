@@ -19,6 +19,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	//ラベル
 	var judgeLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
 	var comboLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
+	let JLScale:CGFloat = 1.5
+	
 	
 	//音楽プレイヤー
 	var BGM:AVAudioPlayer?
@@ -381,7 +383,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		for (index,value) in lanes.enumerated(){
 			lanes[index].currentTime = currentTime
 			if value.timeState == .passed {
-				judgeLabel.text = "miss!"
+				setJudgeLabelText(text: "miss!")
 				ResultScene.miss += 1
 				ResultScene.combo = 0
 				self.removeChildren(in: [lanes[index].laneNotes[value.nextNoteIndex].image])	//ここで消しても大丈夫なはず
@@ -479,6 +481,23 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	}
 	
 	
+	//判定ラベルのテキストを更新（アニメーション付き）
+	func setJudgeLabelText(text:String){
+		judgeLabel.text = text
+		
+		judgeLabel.removeAllActions()
+		
+		let set = SKAction.scale(to: 1/JLScale, duration: 0)
+		let add = SKAction.unhide()
+		let scale = SKAction.scale(to: 1, duration: 120)
+		let pause = SKAction.wait(forDuration: 2000)
+		let hide = SKAction.hide()
+		let seq = SKAction.sequence([set,add,scale,pause,hide])
+		
+		judgeLabel.run(seq)
+	}
+	
+	//タッチ関係
 	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 		
 		for i in touches {//すべてのタッチに対して処理する（同時押しなどもあるため）
@@ -602,42 +621,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			scene.scaleMode = .resizeFill
 			skView?.presentScene(scene)  //ResultSceneに移動
 		}
-//		else{
-//			print("効果音再生終了")
-//		}
-//		else if player as AVAudioPlayer! == tapSound1{
-//			while !(tapSound1?.prepareToPlay())!{
-//				print("tap1の準備に失敗")
-//			}
-//		}else if player as AVAudioPlayer! == tapSound2{
-//			while !(tapSound2?.prepareToPlay())!{
-//				print("tap1の準備に失敗")
-//			}
-//		}else if player as AVAudioPlayer! == tapSound3{
-//			while !(tapSound3?.prepareToPlay())!{
-//				print("tap3の準備に失敗")
-//			}
-//		}else if player as AVAudioPlayer! == tapSound4{
-//			while !(tapSound4?.prepareToPlay())!{
-//				print("tap4の準備に失敗")
-//			}
-//		}
-//		else if player as AVAudioPlayer! == flickSound1{
-//			while !(flickSound1?.prepareToPlay())!{
-//			}
-//		}
-//		else if player as AVAudioPlayer! == flickSound2{
-//			while !(flickSound2?.prepareToPlay())!{
-//			}
-//		}
-//		else if player as AVAudioPlayer! == kara1{
-//			while !(kara1?.prepareToPlay())!{
-//			}
-//		}
-//		else if player as AVAudioPlayer! == kara2{
-//			while !(kara2?.prepareToPlay())!{
-//			}
-//		}
 	}
 	
 	func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
