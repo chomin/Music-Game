@@ -22,15 +22,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//音楽プレイヤー
 	var BGM:AVAudioPlayer?
-	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。
+	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。やっぱり２つだと遅延も起こるので４つ
 	var flickSound2:AVAudioPlayer?
 	var tapSound1:AVAudioPlayer?
 	var tapSound2:AVAudioPlayer?
+	var tapSound3:AVAudioPlayer?
+	var tapSound4:AVAudioPlayer?
 	var kara1:AVAudioPlayer?
 	var kara2:AVAudioPlayer?
 	var tapSoundResevation = 0
 	var flickSoundResevation = 0
 	var karaSoundResevation = 0
+	var nextPlayTapNumber = 1
 
 	
 	
@@ -189,6 +192,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		GameScene.start = CACurrentMediaTime()
 		BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
 		BGM?.delegate = self
+//		tapSound1?.delegate = self
+//		tapSound2?.delegate = self
+//		tapSound3?.delegate = self
+//		tapSound4?.delegate = self
+//		flickSound1?.delegate = self
+//		flickSound2?.delegate = self
+//		kara1?.delegate = self
+//		kara2?.delegate = self
 		
 		//各レーンにノーツをセット
 		for i in notes{
@@ -590,31 +601,43 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			skView?.ignoresSiblingOrder = true
 			scene.scaleMode = .resizeFill
 			skView?.presentScene(scene)  //ResultSceneに移動
-		}else if player as AVAudioPlayer! == tapSound1{
-			while !(tapSound1?.prepareToPlay())!{
-				print("tap1の準備に失敗")
-			}
-		}else if player as AVAudioPlayer! == tapSound2{
-			while !(tapSound2?.prepareToPlay())!{
-				print("tap1の準備に失敗")
-			}
 		}
-		else if player as AVAudioPlayer! == flickSound1{
-			while !(flickSound1?.prepareToPlay())!{
-			}
-		}
-		else if player as AVAudioPlayer! == flickSound2{
-			while !(flickSound2?.prepareToPlay())!{
-			}
-		}
-		else if player as AVAudioPlayer! == kara1{
-			while !(kara1?.prepareToPlay())!{
-			}
-		}
-		else if player as AVAudioPlayer! == kara2{
-			while !(kara2?.prepareToPlay())!{
-			}
-		}
+//		else{
+//			print("効果音再生終了")
+//		}
+//		else if player as AVAudioPlayer! == tapSound1{
+//			while !(tapSound1?.prepareToPlay())!{
+//				print("tap1の準備に失敗")
+//			}
+//		}else if player as AVAudioPlayer! == tapSound2{
+//			while !(tapSound2?.prepareToPlay())!{
+//				print("tap1の準備に失敗")
+//			}
+//		}else if player as AVAudioPlayer! == tapSound3{
+//			while !(tapSound3?.prepareToPlay())!{
+//				print("tap3の準備に失敗")
+//			}
+//		}else if player as AVAudioPlayer! == tapSound4{
+//			while !(tapSound4?.prepareToPlay())!{
+//				print("tap4の準備に失敗")
+//			}
+//		}
+//		else if player as AVAudioPlayer! == flickSound1{
+//			while !(flickSound1?.prepareToPlay())!{
+//			}
+//		}
+//		else if player as AVAudioPlayer! == flickSound2{
+//			while !(flickSound2?.prepareToPlay())!{
+//			}
+//		}
+//		else if player as AVAudioPlayer! == kara1{
+//			while !(kara1?.prepareToPlay())!{
+//			}
+//		}
+//		else if player as AVAudioPlayer! == kara2{
+//			while !(kara2?.prepareToPlay())!{
+//			}
+//		}
 	}
 	
 	func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {

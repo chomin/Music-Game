@@ -17,6 +17,8 @@ extension GameScene{
 		BGM = setSound(fileName: bgmName, type: "mp3")
 		tapSound1 = setSound(fileName: "タップ", type: "wav")
 		tapSound2 = setSound(fileName: "タップ", type: "wav")
+		tapSound3 = setSound(fileName: "タップ", type: "wav")
+		tapSound4 = setSound(fileName: "タップ", type: "wav")
 		
 		flickSound1 = setSound(fileName: "フリック", type: "wav")
 		flickSound2 = setSound(fileName: "フリック", type: "wav")
@@ -50,28 +52,118 @@ extension GameScene{
 
 	func playSound(type:SoundType){
 		switch type {
-		case .tap:
-			if tapSound1?.isPlaying == false{
-				tapSound1?.currentTime = 0
-				if !(tapSound1?.play())!{
-					print("tap1でfalse")
-					tapSoundResevation += 1
+		case .tap:	//1ばかりが呼ばれているので、1,2,3,4と呼ばれるようにするとか？
+			switch nextPlayTapNumber{
+			case 1:
+				if tapSound1?.isPlaying == false{
+					tapSound1?.currentTime = 0
+					if !(tapSound1?.play())!{
+						print("tap1でfalse")
+						tapSoundResevation += 1
+					}else{
+						print("tap1")
+						nextPlayTapNumber = 2
+						break
+						
+					}
+					
 				}else{
-					print("tap1")
+					tapSoundResevation += 1
 				}
 				
-			}else if tapSound2?.isPlaying == false{
-				tapSound2?.currentTime = 0
-				if !(tapSound2?.play())!{
-					print("tap2でfalse")
-					tapSoundResevation += 1
+			case 2:
+				if tapSound2?.isPlaying == false{
+					tapSound2?.currentTime = 0
+					if !(tapSound2?.play())!{
+						print("tap2でfalse")
+						tapSoundResevation += 1
+					}else{
+						print("tap2")
+						nextPlayTapNumber = 3
+						break
+						
+					}
+					
 				}else{
-					print("tap2")
+					tapSoundResevation += 1
 				}
-			}else{
-				tapSoundResevation += 1
-				print("tap予約")
+				
+			case 3:
+				if tapSound3?.isPlaying == false{
+					tapSound3?.currentTime = 0
+					if !(tapSound3?.play())!{
+						print("tap3でfalse")
+						tapSoundResevation += 1
+					}else{
+						print("tap3")
+						nextPlayTapNumber = 4
+						break
+						
+					}
+					
+				}else{
+					tapSoundResevation += 1
+				}
+				
+			case 4:
+				if tapSound4?.isPlaying == false{
+					tapSound4?.currentTime = 0
+					if !(tapSound4?.play())!{
+						print("tap4でfalse")
+						tapSoundResevation += 1
+					}else{
+						print("tap4")
+						nextPlayTapNumber = 1
+						break
+						
+					}
+					
+				}else{
+					tapSoundResevation += 1
+				}
+				
+			default:
+				print("タップ音を鳴らせませんでした")
 			}
+			
+			
+//			if tapSound1?.isPlaying == false{
+//				tapSound1?.currentTime = 0
+//				if !(tapSound1?.play())!{
+//					print("tap1でfalse")
+//					tapSoundResevation += 1
+//				}else{
+//					print("tap1")
+//				}
+//
+//			}else if tapSound2?.isPlaying == false{
+//				tapSound2?.currentTime = 0
+//				if !(tapSound2?.play())!{
+//					print("tap2でfalse")
+//					tapSoundResevation += 1
+//				}else{
+//					print("tap2")
+//				}
+//			}else if tapSound3?.isPlaying == false{
+//				tapSound3?.currentTime = 0
+//				if !(tapSound3?.play())!{
+//					print("tap3でfalse")
+//					tapSoundResevation += 1
+//				}else{
+//					print("tap3")
+//				}
+//			}else if tapSound4?.isPlaying == false{
+//				tapSound4?.currentTime = 0
+//				if !(tapSound4?.play())!{
+//					print("tap4でfalse")
+//					tapSoundResevation += 1
+//				}else{
+//					print("tap4")
+//				}
+//			}else{
+//				tapSoundResevation += 1
+//				print("tap予約")
+//			}
 			
 		case .flick:
 			if flickSound1?.isPlaying == false{
