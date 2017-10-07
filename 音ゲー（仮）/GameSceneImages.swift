@@ -10,7 +10,7 @@
 import SpriteKit
 
 extension GameScene{
-    // GameScene初期化時に呼ばれる画像設定用関数
+	// GameScene初期化時に呼ばれる画像設定用関数
 	func setImages(){
 		
 		//レーンの境目の線の描写
@@ -22,7 +22,7 @@ extension GameScene{
 			line.alpha = 0.3
 			
 			self.addChild(line)
-
+			
 		}
 		
 		//判定ラインの描写
@@ -32,19 +32,19 @@ extension GameScene{
 		judgeLine.strokeColor = UIColor.white
 		judgeLine.position = CGPoint(x:self.frame.width/9, y:self.frame.width/9)
 		self.addChild(judgeLine)
-
-        // 全ノートを描画し、各Noteのimageメンバに格納する
-        for i in notes{   //始点を描く
-
-             i.image = paintNote(i: i)    //描き、格納
-
-            var note:Note = i
-            while note.next != nil {	//つながっている先のノーツを描き、格納
+		
+		// 全ノートを描画し、各Noteのimageメンバに格納する
+		for i in notes{   //始点を描く
+			
+			i.image = paintNote(i: i)    //描き、格納
+			
+			var note:Note = i
+			while note.next != nil {	//つながっている先のノーツを描き、格納
 				note = note.next		// 進める
 				
-                note.image = paintNote(i: note)
-            }
-        }
+				note.image = paintNote(i: note)
+			}
+		}
 		
 		//同時押し線の描写
 		var i = 0
@@ -121,10 +121,10 @@ extension GameScene{
 			note.fillColor = UIColor.white
 		}
 		
-//		//視点辺りを向くようにする→間違いでした
-//		let point = CGPoint(x:self.frame.midX ,y:-horizontalDistance)
-//		let cons = SKConstraint.orient(to: point,offset: SKRange(constantValue: CGFloat(1/(M_1_PI*2)))) // 姿勢へのConstraintsを作成.
-//		note.constraints = [cons]   // Constraintsを適用.
+		//		//視点辺りを向くようにする→間違いでした
+		//		let point = CGPoint(x:self.frame.midX ,y:-horizontalDistance)
+		//		let cons = SKConstraint.orient(to: point,offset: SKRange(constantValue: CGFloat(1/(M_1_PI*2)))) // 姿勢へのConstraintsを作成.
+		//		note.constraints = [cons]   // Constraintsを適用.
 		
 		
 		//位置(同時押し線にに必要なため、設定(画面外))（yは現状不要!）
@@ -132,12 +132,12 @@ extension GameScene{
 		if i.type == .middle{ //線だけずらす(開始点がposition)
 			xpos -= (self.frame.width/18)
 		}
-
-//		var ypos =  self.frame.width/9
-//		ypos += (CGFloat(60*i.pos/GameScene.bpm))*CGFloat(speed)
-
+		
+		//		var ypos =  self.frame.width/9
+		//		ypos += (CGFloat(60*i.pos/GameScene.bpm))*CGFloat(speed)
+		
 		note.position = CGPoint(x:xpos-1000 ,y:-1000)	//同時押し線の描写に必要！また、後で位置が変わるが、これを消すと途中で隠れなくなり、左下に表示される
-
+		
 		note.isHidden = true	//初期状態では隠しておく
 		
 		self.addChild(note)
@@ -159,16 +159,21 @@ extension GameScene{
 		
 	}
 	
-
-    // firstNoteから始まるロングノーツを表す緑太線を描き、firstNoteにlongImageを格納(毎フレーム呼ばれる)
+	
+	// firstNoteから始まるロングノーツを表す緑太線を描き、firstNoteにlongImageを格納(毎フレーム呼ばれる)
 	func setLong(firstNote:Note ,currentTime:TimeInterval)  {
-
-		if firstNote.longImage != nil{
-			self.removeChildren(in: [firstNote.longImage])
-		}else if firstNote.next == nil{
+		
+		guard firstNote.next != nil else {
 			print("先ノーツが無いので描けません")
 			return
 		}
+		if firstNote.longImages.long != nil{//初で無いなら除去
+			self.removeChildren(in: [firstNote.longImages.long!])
+			if firstNote.longImages.circle != nil {
+				self.removeChildren(in: [firstNote.longImages.circle!])
+			}
+		}
+		
 		
 		
 		let path = CGMutablePath()      // 台形の外周
@@ -184,7 +189,9 @@ extension GameScene{
 			endNotepos.x += firstNote.next.size/2
 		}
 		
-
+		
+		
+		var longStartPos = CGPoint(x:0 ,y:self.frame.width/9)
 		
 		
 		if startNotepos.y > self.frame.width/9 && firstNote.isJudged == false{//始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
@@ -196,8 +203,6 @@ extension GameScene{
 		}else{
 			
 			//ロングの始点の中心位置を計算
-			var longStartPos = CGPoint(x:0 ,y:self.frame.width/9)
-			
 			let nowPos = (currentTime - GameScene.start) * GameScene.bpm/60	//y座標で比をとると、途中で発散するためposから比を求める
 			let laneDifference:CGFloat = CGFloat(firstNote.lane - firstNote.next.lane)	//レーン差(符号込み)
 			let way1 = laneWidth * laneDifference	//判定線でのレーン差分のx座標の差(符号込み)
@@ -210,11 +215,22 @@ extension GameScene{
 			path.addLine(to: CGPoint(x:longStartPos.x + laneWidth/2, y:longStartPos.y))
 			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/noteScale, y:endNotepos.y))
 			path.addLine(to: CGPoint(x:endNotepos.x-firstNote.next.size/2/noteScale, y:endNotepos.y))
-
+			
 			path.closeSubpath()
+			
+			//理想軌道の判定線上に緑円を描く
+			//楕円の縦幅を計算
+			let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
+			let l = sqrt(pow(horizontalDistance , 2) + pow(self.frame.width/2-longStartPos.x, 2))
+			let deltaY = R * atan(noteScale*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(noteScale*laneWidth/2, 2)))
+			
+			let tmpCircle = SKShapeNode(ellipseOf: CGSize(width:noteScale*laneWidth, height:deltaY))
+			tmpCircle.position = longStartPos
+			tmpCircle.fillColor = .green
+			firstNote.longImages.circle = tmpCircle
+			self.addChild(tmpCircle)
+			
 		}
-		
-		
 		
 		let tmplong = SKShapeNode(path:path)
 		
@@ -224,21 +240,18 @@ extension GameScene{
 		tmplong.zPosition = -1
 		
 		
-		
-		
 		self.addChild(tmplong)
-		firstNote.longImage = tmplong
-//		firstNote.firstLongSize = firstNote.size
+		firstNote.longImages.long = tmplong
+		//		firstNote.firstLongSize = firstNote.size
 		
-//		//		位置の変更
-//		firstNote.longImage.position = firstNote.image.position
-//		firstNote.longImage.position.x -= firstNote.size/2
-//		if firstNote.type == .middle{
-//			firstNote.longImage.position.x += firstNote.size/2
-//		}
+		//		//		位置の変更
+		//		firstNote.longImage.position = firstNote.image.position
+		//		firstNote.longImage.position.x -= firstNote.size/2
+		//		if firstNote.type == .middle{
+		//			firstNote.longImage.position.x += firstNote.size/2
+		//		}
 		
-	
+		
+		
 	}
 }
-
-

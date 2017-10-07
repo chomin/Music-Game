@@ -300,9 +300,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
 			
 			if i.next != nil{
-				if (i.next.image.position.y < self.frame.width/9 || i.next.isJudged == true) && i.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
-					self.removeChildren(in: [i.longImage])
-					i.longImage = nil	//複数回removeされるのを防ぐため、nilにする
+				if (i.next.image.position.y < self.frame.width/9 || i.next.isJudged == true) && i.longImages.long != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
+					self.removeChildren(in: [i.longImages.long!])
+					i.longImages.long = nil	//複数回removeされるのを防ぐため、nilにする
+					
+					if i.longImages.circle != nil{//短いときにnilがありえるかも？
+						self.removeChildren(in: [i.longImages.circle!])
+						i.longImages.circle = nil
+					}
 				}else if remainingBeat < 4 && i.next.image.position.y > self.frame.width/9 && i.next.isJudged == false && i.image.position.y < horizonY{
 					
 					//毎フレーム描き直す
@@ -318,9 +323,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				let remainingBeat2 = note.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
                 
 				if note.next != nil {
-					if (note.next.image.position.y < self.frame.width/9 || note.next.isJudged == true) && note.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
-						self.removeChildren(in: [note.longImage])
-						note.longImage = nil
+					if (note.next.image.position.y < self.frame.width/9 || note.next.isJudged == true) && note.longImages.long != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
+						self.removeChildren(in: [note.longImages.long!])
+						note.longImages.long = nil
+						
+						if note.longImages.circle != nil{//短いときにnilがありえるかも？
+							self.removeChildren(in: [note.longImages.circle!])
+							note.longImages.circle = nil
+						}
 					}else if remainingBeat2 < 4 && note.next.image.position.y > self.frame.width/9 && note.next.isJudged == false && note.image.position.y < horizonY!{
 						
 						//毎フレーム描き直す
@@ -419,7 +429,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		
 		//大きさと形の変更(楕円は描き直し,その他は拡大のみ)
-		
 		// 楕円の横幅を計算
 		let grad = (horizon/7-laneWidth)/(horizonY - self.frame.width/9)//傾き
 		let diameter = noteScale*(grad*(y-horizonY) + horizon/7)
@@ -640,7 +649,7 @@ class Note {
 	let lane: Int				// レーンのインデックス(0始まり)
 	var next: Note!				// 次のノーツ(単ノーツの場合はnil)
 	var image:SKShapeNode!		// ノーツの画像
-	var longImage:SKShapeNode!	// このノーツを始点とする緑太線の画像
+	var longImages:(long:SKShapeNode? ,circle:SKShapeNode?)	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	var size:CGFloat = 0		// 線の座標をずらすのに必要
 
 //	var firstLongSize:CGFloat = 0
