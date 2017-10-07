@@ -167,13 +167,13 @@ extension GameScene{
 			print("先ノーツが無いので描けません")
 			return
 		}
-		if firstNote.longImages.long != nil{//初で無いなら除去
-			self.removeChildren(in: [firstNote.longImages.long!])
-//			if firstNote.longImages.circle != nil {//拡大とかで実装したほうがよくね？
-//
-//				self.removeChildren(in: [firstNote.longImages.circle!])
-//			}
-		}
+//		if firstNote.longImages.long != nil{//初で無いなら除去
+//			self.removeChildren(in: [firstNote.longImages.long!])
+////			if firstNote.longImages.circle != nil {//拡大とかで実装したほうがよくね？
+////
+////				self.removeChildren(in: [firstNote.longImages.circle!])
+////			}
+//		}
 		
 		
 		
@@ -242,16 +242,22 @@ extension GameScene{
 			
 		}
 		
-		let tmplong = SKShapeNode(path:path)
+		//パスをもとにlongを描く
+		if let long = firstNote.longImages.long{
+			long.path = path
+		}else{
+			let tmplong = SKShapeNode()
+			
+			tmplong.fillColor = UIColor.green
+			tmplong.path = path
+			
+			tmplong.alpha = 0.8
+			tmplong.zPosition = -1
+			
+			self.addChild(tmplong)
+			firstNote.longImages.long = tmplong
+		}
 		
-		tmplong.fillColor = UIColor.green
-		
-		tmplong.alpha = 0.8
-		tmplong.zPosition = -1
-		
-		
-		self.addChild(tmplong)
-		firstNote.longImages.long = tmplong
 		//		firstNote.firstLongSize = firstNote.size
 		
 		//		//		位置の変更
