@@ -169,9 +169,10 @@ extension GameScene{
 		}
 		if firstNote.longImages.long != nil{//初で無いなら除去
 			self.removeChildren(in: [firstNote.longImages.long!])
-			if firstNote.longImages.circle != nil {
-				self.removeChildren(in: [firstNote.longImages.circle!])
-			}
+//			if firstNote.longImages.circle != nil {//拡大とかで実装したほうがよくね？
+//
+//				self.removeChildren(in: [firstNote.longImages.circle!])
+//			}
 		}
 		
 		
@@ -194,7 +195,7 @@ extension GameScene{
 		var longStartPos = CGPoint(x:0 ,y:self.frame.width/9)
 		
 		
-		if startNotepos.y > self.frame.width/9 && firstNote.isJudged == false{//始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
+		if startNotepos.y > self.frame.width/9 && !firstNote.isJudged{//始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
 			path.move(to: CGPoint(x:startNotepos.x-firstNote.size/2/noteScale, y:startNotepos.y))  	//始点、台形の左下
 			path.addLine(to: CGPoint(x:startNotepos.x+firstNote.size/2/noteScale, y:startNotepos.y))	//右下
 			path.addLine(to: CGPoint(x:endNotepos.x+firstNote.next.size/2/noteScale, y:endNotepos.y))	//右上
@@ -218,17 +219,26 @@ extension GameScene{
 			
 			path.closeSubpath()
 			
-			//理想軌道の判定線上に緑円を描く
-			//楕円の縦幅を計算
-			let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
-			let l = sqrt(pow(horizontalDistance , 2) + pow(self.frame.width/2-longStartPos.x, 2))
-			let deltaY = R * atan(noteScale*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(noteScale*laneWidth/2, 2)))
-			
-			let tmpCircle = SKShapeNode(ellipseOf: CGSize(width:noteScale*laneWidth, height:deltaY))
-			tmpCircle.position = longStartPos
-			tmpCircle.fillColor = .green
-			firstNote.longImages.circle = tmpCircle
-			self.addChild(tmpCircle)
+			if firstNote.isJudged{
+				//理想軌道の判定線上に緑円を描く
+				//楕円の縦幅を計算
+				let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
+				let l = sqrt(pow(horizontalDistance , 2) + pow(self.frame.width/2-longStartPos.x, 2))
+				let deltaY = R * atan(noteScale*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(noteScale*laneWidth/2, 2)))
+				
+				if let circle = firstNote.longImages.circle{	//縦幅と座標だけ変更
+					circle.yScale = deltaY/(noteScale*laneWidth)
+					circle.position = longStartPos
+				}else{
+					let tmpCircle = SKShapeNode(circleOfRadius:noteScale*laneWidth/2)	//まず円
+					tmpCircle.position = longStartPos
+					tmpCircle.fillColor = .green
+					tmpCircle.yScale = deltaY/(noteScale*laneWidth)	//縦幅だけ変更して楕円にする
+					
+					firstNote.longImages.circle = tmpCircle
+					self.addChild(tmpCircle)
+				}
+			}
 			
 		}
 		

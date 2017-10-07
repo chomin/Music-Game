@@ -318,10 +318,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			//つながっているノーツ
 			var note:Note = i
 			while note.next != nil{
-                note = note.next
-                
+				note = note.next
+				
 				let remainingBeat2 = note.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
-                
+				
 				if note.next != nil {
 					if (note.next.image.position.y < self.frame.width/9 || note.next.isJudged == true) && note.longImages.long != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
 						self.removeChildren(in: [note.longImages.long!])
@@ -700,14 +700,4 @@ struct Lane {
 	var currentTime:TimeInterval = 0.0
 	var laneNotes:[Note] = [] //最初に全部格納する！
 }
-
-//enum tapPlayer{
-//	case tap1,tap2
-//}
-//enum flickPlayer{
-//	case flick1,flick2
-//}
-//enum karaPlayer{
-//	case kara1,kara2
-//}
 
