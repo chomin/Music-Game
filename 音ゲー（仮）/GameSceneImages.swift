@@ -219,26 +219,26 @@ extension GameScene{
 			
 			path.closeSubpath()
 			
-			if firstNote.isJudged{
-				//理想軌道の判定線上に緑円を描く
-				//楕円の縦幅を計算
-				let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
-				let l = sqrt(pow(horizontalDistance , 2) + pow(self.frame.width/2-longStartPos.x, 2))
-				let deltaY = R * atan(noteScale*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(noteScale*laneWidth/2, 2)))
+			
+			//理想軌道の判定線上に緑円を描く
+			//楕円の縦幅を計算
+			let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
+			let l = sqrt(pow(horizontalDistance , 2) + pow(self.frame.width/2-longStartPos.x, 2))
+			let deltaY = R * atan(noteScale*laneWidth*verticalDistance / (pow(l, 2) + pow(verticalDistance, 2) - pow(noteScale*laneWidth/2, 2)))
+			
+			if let circle = firstNote.longImages.circle{	//縦幅と座標だけ変更
+				circle.yScale = deltaY/(noteScale*laneWidth)
+				circle.position = longStartPos
+			}else{
+				let tmpCircle = SKShapeNode(circleOfRadius:noteScale*laneWidth/2)	//まず円
+				tmpCircle.position = longStartPos
+				tmpCircle.fillColor = .green
+				tmpCircle.yScale = deltaY/(noteScale*laneWidth)	//縦幅だけ変更して楕円にする
 				
-				if let circle = firstNote.longImages.circle{	//縦幅と座標だけ変更
-					circle.yScale = deltaY/(noteScale*laneWidth)
-					circle.position = longStartPos
-				}else{
-					let tmpCircle = SKShapeNode(circleOfRadius:noteScale*laneWidth/2)	//まず円
-					tmpCircle.position = longStartPos
-					tmpCircle.fillColor = .green
-					tmpCircle.yScale = deltaY/(noteScale*laneWidth)	//縦幅だけ変更して楕円にする
-					
-					firstNote.longImages.circle = tmpCircle
-					self.addChild(tmpCircle)
-				}
+				firstNote.longImages.circle = tmpCircle
+				self.addChild(tmpCircle)
 			}
+			
 			
 		}
 		
