@@ -10,7 +10,7 @@
 import SpriteKit
 
 extension GameScene{
-    // GameScene初期化時に呼ばれる画像設定用関数
+	// GameScene初期化時に呼ばれる画像設定用関数
 	func setImages(){
 		
 		//レーンの境目の線の描写
@@ -22,7 +22,7 @@ extension GameScene{
 			line.alpha = 0.3
 			
 			self.addChild(line)
-
+			
 		}
 		
 		//判定ラインの描写
@@ -83,7 +83,7 @@ extension GameScene{
 		
 		//lnotesをposの早い順にソート(してもらう)
 		lNotes = lNotes.sorted{$0.pos < $1.pos}
-		
+
 		//同時押し線の描写
 		var i = 0
 		while(i+1 < fNotes.count){  //iとi+1を見るため...
@@ -123,12 +123,7 @@ extension GameScene{
 		}
 		
 	}
-	
-	
-	
-	
-	
-	
+
 	
 	/* Noteクラスに移動 */
 	
@@ -197,10 +192,6 @@ extension GameScene{
 	
 	
 	/* ここまで */
-	
-	
-	
-	
 	
 	
 	
@@ -306,6 +297,5 @@ extension GameScene{
 //		
 //	
 //	}
+
 }
-
-

@@ -19,18 +19,23 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	//ラベル
 	var judgeLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
 	var comboLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
+	let JLScale:CGFloat = 1.5
+	
 	
 	//音楽プレイヤー
 	var BGM:AVAudioPlayer?
-	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。
+	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。やっぱり２つだと遅延も起こるので４つ
 	var flickSound2:AVAudioPlayer?
 	var tapSound1:AVAudioPlayer?
 	var tapSound2:AVAudioPlayer?
+	var tapSound3:AVAudioPlayer?
+	var tapSound4:AVAudioPlayer?
 	var kara1:AVAudioPlayer?
 	var kara2:AVAudioPlayer?
 	var tapSoundResevation = 0
 	var flickSoundResevation = 0
 	var karaSoundResevation = 0
+	var nextPlayTapNumber = 1
 
 	
 	
@@ -443,24 +448,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			}
 		}
 		
-		//		for i in 0...6{
-		//
-		//
-		//
-		//			let nextIndex = lanes[i].nextNoteIndex
-		//
-		//			if lanes[i].timeState == .parfect && lanes[i].laneNotes[nextIndex].type == .middle{
-		//
-		//			}
-		//
-		//		}
-		
 		
 		//レーンの監視(過ぎて行ってないか)
 		for (index,value) in lanes.enumerated(){
 			lanes[index].currentTime = currentTime
 			if value.timeState == .passed {
-				judgeLabel.text = "miss!"
+				setJudgeLabelText(text: "miss!")
 				ResultScene.miss += 1
 				ResultScene.combo = 0
 				self.removeChildren(in: [lanes[index].laneNotes[value.nextNoteIndex].image])	//ここで消しても大丈夫なはず
@@ -473,6 +466,23 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	}
 	
 	
+	//判定ラベルのテキストを更新（アニメーション付き）
+	func setJudgeLabelText(text:String){
+		judgeLabel.text = text
+		
+		judgeLabel.removeAllActions()
+		
+		let set = SKAction.scale(to: 1/JLScale, duration: 0)
+		let add = SKAction.unhide()
+		let scale = SKAction.scale(to: 1, duration: 120)
+		let pause = SKAction.wait(forDuration: 2000)
+		let hide = SKAction.hide()
+		let seq = SKAction.sequence([set,add,scale,pause,hide])
+		
+		judgeLabel.run(seq)
+	}
+	
+	//タッチ関係
 	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 		
 		for i in touches {//すべてのタッチに対して処理する（同時押しなどもあるため）
@@ -604,6 +614,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 }
 
+
 enum TimeState {
 	case miss,bad,good,great,parfect,still,passed
 }
@@ -642,14 +653,4 @@ struct Lane {
 	var currentTime:TimeInterval = 0.0
 	var laneNotes:[Note] = [] //最初に全部格納する！
 }
-
-//enum tapPlayer{
-//	case tap1,tap2
-//}
-//enum flickPlayer{
-//	case flick1,flick2
-//}
-//enum karaPlayer{
-//	case kara1,kara2
-//}
 

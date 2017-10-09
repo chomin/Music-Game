@@ -33,7 +33,7 @@ extension GameScene{
 		
 		switch lanes[laneIndex].timeState {
 		case .parfect:
-			judgeLabel.text = "parfect!!"
+			setJudgeLabelText(text: "parfect!!")
 			ResultScene.parfect += 1
 			ResultScene.combo += 1
 			if ResultScene.combo > ResultScene.maxCombo{
@@ -44,7 +44,7 @@ extension GameScene{
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .great:
-			judgeLabel.text = "great!"
+			setJudgeLabelText(text: "great!")
 			ResultScene.great += 1
 			ResultScene.combo += 1
 			if ResultScene.combo > ResultScene.maxCombo{
@@ -55,7 +55,7 @@ extension GameScene{
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .good:
-			judgeLabel.text = "good"
+			setJudgeLabelText(text: "good")
 			ResultScene.good += 1
 			ResultScene.combo = 0
 			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
@@ -63,7 +63,7 @@ extension GameScene{
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .bad:
-			judgeLabel.text = "bad"
+			setJudgeLabelText(text: "bad")
 			ResultScene.bad += 1
 			ResultScene.combo = 0
 			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
@@ -71,7 +71,7 @@ extension GameScene{
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .miss:
-			judgeLabel.text = "miss!"
+			setJudgeLabelText(text: "miss!")
 			ResultScene.miss += 1
 			ResultScene.combo = 0
 			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
@@ -97,7 +97,7 @@ extension GameScene{
 		
 		switch lanes[laneIndex].timeState {
 		case .parfect:
-			judgeLabel.text = "parfect!!"
+			setJudgeLabelText(text: "parfect!!")
 			ResultScene.parfect += 1
 			ResultScene.combo += 1
 			if ResultScene.combo > ResultScene.maxCombo{
