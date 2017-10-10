@@ -21,14 +21,23 @@ extension GameScene{
 
 
 	
-	func judge(laneIndex:Int,type:NoteType) -> Bool{	  //対象ノーツが実在し、判定したかを返す
+	func judge(laneIndex:Int, type:NoteType) -> Bool{	  //対象ノーツが実在し、判定したかを返す
 		
 		let nextIndex = lanes[laneIndex].nextNoteIndex
 		
 		if nextIndex >= lanes[laneIndex].laneNotes.count{//最後まで判定が終わってる
 			return false
-		}else if lanes[laneIndex].laneNotes[nextIndex].type != type{//種類が違う
-			return false
+		} else {
+			// 種類が違う場合を弾く
+			let note = lanes[laneIndex].laneNotes[nextIndex]
+			switch type {
+			case .tap:      if !(note is Tap)      { return false }
+			case .flick:    if !(note is Flick)    { return false }
+			case .tapStart: if !(note is TapStart) { return false }
+			case .middle:   if !(note is Middle)   { return false }
+			case .tapEnd:   if !(note is TapEnd)   { return false }
+			case .flickEnd: if !(note is FlickEnd) { return false }
+			}
 		}
 		
 		switch lanes[laneIndex].timeState {
@@ -91,7 +100,7 @@ extension GameScene{
 		
 		if nextIndex >= lanes[laneIndex].laneNotes.count{//最後まで判定が終わってる
 			return false
-		}else if lanes[laneIndex].laneNotes[nextIndex].type != .middle{//種類が違う
+		}else if !(lanes[laneIndex].laneNotes[nextIndex] is Middle){//種類が違う
 			return false
 		}
 		

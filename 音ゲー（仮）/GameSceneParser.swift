@@ -282,11 +282,11 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 
 		// ロングノーツを時間順にソート(同じ場合は.tapEnd or .flickEnd < .tapStart)
 		longNotes1.sort(by: {
-			if $0.pos == $1.pos { return $1.type == .tapStart }
+			if $0.pos == $1.pos { return $1 is TapStart }
 			else { return $0.pos < $1.pos }
 		})
 		longNotes2.sort(by: {
-			if $0.pos == $1.pos { return $1.type == .tapStart }
+			if $0.pos == $1.pos { return $1 is TapStart }
 			else { return $0.pos < $1.pos }
 		})
 
@@ -294,14 +294,13 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		// longNotes1について
 		var i = 0
 		while i < longNotes1.count {
-			if longNotes1[i].type == .tapStart {
+			if longNotes1[i] is TapStart {
 				notes.append(longNotes1[i])
-				while longNotes1[i].type != .tapEnd &&
-					  longNotes1[i].type != .flickEnd {
+				while !(longNotes1[i] is TapEnd) && !(longNotes1[i] is FlickEnd) {
 					guard i + 1 < longNotes1.count else {
 						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")
 					}
-					guard longNotes1[i + 1].type == .middle || longNotes1[i + 1].type == .tapEnd || longNotes1[i + 1].type == .flickEnd else {
+					guard longNotes1[i + 1] is Middle || longNotes1[i + 1] is TapEnd || longNotes1[i + 1] is FlickEnd else {
 						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")
 					}
 					if let temp = longNotes1[i] as? TapStart {
@@ -324,27 +323,26 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		// longNotes2について
 		i = 0
 		while i < longNotes2.count {
-			if longNotes2[i].type == .tapStart {
+			if longNotes2[i] is TapStart {
 				notes.append(longNotes2[i])
-				while longNotes2[i].type != .tapEnd &&
-					longNotes2[i].type != .flickEnd {
-						guard i + 1 < longNotes2.count else {
-							throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")
-						}
-						guard longNotes2[i + 1].type == .middle || longNotes2[i + 1].type == .tapEnd || longNotes2[i + 1].type == .flickEnd else {
-							throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")
-						}
-						if let temp = longNotes2[i] as? TapStart {
-							temp.next = longNotes2[i + 1]
-							longNotes2[i] = temp
-						} else if let temp = longNotes2[i] as? Middle {
-							temp.next = longNotes2[i + 1]
-							longNotes2[i] = temp
-						} else {
-							throw ParseError.unexpected("予期せぬエラー")
-						}
-						
-						i += 1
+				while !(longNotes2[i] is TapEnd) && !(longNotes2[i] is FlickEnd) {
+					guard i + 1 < longNotes2.count else {
+						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")
+					}
+					guard longNotes2[i + 1] is Middle || longNotes2[i + 1] is TapEnd || longNotes2[i + 1] is FlickEnd else {
+						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")
+					}
+					if let temp = longNotes2[i] as? TapStart {
+						temp.next = longNotes2[i + 1]
+						longNotes2[i] = temp
+					} else if let temp = longNotes2[i] as? Middle {
+						temp.next = longNotes2[i + 1]
+						longNotes2[i] = temp
+					} else {
+						throw ParseError.unexpected("予期せぬエラー")
+					}
+					
+					i += 1
 				}
 				i += 1
 			} else {

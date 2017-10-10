@@ -14,8 +14,8 @@ enum NoteType {
 
 class Tap: Note {
 	
-	init(position pos: Double, lane: Int) {
-        super.init(type: .tap, position: pos, lane: lane)
+	override init(position pos: Double, lane: Int) {
+        super.init(position: pos, lane: lane)
 		
 		// imageのインスタンス(白円)を作成
 		self.image = SKShapeNode(circleOfRadius: GameScene.laneWidth / 2)
@@ -42,8 +42,8 @@ class Tap: Note {
 
 class Flick: Note {
 
-    init(position pos: Double, lane: Int) {
-        super.init(type: .flick, position: pos, lane: lane)
+    override init(position pos: Double, lane: Int) {
+        super.init(position: pos, lane: lane)
 		
 		// imageのインスタンス(マゼンタ三角形)を作成
 		let length = GameScene.laneWidth / 2 // 三角形一辺の長さの半分
@@ -81,8 +81,8 @@ class TapStart: Note {
 	var next = Note()				// 次のノーツ
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	
-	init(position pos: Double, lane: Int) {
-		super.init(type: .tapStart, position: pos, lane: lane)
+	override init(position pos: Double, lane: Int) {
+		super.init(position: pos, lane: lane)
 		
 		// imageのインスタンス(緑円)を作成
 		image = SKShapeNode(circleOfRadius: GameScene.laneWidth / 2)
@@ -184,8 +184,8 @@ class Middle: Note {
 	var next = Note()				// 次のノーツ
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	
-    init(position pos: Double, lane: Int) {
-        super.init(type: .middle, position: pos, lane: lane)
+    override init(position pos: Double, lane: Int) {
+        super.init(position: pos, lane: lane)
 		
 		// imageのインスタンス(緑線分)を作成
 		var points = [
@@ -292,8 +292,8 @@ class Middle: Note {
 
 class TapEnd: Note {
 
-    init(position pos: Double, lane: Int) {
-        super.init(type: .tapEnd, position: pos, lane: lane)
+    override init(position pos: Double, lane: Int) {
+        super.init(position: pos, lane: lane)
 		
 		// imageのインスタンス(緑円)を作成
 		image = SKShapeNode(circleOfRadius: GameScene.laneWidth / 2)
@@ -320,8 +320,8 @@ class TapEnd: Note {
 
 class FlickEnd: Note {
 	
-    init(position pos: Double, lane: Int) {
-        super.init(type: .flickEnd, position: pos, lane: lane)
+    override init(position pos: Double, lane: Int) {
+        super.init(position: pos, lane: lane)
 		
 		// imageのインスタンス(マゼンタ三角形)を作成
 		let length = GameScene.laneWidth / 2 // 三角形一辺の長さの半分
@@ -359,7 +359,6 @@ class FlickEnd: Note {
 // ノーツ基本クラス
 class Note {
 	
-	let type: NoteType			// ノートの種類(タップかフリックかなど)
 	let pos: Double				// "拍"単位！小節ではない！！！
 	let lane: Int				// レーンのインデックス(0始まり)
 	var image = SKShapeNode()	// ノーツの画像
@@ -374,13 +373,11 @@ class Note {
 												//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
 
 	
-    init(type: NoteType, position pos: Double, lane: Int) {
-        self.type = type
+    init(position pos: Double, lane: Int) {
         self.pos = pos
         self.lane = lane
     }
 	init() {
-		self.type = .tap
 		self.pos = 0
 		self.lane = 0
 	}
