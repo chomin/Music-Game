@@ -150,6 +150,7 @@ class TapStart: Note {
 			let deltaY = R * atan(noteScale * GameScene.laneWidth * verticalDistance / denomOfAtan)
 			
 			longImages.circle.yScale = deltaY / GameScene.laneWidth
+			longImages.circle.xScale = noteScale
 			longImages.circle.position = longStartPos
 		}
 		
@@ -158,7 +159,7 @@ class TapStart: Note {
 		
 		
 		// isHiddenを更新
-		if position.y >= GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
+		if position.y >= GameScene.horizonY || isJudged || position.y<GameScene.judgeLineY{		// 水平線より上、判定済みのものは隠す(判定線超えたら引き継ぐ)
 			image.isHidden = true
 		}else{
 			image.isHidden = false
@@ -266,6 +267,7 @@ class Middle: Note {
 			let deltaY = R * atan(noteScale * GameScene.laneWidth * verticalDistance / denomOfAtan)
 			
 			longImages.circle.yScale = deltaY / GameScene.laneWidth
+			longImages.circle.xScale = noteScale
 			longImages.circle.position = longStartPos
 		}
 		
@@ -274,7 +276,7 @@ class Middle: Note {
 		
 		
 		// isHiddenを更新
-		if position.y >= GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
+		if position.y >= GameScene.horizonY || isJudged || position.y<GameScene.judgeLineY{		// 水平線より上、判定済みのものは隠す。判定線超えたら引き継ぐ
 			image.isHidden = true
 		} else {
 			image.isHidden = false

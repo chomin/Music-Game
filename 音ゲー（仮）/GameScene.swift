@@ -418,8 +418,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
             // 同時押しラインを移動
 			i.line.position = i.note.position
 //			i.line.isHidden = i.note.image.isHidden
-			if i.note.isJudged{
+			if i.note.isJudged || i.note.position.y == 0{//判定後または初期初期位置では隠す
 				i.line.isHidden = true
+			}else{
+				i.line.isHidden = false
 			}
 			
 			// 大きさも変更
