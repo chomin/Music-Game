@@ -1,6 +1,6 @@
 //
 //  Buttons.swift
-//  音ゲー（仮）
+//  音ゲー（仮）
 //
 //  Created by Kohei Nakai on 2017/09/05.
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
@@ -28,7 +28,7 @@ extension GameScene{
 		if nextIndex >= lanes[laneIndex].laneNotes.count{//最後まで判定が終わってる
 			return false
 		} else {
-			// 種類が違う場合を弾く
+			// 種類が違う場合を弾く(型で判別)
 			let note = lanes[laneIndex].laneNotes[nextIndex]
 			switch type {
 			case .tap:      if !(note is Tap)      { return false }
