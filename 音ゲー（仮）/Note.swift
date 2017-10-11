@@ -172,7 +172,7 @@ class TapStart: Note {
 		} else {
 			longImages.long.isHidden = false
 		}
-		if image.position.y >= GameScene.judgeLineY || next.isJudged {
+		if image.position.y >= GameScene.judgeLineY || next.image.position.y <= GameScene.judgeLineY {
 			longImages.circle.isHidden = true
 		} else {
 			longImages.circle.isHidden = false
@@ -275,7 +275,7 @@ class Middle: Note {
 		// isHiddenを更新
 		if image.position.y >= GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
-		}else{
+		} else {
 			image.isHidden = false
 		}
 		if image.position.y >= GameScene.horizonY || next.image.position.y <= GameScene.judgeLineY || next.isJudged {
@@ -283,7 +283,7 @@ class Middle: Note {
 		} else {
 			longImages.long.isHidden = false
 		}
-		if image.position.y >= GameScene.judgeLineY || next.isJudged {//所詮ガイドなので、判定前でも隠してしまうべきでは？(next.image.position.y <= GameScene.judgeLineYを入れたほうが良くない？)
+		if image.position.y >= GameScene.judgeLineY || next.image.position.y <= GameScene.judgeLineY {
 			longImages.circle.isHidden = true
 		} else {
 			longImages.circle.isHidden = false
