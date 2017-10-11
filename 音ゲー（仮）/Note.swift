@@ -283,7 +283,7 @@ class Middle: Note {
 		} else {
 			longImages.long.isHidden = false
 		}
-		if image.position.y >= GameScene.judgeLineY || next.isJudged {
+		if image.position.y >= GameScene.judgeLineY || next.isJudged {//所詮ガイドなので、判定前でも隠してしまうべきでは？(next.image.position.y <= GameScene.judgeLineYを入れたほうが良くない？)
 			longImages.circle.isHidden = true
 		} else {
 			longImages.circle.isHidden = false
