@@ -416,7 +416,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		// 同時押しラインの更新
 		for i in sameLines{
             // 同時押しラインを移動
-			i.line.position = i.note.image.position
+			i.line.position = i.note.position
 			i.line.isHidden = i.note.image.isHidden
             
 			// 大きさも変更

@@ -25,14 +25,14 @@ class Tap: Note {
     
     override func update(currentTime: TimeInterval) {
 		
-        // x座標とy座標を計算しimage.positionを変更
+        // x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
 		
 		// 縦と横の大きさを計算し、imageのスケールを変更
 		setScale(currentTime: currentTime)
 		
 		// image.isHiddenを更新
-		if image.position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
+		if position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
 		}else{
 			image.isHidden = false
@@ -61,14 +61,14 @@ class Flick: Note {
     }
 
     override func update(currentTime: TimeInterval) {
-		// x座標とy座標を計算しimage.positionを変更
+		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
 		
 		// スケールを変更
 		setScale(currentTime: currentTime)
 		
 		// image.isHiddenを更新
-		if image.position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
+		if position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
 		}else{
 			image.isHidden = false
@@ -100,7 +100,7 @@ class TapStart: Note {
 	}
 	
 	override func update(currentTime: TimeInterval) {
-		// x座標とy座標を計算しimage.positionを変更
+		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
 		
 		// 縦と横の大きさを計算し、imageのスケールを変更
@@ -110,12 +110,8 @@ class TapStart: Note {
 		// longImageを更新
 		let path = CGMutablePath()      // 台形の外周
 		
-		let startNotePos = image.position 		// 中心座標
-		var endNotePos = next.image.position	// 中心座標
-		// 終点ノーツが円か線かで中心座標が異なるため場合分け
-		if next is Middle {
-			endNotePos.x += next.size / 2		// 線だけずらす
-		}
+		let startNotePos = position 	// 中心座標
+		let endNotePos = next.position	// 中心座標
 		
 		if startNotePos.y > GameScene.judgeLineY && isJudged == false {	// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
 			path.move   (to: CGPoint(x: startNotePos.x - size/2/noteScale, y: startNotePos.y))  // 始点、台形の左下
@@ -161,18 +157,18 @@ class TapStart: Note {
 		
 		
 		// isHiddenを更新
-		if image.position.y >= GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
+		if position.y >= GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
 		}else{
 			image.isHidden = false
 		}
-		if image.position.y >= GameScene.horizonY || next.image.position.y <= GameScene.judgeLineY || next.isJudged {
-			if next.image.position.y <= GameScene.judgeLineY || next.isJudged {print(next.image.position.y)}
+		if position.y >= GameScene.horizonY || next.position.y <= GameScene.judgeLineY || next.isJudged {
+			if next.position.y <= GameScene.judgeLineY || next.isJudged {print(next.position.y)}
 			longImages.long.isHidden = true
 		} else {
 			longImages.long.isHidden = false
 		}
-		if image.position.y >= GameScene.judgeLineY || next.image.position.y <= GameScene.judgeLineY {
+		if position.y >= GameScene.judgeLineY || next.position.y <= GameScene.judgeLineY || next.isJudged {
 			longImages.circle.isHidden = true
 		} else {
 			longImages.circle.isHidden = false
@@ -184,6 +180,14 @@ class Middle: Note {
 
 	var next = Note()				// 次のノーツ
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
+	override var position: CGPoint {								// positionを左端ではなく線の中点にするためオーバーライド
+		get {
+			return CGPoint(x: image.position.x + size / 2, y: image.position.y)
+		}
+		set {
+			image.position = CGPoint(x: newValue.x - size / 2, y: newValue.y)
+		}
+	}
 	
     override init(position pos: Double, lane: Int) {
         super.init(position: pos, lane: lane)
@@ -209,9 +213,8 @@ class Middle: Note {
     }
 
     override func update(currentTime: TimeInterval) {
-		// x座標とy座標を計算しimage.positionを変更
+		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
-		image.position.x -= size / 2	// 線のときだけずらす(開始点がposition)→長さの半分だけずらすように！
 
 		
 		// スケールを変更
@@ -221,13 +224,8 @@ class Middle: Note {
 		// longImageをpathのみ更新
 		let path = CGMutablePath()      // 台形の外周
 		
-		var startNotePos = image.position 		// 中心座標
-		startNotePos.x += size / 2				// 幅の半分ずらす(.positionが左端を指すから)
-		var endNotePos = next.image.position	// 中心座標
-		// 終点ノーツが円か線かで中心座標が異なるため場合分け
-		if next is Middle {
-			endNotePos.x += next.size / 2		// 線だけずらす
-		}
+		let startNotePos = position 	// 中心座標
+		let endNotePos = next.position	// 中心座標
 		
 		if startNotePos.y > GameScene.judgeLineY && isJudged == false {	// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
 			path.move   (to: CGPoint(x: startNotePos.x - size/2/noteScale, y: startNotePos.y))  // 始点、台形の左下
@@ -273,17 +271,17 @@ class Middle: Note {
 		
 		
 		// isHiddenを更新
-		if image.position.y >= GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
+		if position.y >= GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
 		} else {
 			image.isHidden = false
 		}
-		if image.position.y >= GameScene.horizonY || next.image.position.y <= GameScene.judgeLineY || next.isJudged {
+		if position.y >= GameScene.horizonY || next.position.y <= GameScene.judgeLineY || next.isJudged {
 			longImages.long.isHidden = true
 		} else {
 			longImages.long.isHidden = false
 		}
-		if image.position.y >= GameScene.judgeLineY || next.image.position.y <= GameScene.judgeLineY {
+		if position.y >= GameScene.judgeLineY || next.position.y <= GameScene.judgeLineY || next.isJudged {
 			longImages.circle.isHidden = true
 		} else {
 			longImages.circle.isHidden = false
@@ -304,14 +302,14 @@ class TapEnd: Note {
 
     override func update(currentTime: TimeInterval) {
 		
-		// x座標とy座標を計算しimage.positionを変更
+		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
 		
 		// 縦と横の大きさを計算し、imageのスケールを変更
 		setScale(currentTime: currentTime)
 		
 		// image.isHiddenを更新
-		if image.position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
+		if position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
 		}else{
 			image.isHidden = false
@@ -341,14 +339,14 @@ class FlickEnd: Note {
 
     override func update(currentTime: TimeInterval) {
 		
-		// x座標とy座標を計算しimage.positionを変更
+		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
 		
 		// 縦と横の大きさを計算し、imageのスケールを変更
 		setScale(currentTime: currentTime)
 		
 		// image.isHiddenを更新
-		if image.position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
+		if position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
 		}else{
 			image.isHidden = false
@@ -365,6 +363,14 @@ class Note {
 	var image = SKShapeNode()	// ノーツの画像
 	var size: CGFloat = 0		// ノーツの横幅
 	var isJudged = false		// 判定済みかどうか
+	var position: CGPoint {		// ノーツの座標
+		get {
+			return image.position
+		}
+		set {
+			image.position = newValue
+		}
+	}
 	
 	let noteScale: CGFloat = 1.3	// レーン幅に対するノーツの幅の倍率
 	let speed: CGFloat = 1700.0		// スピード
@@ -412,7 +418,7 @@ class Note {
 		
 		
 		// 座標を反映
-		self.image.position = CGPoint(x: posX, y: posY)
+		self.position = CGPoint(x: posX, y: posY)
 	}
 	
 	// ノーツのスケールを設定
@@ -422,7 +428,7 @@ class Note {
 		let fypos = (CGFloat(60*pos/GameScene.bpm) - CGFloat(currentTime - GameScene.start)) * speed	// 判定線からの水平距離x
 		let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))								// 視点から判定線までの距離(射影する球の半径)
 		let grad = (GameScene.horizon/7 - GameScene.laneWidth) / (GameScene.horizonY - GameScene.judgeLineY)	// 傾き
-		self.size = noteScale * (grad * (image.position.y - GameScene.horizonY) + GameScene.horizon/7)
+		self.size = noteScale * (grad * (position.y - GameScene.horizonY) + GameScene.horizon/7)
 
 		// ノーツの横幅と縦幅をscaleで設定
 		if self is Tap || self is TapStart || self is TapEnd {		// 楕円
