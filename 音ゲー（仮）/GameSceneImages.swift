@@ -74,7 +74,7 @@ extension GameScene{
 					if let middle = following as? Middle {
 						following = middle.next
 					} else {
-						lNotes.append(following)
+						lNotes.append(following!)
 						break
 					}
 				}

@@ -78,7 +78,7 @@ class Flick: Note {
 
 class TapStart: Note {
 	
-	var next = Note()				// 次のノーツ
+	var next:Note!				// 次のノーツ（仮のインスタンス？）
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	
 	override init(position pos: Double, lane: Int) {
@@ -167,6 +167,7 @@ class TapStart: Note {
 			image.isHidden = false
 		}
 		if image.position.y >= GameScene.horizonY || next.image.position.y <= GameScene.judgeLineY || next.isJudged {
+			if next.image.position.y <= GameScene.judgeLineY || next.isJudged {print(next.image.position.y)}
 			longImages.long.isHidden = true
 		} else {
 			longImages.long.isHidden = false
