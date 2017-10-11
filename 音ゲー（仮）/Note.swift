@@ -111,6 +111,7 @@ class TapStart: Note {
 		let path = CGMutablePath()      // 台形の外周
 		
 		let startNotePos = position 	// 中心座標
+		next.setPos(currentTime: currentTime)
 		let endNotePos = next.position	// 中心座標
 		
 		if startNotePos.y > GameScene.judgeLineY && isJudged == false {	// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
@@ -163,7 +164,7 @@ class TapStart: Note {
 			image.isHidden = false
 		}
 		if position.y >= GameScene.horizonY || next.position.y <= GameScene.judgeLineY || next.isJudged {
-			if next.position.y <= GameScene.judgeLineY || next.isJudged {print(next.position.y)}
+			
 			longImages.long.isHidden = true
 		} else {
 			longImages.long.isHidden = false
@@ -212,10 +213,10 @@ class Middle: Note {
 		longImages.circle.isHidden = true
     }
 
-    override func update(currentTime: TimeInterval) {
+	override func update(currentTime: TimeInterval) {
 		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
-
+		
 		
 		// スケールを変更
 		setScale(currentTime: currentTime)
@@ -225,6 +226,8 @@ class Middle: Note {
 		let path = CGMutablePath()      // 台形の外周
 		
 		let startNotePos = position 	// 中心座標
+		
+		next.setPos(currentTime: currentTime)	//次のノーツの位置を更新
 		let endNotePos = next.position	// 中心座標
 		
 		if startNotePos.y > GameScene.judgeLineY && isJudged == false {	// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
