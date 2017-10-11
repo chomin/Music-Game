@@ -417,8 +417,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		for i in sameLines{
             // 同時押しラインを移動
 			i.line.position = i.note.position
-			i.line.isHidden = i.note.image.isHidden
-            
+//			i.line.isHidden = i.note.image.isHidden
+			if i.note.isJudged{
+				i.line.isHidden = true
+			}
+			
 			// 大きさも変更
 			let a = (GameScene.horizon/7 - self.frame.width/9) / (GameScene.horizonY - self.frame.width/9)
 			let diameter = a*(i.line.position.y - GameScene.horizonY) + GameScene.horizon/7
@@ -507,6 +510,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
 						
 						if judge(laneIndex: index, type: .tap){//タップの判定
+							
+							playSound(type: .tap)
+							doKara = false
+							break
+							
+						}else if judge(laneIndex: index, type: .tapStart){//始点の判定
 							
 							playSound(type: .tap)
 							doKara = false
