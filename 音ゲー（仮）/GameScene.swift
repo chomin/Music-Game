@@ -19,7 +19,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	//ラベル
 	var judgeLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
 	var comboLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
-	let JLScale:CGFloat = 1.5
+	let JLScale:CGFloat = 1.25	//拡大縮小アニメーションの倍率
 	
 	
 	//音楽プレイヤー
@@ -473,14 +473,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//判定ラベルのテキストを更新（アニメーション付き）
 	func setJudgeLabelText(text:String){
+		
 		judgeLabel.text = text
 		
 		judgeLabel.removeAllActions()
 		
 		let set = SKAction.scale(to: 1/JLScale, duration: 0)
 		let add = SKAction.unhide()
-		let scale = SKAction.scale(to: 1, duration: 120)
-		let pause = SKAction.wait(forDuration: 2000)
+		let scale = SKAction.scale(to: 1, duration: 0.07)
+		let pause = SKAction.wait(forDuration: 3)
 		let hide = SKAction.hide()
 		let seq = SKAction.sequence([set,add,scale,pause,hide])
 		
