@@ -51,7 +51,9 @@ class ChooseMusicScene: SKScene {
 	@objc func onClickPlayButton(_ sender : UIButton){
 		
 		picker.isHidden = true
+		picker.resignFirstResponder()
 		playButton.isHidden = true
+		
 		
 		let scene = GameScene(musicName:picker.textStore ,size: (view?.bounds.size)!)
 		let skView = view as SKView!

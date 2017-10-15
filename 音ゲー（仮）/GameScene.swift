@@ -23,7 +23,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	
 	//音楽プレイヤー
-	var BGM:AVAudioPlayer?
+	static var BGM:AVAudioPlayer?
 	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。やっぱり２つだと遅延も起こるので４つ
 	var flickSound2:AVAudioPlayer?
 	var tapSound1:AVAudioPlayer?
@@ -75,6 +75,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var bgmName = "オラシオン"
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
+	static var resignActiveTime:TimeInterval = 0.0
 	var musicStartPos = 1.0	  //BGM開始の"拍"！
 	var playLebel = 0
 	var genre = ""				// ジャンル
@@ -187,8 +188,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		//BGMの再生(時間指定)
 		GameScene.start = CACurrentMediaTime()
-		BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
-		BGM?.delegate = self
+		GameScene.BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
+		GameScene.BGM?.delegate = self
 		
 		//各レーンにノーツをセット
 		for note in notes{
@@ -250,7 +251,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			// まずロングノーツと単ノーツで場合分け
 			if let start = note as? TapStart {//ロングの始点
 				// ロングノーツを更新
-				let remainingBeat2 = start.next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // 次ノーツがあと何拍で判定ラインに乗るか
+//				let remainingBeat2 = start.next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // 次ノーツがあと何拍で判定ラインに乗るか
 				// 位置を設定(水平線より上でもロング先に必要、" 判 定 後 で も "ロング初めに必要、判定線過ぎても判定前なら普通に必要)
 //				if ((start.isJudged == false || remainingBeat > 0) && remainingBeat < 8) || (remainingBeat2 > 0 && remainingBeat2 < 8) {
 					start.update(currentTime: currentTime)		// 大きさや位置を更新
@@ -260,7 +261,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				while(true) {
 					if let middle = following as? Middle {		// 次のノーツがMiddleだったとき
 						
-						let remainingBeat2 = middle.next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)	// ロングに必要なので次ノーツについて判断
+//						let remainingBeat2 = middle.next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)	// ロングに必要なので次ノーツについて判断
 //						if (middle.next.isJudged == false || remainingBeat2 > 0) && remainingBeat2 < 8 {	// 次ノーツが描画域内にあるか、過ぎていても判定前なら更新
 							middle.update(currentTime: currentTime)		// 更新
 //						}
@@ -268,7 +269,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						following = middle.next
 					} else {									// 次のノーツがTapEndかFlickEndだったとき
 						
-						let remainingBeat = (following?.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
+//						let remainingBeat = (following?.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
 //						if (following?.isJudged == false || remainingBeat > 0) && remainingBeat < 8 {	// 描画域内にあるか、過ぎていても判定前なら更新
 							following?.update(currentTime: currentTime)		// 更新
 //						}
@@ -609,7 +610,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//再生終了時の呼び出しメソッド
 	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {//playしたクラスと同じクラスに入れる必要あり？
-		if player as AVAudioPlayer! == BGM{
+		if player as AVAudioPlayer! == GameScene.BGM{
+			GameScene.BGM = nil	//別のシーンでアプリを再開したときに鳴るのを防止
 			let scene = ResultScene(size: (view?.bounds.size)!)
 			let skView = view as SKView!
 			skView?.showsFPS = true
@@ -622,6 +624,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
 		print("\(player)で\(String(describing: error))")
+	}
+	
+	//アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
+	static func willResignActive(){
+		
+	}
+	
+	//アプリを再開したときに呼ばれる
+	static func didBecomeActive(){
+		
 	}
 	
 }
