@@ -60,6 +60,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		case "This game":
 			bmsName = "This game.bms"
 			bgmName = "This game"
+		case "SAKURAスキップ":
+			bmsName = "SAKURAスキップ.bms"
+			bgmName = "SAKURAスキップ"
 		default:
 			break
 		}

@@ -10,7 +10,7 @@ import UIKit
 
 class PickerKeyboard: UIControl {
 	
-	var data: [String] = ["シュガーソングとビターステップ", "ようこそジャパリパークへ", "オラシオン","This game"] // ピッカーに表示させるデータ
+	var data: [String] = ["シュガーソングとビターステップ", "ようこそジャパリパークへ", "オラシオン", "This game", "SAKURAスキップ"] // ピッカーに表示させるデータ
 	var textStore: String = "シュガーソングとビターステップ"	//入力文字列を保存するためのプロパティ
 	
 	// PickerViewで選択されたデータを表示する
