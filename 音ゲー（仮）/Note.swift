@@ -141,13 +141,13 @@ class TapStart: Note {
 			// longImages.circleを更新
 			// 理想軌道の判定線上に緑円を描く
 			// 楕円の縦幅を計算
-			let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
+			let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance!, 2))
 			let lSquare = pow(horizontalDistance, 2) + pow(GameScene.laneWidth * 9/2 - longStartPos.x, 2)
-			let denomOfAtan = lSquare + pow(verticalDistance, 2) - pow(noteScale * GameScene.laneWidth / 2, 2)
+			let denomOfAtan = lSquare + pow(verticalDistance!, 2) - pow(noteScale * GameScene.laneWidth / 2, 2)
 			guard 0 < denomOfAtan else {
 				return
 			}
-			let deltaY = R * atan(noteScale * GameScene.laneWidth * verticalDistance / denomOfAtan)
+			let deltaY = R * atan(noteScale * GameScene.laneWidth * verticalDistance! / denomOfAtan)
 			
 			longImages.circle.yScale = deltaY / GameScene.laneWidth
 			longImages.circle.xScale = noteScale
@@ -258,13 +258,13 @@ class Middle: Note {
 			// longImages.circleを更新
 			// 理想軌道の判定線上に緑円を描く
 			// 楕円の縦幅を計算
-			let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
+			let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance!, 2))
 			let lSquare = pow(horizontalDistance, 2) + pow(GameScene.laneWidth * 9/2 - longStartPos.x, 2)
-			let denomOfAtan = lSquare + pow(verticalDistance, 2) - pow(noteScale * GameScene.laneWidth / 2, 2)
+			let denomOfAtan = lSquare + pow(verticalDistance!, 2) - pow(noteScale * GameScene.laneWidth / 2, 2)
 			guard 0 < denomOfAtan else {
 				return
 			}
-			let deltaY = R * atan(noteScale * GameScene.laneWidth * verticalDistance / denomOfAtan)
+			let deltaY = R * atan(noteScale * GameScene.laneWidth * verticalDistance! / denomOfAtan)
 			
 			longImages.circle.yScale = deltaY / GameScene.laneWidth
 			longImages.circle.xScale = noteScale
@@ -378,10 +378,10 @@ class Note {
 	}
 	
 	let noteScale: CGFloat = 1.3	// レーン幅に対するノーツの幅の倍率
-	let speed: CGFloat = 1600.0		// スピード
+	let speed: CGFloat = 1350.0		// スピード
 	//立体感を出すための定数
 	let horizontalDistance:CGFloat = GameScene.horizontalDistance		//画面から目までの水平距離a（約5000で10cmほど）
-	let verticalDistance = GameScene.horizonY	//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
+	let verticalDistance = GameScene.verticalDistance	//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
 												//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
 
 	
@@ -404,12 +404,12 @@ class Note {
 		
 		let fypos = (CGFloat(60*pos/GameScene.bpm) - CGFloat(currentTime - GameScene.start)) * speed	  // 判定線からの水平距離x
 		// 球面?に投写
-		let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))		// 視点から判定線までの距離(射影する球の半径)
+		let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance!, 2))		// 視点から判定線までの距離(射影する球の半径)
 		let denomOfAtan = pow(R, 2) + horizontalDistance * fypos				// atanの分母
 		guard 0 < denomOfAtan else {	// atan内の分母が0になるのを防止
 			return
 		}
-		let posY = R * atan(verticalDistance * fypos / denomOfAtan) + GameScene.judgeLineY
+		let posY = R * atan(verticalDistance! * fypos / denomOfAtan) + GameScene.judgeLineY
 		
 		
 		/* x座標の計算 */
@@ -431,18 +431,18 @@ class Note {
 		
 		// ノーツの横幅を計算(改善点: fyposとRはsetPos関数でも計算されている。上手く計算を1度で済ませたい。)
 		let fypos = (CGFloat(60*pos/GameScene.bpm) - CGFloat(currentTime - GameScene.start)) * speed	// 判定線からの水平距離x
-		let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))								// 視点から判定線までの距離(射影する球の半径)
+		let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance!, 2))								// 視点から判定線までの距離(射影する球の半径)
 		let grad = (GameScene.horizon/7 - GameScene.laneWidth) / (GameScene.horizonY - GameScene.judgeLineY)	// 傾き
 		self.size = noteScale * (grad * (position.y - GameScene.horizonY) + GameScene.horizon/7)
 
 		// ノーツの横幅と縦幅をscaleで設定
 		if self is Tap || self is TapStart || self is TapEnd {		// 楕円
 			let lSquare = pow(horizontalDistance + fypos, 2) + pow(GameScene.laneWidth * CGFloat(3 - lane), 2)
-			let denomOfAtan = lSquare + pow(verticalDistance, 2) - pow(noteScale * GameScene.laneWidth / 2, 2)				// atan内の分母
+			let denomOfAtan = lSquare + pow(verticalDistance!, 2) - pow(noteScale * GameScene.laneWidth / 2, 2)				// atan内の分母
 			guard 0 < denomOfAtan else {	// atan内の分母が0になるのを防止
 				return
 			}
-			let deltaY = R * atan(noteScale * GameScene.laneWidth * verticalDistance / denomOfAtan)
+			let deltaY = R * atan(noteScale * GameScene.laneWidth * verticalDistance! / denomOfAtan)
 
 			image.xScale = size / GameScene.laneWidth
 			image.yScale = deltaY / GameScene.laneWidth
