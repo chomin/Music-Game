@@ -378,9 +378,9 @@ class Note {
 	}
 	
 	let noteScale: CGFloat = 1.3	// レーン幅に対するノーツの幅の倍率
-	let speed: CGFloat = 1700.0		// スピード
+	let speed: CGFloat = 1600.0		// スピード
 	//立体感を出すための定数
-	let horizontalDistance:CGFloat = 470		//画面から目までの水平距離a（約5000で10cmほど）
+	let horizontalDistance:CGFloat = GameScene.horizontalDistance		//画面から目までの水平距離a（約5000で10cmほど）
 	let verticalDistance = GameScene.horizonY	//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
 												//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
 

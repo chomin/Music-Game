@@ -93,6 +93,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	static var horizonY:CGFloat = 0 	// 水平線のy座標
 	static var laneWidth:CGFloat = 0	// 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
 	static var judgeLineY:CGFloat = 0	// 判定線のy座標
+	//立体感を出すための定数
+	static let horizontalDistance:CGFloat = 440		//画面から目までの水平距離a（約5000で10cmほど）
+	static var verticalDistance:CGFloat!//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
+	//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
 	
 	var halfBound:CGFloat! // 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
 	
@@ -114,10 +118,19 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		ResultScene.combo = 0
 		ResultScene.maxCombo = 0
 		
+		
 		halfBound = self.frame.width/12	//1/18~1/9の値にすること
 		GameScene.laneWidth = self.frame.width/9
-		GameScene.horizon = self.frame.width/16	  // TODO: 厳密な公式あり
 		GameScene.horizonY = self.frame.height*15/16	//モデル値
+		
+		GameScene.verticalDistance = GameScene.horizonY - self.frame.width/14
+		
+		let laneHeight = GameScene.horizonY - self.frame.width/9
+		let L = (GameScene.horizontalDistance * laneHeight)/(GameScene.verticalDistance - laneHeight)
+		
+//		GameScene.horizon = self.frame.width/16	  // TODO: 厳密な公式あり
+		GameScene.horizon = 7*GameScene.laneWidth*GameScene.horizontalDistance/(GameScene.horizontalDistance+L)
+		
 		GameScene.judgeLineY = self.frame.width/9
 		
 		//		verticalDistance = self.frame.width/9 + (GameScene.horizonY-self.frame.width/9)*1.1
