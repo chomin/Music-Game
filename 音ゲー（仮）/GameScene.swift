@@ -187,7 +187,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				
 				var following = start.next
 				while(true) {
-					self.addChild((following?.image)!)
+					self.addChild(following.image)
 					if let middle = following as? Middle {	// ダウンキャスト
 						// middleに付随する緑太線と緑円をaddChild
 						self.addChild(middle.longImages.long)
@@ -216,7 +216,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			if let start = note as? TapStart {
 				var following = start.next
 				while(true) {
-					lanes[(following?.lane)!].laneNotes.append(following!)
+					lanes[following.lane].laneNotes.append(following)
 					if let middle = following as? Middle {
 						following = middle.next
 					} else {
@@ -255,69 +255,76 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		
 		
-		
-		
-		
-		/* ここからリファクタリング */
-		
-		
-		//時間でノーツの位置を設定する(重くなるので近場のみ！)
+		// 各ノーツの位置や大きさを更新
 		for note in notes {
-			
-			let remainingBeat = note.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // あと何拍で判定ラインに乗るか
-			
-			// まずロングノーツと単ノーツで場合分け
-			if let start = note as? TapStart {//ロングの始点
-				// ロングノーツを更新
-//				let remainingBeat2 = start.next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // 次ノーツがあと何拍で判定ラインに乗るか
-				// 位置を設定(水平線より上でもロング先に必要、" 判 定 後 で も "ロング初めに必要、判定線過ぎても判定前なら普通に必要)
-//				if ((start.isJudged == false || remainingBeat > 0) && remainingBeat < 8) || (remainingBeat2 > 0 && remainingBeat2 < 8) {
-					start.update(currentTime: currentTime)		// 大きさや位置を更新
-//				}
-				
-				var following = start.next		// 親を持つノーツ
-				while(true) {
-					if let middle = following as? Middle {		// 次のノーツがMiddleだったとき
-						
-//						let remainingBeat2 = middle.next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)	// ロングに必要なので次ノーツについて判断
-//						if (middle.next.isJudged == false || remainingBeat2 > 0) && remainingBeat2 < 8 {	// 次ノーツが描画域内にあるか、過ぎていても判定前なら更新
-							middle.update(currentTime: currentTime)		// 更新
-//						}
-						
-						following = middle.next
-					} else {									// 次のノーツがTapEndかFlickEndだったとき
-						
-//						let remainingBeat = (following?.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
-//						if (following?.isJudged == false || remainingBeat > 0) && remainingBeat < 8 {	// 描画域内にあるか、過ぎていても判定前なら更新
-							following?.update(currentTime: currentTime)		// 更新
-//						}
-						
-						break
-					}
-				}
-			} else {
-				// 単ノーツを更新
-				// 判定線より上で判定線まで8拍以内のもの及び、判定線を過ぎていても判定前のものについて
-				if (note.isJudged == false || remainingBeat > 0) && remainingBeat < 8 {
-					note.update(currentTime: currentTime)		// 大きさや位置を更新
-				}
-			}
+			note.update(currentTime: currentTime)
 		}
 		
-		/* ここまで */
 		
+
+		
+		
+		
+//		/* ここからリファクタリング */
+//
+//
+//		//時間でノーツの位置を設定する(重くなるので近場のみ！)
+//		for note in notes {
+//
+//			let remainingBeat = note.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // あと何拍で判定ラインに乗るか
+//
+//			// まずロングノーツと単ノーツで場合分け
+//			if let start = note as? TapStart {//ロングの始点
+//				// ロングノーツを更新
+////				let remainingBeat2 = start.next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // 次ノーツがあと何拍で判定ラインに乗るか
+//				// 位置を設定(水平線より上でもロング先に必要、" 判 定 後 で も "ロング初めに必要、判定線過ぎても判定前なら普通に必要)
+////				if ((start.isJudged == false || remainingBeat > 0) && remainingBeat < 8) || (remainingBeat2 > 0 && remainingBeat2 < 8) {
+//					start.update(currentTime: currentTime)		// 大きさや位置を更新
+////				}
+//
+//				var following = start.next		// 親を持つノーツ
+//				while(true) {
+//					if let middle = following as? Middle {		// 次のノーツがMiddleだったとき
+//
+////						let remainingBeat2 = middle.next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)	// ロングに必要なので次ノーツについて判断
+////						if (middle.next.isJudged == false || remainingBeat2 > 0) && remainingBeat2 < 8 {	// 次ノーツが描画域内にあるか、過ぎていても判定前なら更新
+//							middle.update(currentTime: currentTime)		// 更新
+////						}
+//
+//						following = middle.next
+//					} else {									// 次のノーツがTapEndかFlickEndだったとき
+//
+////						let remainingBeat = (following?.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
+////						if (following?.isJudged == false || remainingBeat > 0) && remainingBeat < 8 {	// 描画域内にあるか、過ぎていても判定前なら更新
+//							following?.update(currentTime: currentTime)		// 更新
+////						}
+//
+//						break
+//					}
+//				}
+//			} else {
+//				// 単ノーツを更新
+//				// 判定線より上で判定線まで8拍以内のもの及び、判定線を過ぎていても判定前のものについて
+//				if (note.isJudged == false || remainingBeat > 0) && remainingBeat < 8 {
+//					note.update(currentTime: currentTime)		// 大きさや位置を更新
+//				}
+//			}
+//		}
+//
+//		/* ここまで */
+//
 		
 		
 		// 同時押しラインの更新
 		for i in sameLines{
             // 同時押しラインを移動
 			i.line.position = i.note.position
-//			i.line.isHidden = i.note.image.isHidden
-			if i.note.isJudged || i.note.position.y == 0{//判定後または初期初期位置では隠す
-				i.line.isHidden = true
-			}else{
-				i.line.isHidden = false
-			}
+			i.line.isHidden = i.note.image.isHidden
+//			if i.note.isJudged || i.note.position.y == 0{//判定後または初期初期位置では隠す
+//				i.line.isHidden = true
+//			}else{
+//				i.line.isHidden = false
+//			}
 			
 			// 大きさも変更
 			let a = (GameScene.horizon/7 - self.frame.width/9) / (GameScene.horizonY - self.frame.width/9)
