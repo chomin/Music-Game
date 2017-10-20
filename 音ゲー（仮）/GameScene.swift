@@ -13,8 +13,9 @@ import AVFoundation
 
 class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
+
 	//タッチ情報
-	var allTouchesLocation:[CGPoint] = []
+	var allTouches:[(touch:UITouch,didJudgeFlick:Bool)] = []
 	
 	//ラベル
 	var judgeLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
@@ -303,131 +304,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			}
 		}
 		
-		
-		
-		
-		
-//		//時間でノーツの位置を設定する(重くなるので近場のみ！)
-//		for i in notes{
-//
-//            // 単ノーツと始点を描画
-//
-//			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // あと何拍で判定ラインに乗るか
-//            //位置を設定(水平線より上でもロング先に必要、判定後でもロング初めに必要、判定線過ぎても判定前なら普通に必要)
-//			if (i.isJudged == false || remainingBeat > 0) && remainingBeat < 8{
-//				setPos(note: i, currentTime: currentTime)
-//				if i.next != nil{	//つながっている1つ先までは描く
-//					setPos(note: i.next, currentTime: currentTime)
-//				}
-//				//				if i.type == .flickEnd || i.type == .tapEnd || i.type == .middle{//先ノーツになりうるものは無条件に描く
-//				//					setPos(note: i, currentTime: currentTime)
-//				//				}else if remainingBeat < 8{
-//				//					setPos(note: i, currentTime: currentTime)
-//				//				}
-//			}
-//			if i.image.position.y > GameScene.horizonY || remainingBeat > 8 || i.isJudged == true{//水平線より上、8拍以上残っている、判定済みのものは隠す
-//				i.image.isHidden = true
-//			}else{
-//				i.image.isHidden = false
-//			}
-//
-//
-//			// 始点につながっているノーツを描画
-//
-//			var note:Note = i
-//			while note.next != nil{
-//                note = note.next
-//
-//				let remainingBeat2 = note.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
-//				if (note.isJudged == false || remainingBeat2 > 0) && remainingBeat2 < 8{//-4拍以上のものは位置を設定(水平線より上でもロング結びに必要)
-//
-//					setPos(note: note, currentTime: currentTime)
-//
-//					if note.next != nil{
-//						setPos(note: note.next!, currentTime: currentTime)
-//					}
-//					//					if note?.next.type == .flickEnd || note?.next.type == .tapEnd || note?.next.type == .middle{//先ノーツになりうるものは無条件に描く
-//					//						setPos(note: (note?.next)!, currentTime: currentTime)
-//					//					}else if remainingBeat2 < 8{
-//					//						setPos(note: (note?.next)!, currentTime: currentTime)
-//					//					}
-//				}
-			
-//				if note.image.position.y > GameScene.horizonY || remainingBeat2 > 12 || note.isJudged == true{//水平線より上、12拍以上残っている、判定済みのものは隠す
-//					note.image.isHidden = true
-//				}else{
-//					note.image.isHidden = false
-//				}
-//			}
-//		}
-//
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-//		//緑太線の描写
-//		for i in notes{
-//
-//			let remainingBeat = i.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
-//
-//			if i.next != nil{
-//				if (i.next.image.position.y < self.frame.width/9 || i.next.isJudged == true) && i.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
-//					self.removeChildren(in: [i.longImage])
-//					i.longImage = nil	//複数回removeされるのを防ぐため、nilにする
-//				}else if remainingBeat < 4 && i.next.image.position.y > self.frame.width/9 && i.next.isJudged == false && i.image.position.y < GameScene.horizonY{
-//
-//					//毎フレーム描き直す
-//					setLong(firstNote: i, currentTime: currentTime)
-//				}
-//			}
-//
-//			//つながっているノーツ
-//			var note:Note = i
-//			while note.next != nil{
-//                note = note.next
-//
-//				let remainingBeat2 = note.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)
-//
-//				if note.next != nil {
-//					if (note.next.image.position.y < self.frame.width/9 || note.next.isJudged == true) && note.longImage != nil{//先ノーツが判定線を通過したあとか、判定されたあとなら除去
-//						self.removeChildren(in: [note.longImage])
-//						note.longImage = nil
-//					}else if remainingBeat2 < 4 && note.next.image.position.y > self.frame.width/9 && note.next.isJudged == false && note.image.position.y < GameScene.horizonY!{
-//
-//						//毎フレーム描き直す
-//
-//						setLong(firstNote: note, currentTime: currentTime)
-//					}
-//				}
-//			}
-//		}
-//
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		/* ここまで */
-		
-		
-		
-		
-		
 		
 		
 		
@@ -452,14 +329,17 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		//判定関係
 		//middleの判定（同じところで長押しのやつ）
-		for i in allTouchesLocation{
-			if i.y < self.frame.width/3{    //上界
+		for i in allTouches{
+			var pos = i.touch.location(in: self.view)
+			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+			
+			if pos.y < self.frame.width/3{    //上界
 				
 				for j in 0...6{
 					
 					let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
 					
-					if i.x > buttonPos - halfBound && i.x < buttonPos + halfBound {//ボタンの範囲
+					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
 						
 						if parfectMiddleJudge(laneIndex: j){//離しの判定(←コメントミス？)
 							
@@ -515,7 +395,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			
 			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
 			
-			allTouchesLocation.append(pos)
+			
+			//フリック判定したかを示すBoolを加えてallTouchにタッチ情報を付加
+			allTouches.append((i,false))
 			
 			if pos.y < self.frame.width/3{    //上界
 				
@@ -561,30 +443,40 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			
 			var pos = i.location(in: self.view)
 			var ppos = i.previousLocation(in: self.view)
+			
 			let moveDistance = sqrt(pow(pos.x-ppos.x, 2) + pow(pos.y-ppos.y, 2))
+			
+			//タッチ情報を更新(不要！)
+//			let ptouchIndex = allTouches.index(where: {$0.touch == i})!
+//			let ptouch = allTouches[ptouchIndex]
+//			let touch = i as! GameSceneTouch
+//			touch.startLocation = ptouch.startLocation
+//			touch.tag = ptouch.tag
+//			allTouches[ptouchIndex] = touch
 			
 			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
 			ppos.y = self.frame.height - ppos.y
-			
-			allTouchesLocation[allTouchesLocation.index(of: ppos)!] = pos
 			
 			if pos.y < self.frame.width/3{    //上界
 				
 				for (index,buttonPos) in buttonX.enumerated(){
 					
-					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
-						
-						//						if parfectMiddleJudge(laneNum: j+1){//途中線の判定
-						//
-						//							playSound(type: .tap)
-						//							break
-						//						}
-					}
+//					if pos.x > buttonPos - halfBound && pos.x < buttonPos + halfBound {//ボタンの範囲
+//					}
 					if ppos.x > buttonPos - halfBound && ppos.x < buttonPos + halfBound{
 						if moveDistance > 10{	//フリックの判定
 							
-							if judge(laneIndex: index, type: .flick) || judge(laneIndex: index, type: .flickEnd){
-								
+							let touchIndex = allTouches.index(where: {$0.touch == i})!
+							let didJudgFlick = allTouches[touchIndex].didJudgeFlick
+							
+							if !didJudgFlick {//ただのフリックは一度だけ判定
+								if judge(laneIndex: index, type: .flick) || judge(laneIndex: index, type: .flickEnd){
+								allTouches[touchIndex].didJudgeFlick = true
+								playSound(type: .flick)
+								break
+								}
+							}else if judge(laneIndex: index, type: .flickEnd){
+							
 								playSound(type: .flick)
 								break
 							}
@@ -605,7 +497,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
 			ppos.y = self.frame.height - ppos.y
 			
-			allTouchesLocation.remove(at: allTouchesLocation.index(of: ppos)!)
+			allTouches.remove(at: allTouches.index(where: {$0.touch == i})!)
 			
 			if pos.y < self.frame.width/3{    //上界
 				
@@ -694,4 +586,16 @@ struct Lane {
 	var currentTime:TimeInterval = 0.0
 	var laneNotes:[Note] = [] //最初に全部格納する！
 }
+
+
+ //extension UITouch{
+//	var startedLocation:CGPoint{
+//		get{
+//
+//		}
+//		set{
+//
+//		}
+//	}
+//}
 
