@@ -8,10 +8,6 @@
 
 import SpriteKit
 
-enum NoteType {
-    case tap, flick, tapStart, middle, tapEnd, flickEnd
-}
-
 class Tap: Note {
 	
 	override init(position pos: Double, lane: Int) {
@@ -24,6 +20,14 @@ class Tap: Note {
     }
     
     override func update(currentTime: TimeInterval) {
+		// update不要なときはreturn
+		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
+			return
+		}
+		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)		// あと何拍で判定ラインに乗るか
+		guard (!isJudged && remainingBeat < 8) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
+			return
+		}
 		
         // x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
@@ -32,9 +36,9 @@ class Tap: Note {
 		setScale(currentTime: currentTime)
 		
 		// image.isHiddenを更新
-		if position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
+		if position.y > GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
-		}else{
+		} else {
 			image.isHidden = false
 		}
     }
@@ -61,6 +65,15 @@ class Flick: Note {
     }
 
     override func update(currentTime: TimeInterval) {
+		// update不要なときはreturn
+		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
+			return
+		}
+		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // あと何拍で判定ラインに乗るか
+		guard (!isJudged && remainingBeat < 8) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
+			return
+		}
+
 		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
 		
@@ -68,9 +81,9 @@ class Flick: Note {
 		setScale(currentTime: currentTime)
 		
 		// image.isHiddenを更新
-		if position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
+		if position.y > GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
-		}else{
+		} else {
 			image.isHidden = false
 		}
     }
@@ -78,7 +91,7 @@ class Flick: Note {
 
 class TapStart: Note {
 	
-	var next:Note!				// 次のノーツ（仮のインスタンス？）
+	var next = Note()				// 次のノーツ（仮のインスタンス）
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	
 	override init(position pos: Double, lane: Int) {
@@ -100,8 +113,23 @@ class TapStart: Note {
 	}
 	
 	override func update(currentTime: TimeInterval) {
+		// 後続ノーツを先にupdate
+		next.update(currentTime: currentTime)
+
+		// update不要なときはreturn
+		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)			// あと何拍で判定ラインに乗るか
+		let remainingBeat2 = next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // 次ノーツがあと何拍で判定ラインに乗るか
+		guard ((!isJudged || remainingBeat > 0) && remainingBeat < 8)							// 描画域内にあるか、過ぎていても判定前なら更新
+			|| (remainingBeat2 > 0 && remainingBeat2 < 8)										// 次ノーツが描画域内にあれば更新(ロングのため)
+			|| ((!longImages.circle.isHidden || !longImages.long.isHidden) && (next.isJudged || next.position.y < GameScene.judgeLineY))	// longImages消し忘れ防止
+			else {
+			return
+		}
+		
+		
 		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
+		
 		
 		// 縦と横の大きさを計算し、imageのスケールを変更
 		setScale(currentTime: currentTime)
@@ -111,7 +139,6 @@ class TapStart: Note {
 		let path = CGMutablePath()      // 台形の外周
 		
 		let startNotePos = position 	// 中心座標
-		next.setPos(currentTime: currentTime)
 		let endNotePos = next.position	// 中心座標
 		
 		if startNotePos.y > GameScene.judgeLineY && isJudged == false {	// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
@@ -159,18 +186,17 @@ class TapStart: Note {
 		
 		
 		// isHiddenを更新
-		if position.y >= GameScene.horizonY || isJudged || position.y<GameScene.judgeLineY{		// 水平線より上、判定済みのものは隠す(判定線超えたら引き継ぐ)
+		if position.y >= GameScene.horizonY || position.y < GameScene.judgeLineY || isJudged {		// 水平線より上、判定済みのものは隠す(判定線超えたら引き継ぐ)
 			image.isHidden = true
-		}else{
+		} else {
 			image.isHidden = false
 		}
-		if position.y >= GameScene.horizonY || next.position.y <= GameScene.judgeLineY || next.isJudged {
-			
+		if position.y >= GameScene.horizonY || next.position.y < GameScene.judgeLineY || next.isJudged {
 			longImages.long.isHidden = true
 		} else {
 			longImages.long.isHidden = false
 		}
-		if position.y >= GameScene.judgeLineY || next.position.y <= GameScene.judgeLineY || next.isJudged {
+		if position.y >= GameScene.judgeLineY || next.position.y < GameScene.judgeLineY || next.isJudged {
 			longImages.circle.isHidden = true
 		} else {
 			longImages.circle.isHidden = false
@@ -180,7 +206,7 @@ class TapStart: Note {
 
 class Middle: Note {
 
-	var next = Note()				// 次のノーツ
+	var next = Note()				// 次のノーツ（仮のインスタンス）
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	override var position: CGPoint {								// positionを左端ではなく線の中点にするためオーバーライド
 		get {
@@ -215,6 +241,20 @@ class Middle: Note {
     }
 
 	override func update(currentTime: TimeInterval) {
+		// 後続ノーツを先にupdate
+		next.update(currentTime: currentTime)
+
+		// update不要なときはreturn
+		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)			// あと何拍で判定ラインに乗るか
+		let remainingBeat2 = next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // 次ノーツがあと何拍で判定ラインに乗るか
+		guard ((!isJudged || remainingBeat > 0) && remainingBeat < 8)							// 描画域内にあるか、過ぎていても判定前なら更新
+			|| (remainingBeat2 > 0 && remainingBeat2 < 8)										// 次ノーツが描画域内にあれば更新(ロングのため)
+			|| ((!longImages.circle.isHidden || !longImages.long.isHidden) && (next.isJudged || next.position.y < GameScene.judgeLineY))	// longImages消し忘れ防止
+			else {
+				return
+		}
+
+		
 		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
 		
@@ -227,8 +267,6 @@ class Middle: Note {
 		let path = CGMutablePath()      // 台形の外周
 		
 		let startNotePos = position 	// 中心座標
-		
-		next.setPos(currentTime: currentTime)	//次のノーツの位置を更新
 		let endNotePos = next.position	// 中心座標
 		
 		if startNotePos.y > GameScene.judgeLineY && isJudged == false {	// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
@@ -276,17 +314,17 @@ class Middle: Note {
 		
 		
 		// isHiddenを更新
-		if position.y >= GameScene.horizonY || isJudged || position.y<GameScene.judgeLineY{		// 水平線より上、判定済みのものは隠す。判定線超えたら引き継ぐ
+		if position.y >= GameScene.horizonY || position.y < GameScene.judgeLineY || isJudged {		// 水平線より上、判定済みのものは隠す。判定線超えたら引き継ぐ
 			image.isHidden = true
 		} else {
 			image.isHidden = false
 		}
-		if position.y >= GameScene.horizonY || next.position.y <= GameScene.judgeLineY || next.isJudged {
+		if position.y >= GameScene.horizonY || next.position.y < GameScene.judgeLineY || next.isJudged {
 			longImages.long.isHidden = true
 		} else {
 			longImages.long.isHidden = false
 		}
-		if position.y >= GameScene.judgeLineY || next.position.y <= GameScene.judgeLineY || next.isJudged {
+		if position.y >= GameScene.judgeLineY || next.position.y < GameScene.judgeLineY || next.isJudged {
 			longImages.circle.isHidden = true
 		} else {
 			longImages.circle.isHidden = false
@@ -306,6 +344,14 @@ class TapEnd: Note {
     }
 
     override func update(currentTime: TimeInterval) {
+		// update不要なときはreturn
+		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
+			return
+		}
+		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)		// あと何拍で判定ラインに乗るか
+		guard (!isJudged && remainingBeat < 8) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
+			return
+		}
 		
 		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
@@ -314,9 +360,9 @@ class TapEnd: Note {
 		setScale(currentTime: currentTime)
 		
 		// image.isHiddenを更新
-		if position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
+		if position.y > GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
-		}else{
+		} else {
 			image.isHidden = false
 		}
 	}
@@ -343,7 +389,15 @@ class FlickEnd: Note {
     }
 
     override func update(currentTime: TimeInterval) {
-		
+		// update不要なときはreturn
+		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
+			return
+		}
+		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)		// あと何拍で判定ラインに乗るか
+		guard (!isJudged && remainingBeat < 8) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
+			return
+		}
+
 		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
 		
@@ -351,9 +405,9 @@ class FlickEnd: Note {
 		setScale(currentTime: currentTime)
 		
 		// image.isHiddenを更新
-		if position.y > GameScene.horizonY || isJudged == true {		// 水平線より上、判定済みのものは隠す
+		if position.y > GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
-		}else{
+		} else {
 			image.isHidden = false
 		}
 	}
@@ -379,10 +433,10 @@ class Note {
 	
 	let noteScale: CGFloat = 1.3	// レーン幅に対するノーツの幅の倍率
 	let speed: CGFloat = 1350.0		// スピード
-	//立体感を出すための定数
+	// 立体感を出すための定数
 	let horizontalDistance:CGFloat = GameScene.horizontalDistance		//画面から目までの水平距離a（約5000で10cmほど）
 	let verticalDistance = GameScene.verticalDistance	//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
-												//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
+														//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
 
 	
     init(position pos: Double, lane: Int) {

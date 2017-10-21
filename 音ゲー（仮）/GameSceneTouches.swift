@@ -18,8 +18,10 @@ extension GameScene{
 		print("touchesEstimatedPropertiesUpdated")
 	}
 
-
-
+	
+	enum NoteType {
+	    case tap, flick, tapStart, middle, tapEnd, flickEnd
+	}
 	
 	func judge(laneIndex:Int, type:NoteType) -> Bool{	  //対象ノーツが実在し、判定したかを返す
 		
