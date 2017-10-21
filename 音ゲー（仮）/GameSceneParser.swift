@@ -298,10 +298,10 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				notes.append(longNotes1[i])
 				while !(longNotes1[i] is TapEnd) && !(longNotes1[i] is FlickEnd) {
 					guard i + 1 < longNotes1.count else {
-						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")
+						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")	//TODO:何小節目の何泊目のスタート(or途中)かを表示する
 					}
 					guard longNotes1[i + 1] is Middle || longNotes1[i + 1] is TapEnd || longNotes1[i + 1] is FlickEnd else {
-						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")
+						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")	//TODO:何小節目の何泊目のスタート(or途中)かを表示する
 					}
 					if let temp = longNotes1[i] as? TapStart {
 						temp.next = longNotes1[i + 1]
@@ -317,7 +317,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				}
 				i += 1
 			} else {
-				throw ParseError.noLongNoteStart("ロングノーツ開始命令がありません")
+				throw ParseError.noLongNoteStart("ロングノーツ開始命令がありません")	//TODO:何小節目の何泊目の終了(or途中)かを表示する
 			}
 		}
 		// longNotes2について
@@ -327,10 +327,10 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				notes.append(longNotes2[i])
 				while !(longNotes2[i] is TapEnd) && !(longNotes2[i] is FlickEnd) {
 					guard i + 1 < longNotes2.count else {
-						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")
+						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")	//TODO:何小節目の何泊目のスタート(or途中)かを表示する
 					}
 					guard longNotes2[i + 1] is Middle || longNotes2[i + 1] is TapEnd || longNotes2[i + 1] is FlickEnd else {
-						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")
+						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")	//TODO:何小節目の何泊目のスタート(or途中)かを表示する
 					}
 					if let temp = longNotes2[i] as? TapStart {
 						temp.next = longNotes2[i + 1]
@@ -346,7 +346,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				}
 				i += 1
 			} else {
-				throw ParseError.noLongNoteStart("ロングノーツ開始命令がありません")
+				throw ParseError.noLongNoteStart("ロングノーツ開始命令がありません")	//TODO:何小節目の何泊目の終了(or途中)かを表示する
 			}
 		}
 
