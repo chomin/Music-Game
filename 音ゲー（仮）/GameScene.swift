@@ -327,10 +327,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 //			}
 			
 			// 大きさも変更
-			let a = (GameScene.horizon/7 - self.frame.width/9) / (GameScene.horizonY - self.frame.width/9)
-			let diameter = a*(i.line.position.y - GameScene.horizonY) + GameScene.horizon/7
+//			let a = (GameScene.horizon/7 - self.frame.width/9) / (GameScene.horizonY - self.frame.width/9)
+//			let diameter = a*(i.line.position.y - GameScene.horizonY) + GameScene.horizon/7
 			
-			i.line.setScale(diameter/GameScene.laneWidth)
+			i.line.setScale(i.note.image.xScale / i.note.noteScale)
 		}
 		
 		
