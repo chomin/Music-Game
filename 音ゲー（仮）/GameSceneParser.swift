@@ -42,19 +42,23 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		case noLongNoteStart(String)
 		case noLongNoteEnd(String)
 		case unexpected(String)
+		
+		// 渡されたnoteのposが何小節目何拍目かを返す
+		static func getBeat(of note: Note) -> String {
+			let bar = Int(note.pos / 4.0)
+			let beat = note.pos - Double(bar * 4)
+			return "\(bar)小節\(beat)拍目"
+		}
 	}
 
 
 
-
-
-
 	// ファイルの読み込み
-	func readFile(fileName: String) throws -> [String] {
+	private func readFile(fileName: String) throws -> [String] {
 
 		// ファイル名を名前と拡張子に分割
 		guard fileName.contains(".") else {
-		    throw FileError.invalidName("ファイル名には拡張子を指定してください")
+			throw FileError.invalidName("ファイル名には拡張子を指定してください")
 		}
 		let splittedName = fileName.components(separatedBy: ".")
 		let dataFileName = splittedName[0]
@@ -87,6 +91,9 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		// 譜面データファイルのメインデータ
 		var rawMainData: [String] = []
 
+		// インデックス型テンポ変更用テーブル
+		var BPMTable: [String: Double] = [:]
+		
 		// ファイルの内容をbmsDataに格納
 		bmsData = try readFile(fileName: fileName)
 
@@ -113,9 +120,9 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			"GENRE":     { value in self.genre     = value },
 			"TITLE":     { value in self.title     = value },
 			"ARTIST":    { value in self.artist    = value },
-			"BPM":       { value in if let num = Double(value) { GameScene.bpm    = num } },
-			"PLAYLEVEL": { value in if let num = Int(value) { self.playLevel = num } },
-			"VOLWAV":    { value in if let num = Int(value) { self.volWav    = num } }
+			"BPM":       { value in if let num = Double(value) { GameScene.bpm = num } },
+			"PLAYLEVEL": { value in if let num = Int(value) { self.playLevel   = num } },
+			"VOLWAV":    { value in if let num = Int(value) { self.volWav      = num } }
 		]
 
 		// 1行ずつ処理
@@ -129,6 +136,11 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 						value += (" " + str)
 					}
 					headerInstruction(value)
+				} else if components[0].hasPrefix("BPM") {
+					// BPM指定コマンドのとき
+					if let bpm = Double(components[1]) {
+						BPMTable[String(components[0].dropFirst(3))] = bpm
+					}
 				}
 			}
 		}
@@ -137,7 +149,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		/*--- メインデータをパース ---*/
 
 		// 利用可能なチャンネル番号
-		let availableChannels = [1, 11, 12, 13, 14, 15, 18, 19]
+		let availableChannels = [1, 3, 8, 11, 12, 13, 14, 15, 18, 19]
 
 		// チャンネルとレーンの対応付け
 		let laneMap = [11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6]
@@ -155,7 +167,6 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			case middle2   = "08"
 			case end2      = "09"
 			case flickEnd2 = "0A"
-			case bgm       = "10"
 		}
 
 		// メインデータ1行を小節番号・チャンネル・データのタプルに分解
@@ -167,7 +178,6 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			let components = str.components(separatedBy: ":")
 
 			guard components.count >= 2 && components[0].count == 5 else {//条件に合わない場合に処理を抜けるコードをシンプルに記述するために用意された構文(falseのときにelse以下が実行される。return、break、throwのいずれかを必ず記述しなければならない。)
-
 				throw ParseError.lackOfData("データが欠損しています: #\(str)")
 			}
 
@@ -192,89 +202,82 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			availableChannels.index(of: $0.channel) != nil		// サポート外のチャンネルを利用する命令を除去
 		}
 
-		// ロングノーツは一時配列に、その他はnotesに格納
+		// ロングノーツは一時配列に、その他はnotesに格納。その他命令も実行
 		var longNotes1: [Note] = []		// ロングノーツ1を一時的に格納
 		var longNotes2: [Note] = []		// ロングノーツ2を一時的に格納
 		for mainData in processedMainData {
 			let unitBeat = 4.0 / Double(mainData.body.count)	// 1オブジェクトの長さ(拍単位)
-			for (index, ob) in mainData.body.enumerated() {
-				switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
-				case .rest:
-					break
-				case .tap:
-					notes.append(
-						Tap(
-							position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
-							lane: laneMap[mainData.channel] ?? 0	// あり得ないけどnilのときは0(できればthrowしたい)
+			if let lane = laneMap[mainData.channel] {
+				// ノーツ指定チャンネルだったとき
+				for (index, ob) in mainData.body.enumerated() {
+					switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
+					case .rest:
+						break
+					case .tap:
+						notes.append(
+							Tap     (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
-					)
-				case .flick:
-					notes.append(
-						Flick(
-							position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
-							lane: laneMap[mainData.channel] ?? 0
+					case .flick:
+						notes.append(
+							Flick   (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
-					)
-				case .start1:
-					longNotes1.append(
-						TapStart(
-							position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
-							lane: laneMap[mainData.channel] ?? 0
+					case .start1:
+						longNotes1.append(
+							TapStart(position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
-					)
-				case .middle1:
-					longNotes1.append(
-						Middle(
-							position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
-							lane: laneMap[mainData.channel] ?? 0
+					case .middle1:
+						longNotes1.append(
+							Middle  (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
-					)
-				case .end1:
-					longNotes1.append(
-						TapEnd(
-							position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
-							lane: laneMap[mainData.channel] ?? 0
+					case .end1:
+						longNotes1.append(
+							TapEnd  (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
-					)
-				case .flickEnd1:
-					longNotes1.append(
-						FlickEnd(
-							position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
-							lane: laneMap[mainData.channel] ?? 0
+					case .flickEnd1:
+						longNotes1.append(
+							FlickEnd(position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
-					)
-				case .start2:
-					longNotes2.append(
-						TapStart(
-							position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
-							lane: laneMap[mainData.channel] ?? 0
+					case .start2:
+						longNotes2.append(
+							TapStart(position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
-					)
-				case .middle2:
-					longNotes2.append(
-						Middle(
-							position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
-							lane: laneMap[mainData.channel] ?? 0
+					case .middle2:
+						longNotes2.append(
+							Middle  (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
-					)
-				case .end2:
-					longNotes2.append(
-						TapEnd(
-							position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
-							lane: laneMap[mainData.channel] ?? 0
+					case .end2:
+						longNotes2.append(
+							TapEnd  (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
-					)
-				case .flickEnd2:
-					longNotes2.append(
-						FlickEnd(
-							position: Double(mainData.bar) * 4.0 + unitBeat * Double(index),
-							lane: laneMap[mainData.channel] ?? 0
+					case .flickEnd2:
+						longNotes2.append(
+							FlickEnd(position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
-					)
-				case .bgm:
-					// 楽曲開始命令の処理
-					if mainData.channel == 1 {
+					}
+				}
+			} else if mainData.channel == 1 {
+				// 楽曲開始命令の処理
+				for (index, ob) in mainData.body.enumerated() {
+					if ob == "10" {
 						musicStartPos = Double(mainData.bar) * 4.0 + unitBeat * Double(index)
+						break
+					}
+				}
+			} else if mainData.channel == 3 {
+				// BPM変更命令の処理
+				for (index, ob) in mainData.body.enumerated() {
+					guard ob != "00" else {
+						continue
+					}
+					if let newBPM = Int(ob, radix: 16) {
+						variableBPMList.append((bpm: Double(newBPM), pos: Double(mainData.bar) * 4.0 + unitBeat * Double(index)))
+					}
+				}
+			} else if mainData.channel == 8 {
+				// BPM変更命令の処理(インデックス型テンポ変更)
+				for (index, ob) in mainData.body.enumerated() {
+					if let newBPM = BPMTable[ob] {
+						variableBPMList.append((bpm: Double(newBPM), pos: Double(mainData.bar) * 4.0 + unitBeat * Double(index)))
 					}
 				}
 			}
@@ -289,7 +292,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			if $0.pos == $1.pos { return $1 is TapStart }
 			else { return $0.pos < $1.pos }
 		})
-
+		
 		// 線形リストを作成し、先頭をnotesに格納
 		// longNotes1について
 		var i = 0
@@ -298,10 +301,10 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				notes.append(longNotes1[i])
 				while !(longNotes1[i] is TapEnd) && !(longNotes1[i] is FlickEnd) {
 					guard i + 1 < longNotes1.count else {
-						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")	//TODO:何小節目の何泊目のスタート(or途中)かを表示する
+						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません(\(ParseError.getBeat(of: longNotes1[i])))")
 					}
 					guard longNotes1[i + 1] is Middle || longNotes1[i + 1] is TapEnd || longNotes1[i + 1] is FlickEnd else {
-						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")	//TODO:何小節目の何泊目のスタート(or途中)かを表示する
+						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません(\(ParseError.getBeat(of: longNotes1[i + 1])))")
 					}
 					if let temp = longNotes1[i] as? TapStart {
 						temp.next = longNotes1[i + 1]
@@ -317,7 +320,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				}
 				i += 1
 			} else {
-				throw ParseError.noLongNoteStart("ロングノーツ開始命令がありません")	//TODO:何小節目の何泊目の終了(or途中)かを表示する
+				throw ParseError.noLongNoteStart("ロングノーツ開始命令がありません(\(ParseError.getBeat(of: longNotes1[i])))")
 			}
 		}
 		// longNotes2について
@@ -327,10 +330,10 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				notes.append(longNotes2[i])
 				while !(longNotes2[i] is TapEnd) && !(longNotes2[i] is FlickEnd) {
 					guard i + 1 < longNotes2.count else {
-						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")	//TODO:何小節目の何泊目のスタート(or途中)かを表示する
+						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません(\(ParseError.getBeat(of: longNotes2[i])))")
 					}
 					guard longNotes2[i + 1] is Middle || longNotes2[i + 1] is TapEnd || longNotes2[i + 1] is FlickEnd else {
-						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません")	//TODO:何小節目の何泊目のスタート(or途中)かを表示する
+						throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません(\(ParseError.getBeat(of: longNotes2[i + 1])))")
 					}
 					if let temp = longNotes2[i] as? TapStart {
 						temp.next = longNotes2[i + 1]
@@ -346,7 +349,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 				}
 				i += 1
 			} else {
-				throw ParseError.noLongNoteStart("ロングノーツ開始命令がありません")	//TODO:何小節目の何泊目の終了(or途中)かを表示する
+				throw ParseError.noLongNoteStart("ロングノーツ開始命令がありません(\(ParseError.getBeat(of: longNotes2[i])))")
 			}
 		}
 
