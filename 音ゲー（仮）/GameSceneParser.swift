@@ -120,7 +120,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			"GENRE":     { value in self.genre     = value },
 			"TITLE":     { value in self.title     = value },
 			"ARTIST":    { value in self.artist    = value },
-			"BPM":       { value in if let num = Double(value) { GameScene.bpm = num } },
+			"BPM":       { value in if let num = Double(value) { GameScene.variableBPMList.append((num,0.0))} },
 			"PLAYLEVEL": { value in if let num = Int(value) { self.playLevel   = num } },
 			"VOLWAV":    { value in if let num = Int(value) { self.volWav      = num } }
 		]
@@ -270,14 +270,14 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 						continue
 					}
 					if let newBPM = Int(ob, radix: 16) {
-						variableBPMList.append((bpm: Double(newBPM), pos: Double(mainData.bar) * 4.0 + unitBeat * Double(index)))
+						GameScene.variableBPMList.append((bpm: Double(newBPM), startPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index)))
 					}
 				}
 			} else if mainData.channel == 8 {
 				// BPM変更命令の処理(インデックス型テンポ変更)
 				for (index, ob) in mainData.body.enumerated() {
 					if let newBPM = BPMTable[ob] {
-						variableBPMList.append((bpm: Double(newBPM), pos: Double(mainData.bar) * 4.0 + unitBeat * Double(index)))
+						GameScene.variableBPMList.append((bpm: Double(newBPM), startPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index)))
 					}
 				}
 			}
