@@ -86,11 +86,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var genre = ""				// ジャンル
 	var title = ""				// タイトル
 	var artist = ""				// アーティスト
-	static var bpm = 132.0			// Beats per Minute
-	//static var bpm:[(bpm:Double,startPos:Double)] = []	//建築予定地
+//	static var bpm = 132.0			// Beats per Minute
+//	//static var bpm:[(bpm:Double,startPos:Double)] = []	//建築予定地
 	var playLevel = 0			// 難易度
 	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
-	var variableBPMList: [(bpm: Double, pos: Double)] = []		// 可変BPM情報
+	static var variableBPMList: [(bpm: Double, startPos: Double)] = []		// 可変BPM情報
 	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		// レーン
 	
 	static var horizon:CGFloat = 0  	// 水平線の長さ
@@ -209,8 +209,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		//BGMの再生(時間指定)
 		GameScene.start = CACurrentMediaTime()
-		GameScene.BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
-//		GameScene.BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm[0].bpm)*60)	//建築予定地
+//		GameScene.BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
+		GameScene.BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.variableBPMList[0].bpm)*60)	//建築予定地
 		GameScene.BGM?.delegate = self
 		
 		//各レーンにノーツをセット
@@ -521,18 +521,18 @@ struct Lane {
 		get{
 			if laneNotes.count > 0 && nextNoteIndex < laneNotes.count{
 				
-				var timeLag = (laneNotes[nextNoteIndex].pos)*60/GameScene.bpm + GameScene.start - currentTime
+//				var timeLag = (laneNotes[nextNoteIndex].pos)*60/GameScene.bpm + GameScene.start - currentTime
 				
 				//建築予定地
-//				var timeLag = GameScene.start - currentTime
-//				for (index,i) in GameScene.bpm.enumerated(){
-//					if GameScene.bpm.count > index+1 && laneNotes[nextNoteIndex].pos > GameScene.bpm[index+1].startPos{
-//						timeLag += (GameScene.bpm[index+1].startPos - i.startPos)*60/i.bpm
-//					}else{
-//						timeLag += (laneNotes[nextNoteIndex].pos - i.startPos)*60/i.bpm
-//						break
-//					}
-//				}
+				var timeLag = GameScene.start - currentTime
+				for (index,i) in GameScene.variableBPMList.enumerated(){
+					if GameScene.variableBPMList.count > index+1 && laneNotes[nextNoteIndex].pos > GameScene.variableBPMList[index+1].startPos{
+						timeLag += (GameScene.variableBPMList[index+1].startPos - i.startPos)*60/i.bpm
+					}else{
+						timeLag += (laneNotes[nextNoteIndex].pos - i.startPos)*60/i.bpm
+						break
+					}
+				}
 				
 				switch timeLag>0 ? timeLag : -timeLag {
 				case 0..<0.05:
