@@ -64,6 +64,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		case "SAKURAスキップ":
 			bmsName = "SAKURAスキップ.bms"
 			bgmName = "SAKURAスキップ"
+		case "残酷な天使のテーゼ":
+			bmsName = "残酷な天使のテーゼ.bms"
+			bgmName = "残酷な天使のテーゼ"
 		default:
 			print("該当する音楽が存在しません。")
 			break
@@ -266,15 +269,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		
 
-		
-		
-		
-//		/* ここからリファクタリング */
 
-//
-//		/* ここまで */
-//
-		
 		
 		// 同時押しラインの更新
 		for i in sameLines{
