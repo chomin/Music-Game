@@ -65,6 +65,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			bmsName = "SAKURAスキップ.bms"
 			bgmName = "SAKURAスキップ"
 		default:
+			print("該当する音楽が存在しません。")
 			break
 		}
 	}
@@ -75,8 +76,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		fatalError("init(coder:) has not been implemented")
 	}
 	
-	var bmsName = "オラシオン.bms"
-	var bgmName = "オラシオン"
+	var bmsName = ""
+	var bgmName = ""
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
 	static var resignActiveTime:TimeInterval = 0.0
@@ -85,7 +86,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var genre = ""				// ジャンル
 	var title = ""				// タイトル
 	var artist = ""				// アーティスト
-	static var bpm = 132.0		// Beats per Minute
+	static var bpm = 132.0			// Beats per Minute
+	//static var bpm:[(bpm:Double,startPos:Double)] = []	//建築予定地
 	var playLevel = 0			// 難易度
 	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
 	var variableBPMList: [(bpm: Double, pos: Double)] = []		// 可変BPM情報
@@ -208,6 +210,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		//BGMの再生(時間指定)
 		GameScene.start = CACurrentMediaTime()
 		GameScene.BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
+//		GameScene.BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm[0].bpm)*60)	//建築予定地
 		GameScene.BGM?.delegate = self
 		
 		//各レーンにノーツをセット
@@ -267,50 +270,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		
 //		/* ここからリファクタリング */
-//
-//
-//		//時間でノーツの位置を設定する(重くなるので近場のみ！)
-//		for note in notes {
-//
-//			let remainingBeat = note.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // あと何拍で判定ラインに乗るか
-//
-//			// まずロングノーツと単ノーツで場合分け
-//			if let start = note as? TapStart {//ロングの始点
-//				// ロングノーツを更新
-////				let remainingBeat2 = start.next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // 次ノーツがあと何拍で判定ラインに乗るか
-//				// 位置を設定(水平線より上でもロング先に必要、" 判 定 後 で も "ロング初めに必要、判定線過ぎても判定前なら普通に必要)
-////				if ((start.isJudged == false || remainingBeat > 0) && remainingBeat < 8) || (remainingBeat2 > 0 && remainingBeat2 < 8) {
-//					start.update(currentTime: currentTime)		// 大きさや位置を更新
-////				}
-//
-//				var following = start.next		// 親を持つノーツ
-//				while(true) {
-//					if let middle = following as? Middle {		// 次のノーツがMiddleだったとき
-//
-////						let remainingBeat2 = middle.next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)	// ロングに必要なので次ノーツについて判断
-////						if (middle.next.isJudged == false || remainingBeat2 > 0) && remainingBeat2 < 8 {	// 次ノーツが描画域内にあるか、過ぎていても判定前なら更新
-//							middle.update(currentTime: currentTime)		// 更新
-////						}
-//
-//						following = middle.next
-//					} else {									// 次のノーツがTapEndかFlickEndだったとき
-//
-////						let remainingBeat = (following?.pos)! - ((currentTime - GameScene.start) * GameScene.bpm/60)
-////						if (following?.isJudged == false || remainingBeat > 0) && remainingBeat < 8 {	// 描画域内にあるか、過ぎていても判定前なら更新
-//							following?.update(currentTime: currentTime)		// 更新
-////						}
-//
-//						break
-//					}
-//				}
-//			} else {
-//				// 単ノーツを更新
-//				// 判定線より上で判定線まで8拍以内のもの及び、判定線を過ぎていても判定前のものについて
-//				if (note.isJudged == false || remainingBeat > 0) && remainingBeat < 8 {
-//					note.update(currentTime: currentTime)		// 大きさや位置を更新
-//				}
-//			}
-//		}
+
 //
 //		/* ここまで */
 //
@@ -321,11 +281,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
             // 同時押しラインを移動
 			i.line.position = i.note.position
 			i.line.isHidden = i.note.image.isHidden
-//			if i.note.isJudged || i.note.position.y == 0{//判定後または初期初期位置では隠す
-//				i.line.isHidden = true
-//			}else{
-//				i.line.isHidden = false
-//			}
+
 			
 			// 大きさも変更
 //			let a = (GameScene.horizon/7 - self.frame.width/9) / (GameScene.horizonY - self.frame.width/9)
@@ -565,7 +521,18 @@ struct Lane {
 		get{
 			if laneNotes.count > 0 && nextNoteIndex < laneNotes.count{
 				
-				let timeLag = laneNotes[nextNoteIndex].pos*60/GameScene.bpm + GameScene.start - currentTime
+				var timeLag = (laneNotes[nextNoteIndex].pos)*60/GameScene.bpm + GameScene.start - currentTime
+				
+				//建築予定地
+//				var timeLag = GameScene.start - currentTime
+//				for (index,i) in GameScene.bpm.enumerated(){
+//					if GameScene.bpm.count > index+1 && laneNotes[nextNoteIndex].pos > GameScene.bpm[index+1].startPos{
+//						timeLag += (GameScene.bpm[index+1].startPos - i.startPos)*60/i.bpm
+//					}else{
+//						timeLag += (laneNotes[nextNoteIndex].pos - i.startPos)*60/i.bpm
+//						break
+//					}
+//				}
 				
 				switch timeLag>0 ? timeLag : -timeLag {
 				case 0..<0.05:
