@@ -15,17 +15,17 @@ extension GameScene{
 	
 	func setAllSounds(){
 		GameScene.BGM = setSound(fileName: bgmName, type: "mp3")
-		tapSound1 = setSound(fileName: "タップ", type: "wav")
-		tapSound2 = setSound(fileName: "タップ", type: "wav")
-		tapSound3 = setSound(fileName: "タップ", type: "wav")
-		tapSound4 = setSound(fileName: "タップ", type: "wav")
+		tapSound1 = setSound(fileName: "タップ", type: "caf")
+		tapSound2 = setSound(fileName: "タップ", type: "caf")
+		tapSound3 = setSound(fileName: "タップ", type: "caf")
+		tapSound4 = setSound(fileName: "タップ", type: "caf")
 		
-		flickSound1 = setSound(fileName: "フリック", type: "wav")
-		flickSound2 = setSound(fileName: "フリック", type: "wav")
+		flickSound1 = setSound(fileName: "フリック", type: "caf")
+		flickSound2 = setSound(fileName: "フリック", type: "caf")
 		
-		kara1 = setSound(fileName: "空打ち", type: "wav")
+		kara1 = setSound(fileName: "空打ち", type: "caf")
 		
-		kara2 = setSound(fileName: "空打ち", type: "wav")
+		kara2 = setSound(fileName: "空打ち", type: "caf")
 		
 		GameScene.BGM!.numberOfLoops = 0	//１度だけ再生
 	}
