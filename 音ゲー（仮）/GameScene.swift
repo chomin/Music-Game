@@ -90,15 +90,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	//static var bpm:[(bpm:Double,startPos:Double)] = []	//建築予定地
 	var playLevel = 0			// 難易度
 	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
-	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		//レーン
+	var variableBPMList: [(bpm: Double, pos: Double)] = []		// 可変BPM情報
+	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		// レーン
 	
 	static var horizon:CGFloat = 0  	// 水平線の長さ
 	static var horizonY:CGFloat = 0 	// 水平線のy座標
 	static var laneWidth:CGFloat = 0	// 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
 	static var judgeLineY:CGFloat = 0	// 判定線のy座標
-	//立体感を出すための定数
-	static let horizontalDistance:CGFloat = 250		//画面から目までの水平距離a（約5000で10cmほど）
-	static var verticalDistance:CGFloat!//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
+	// 立体感を出すための定数
+	static let horizontalDistance:CGFloat = 250		// 画面から目までの水平距離a（約5000で10cmほど）
+	static var verticalDistance:CGFloat!			// 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
 	
 	
 	var halfBound:CGFloat! // 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
