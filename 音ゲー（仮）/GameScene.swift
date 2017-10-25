@@ -48,6 +48,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	init(musicName:String ,size:CGSize) {
 		super.init(size:size)
 		
+		GameScene.variableBPMList = []
+		
 		switch musicName {
 		case "シュガーソングとビターステップ":
 			bmsName = "シュガーソングとビターステップ.bms"
