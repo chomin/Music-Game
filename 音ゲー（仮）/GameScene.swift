@@ -64,6 +64,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		case "SAKURAスキップ":
 			bmsName = "SAKURAスキップ.bms"
 			bgmName = "SAKURAスキップ"
+		case "にめんせい☆ウラオモテライフ！":
+			bmsName = "にめんせい☆ウラオモテライフ！.bms"
+			bgmName = "にめんせい☆ウラオモテライフ！"
 		default:
 			print("該当する音楽が存在しません。")
 			break
@@ -90,7 +93,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 //	//static var bpm:[(bpm:Double,startPos:Double)] = []	//建築予定地
 	var playLevel = 0			// 難易度
 	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
-	static var variableBPMList: [(bpm: Double, startPos: Double)] = []		// 可変BPM情報
+	static var variableBPMList: [(bpm: Double, startPos: Double, startTime:TimeInterval?)] = []		// 可変BPM情報
 	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		// レーン
 	
 	static var horizon:CGFloat = 0  	// 水平線の長さ
@@ -133,14 +136,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		let laneHeight = GameScene.horizonY - self.frame.width/9
 		let L = (GameScene.horizontalDistance * laneHeight)/(GameScene.verticalDistance - laneHeight)
 		
-//		GameScene.horizon = self.frame.width/16	  // TODO: 厳密な公式あり
 		GameScene.horizon = 7*GameScene.laneWidth*GameScene.horizontalDistance/(GameScene.horizontalDistance+L)
 		
 		GameScene.judgeLineY = self.frame.width/9
-		
-		//		verticalDistance = self.frame.width/9 + (GameScene.horizonY-self.frame.width/9)*1.1
-		//		verticalDistance = GameScene.horizonY - self.frame.width/24
-		print(GameScene.horizonY-self.frame.width/9)	//判定線から水平線までの画面上での幅。277くらい
 		
 		//ラベルの設定
 		judgeLabel = {() -> SKLabelNode in
@@ -227,6 +225,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						break
 					}
 				}
+			}
+		}
+		
+		//bpmのstartTimeを計算してセット
+		for (index,i) in GameScene.variableBPMList.enumerated(){
+			if index == 0{
+				GameScene.variableBPMList[index].startTime = GameScene.start
+			}else{
+				GameScene.variableBPMList[index].startTime = GameScene.variableBPMList[index-1].startTime! + (i.startPos - GameScene.variableBPMList[index-1].startPos) / GameScene.variableBPMList[index-1].bpm * 60
 			}
 		}
 	}

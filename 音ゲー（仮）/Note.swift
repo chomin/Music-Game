@@ -29,7 +29,10 @@ class Tap: Note {
 //		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)		// あと何拍で判定ラインに乗るか
 		
 		//建築予定地
-		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.variableBPMList[bpmIndex].bpm/60)		// あと何拍で判定ラインに乗るか
+		//建築予定地
+		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
+		let remainingBeat = pos - nowPos		// あと何拍で判定ラインに乗るか
+		
 		
 		
 		guard (!isJudged && remainingBeat < 8) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
@@ -78,8 +81,11 @@ class Flick: Note {
 		}
 //		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // あと何拍で判定ラインに乗るか
 		
+		
 		//建築予定地
-		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.variableBPMList[bpmIndex].bpm/60)		// あと何拍で判定ラインに乗るか
+		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
+		let remainingBeat = pos - nowPos		// あと何拍で判定ラインに乗るか
+		
 		
 		guard (!isJudged && remainingBeat < 8) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
 			return
@@ -132,10 +138,10 @@ class TapStart: Note {
 //		let remainingBeat2 = next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // 次ノーツがあと何拍で判定ラインに乗るか
 		
 		//建築予定地
-				let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.variableBPMList[bpmIndex].bpm/60)		// あと何拍で判定ラインに乗るか
-	
-	
-				let remainingBeat2 = next.pos - ((currentTime - GameScene.start) * GameScene.variableBPMList[next.bpmIndex].bpm/60)		// あと何拍で判定ラインに乗るか
+		//建築予定地
+		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
+		let remainingBeat = pos - nowPos		// あと何拍で判定ラインに乗るか
+		let remainingBeat2 = next.pos - nowPos		// あと何拍で判定ラインに乗るか
 		
 		
 		
@@ -175,7 +181,7 @@ class TapStart: Note {
 //			let nowPos = (currentTime - GameScene.start) * GameScene.bpm/60		// y座標で比をとると、途中で発散するためposから比を求める
 			
 			//建築予定地
-			let nowPos = (currentTime - GameScene.start) * GameScene.variableBPMList[bpmIndex].bpm/60		// y座標で比をとると、途中で発散するためposから比を求める
+			let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60	// y座標で比をとると、途中で発散するためposから比を求める
 //
 			
 			let laneDifference:CGFloat = CGFloat(lane - next.lane)				// レーン差(符号込み)
@@ -274,9 +280,10 @@ class Middle: Note {
 		//		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)			// あと何拍で判定ラインに乗るか
 		//		let remainingBeat2 = next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // 次ノーツがあと何拍で判定ラインに乗るか
 		
-		//建築予定地
-		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.variableBPMList[bpmIndex].bpm/60)		// あと何拍で判定ラインに乗るか
-		let remainingBeat2 = next.pos - ((currentTime - GameScene.start) * GameScene.variableBPMList[next.bpmIndex].bpm/60)		// あと何拍で判定ラインに乗るか
+		//建築予定地//建築予定地
+		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
+		let remainingBeat = pos - nowPos		// あと何拍で判定ラインに乗るか
+		let remainingBeat2 = next.pos - nowPos	// あと何拍で判定ラインに乗るか
 		
 		
 		guard ((!isJudged || remainingBeat > 0) && remainingBeat < 8)							// 描画域内にあるか、過ぎていても判定前なら更新
@@ -314,7 +321,7 @@ class Middle: Note {
 //			let nowPos = (currentTime - GameScene.start) * GameScene.bpm/60		// y座標で比をとると、途中で発散するためposから比を求める
 			
 			//建築予定地
-			let nowPos = (currentTime - GameScene.start) * GameScene.variableBPMList[bpmIndex].bpm/60		// y座標で比をとると、途中で発散するためposから比を求める
+			let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60	// y座標で比をとると、途中で発散するためposから比を求める
 			//
 			
 			let laneDifference:CGFloat = CGFloat(lane - next.lane)				// レーン差(符号込み)
@@ -366,31 +373,32 @@ class Middle: Note {
 		} else {
 			longImages.circle.isHidden = false
 		}
-    }
+	}
 }
 
 class TapEnd: Note {
-
-    override init(position pos: Double, lane: Int) {
-        super.init(position: pos, lane: lane)
+	
+	override init(position pos: Double, lane: Int) {
+		super.init(position: pos, lane: lane)
 		
 		// imageのインスタンス(緑円)を作成
 		image = SKShapeNode(circleOfRadius: GameScene.laneWidth / 2)
 		image.fillColor = UIColor.green
 		image.isHidden = true	// 初期状態では隠しておく
-    }
-
-    override func update(currentTime: TimeInterval) {
+	}
+	
+	override func update(currentTime: TimeInterval) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
-//		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)		// あと何拍で判定ラインに乗るか
-	
-	//建築予定地
-	    let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.variableBPMList[bpmIndex].bpm/60)		// あと何拍で判定ラインに乗るか
-	
-	
+		//		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)		// あと何拍で判定ラインに乗るか
+		
+		//建築予定地
+		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
+		let remainingBeat = pos - nowPos		// あと何拍で判定ラインに乗るか	// あと何拍で判定ラインに乗るか
+		
+		
 		guard (!isJudged && remainingBeat < 8) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
 			return
 		}
@@ -412,8 +420,8 @@ class TapEnd: Note {
 
 class FlickEnd: Note {
 	
-    override init(position pos: Double, lane: Int) {
-        super.init(position: pos, lane: lane)
+	override init(position pos: Double, lane: Int) {
+		super.init(position: pos, lane: lane)
 		
 		// imageのインスタンス(マゼンタ三角形)を作成
 		let length = GameScene.laneWidth / 2 // 三角形一辺の長さの半分
@@ -428,24 +436,24 @@ class FlickEnd: Note {
 		image.lineWidth = 3.0
 		image.fillColor = UIColor.magenta
 		image.isHidden = true	// 初期状態では隠しておく
-    }
-
-    override func update(currentTime: TimeInterval) {
+	}
+	
+	override func update(currentTime: TimeInterval) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
-//		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene./60)		// あと何拍で判定ラインに乗るか
-	
-	//建築予定地
-	
-			let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.variableBPMList[bpmIndex].bpm/60)		// あと何拍で判定ラインに乗るか
-	
-
+		//		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene./60)		// あと何拍で判定ラインに乗るか
+		
+		//建築予定地
+		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
+		let remainingBeat = pos - nowPos		// あと何拍で判定ラインに乗るか
+		
+		
 		guard (!isJudged && remainingBeat < 8) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
 			return
 		}
-
+		
 		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
 		
@@ -516,8 +524,18 @@ class Note {
 //		let fypos = (CGFloat(60*pos/GameScene.bpm) - CGFloat(currentTime - GameScene.start)) * speed	  // 判定線からの水平距離x
 		
 		//建築予定地
+		var fypos:CGFloat = 0.0	// 判定線からの水平距離x(bpm変更後のものをちゃんと計算し直すべき？)
+		for i in 0...bpmIndex{
+			if i == bpmIndex{
+				fypos += CGFloat(60*(pos - GameScene.variableBPMList[i].startPos)/GameScene.variableBPMList[i].bpm)
+			}else{
+				fypos += CGFloat(60*(GameScene.variableBPMList[i+1].startPos - GameScene.variableBPMList[i].startPos)/GameScene.variableBPMList[i].bpm)
+			}
+		}
+		fypos -= CGFloat(currentTime - GameScene.start)
+		fypos *= speed
 	
-		let fypos = (CGFloat(60*pos/GameScene.variableBPMList[bpmIndex].bpm) - CGFloat(currentTime - GameScene.start)) * speed	  // 判定線からの水平距離x
+		
 		
 		
 		// 球面?に投写
@@ -550,7 +568,17 @@ class Note {
 //		let fypos = (CGFloat(60*pos/GameScene.bpm) - CGFloat(currentTime - GameScene.start)) * speed	// 判定線からの水平距離x
 		
 		//建築予定地
-		let fypos = (CGFloat(60*pos/GameScene.variableBPMList[bpmIndex].bpm) - CGFloat(currentTime - GameScene.start)) * speed	  // 判定線からの水平距離x
+		var fypos:CGFloat = 0.0	// 判定線からの水平距離x
+		for i in 0...bpmIndex{
+			if i == bpmIndex{
+				fypos += CGFloat(60*(pos - GameScene.variableBPMList[i].startPos)/GameScene.variableBPMList[i].bpm)
+			}else{
+				fypos += CGFloat(60*(GameScene.variableBPMList[i+1].startPos - GameScene.variableBPMList[i].startPos)/GameScene.variableBPMList[i].bpm)
+			}
+		}
+		fypos -= CGFloat(currentTime - GameScene.start)
+		fypos *= speed
+//		let fypos = (CGFloat(60*pos/GameScene.variableBPMList[bpmIndex].bpm) - CGFloat(currentTime - GameScene.start)) * speed	  // 判定線からの水平距離x
 		
 		let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance!, 2))								// 視点から判定線までの距離(射影する球の半径)
 		let grad = (GameScene.horizon/7 - GameScene.laneWidth) / (GameScene.horizonY - GameScene.judgeLineY)	// 傾き
