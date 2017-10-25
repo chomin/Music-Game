@@ -100,7 +100,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		// 先頭が'#'であるものだけを抽出し、'#'を削除
 		bmsData = bmsData
 			.filter { $0.hasPrefix("#") }
-			.map { str in String(str.suffix(str.count - 1)) }//後ろ...文字
+			.map { str in String(str.dropFirst()) }
 
 
 		// ヘッダとメインデータに分割
