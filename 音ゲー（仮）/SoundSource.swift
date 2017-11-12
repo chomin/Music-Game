@@ -9,7 +9,7 @@
 import Foundation
 import OpenAL
 
-final class SoundSource {
+final class SoundSource {//AVAudioPlayerの代わり？
 	private var buffer: ALuint
 	private var source: ALuint
 	private let fullFilePath: String
