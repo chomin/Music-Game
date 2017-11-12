@@ -9,6 +9,73 @@
 
 import SpriteKit
 import AVFoundation
+import OpenAL
+
+fileprivate let alTrue: ALboolean = Int8(AL_TRUE)
+fileprivate let alFalse: ALboolean = Int8(AL_FALSE)
+fileprivate let alNone: ALuint = ALuint(AL_NONE)
+
+
+
+final class SoundSource {
+    private var buffer: ALuint
+    private var source: ALuint
+    private let fullFilePath: String
+	
+    init?(fullFilePath: String) {
+        let buffer = alureCreateBufferFromFile(fullFilePath)
+
+        if buffer == alNone {
+            print("Failed to load \(fullFilePath)")
+            return nil
+        }
+		
+        var source: ALuint = 0
+        alGenSources(1, &source)
+		
+        alSourcei(source, AL_BUFFER, ALint(buffer))
+		
+        self.buffer = buffer
+        self.source = source
+        self.fullFilePath = fullFilePath
+    }
+	
+    deinit {
+        alureStopSource(source, alTrue)
+        alDeleteSources(1, &source)
+        alDeleteBuffers(1, &buffer)
+    }
+	
+    func play() {
+        if alurePlaySource(source, nil, nil) != alTrue {
+            print("Failed to play source \(self.fullFilePath)")
+        }
+    }
+	
+    func stop() {
+        if alureStopSource(source, alFalse) != alTrue {
+            print("Failed to stop source \(self.fullFilePath)")
+        }
+    }
+	
+    func pause() {
+        if alurePauseSource(source) != alTrue {
+            print("Failed to pause source \(self.fullFilePath)")
+        }
+    }
+	
+    func setOffset(second: Float) {
+        alSourcef(source, AL_SEC_OFFSET, second)
+    }
+	
+    func setVolume(_ value: Float) {
+        alSourcef(source, AL_GAIN, value)
+    }
+}
+
+
+
+
 
 
 extension GameScene{
