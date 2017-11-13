@@ -23,20 +23,25 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	let JLScale:CGFloat = 1.25	//拡大縮小アニメーションの倍率
 	
 	
+	
+	static var BGM: BGMPlayer!
+	let actionSound = ActionSoundPlayer()
+	
+	
 	//音楽プレイヤー
-	static var BGM:AVAudioPlayer?
-	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。やっぱり２つだと遅延も起こるので４つ
-	var flickSound2:AVAudioPlayer?
-	var tapSound1:AVAudioPlayer?
-	var tapSound2:AVAudioPlayer?
-	var tapSound3:AVAudioPlayer?
-	var tapSound4:AVAudioPlayer?
-	var kara1:AVAudioPlayer?
-	var kara2:AVAudioPlayer?
-	var tapSoundResevation = 0
-	var flickSoundResevation = 0
-	var karaSoundResevation = 0
-	var nextPlayTapNumber = 1
+//	static var BGM:AVAudioPlayer?
+//	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。やっぱり２つだと遅延も起こるので４つ
+//	var flickSound2:AVAudioPlayer?
+//	var tapSound1:AVAudioPlayer?
+//	var tapSound2:AVAudioPlayer?
+//	var tapSound3:AVAudioPlayer?
+//	var tapSound4:AVAudioPlayer?
+//	var kara1:AVAudioPlayer?
+//	var kara2:AVAudioPlayer?
+//	var tapSoundResevation = 0
+//	var flickSoundResevation = 0
+//	var karaSoundResevation = 0
+//	var nextPlayTapNumber = 1
 
 	
 	
@@ -79,6 +84,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			print("該当する音楽が存在しません。")
 			break
 		}
+		
+		GameScene.BGM = BGMPlayer(bgmName: bgmName, type: "mp3")
 	}
 	
 	
@@ -210,14 +217,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		}
 		
 		//画像、音楽、ラベルの設定
-		setAllSounds()
+//		setAllSounds()
 		setImages()
 		
 		//BGMの再生(時間指定)
-		GameScene.start = CACurrentMediaTime()
-//		GameScene.BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.bpm)*60)
-		GameScene.BGM!.play(atTime: GameScene.start + (musicStartPos/GameScene.variableBPMList[0].bpm)*60)	//建築予定地
-		GameScene.BGM?.delegate = self
+//		GameScene.start = CACurrentMediaTime()
+//		GameScene.BGM.play(atTime: GameScene.start + (musicStartPos/GameScene.variableBPMList[0].bpm)*60)	//建築予定地
+//		GameScene.BGM?.delegate = self
+		GameScene.BGM.play()
 		
 		//各レーンにノーツをセット
 		for note in notes{
@@ -249,21 +256,21 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	override func update(_ currentTime: TimeInterval) {
 		
-		//鳴らしそびれた音があれば鳴らす
-		if tapSoundResevation > 0{
-			print("tap予約発動")
-			playSound(type: .tap)
-			
-			tapSoundResevation -= 1
-		}
-		if flickSoundResevation > 0{
-			playSound(type: .flick)
-			flickSoundResevation -= 1
-		}
-		if karaSoundResevation > 0{
-			playSound(type: .kara)
-			karaSoundResevation -= 1
-		}
+//		//鳴らしそびれた音があれば鳴らす
+//		if tapSoundResevation > 0{
+//			print("tap予約発動")
+//			playSound(type: .tap)
+//
+//			tapSoundResevation -= 1
+//		}
+//		if flickSoundResevation > 0{
+//			playSound(type: .flick)
+//			flickSoundResevation -= 1
+//		}
+//		if karaSoundResevation > 0{
+//			playSound(type: .kara)
+//			karaSoundResevation -= 1
+//		}
 		
 		//ラベルの更新
 		comboLabel.text = String(ResultScene.combo)
@@ -289,11 +296,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			i.line.position = i.note.position
 			i.line.isHidden = i.note.image.isHidden
 
-			
 			// 大きさも変更
-//			let a = (GameScene.horizon/7 - self.frame.width/9) / (GameScene.horizonY - self.frame.width/9)
-//			let diameter = a*(i.line.position.y - GameScene.horizonY) + GameScene.horizon/7
-			
 			i.line.setScale(i.note.image.xScale / i.note.noteScale)
 		}
 		
@@ -314,7 +317,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						
 						if parfectMiddleJudge(laneIndex: j){//離しの判定(←コメントミス？)
 							
-							playSound(type: .tap)
+							actionSound.play(type: .tap)
 							break
 						}
 					}
@@ -385,13 +388,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						
 						if judge(laneIndex: index, type: .tap){//タップの判定
 							
-							playSound(type: .tap)
+							actionSound.play(type: .tap)
 							doKara = false
 							break
 							
 						}else if judge(laneIndex: index, type: .tapStart){//始点の判定
 							
-							playSound(type: .tap)
+							actionSound.play(type: .tap)
 							doKara = false
 							break
 							
@@ -402,7 +405,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				}
 				
 				if doKara == true{//
-					playSound(type: .kara)
+					actionSound.play(type: .kara)
 				}
 			}
 		}
@@ -443,12 +446,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 							if !didJudgFlick {//ただのフリックは一度だけ判定
 								if judge(laneIndex: index, type: .flick) || judge(laneIndex: index, type: .flickEnd){
 								allTouches[touchIndex].didJudgeFlick = true
-								playSound(type: .flick)
+								actionSound.play(type: .flick)
 								break
 								}
 							}else if judge(laneIndex: index, type: .flickEnd){
 							
-								playSound(type: .flick)
+								actionSound.play(type: .flick)
 								break
 							}
 						}
@@ -478,7 +481,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						
 						if judge(laneIndex: index, type: .tapEnd){//離しの判定
 							
-							playSound(type: .tap)
+							actionSound.play(type: .tap)
 							break
 						}
 					}
@@ -488,19 +491,19 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	}
 	
 	
-	//再生終了時の呼び出しメソッド
-	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {//playしたクラスと同じクラスに入れる必要あり？
-		if player as AVAudioPlayer! == GameScene.BGM{
-			GameScene.BGM = nil	//別のシーンでアプリを再開したときに鳴るのを防止
-			let scene = ResultScene(size: (view?.bounds.size)!)
-			let skView = view as SKView!
-			skView?.showsFPS = true
-			skView?.showsNodeCount = true
-			skView?.ignoresSiblingOrder = true
-			scene.scaleMode = .resizeFill
-			skView?.presentScene(scene)  //ResultSceneに移動
-		}
-	}
+//	//再生終了時の呼び出しメソッド
+//	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {//playしたクラスと同じクラスに入れる必要あり？
+//		if player as AVAudioPlayer! == GameScene.BGM{
+//			GameScene.BGM = nil	//別のシーンでアプリを再開したときに鳴るのを防止
+//			let scene = ResultScene(size: (view?.bounds.size)!)
+//			let skView = view as SKView!
+//			skView?.showsFPS = true
+//			skView?.showsNodeCount = true
+//			skView?.ignoresSiblingOrder = true
+//			scene.scaleMode = .resizeFill
+//			skView?.presentScene(scene)  //ResultSceneに移動
+//		}
+//	}
 	
 	func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
 		print("\(player)で\(String(describing: error))")

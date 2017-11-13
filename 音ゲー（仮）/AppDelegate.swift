@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		print("move from active to inactive state")
 		
 		GameScene.resignActiveTime = CACurrentMediaTime()
-		GameScene.BGM?.pause()
+		GameScene.BGM.pause()
 	}
 
 	func applicationDidEnterBackground(_ application: UIApplication) {
@@ -46,8 +46,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		print("DidBecomeActive")
 		
 		GameScene.start += CACurrentMediaTime() - GameScene.resignActiveTime + 3.06	//BGMと少し誤差が出る
-		GameScene.BGM?.currentTime -= 3	//3秒巻き戻し
-		GameScene.BGM?.play()
+//		GameScene.BGM?.currentTime -= 3	//3秒巻き戻し
+//		GameScene.BGM.play()
 	}
 
 	func applicationWillTerminate(_ application: UIApplication) {
