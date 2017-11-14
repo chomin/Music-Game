@@ -85,7 +85,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			break
 		}
 		
-		GameScene.BGM = BGMPlayer(bgmName: bgmName, type: "mp3")
+		GameScene.BGM = BGMPlayer(bgmName: "Sounds/"+bgmName, type: "wav")
 	}
 	
 	

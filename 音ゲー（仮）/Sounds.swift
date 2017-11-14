@@ -24,16 +24,19 @@ final class SoundSource {
         let buffer = alureCreateBufferFromFile(fullFilePath)
 
         if buffer == alNone {
+		
             print("Failed to load \(fullFilePath)")
             return nil
         }
 		
         var source: ALuint = 0
-		alGetError()
+	  alGetError()
         alGenSources(1, &source)
 		let error = alGetError()
 		if error != AL_NO_ERROR {
-			print(error)
+			let er = String(error, radix: 16)	//16進数に変換
+			
+			print("error:\(er)")
 		}
 		
         alSourcei(source, AL_BUFFER, ALint(buffer))
@@ -81,7 +84,7 @@ class BGMPlayer {
 	
 	init(bgmName fileName: String, type: String) {
 		// サウンドファイルのパスを生成
-		let path = Bundle.main.path(forResource: fileName, ofType: type)!    //m4a,oggは不可
+		let path = Bundle.main.path(forResource: fileName, ofType: type)!    //m4a,oggは不可(openALならmp3も)
 		
 		bgm = SoundSource(fullFilePath: path)
 	}
@@ -125,9 +128,9 @@ class ActionSoundPlayer {
 	
 	init() {
 		// サウンドファイルのパスを生成
-		let tapSoundPath = Bundle.main.path(forResource: "タップ", ofType: "wav")!    //m4a,oggは不可
-		let flickSoundPath = Bundle.main.path(forResource: "フリック", ofType: "wav")!
-		let karaSoundPath = Bundle.main.path(forResource: "空打ち", ofType: "wav")!
+		let tapSoundPath = Bundle.main.path(forResource: "Sounds/タップ", ofType: "wav")!    //m4a,oggは不可
+		let flickSoundPath = Bundle.main.path(forResource: "Sounds/フリック", ofType: "wav")!
+		let karaSoundPath = Bundle.main.path(forResource: "Sounds/空打ち", ofType: "wav")!
 		
 		tap1 = SoundSource(fullFilePath: tapSoundPath)
 //		tap2 = SoundSource(fullFilePath: tapSoundPath)
