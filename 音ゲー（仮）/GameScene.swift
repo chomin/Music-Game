@@ -23,13 +23,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	let JLScale:CGFloat = 1.25	//拡大縮小アニメーションの倍率
 	
 	
-	
-	static var BGM: BGMPlayer!
-	let actionSound = ActionSoundPlayer()
+	static var BGM: AVAudioPlayer?
+	let actionSoundSet = ActionSoundPlayers()
 	
 	
 	//音楽プレイヤー
-//	static var BGM:AVAudioPlayer?
 //	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。やっぱり２つだと遅延も起こるので４つ
 //	var flickSound2:AVAudioPlayer?
 //	var tapSound1:AVAudioPlayer?
@@ -85,7 +83,17 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			break
 		}
 		
-		GameScene.BGM = BGMPlayer(bgmName: "Sounds/"+bgmName, type: "wav")
+		// サウンドファイルのパスを生成
+		let Path = Bundle.main.path(forResource: "Sounds/" + bgmName, ofType: "mp3")!    //m4a,oggは不可
+		let soundURL:URL = URL(fileURLWithPath: Path)
+		// AVAudioPlayerのインスタンスを作成
+		do {
+			GameScene.BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: nil)
+		} catch {
+			print("AVAudioPlayerインスタンス作成失敗")
+		}
+		// バッファに保持していつでも再生できるようにする
+		GameScene.BGM?.prepareToPlay()
 	}
 	
 	
@@ -220,11 +228,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 //		setAllSounds()
 		setImages()
 		
-		//BGMの再生(時間指定)
-//		GameScene.start = CACurrentMediaTime()
-//		GameScene.BGM.play(atTime: GameScene.start + (musicStartPos/GameScene.variableBPMList[0].bpm)*60)	//建築予定地
-//		GameScene.BGM?.delegate = self
-		GameScene.BGM.play()
+		// BGMの再生(時間指定)
+		GameScene.start = CACurrentMediaTime()
+		GameScene.BGM?.play(atTime: GameScene.start + (musicStartPos/GameScene.variableBPMList[0].bpm)*60)	//建築予定地
+		GameScene.BGM?.delegate = self
 		
 		//各レーンにノーツをセット
 		for note in notes{
@@ -317,7 +324,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						
 						if parfectMiddleJudge(laneIndex: j){//離しの判定(←コメントミス？)
 							
-							actionSound.play(type: .tap)
+							actionSoundSet.play(type: .tap)
 							break
 						}
 					}
@@ -388,13 +395,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						
 						if judge(laneIndex: index, type: .tap){//タップの判定
 							
-							actionSound.play(type: .tap)
+							actionSoundSet.play(type: .tap)
 							doKara = false
 							break
 							
 						}else if judge(laneIndex: index, type: .tapStart){//始点の判定
 							
-							actionSound.play(type: .tap)
+							actionSoundSet.play(type: .tap)
 							doKara = false
 							break
 							
@@ -405,7 +412,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				}
 				
 				if doKara == true{//
-					actionSound.play(type: .kara)
+					actionSoundSet.play(type: .kara)
 				}
 			}
 		}
@@ -446,12 +453,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 							if !didJudgFlick {//ただのフリックは一度だけ判定
 								if judge(laneIndex: index, type: .flick) || judge(laneIndex: index, type: .flickEnd){
 								allTouches[touchIndex].didJudgeFlick = true
-								actionSound.play(type: .flick)
+								actionSoundSet.play(type: .flick)
 								break
 								}
 							}else if judge(laneIndex: index, type: .flickEnd){
 							
-								actionSound.play(type: .flick)
+								actionSoundSet.play(type: .flick)
 								break
 							}
 						}
@@ -481,7 +488,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						
 						if judge(laneIndex: index, type: .tapEnd){//離しの判定
 							
-							actionSound.play(type: .tap)
+							actionSoundSet.play(type: .tap)
 							break
 						}
 					}
@@ -491,19 +498,19 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	}
 	
 	
-//	//再生終了時の呼び出しメソッド
-//	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {//playしたクラスと同じクラスに入れる必要あり？
-//		if player as AVAudioPlayer! == GameScene.BGM{
-//			GameScene.BGM = nil	//別のシーンでアプリを再開したときに鳴るのを防止
-//			let scene = ResultScene(size: (view?.bounds.size)!)
-//			let skView = view as SKView!
-//			skView?.showsFPS = true
-//			skView?.showsNodeCount = true
-//			skView?.ignoresSiblingOrder = true
-//			scene.scaleMode = .resizeFill
-//			skView?.presentScene(scene)  //ResultSceneに移動
-//		}
-//	}
+	//再生終了時の呼び出しメソッド
+	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {//playしたクラスと同じクラスに入れる必要あり？
+		if player as AVAudioPlayer! == GameScene.BGM{
+			GameScene.BGM = nil	//別のシーンでアプリを再開したときに鳴るのを防止
+			let scene = ResultScene(size: (view?.bounds.size)!)
+			let skView = view as SKView!
+			skView?.showsFPS = true
+			skView?.showsNodeCount = true
+			skView?.ignoresSiblingOrder = true
+			scene.scaleMode = .resizeFill
+			skView?.presentScene(scene)  //ResultSceneに移動
+		}
+	}
 	
 	func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
 		print("\(player)で\(String(describing: error))")

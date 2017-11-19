@@ -79,38 +79,7 @@ final class SoundSource {
     }
 }
 
-class BGMPlayer {
-	private let bgm: SoundSource?
-	
-	init(bgmName fileName: String, type: String) {
-		// サウンドファイルのパスを生成
-		let path = Bundle.main.path(forResource: fileName, ofType: type)!    //m4a,oggは不可(openALならmp3も)
-		
-		bgm = SoundSource(fullFilePath: path)
-	}
-
-	func play() {
-		bgm?.play()
-	}
-	
-	func stop() {
-		bgm?.stop()
-	}
-	
-	func pause() {
-		bgm?.pause()
-	}
-	
-	func setOffset(second: Float) {
-		bgm?.setOffset(second: second)
-	}
-	
-	func setVolume(_ value: Float) {
-		bgm?.setVolume(value)
-	}
-}
-
-class ActionSoundPlayer {
+class ActionSoundPlayers {
 	private let tap1: SoundSource?
 //	private let tap2: SoundSource?
 //	private let tap3: SoundSource?
