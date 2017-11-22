@@ -25,19 +25,39 @@ final class SoundSource {
 
         if buffer == alNone {
 		
-            print("Failed to load \(fullFilePath)")
+            print("alureCreateBufferFromFile error. Failed to load \(fullFilePath)")
             return nil
         }
-		
-        var source: ALuint = 0
-	  alGetError()
-        alGenSources(1, &source)
-		let error = alGetError()
-		if error != AL_NO_ERROR {
-			let er = String(error, radix: 16)	//16進数に変換
+	
+//	var buffer2:ALuint = 0
+//	 alGetError()
+//	  alGenBuffers(1, &buffer2)
+//	let error = alGetError()
+//	if error != AL_NO_ERROR {
+//		let er = String(error, radix: 16)	//16進数に変換
+//
+//		print("error:\(er)")
+//		print("alGenBuffers error \(fullFilePath)")
+	//		return nil
+	//	}
+	
+	
+	
+	
+	var source: ALuint = 0
+	alGetError()
+	alGenSources(1, &source)	//なんで失敗するんや
+	let error = alGetError()
+	if error != AL_NO_ERROR {
+		let er = String(error, radix: 16)	//16進数に変換
+		//			let er:String = alGetString(error).pointee
 			
-			print("error:\(er)")
-		}
+			print("error:\(String(er))")
+			print("alGenSources error \(fullFilePath)")
+			return nil
+		}else{
+			print("succeed!")
+	}
 		
         alSourcei(source, AL_BUFFER, ALint(buffer))
 		
