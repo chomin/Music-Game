@@ -21,30 +21,47 @@ final class SoundSource {
     private let fullFilePath: String
 	
     init?(fullFilePath: String) {
+		// 音声ファイルからバッファを作成
         let buffer = alureCreateBufferFromFile(fullFilePath)
-
         if buffer == alNone {
-		
             print("Failed to load \(fullFilePath)")
             return nil
         }
 		
         var source: ALuint = 0
-	  alGetError()
+		
+		alGetError()
+		// ソースオブジェクトを作成
         alGenSources(1, &source)
-		let error = alGetError()
+		// エラー処理
+		var error = alGetError()
 		if error != AL_NO_ERROR {
-			let er = String(error, radix: 16)	//16進数に変換
-			
+			let er = String(error, radix: 16)	// 16進数に変換
+
 			print("error:\(er)")
+			return nil
 		}
 		
+		// バッファをソースに紐付け
         alSourcei(source, AL_BUFFER, ALint(buffer))
-		
+		// エラー処理
+		error = alGetError()
+		if error != AL_NO_ERROR {
+			let er = String(error, radix: 16)	// 16進数に変換
+			
+			print("error:\(er)")
+			return nil
+		}
+
         self.buffer = buffer
         self.source = source
         self.fullFilePath = fullFilePath
     }
+	init() {
+		self.buffer = 0
+		self.source = 0
+		self.fullFilePath = ""
+	}
 	
     deinit {
         alureStopSource(source, alTrue)
@@ -77,64 +94,102 @@ final class SoundSource {
     func setVolume(_ value: Float) {
         alSourcef(source, AL_GAIN, value)
     }
+	
+	var isPlaying: Bool {
+		get {
+			var state: ALint = 0
+			
+			alGetSourcei(source, AL_SOURCE_STATE, &state)
+			return state == AL_PLAYING || state == AL_PAUSED
+		}
+	}
 }
 
 class ActionSoundPlayers {
-	private let tap1: SoundSource?
-//	private let tap2: SoundSource?
-//	private let tap3: SoundSource?
-//	private let tap4: SoundSource?
-//	private let flick1: SoundSource?
-//	private let flick2: SoundSource?
-//	private let flick3: SoundSource?
-//	private let flick4: SoundSource?
-//	private let kara1: SoundSource?
-//	private let kara2: SoundSource?
+	private let tap1: SoundSource
+	private let tap2: SoundSource
+	private let tap3: SoundSource
+	private let tap4: SoundSource
+	private let flick1: SoundSource
+	private let flick2: SoundSource
+	private let flick3: SoundSource
+	private let flick4: SoundSource
+	private let kara1: SoundSource
+	private let kara2: SoundSource
 
 	enum SoundType{
 		case tap, flick, kara
 	}
 	
 	init() {
+		// Initialize Open AL
+		let device = alcOpenDevice(nil)	// open default device
+		if device != nil {
+			let context=alcCreateContext(device, nil)	// create context
+			if context != nil {
+				alcMakeContextCurrent(context)	// set active context
+			}
+		}
+		
 		// サウンドファイルのパスを生成
-		let tapSoundPath = Bundle.main.path(forResource: "Sounds/タップ", ofType: "wav")!    //m4a,oggは不可
+		let tapSoundPath = Bundle.main.path(forResource: "Sounds/タップ", ofType: "wav")!    // mp3,m4a,ogg は不可
 		let flickSoundPath = Bundle.main.path(forResource: "Sounds/フリック", ofType: "wav")!
 		let karaSoundPath = Bundle.main.path(forResource: "Sounds/空打ち", ofType: "wav")!
 		
-		tap1 = SoundSource(fullFilePath: tapSoundPath)
-//		tap2 = SoundSource(fullFilePath: tapSoundPath)
-//		tap3 = SoundSource(fullFilePath: tapSoundPath)
-//		tap4 = SoundSource(fullFilePath: tapSoundPath)
-//		flick1 = SoundSource(fullFilePath: flickSoundPath)
-//		flick2 = SoundSource(fullFilePath: flickSoundPath)
-//		flick3 = SoundSource(fullFilePath: flickSoundPath)
-//		flick4 = SoundSource(fullFilePath: flickSoundPath)
-//		kara1 = SoundSource(fullFilePath: karaSoundPath)
-//		kara2 = SoundSource(fullFilePath: karaSoundPath)
+		tap1   = SoundSource(fullFilePath: tapSoundPath)   ?? SoundSource()
+		tap2   = SoundSource(fullFilePath: tapSoundPath)   ?? SoundSource()
+		tap3   = SoundSource(fullFilePath: tapSoundPath)   ?? SoundSource()
+		tap4   = SoundSource(fullFilePath: tapSoundPath)   ?? SoundSource()
+		flick1 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
+		flick2 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
+		flick3 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
+		flick4 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
+		kara1  = SoundSource(fullFilePath: karaSoundPath)  ?? SoundSource()
+		kara2  = SoundSource(fullFilePath: karaSoundPath)  ?? SoundSource()
 	}
 	
 	func play(type: SoundType) {
 		switch type {
 		case .tap:
-			tap1?.play()
+			if !tap1.isPlaying {
+				tap1.play()
+			} else if !tap2.isPlaying {
+				tap2.play()
+			} else if !tap3.isPlaying {
+				tap3.play()
+			} else if !tap4.isPlaying {
+				tap3.play()
+			}
 		case .flick:
-			tap1?.play()
+			if !flick1.isPlaying {
+				flick1.play()
+			} else if !flick2.isPlaying {
+				flick2.play()
+			} else if !flick3.isPlaying {
+				flick3.play()
+			} else if !flick4.isPlaying {
+				flick4.play()
+			}
 		case .kara:
-			tap1?.play()
+			if !kara1.isPlaying {
+				kara1.play()
+			} else if !kara2.isPlaying {
+				kara2.play()
+			}
 		}
 	}
 	
 	func setVolume(_ value: Float) {
-		tap1?.setVolume(value)
-//		tap2?.setVolume(value)
-//		tap3?.setVolume(value)
-//		tap4?.setVolume(value)
-//		flick1?.setVolume(value)
-//		flick2?.setVolume(value)
-//		flick3?.setVolume(value)
-//		flick4?.setVolume(value)
-//		kara1?.setVolume(value)
-//		kara2?.setVolume(value)
+		tap1.setVolume(value)
+		tap2.setVolume(value)
+		tap3.setVolume(value)
+		tap4.setVolume(value)
+		flick1.setVolume(value)
+		flick2.setVolume(value)
+		flick3.setVolume(value)
+		flick4.setVolume(value)
+		kara1.setVolume(value)
+		kara2.setVolume(value)
 	}
 }
 
