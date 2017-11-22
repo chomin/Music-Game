@@ -52,6 +52,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		super.init(size:size)
 		
 		GameScene.variableBPMList = []
+		var bgmName: String
 		
 		switch musicName {
 		case "シュガーソングとビターステップ":
@@ -80,6 +81,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 
 		default:
 			print("該当する音楽が存在しません。")
+			bgmName = ""
 			break
 		}
 		
@@ -103,7 +105,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	}
 	
 	var bmsName = ""
-	var bgmName = ""
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
 	static var resignActiveTime:TimeInterval = 0.0
