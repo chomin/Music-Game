@@ -22,12 +22,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var comboLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
 	let JLScale:CGFloat = 1.25	//拡大縮小アニメーションの倍率
 	
-	
+	//音楽プレイヤー
 	static var BGM: AVAudioPlayer?
 	let actionSoundSet = ActionSoundPlayers()
 	
 	
-	//音楽プレイヤー
+	
 //	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。やっぱり２つだと遅延も起こるので４つ
 //	var flickSound2:AVAudioPlayer?
 //	var tapSound1:AVAudioPlayer?
@@ -48,62 +48,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var sameLines:[(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
 	
 	// 楽曲データ
-	init(musicName:String ,size:CGSize) {
-		super.init(size:size)
-		
-		GameScene.variableBPMList = []
-		var bgmName: String
-		
-		switch musicName {
-		case "シュガーソングとビターステップ":
-			bmsName = "シュガーソングとビターステップ.bms"
-			bgmName = "シュガビタ"
-		case "ようこそジャパリパークへ":
-			bmsName = "ようこそジャパリパークへ.bms"
-			bgmName = "ようこそジャパリパークへ"
-		case "オラシオン":
-			bmsName = "オラシオン.bms"
-			bgmName = "オラシオン"
-		case "This game":
-			bmsName = "This game.bms"
-			bgmName = "This game"
-		case "SAKURAスキップ":
-			bmsName = "SAKURAスキップ.bms"
-			bgmName = "SAKURAスキップ"
-
-		case "にめんせい☆ウラオモテライフ！":
-			bmsName = "にめんせい☆ウラオモテライフ！.bms"
-			bgmName = "にめんせい☆ウラオモテライフ！"
-
-		case "残酷な天使のテーゼ":
-			bmsName = "残酷な天使のテーゼ.bms"
-			bgmName = "残酷な天使のテーゼ"
-
-		default:
-			print("該当する音楽が存在しません。")
-			bgmName = ""
-			break
-		}
-		
-		// サウンドファイルのパスを生成
-		let Path = Bundle.main.path(forResource: "Sounds/" + bgmName, ofType: "mp3")!    //m4a,oggは不可
-		let soundURL:URL = URL(fileURLWithPath: Path)
-		// AVAudioPlayerのインスタンスを作成
-		do {
-			GameScene.BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: nil)
-		} catch {
-			print("AVAudioPlayerインスタンス作成失敗")
-		}
-		// バッファに保持していつでも再生できるようにする
-		GameScene.BGM?.prepareToPlay()
-	}
-	
-	
-	
-	required init?(coder aDecoder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
-	
 	var bmsName = ""
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
@@ -132,6 +76,62 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var halfBound:CGFloat! // 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
 	
 	var buttonX:[CGFloat] = []
+	
+	
+	init(musicName:String ,size:CGSize) {
+		super.init(size:size)
+		
+		GameScene.variableBPMList = []
+		var bgmName: String
+		
+		switch musicName {
+		case "シュガーソングとビターステップ":
+			bmsName = "シュガーソングとビターステップ.bms"
+			bgmName = "シュガビタ"
+		case "ようこそジャパリパークへ":
+			bmsName = "ようこそジャパリパークへ.bms"
+			bgmName = "ようこそジャパリパークへ"
+		case "オラシオン":
+			bmsName = "オラシオン.bms"
+			bgmName = "オラシオン"
+		case "This game":
+			bmsName = "This game.bms"
+			bgmName = "This game"
+		case "SAKURAスキップ":
+			bmsName = "SAKURAスキップ.bms"
+			bgmName = "SAKURAスキップ"
+			
+		case "にめんせい☆ウラオモテライフ！":
+			bmsName = "にめんせい☆ウラオモテライフ！.bms"
+			bgmName = "にめんせい☆ウラオモテライフ！"
+			
+		case "残酷な天使のテーゼ":
+			bmsName = "残酷な天使のテーゼ.bms"
+			bgmName = "残酷な天使のテーゼ"
+			
+		default:
+			print("該当する音楽が存在しません。")
+			bgmName = ""
+			break
+		}
+		
+		// サウンドファイルのパスを生成
+		let Path = Bundle.main.path(forResource: "Sounds/" + bgmName, ofType: "mp3")!    //m4a,oggは不可
+		let soundURL:URL = URL(fileURLWithPath: Path)
+		// AVAudioPlayerのインスタンスを作成
+		do {
+			GameScene.BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: nil)
+		} catch {
+			print("AVAudioPlayerインスタンス作成失敗")
+		}
+		// バッファに保持していつでも再生できるようにする
+		GameScene.BGM?.prepareToPlay()
+	}
+	
+	required init?(coder aDecoder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+
 	
 	override func didMove(to view: SKView) {
 		
@@ -202,7 +202,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		catch ParseError.unexpected     (let msg) { print(msg) }
 		catch                                     { print("未知のエラー") }
 		
-		// 全ノーツ及び関連画像をGameSceneにaddChild(この全ノーツにアクセスするアルゴリズムは以降しばしば出てくる)
+		// 全ノーツ及び関連画像をGameSceneにaddChild
 		for note in notes {
 			self.addChild(note.image)			// 始点及び単ノーツをaddChild
 			if let start = note as? TapStart {	// ダウンキャスト

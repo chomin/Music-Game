@@ -24,13 +24,9 @@ final class SoundSource {
 		// 音声ファイルからバッファを作成
         let buffer = alureCreateBufferFromFile(fullFilePath)
         if buffer == alNone {
-
-		
             print("alureCreateBufferFromFile error. Failed to load \(fullFilePath)")
             return nil
         }
-	
-
 		
         var source: ALuint = 0
 		
@@ -46,7 +42,6 @@ final class SoundSource {
 			return nil
 		}
 
-		
 		// バッファをソースに紐付け
         alSourcei(source, AL_BUFFER, ALint(buffer))
 		// エラー処理
@@ -127,14 +122,7 @@ class ActionSoundPlayers {
 	}
 	
 	init() {
-		// Initialize Open AL
-		let device = alcOpenDevice(nil)	// open default device
-		if device != nil {
-			let context=alcCreateContext(device, nil)	// create context
-			if context != nil {
-				alcMakeContextCurrent(context)	// set active context
-			}
-		}
+		alureInitDevice(nil, nil)
 		
 		// サウンドファイルのパスを生成
 		let tapSoundPath = Bundle.main.path(forResource: "Sounds/タップ", ofType: "wav")!    // mp3,m4a,ogg は不可
