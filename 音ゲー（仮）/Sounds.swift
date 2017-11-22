@@ -24,9 +24,13 @@ final class SoundSource {
 		// 音声ファイルからバッファを作成
         let buffer = alureCreateBufferFromFile(fullFilePath)
         if buffer == alNone {
-            print("Failed to load \(fullFilePath)")
+
+		
+            print("alureCreateBufferFromFile error. Failed to load \(fullFilePath)")
             return nil
         }
+	
+
 		
         var source: ALuint = 0
 		
@@ -41,6 +45,7 @@ final class SoundSource {
 			print("error:\(er)")
 			return nil
 		}
+
 		
 		// バッファをソースに紐付け
         alSourcei(source, AL_BUFFER, ALint(buffer))
