@@ -106,16 +106,16 @@ final class SoundSource {
 }
 
 class ActionSoundPlayers {
-	private let tap1: SoundSource
-	private let tap2: SoundSource
-	private let tap3: SoundSource
-	private let tap4: SoundSource
+	private let tap1:   SoundSource
+	private let tap2:   SoundSource
+	private let tap3:   SoundSource
+	private let tap4:   SoundSource
 	private let flick1: SoundSource
 	private let flick2: SoundSource
 	private let flick3: SoundSource
 	private let flick4: SoundSource
-	private let kara1: SoundSource
-	private let kara2: SoundSource
+	private let kara1:  SoundSource
+	private let kara2:  SoundSource
 
 	enum SoundType{
 		case tap, flick, kara
@@ -144,31 +144,18 @@ class ActionSoundPlayers {
 	func play(type: SoundType) {
 		switch type {
 		case .tap:
-			if !tap1.isPlaying {
-				tap1.play()
-			} else if !tap2.isPlaying {
-				tap2.play()
-			} else if !tap3.isPlaying {
-				tap3.play()
-			} else if !tap4.isPlaying {
-				tap3.play()
-			}
+			if      !tap1.isPlaying { tap1.play() }
+			else if !tap2.isPlaying { tap2.play() }
+			else if !tap3.isPlaying { tap3.play() }
+			else if !tap4.isPlaying { tap4.play() }
 		case .flick:
-			if !flick1.isPlaying {
-				flick1.play()
-			} else if !flick2.isPlaying {
-				flick2.play()
-			} else if !flick3.isPlaying {
-				flick3.play()
-			} else if !flick4.isPlaying {
-				flick4.play()
-			}
+			if      !flick1.isPlaying { flick1.play() }
+			else if !flick2.isPlaying { flick2.play() }
+			else if !flick3.isPlaying { flick3.play() }
+			else if !flick4.isPlaying { flick4.play() }
 		case .kara:
-			if !kara1.isPlaying {
-				kara1.play()
-			} else if !kara2.isPlaying {
-				kara2.play()
-			}
+			if      !kara1.isPlaying { kara1.play() }
+			else if !kara2.isPlaying { kara2.play() }
 		}
 	}
 	

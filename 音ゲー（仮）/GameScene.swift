@@ -135,9 +135,22 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	override func didMove(to view: SKView) {
 		
+		halfBound = self.frame.width/12	//1/18~1/9の値にすること
+		GameScene.laneWidth = self.frame.width/9
+		//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
+		GameScene.horizonY = self.frame.height*15/16	//モデル値
+		GameScene.judgeLineY = self.frame.width/9
+		GameScene.verticalDistance = GameScene.horizonY - self.frame.width/14	// GameScene.horizonY - self.frame.width/14
+		
+		let R = sqrt(pow(GameScene.horizontalDistance, 2) + pow(GameScene.verticalDistance!, 2))	// 視点から判定線までの距離(射影する球の半径)
+		let laneHeight = GameScene.horizonY - GameScene.judgeLineY									// レーンの高さ(画面上)
+		let L = pow(R, 2) / (GameScene.verticalDistance / tan(laneHeight/R) - GameScene.horizontalDistance)	// レーン長(3D)
+		GameScene.horizon = 2 * GameScene.horizontalDistance * atan(GameScene.laneWidth * 7/2 / (GameScene.horizontalDistance + L))
+		
+		
 		//ボタンの位置をセット
 		for i in 0...6{
-			buttonX.append(self.frame.width/6 + CGFloat(i)*self.frame.width/9)
+			buttonX.append(self.frame.width/6 + CGFloat(i)*GameScene.laneWidth)
 		}
 		
 		//リザルトの初期化
@@ -148,21 +161,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		ResultScene.miss = 0
 		ResultScene.combo = 0
 		ResultScene.maxCombo = 0
-		
-		
-		halfBound = self.frame.width/12	//1/18~1/9の値にすること
-		GameScene.laneWidth = self.frame.width/9
-		GameScene.horizonY = self.frame.height*15/16	//モデル値
-		
-		GameScene.verticalDistance = GameScene.horizonY - self.frame.width/14
-		//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
-		
-		let laneHeight = GameScene.horizonY - self.frame.width/9
-		let L = (GameScene.horizontalDistance * laneHeight)/(GameScene.verticalDistance - laneHeight)
-		
-		GameScene.horizon = 7*GameScene.laneWidth*GameScene.horizontalDistance/(GameScene.horizontalDistance+L)
-		
-		GameScene.judgeLineY = self.frame.width/9
 		
 		//ラベルの設定
 		judgeLabel = {() -> SKLabelNode in
