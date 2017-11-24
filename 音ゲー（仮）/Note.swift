@@ -44,6 +44,9 @@ class Tap: Note {
 		// 縦と横の大きさを計算し、imageのスケールを変更
 		setScale(currentTime: currentTime)
 		
+		// ノーツが視点を向くように
+		image.zRotation = atan(GameScene.laneWidth * CGFloat(3 - lane) / (getPositionOnLane(currentTime: currentTime) + horizontalDistance * 8))
+		
 		// image.isHiddenを更新
 		if position.y > GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
@@ -165,7 +168,11 @@ class TapStart: Note {
 		// 縦と横の大きさを計算し、imageのスケールを変更
 		setScale(currentTime: currentTime)
 		
-	
+		
+		// ノーツが視点を向くように
+		image.zRotation = atan(GameScene.laneWidth * CGFloat(3 - lane) / (getPositionOnLane(currentTime: currentTime) + horizontalDistance * 8))
+		
+		
 		// longImageを更新
 		let path = CGMutablePath()      // 台形の外周
 		
@@ -214,6 +221,8 @@ class TapStart: Note {
 			longImages.circle.yScale = deltaY / GameScene.laneWidth
 			longImages.circle.xScale = noteScale
 			longImages.circle.position = longStartPos
+			longImages.circle.zRotation = atan(GameScene.laneWidth * CGFloat(3 - lane) / (horizontalDistance * 8))
+
 		}
 		
 		// longImage.longを更新(pathを変更)
@@ -352,6 +361,7 @@ class Middle: Note {
 			longImages.circle.yScale = deltaY / GameScene.laneWidth
 			longImages.circle.xScale = noteScale
 			longImages.circle.position = longStartPos
+			longImages.circle.zRotation = atan(GameScene.laneWidth * CGFloat(3 - lane) / (horizontalDistance * 8))
 		}
 		
 		// longImages.longを更新(pathを変更)
@@ -407,6 +417,9 @@ class TapEnd: Note {
 		// 縦と横の大きさを計算し、imageのスケールを変更
 		setScale(currentTime: currentTime)
 		
+		// ノーツが視点を向くように
+		image.zRotation = atan(GameScene.laneWidth * CGFloat(3 - lane) / (getPositionOnLane(currentTime: currentTime) + horizontalDistance * 8))
+
 		// image.isHiddenを更新
 		if position.y > GameScene.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
 			image.isHidden = true
