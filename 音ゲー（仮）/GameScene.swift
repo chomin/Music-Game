@@ -61,13 +61,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 //	//static var bpm:[(bpm:Double,startPos:Double)] = []	//建築予定地
 	var playLevel = 0			// 難易度
 	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
-	static var variableBPMList: [(bpm: Double, startPos: Double, startTime:TimeInterval?)] = []		// 可変BPM情報
+	static var variableBPMList: [(bpm: Double, startPos: Double)] = []		// 可変BPM情報
 	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		// レーン
 	
 	static var horizon:CGFloat = 0  	// 水平線の長さ
 	static var horizonY:CGFloat = 0 	// 水平線のy座標
 	static var laneWidth:CGFloat = 0	// 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
-	static var judgeLineY:CGFloat = 0	// 判定線のy座標
+	static var laneLength:CGFloat = 0	// 3D上でのレーン長
+	static var judgeLineY: CGFloat = 0	// 判定線のy座標
 	// 立体感を出すための定数
 	static let horizontalDistance:CGFloat = 250		// 画面から目までの水平距離a（約5000で10cmほど）
 	static var verticalDistance:CGFloat!			// 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
@@ -144,8 +145,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		let R = sqrt(pow(GameScene.horizontalDistance, 2) + pow(GameScene.verticalDistance!, 2))	// 視点から判定線までの距離(射影する球の半径)
 		let laneHeight = GameScene.horizonY - GameScene.judgeLineY									// レーンの高さ(画面上)
-		let L = pow(R, 2) / (GameScene.verticalDistance / tan(laneHeight/R) - GameScene.horizontalDistance)	// レーン長(3D)
-		GameScene.horizon = 2 * GameScene.horizontalDistance * atan(GameScene.laneWidth * 7/2 / (GameScene.horizontalDistance + L))
+		GameScene.laneLength = pow(R, 2) / (GameScene.verticalDistance / tan(laneHeight/R) - GameScene.horizontalDistance)	// レーン長(3D)
+		GameScene.horizon = 2 * GameScene.horizontalDistance * atan(GameScene.laneWidth * 7/2 / (GameScene.horizontalDistance + GameScene.laneLength))
 		
 		
 		//ボタンの位置をセット
@@ -249,14 +250,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			}
 		}
 		
-		//bpmのstartTimeを計算してセット
-		for (index,i) in GameScene.variableBPMList.enumerated(){
-			if index == 0{
-				GameScene.variableBPMList[index].startTime = GameScene.start
-			}else{
-				GameScene.variableBPMList[index].startTime = GameScene.variableBPMList[index-1].startTime! + (i.startPos - GameScene.variableBPMList[index-1].startPos) / GameScene.variableBPMList[index-1].bpm * 60
-			}
-		}
+//		//bpmのstartTimeを計算してセット
+//		for (index,i) in GameScene.variableBPMList.enumerated(){
+//			if index == 0{
+//				GameScene.variableBPMList[index].startTime = GameScene.start
+//			}else{
+//				GameScene.variableBPMList[index].startTime = GameScene.variableBPMList[index-1].startTime! + (i.startPos - GameScene.variableBPMList[index-1].startPos) / GameScene.variableBPMList[index-1].bpm * 60
+//			}
+//		}
 	}
 	
 	
@@ -542,10 +543,10 @@ struct Lane {
 				//建築予定地
 				var timeLag = GameScene.start - currentTime
 				for (index,i) in GameScene.variableBPMList.enumerated(){
-					if GameScene.variableBPMList.count > index+1 && laneNotes[nextNoteIndex].pos > GameScene.variableBPMList[index+1].startPos{
+					if GameScene.variableBPMList.count > index+1 && laneNotes[nextNoteIndex].beat > GameScene.variableBPMList[index+1].startPos{
 						timeLag += (GameScene.variableBPMList[index+1].startPos - i.startPos)*60/i.bpm
 					}else{
-						timeLag += (laneNotes[nextNoteIndex].pos - i.startPos)*60/i.bpm
+						timeLag += (laneNotes[nextNoteIndex].beat - i.startPos)*60/i.bpm
 						break
 					}
 				}
