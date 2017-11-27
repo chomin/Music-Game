@@ -81,13 +81,13 @@ extension GameScene{
 			}
 		}
 		
-		//lnotesをposの早い順にソート(してもらう)
-		lNotes = lNotes.sorted{$0.pos < $1.pos}
+		//lnotesをbeatの早い順にソート(してもらう)
+		lNotes = lNotes.sorted{$0.beat < $1.beat}
 
 		//同時押し線の描写
 		var i = 0
 		while(i+1 < fNotes.count){  //iとi+1を見るため...
-			if fNotes[i].pos == fNotes[i+1].pos {//まず始点同士
+			if fNotes[i].beat == fNotes[i+1].beat {//まず始点同士
 				paintSameLine(i: fNotes[i], j: fNotes[i+1])
 				fNotes.removeSubrange(i...i+1)
 				continue
@@ -98,7 +98,7 @@ extension GameScene{
 		
 		i=0
 		while i+1 < lNotes.count {
-			if lNotes[i].pos == lNotes[i+1].pos {//次に終点同士
+			if lNotes[i].beat == lNotes[i+1].beat {//次に終点同士
 				paintSameLine(i: lNotes[i], j: lNotes[i+1])
 				lNotes.removeSubrange(i...i+1)
 				continue
@@ -111,10 +111,10 @@ extension GameScene{
 		for j in fNotes{	  //最後に始点と終点
 			i=0
 			while i < lNotes.count{
-				if j.pos == lNotes[i].pos{
+				if j.beat == lNotes[i].beat{
 					paintSameLine(i: j, j: lNotes[i])
 					break
-				}else if j.pos < lNotes[i].pos{
+				}else if j.beat < lNotes[i].beat{
 					break
 				}
 				

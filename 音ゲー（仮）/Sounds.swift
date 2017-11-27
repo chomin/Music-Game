@@ -24,13 +24,9 @@ final class SoundSource {
 		// 音声ファイルからバッファを作成
         let buffer = alureCreateBufferFromFile(fullFilePath)
         if buffer == alNone {
-
-		
             print("alureCreateBufferFromFile error. Failed to load \(fullFilePath)")
             return nil
         }
-	
-
 		
         var source: ALuint = 0
 		
@@ -46,7 +42,6 @@ final class SoundSource {
 			return nil
 		}
 
-		
 		// バッファをソースに紐付け
         alSourcei(source, AL_BUFFER, ALint(buffer))
 		// エラー処理
@@ -111,31 +106,26 @@ final class SoundSource {
 }
 
 class ActionSoundPlayers {
-	private let tap1: SoundSource
-	private let tap2: SoundSource
-	private let tap3: SoundSource
-	private let tap4: SoundSource
+	private let tap1:   SoundSource
+	private let tap2:   SoundSource
+	private let tap3:   SoundSource
+	private let tap4:   SoundSource
 	private let flick1: SoundSource
 	private let flick2: SoundSource
 	private let flick3: SoundSource
 	private let flick4: SoundSource
+
 	private let kara1: SoundSource
 	private let kara2: SoundSource
 	
+
 	enum SoundType{
 		case tap, flick, kara
 	}
 	
 	init() {
-		// Initialize Open AL
-		let device = alcOpenDevice(nil)	// open default device
-		
-		if device != nil {
-			let context=alcCreateContext(device, nil)	// create context
-			if context != nil {
-				alcMakeContextCurrent(context)	// set active context
-			}
-		}
+
+		alureInitDevice(nil, nil)
 		
 		// サウンドファイルのパスを生成
 		let tapSoundPath = Bundle.main.path(forResource: "Sounds/タップ", ofType: "wav")!    // mp3,m4a,ogg は不可
@@ -157,31 +147,18 @@ class ActionSoundPlayers {
 	func play(type: SoundType) {
 		switch type {
 		case .tap:
-			if !tap1.isPlaying {
-				tap1.play()
-			} else if !tap2.isPlaying {
-				tap2.play()
-			} else if !tap3.isPlaying {
-				tap3.play()
-			} else if !tap4.isPlaying {
-				tap3.play()
-			}
+			if      !tap1.isPlaying { tap1.play() }
+			else if !tap2.isPlaying { tap2.play() }
+			else if !tap3.isPlaying { tap3.play() }
+			else if !tap4.isPlaying { tap4.play() }
 		case .flick:
-			if !flick1.isPlaying {
-				flick1.play()
-			} else if !flick2.isPlaying {
-				flick2.play()
-			} else if !flick3.isPlaying {
-				flick3.play()
-			} else if !flick4.isPlaying {
-				flick4.play()
-			}
+			if      !flick1.isPlaying { flick1.play() }
+			else if !flick2.isPlaying { flick2.play() }
+			else if !flick3.isPlaying { flick3.play() }
+			else if !flick4.isPlaying { flick4.play() }
 		case .kara:
-			if !kara1.isPlaying {
-				kara1.play()
-			} else if !kara2.isPlaying {
-				kara2.play()
-			}
+			if      !kara1.isPlaying { kara1.play() }
+			else if !kara2.isPlaying { kara2.play() }
 		}
 	}
 	

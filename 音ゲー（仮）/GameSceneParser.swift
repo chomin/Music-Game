@@ -43,11 +43,11 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		case noLongNoteEnd(String)
 		case unexpected(String)
 		
-		// 渡されたnoteのposが何小節目何拍目かを返す
+		// 渡されたnoteのbeatが何小節目何拍目かを返す
 		static func getBeat(of note: Note) -> String {
-			let bar = Int(note.pos / 4.0)
-			let beat = note.pos - Double(bar * 4)
-			return "\(bar)小節\(beat)拍目"
+			let bar = Int(note.beat / 4.0)
+			let restBeat = note.beat - Double(bar * 4)
+			return "\(bar)小節\(restBeat)拍目"
 		}
 	}
 
@@ -120,7 +120,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			"GENRE":     { value in self.genre     = value },
 			"TITLE":     { value in self.title     = value },
 			"ARTIST":    { value in self.artist    = value },
-			"BPM":       { value in if let num = Double(value) { GameScene.variableBPMList.append((num,0.0,nil))} },
+			"BPM":       { value in if let num = Double(value) { GameScene.variableBPMList.append((num, 0.0)) } },
 			"PLAYLEVEL": { value in if let num = Int(value) { self.playLevel   = num } },
 			"VOLWAV":    { value in if let num = Int(value) { self.volWav      = num } }
 		]
@@ -215,43 +215,43 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 						break
 					case .tap:
 						notes.append(
-							Tap     (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Tap     (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .flick:
 						notes.append(
-							Flick   (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Flick   (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .start1:
 						longNotes1.append(
-							TapStart(position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapStart(beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .middle1:
 						longNotes1.append(
-							Middle  (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Middle  (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .end1:
 						longNotes1.append(
-							TapEnd  (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapEnd  (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .flickEnd1:
 						longNotes1.append(
-							FlickEnd(position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							FlickEnd(beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .start2:
 						longNotes2.append(
-							TapStart(position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapStart(beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .middle2:
 						longNotes2.append(
-							Middle  (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Middle  (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .end2:
 						longNotes2.append(
-							TapEnd  (position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapEnd  (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .flickEnd2:
 						longNotes2.append(
-							FlickEnd(position: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							FlickEnd(beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					}
 				}
@@ -270,14 +270,14 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 						continue
 					}
 					if let newBPM = Int(ob, radix: 16) {
-						GameScene.variableBPMList.append((bpm: Double(newBPM), startPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), startTime:nil))
+						GameScene.variableBPMList.append((bpm: Double(newBPM), startPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index)))
 					}
 				}
 			} else if mainData.channel == 8 {
 				// BPM変更命令の処理(インデックス型テンポ変更)
 				for (index, ob) in mainData.body.enumerated() {
 					if let newBPM = BPMTable[ob] {
-						GameScene.variableBPMList.append((bpm: Double(newBPM), startPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), startTime:nil))
+						GameScene.variableBPMList.append((bpm: Double(newBPM), startPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index)))
 					}
 				}
 			}
@@ -285,12 +285,12 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 
 		// ロングノーツを時間順にソート(同じ場合は.tapEnd or .flickEnd < .tapStart)
 		longNotes1.sort(by: {
-			if $0.pos == $1.pos { return $1 is TapStart }
-			else { return $0.pos < $1.pos }
+			if $0.beat == $1.beat { return $1 is TapStart }
+			else { return $0.beat < $1.beat }
 		})
 		longNotes2.sort(by: {
-			if $0.pos == $1.pos { return $1 is TapStart }
-			else { return $0.pos < $1.pos }
+			if $0.beat == $1.beat { return $1 is TapStart }
+			else { return $0.beat < $1.beat }
 		})
 		
 		// 線形リストを作成し、先頭をnotesに格納
@@ -354,6 +354,6 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		}
 
 		// 時間順にソート
-		notes.sort(by: { $0.pos < $1.pos })
+		notes.sort(by: { $0.beat < $1.beat })
 	}
 }

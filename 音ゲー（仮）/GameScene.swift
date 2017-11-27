@@ -22,12 +22,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var comboLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
 	let JLScale:CGFloat = 1.25	//拡大縮小アニメーションの倍率
 	
-	
+	//音楽プレイヤー
 	static var BGM: AVAudioPlayer?
 	let actionSoundSet = ActionSoundPlayers()
 	
 	
-	//音楽プレイヤー
+	
 //	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。やっぱり２つだと遅延も起こるので４つ
 //	var flickSound2:AVAudioPlayer?
 //	var tapSound1:AVAudioPlayer?
@@ -48,10 +48,42 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var sameLines:[(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
 	
 	// 楽曲データ
+	var bmsName = ""
+	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
+	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
+	static var resignActiveTime:TimeInterval = 0.0
+	var musicStartPos = 1.0	  //BGM開始の"拍"！
+	var playLebel = 0
+	var genre = ""				// ジャンル
+	var title = ""				// タイトル
+	var artist = ""				// アーティスト
+//	static var bpm = 132.0			// Beats per Minute
+//	//static var bpm:[(bpm:Double,startPos:Double)] = []	//建築予定地
+	var playLevel = 0			// 難易度
+	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
+	static var variableBPMList: [(bpm: Double, startPos: Double)] = []		// 可変BPM情報
+	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		// レーン
+	
+	static var horizon:CGFloat = 0  	// 水平線の長さ
+	static var horizonY:CGFloat = 0 	// 水平線のy座標
+	static var laneWidth:CGFloat = 0	// 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
+	static var laneLength:CGFloat = 0	// 3D上でのレーン長
+	static var judgeLineY: CGFloat = 0	// 判定線のy座標
+	// 立体感を出すための定数
+	static let horizontalDistance:CGFloat = 250		// 画面から目までの水平距離a（約5000で10cmほど）
+	static var verticalDistance:CGFloat!			// 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
+	
+	
+	var halfBound:CGFloat! // 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
+	
+	var buttonX:[CGFloat] = []
+	
+	
 	init(musicName:String ,size:CGSize) {
 		super.init(size:size)
 		
 		GameScene.variableBPMList = []
+		var bgmName: String
 		
 		switch musicName {
 		case "シュガーソングとビターステップ":
@@ -69,17 +101,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		case "SAKURAスキップ":
 			bmsName = "SAKURAスキップ.bms"
 			bgmName = "SAKURAスキップ"
-
+			
 		case "にめんせい☆ウラオモテライフ！":
 			bmsName = "にめんせい☆ウラオモテライフ！.bms"
 			bgmName = "にめんせい☆ウラオモテライフ！"
-
+			
 		case "残酷な天使のテーゼ":
 			bmsName = "残酷な天使のテーゼ.bms"
 			bgmName = "残酷な天使のテーゼ"
-
+			
 		default:
 			print("該当する音楽が存在しません。")
+			bgmName = ""
 			break
 		}
 		
@@ -96,47 +129,29 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		GameScene.BGM?.prepareToPlay()
 	}
 	
-	
-	
 	required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
-	
-	var bmsName = ""
-	var bgmName = ""
-	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
-	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
-	static var resignActiveTime:TimeInterval = 0.0
-	var musicStartPos = 1.0	  //BGM開始の"拍"！
-	var playLebel = 0
-	var genre = ""				// ジャンル
-	var title = ""				// タイトル
-	var artist = ""				// アーティスト
-//	static var bpm = 132.0			// Beats per Minute
-//	//static var bpm:[(bpm:Double,startPos:Double)] = []	//建築予定地
-	var playLevel = 0			// 難易度
-	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
-	static var variableBPMList: [(bpm: Double, startPos: Double, startTime:TimeInterval?)] = []		// 可変BPM情報
-	var lanes:[Lane] = [Lane(),Lane(),Lane(),Lane(),Lane(),Lane(),Lane()]		// レーン
-	
-	static var horizon:CGFloat = 0  	// 水平線の長さ
-	static var horizonY:CGFloat = 0 	// 水平線のy座標
-	static var laneWidth:CGFloat = 0	// 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
-	static var judgeLineY:CGFloat = 0	// 判定線のy座標
-	// 立体感を出すための定数
-	static let horizontalDistance:CGFloat = 250		// 画面から目までの水平距離a（約5000で10cmほど）
-	static var verticalDistance:CGFloat!			// 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
-	
-	
-	var halfBound:CGFloat! // 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
-	
-	var buttonX:[CGFloat] = []
+
 	
 	override func didMove(to view: SKView) {
 		
+		halfBound = self.frame.width/12	//1/18~1/9の値にすること
+		GameScene.laneWidth = self.frame.width/9
+		//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
+		GameScene.horizonY = self.frame.height*15/16	//モデル値
+		GameScene.judgeLineY = self.frame.width/9
+		GameScene.verticalDistance = GameScene.horizonY - self.frame.width/14	// GameScene.horizonY - self.frame.width/14
+		
+		let R = sqrt(pow(GameScene.horizontalDistance, 2) + pow(GameScene.verticalDistance!, 2))	// 視点から判定線までの距離(射影する球の半径)
+		let laneHeight = GameScene.horizonY - GameScene.judgeLineY									// レーンの高さ(画面上)
+		GameScene.laneLength = pow(R, 2) / (GameScene.verticalDistance / tan(laneHeight/R) - GameScene.horizontalDistance)	// レーン長(3D)
+		GameScene.horizon = 2 * GameScene.horizontalDistance * atan(GameScene.laneWidth * 7/2 / (GameScene.horizontalDistance + GameScene.laneLength))
+		
+		
 		//ボタンの位置をセット
 		for i in 0...6{
-			buttonX.append(self.frame.width/6 + CGFloat(i)*self.frame.width/9)
+			buttonX.append(self.frame.width/6 + CGFloat(i)*GameScene.laneWidth)
 		}
 		
 		//リザルトの初期化
@@ -147,21 +162,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		ResultScene.miss = 0
 		ResultScene.combo = 0
 		ResultScene.maxCombo = 0
-		
-		
-		halfBound = self.frame.width/12	//1/18~1/9の値にすること
-		GameScene.laneWidth = self.frame.width/9
-		GameScene.horizonY = self.frame.height*15/16	//モデル値
-		
-		GameScene.verticalDistance = GameScene.horizonY - self.frame.width/14
-		//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
-		
-		let laneHeight = GameScene.horizonY - self.frame.width/9
-		let L = (GameScene.horizontalDistance * laneHeight)/(GameScene.verticalDistance - laneHeight)
-		
-		GameScene.horizon = 7*GameScene.laneWidth*GameScene.horizontalDistance/(GameScene.horizontalDistance+L)
-		
-		GameScene.judgeLineY = self.frame.width/9
 		
 		//ラベルの設定
 		judgeLabel = {() -> SKLabelNode in
@@ -201,7 +201,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		catch ParseError.unexpected     (let msg) { print(msg) }
 		catch                                     { print("未知のエラー") }
 		
-		// 全ノーツ及び関連画像をGameSceneにaddChild(この全ノーツにアクセスするアルゴリズムは以降しばしば出てくる)
+		// 全ノーツ及び関連画像をGameSceneにaddChild
 		for note in notes {
 			self.addChild(note.image)			// 始点及び単ノーツをaddChild
 			if let start = note as? TapStart {	// ダウンキャスト
@@ -250,14 +250,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			}
 		}
 		
-		//bpmのstartTimeを計算してセット
-		for (index,i) in GameScene.variableBPMList.enumerated(){
-			if index == 0{
-				GameScene.variableBPMList[index].startTime = GameScene.start
-			}else{
-				GameScene.variableBPMList[index].startTime = GameScene.variableBPMList[index-1].startTime! + (i.startPos - GameScene.variableBPMList[index-1].startPos) / GameScene.variableBPMList[index-1].bpm * 60
-			}
-		}
+//		//bpmのstartTimeを計算してセット
+//		for (index,i) in GameScene.variableBPMList.enumerated(){
+//			if index == 0{
+//				GameScene.variableBPMList[index].startTime = GameScene.start
+//			}else{
+//				GameScene.variableBPMList[index].startTime = GameScene.variableBPMList[index-1].startTime! + (i.startPos - GameScene.variableBPMList[index-1].startPos) / GameScene.variableBPMList[index-1].bpm * 60
+//			}
+//		}
 	}
 	
 	
@@ -543,10 +543,10 @@ struct Lane {
 				//建築予定地
 				var timeLag = GameScene.start - currentTime
 				for (index,i) in GameScene.variableBPMList.enumerated(){
-					if GameScene.variableBPMList.count > index+1 && laneNotes[nextNoteIndex].pos > GameScene.variableBPMList[index+1].startPos{
+					if GameScene.variableBPMList.count > index+1 && laneNotes[nextNoteIndex].beat > GameScene.variableBPMList[index+1].startPos{
 						timeLag += (GameScene.variableBPMList[index+1].startPos - i.startPos)*60/i.bpm
 					}else{
-						timeLag += (laneNotes[nextNoteIndex].pos - i.startPos)*60/i.bpm
+						timeLag += (laneNotes[nextNoteIndex].beat - i.startPos)*60/i.bpm
 						break
 					}
 				}
