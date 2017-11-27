@@ -121,7 +121,7 @@ class ActionSoundPlayers {
 	private let flick4: SoundSource
 	private let kara1: SoundSource
 	private let kara2: SoundSource
-
+	
 	enum SoundType{
 		case tap, flick, kara
 	}
@@ -129,6 +129,7 @@ class ActionSoundPlayers {
 	init() {
 		// Initialize Open AL
 		let device = alcOpenDevice(nil)	// open default device
+		
 		if device != nil {
 			let context=alcCreateContext(device, nil)	// create context
 			if context != nil {
