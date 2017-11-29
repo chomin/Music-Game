@@ -173,45 +173,49 @@ class TapStart: Note {
 		image.zRotation = atan(GameScene.laneWidth * CGFloat(3 - lane) / (getPositionOnLane(currentTime: currentTime) + horizontalDistance * 8))
 		
 		
-		// longImageを更新
-		let path = CGMutablePath()      // 台形の外周
+		// longImage.longを更新
+		var long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)	// 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
 		
-		let startNotePos = position 	// 中心座標
-		let endNotePos = next.position	// 中心座標
-		
-		if startNotePos.y > GameScene.judgeLineY && isJudged == false {	// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
-			path.move   (to: CGPoint(x: startNotePos.x - size/2/noteScale, y: startNotePos.y))  // 始点、台形の左下
-			path.addLine(to: CGPoint(x: startNotePos.x + size/2/noteScale, y: startNotePos.y))	// 右下
-			path.addLine(to: CGPoint(x: endNotePos.x + next.size/2/noteScale, y: endNotePos.y))	// 右上
-			path.addLine(to: CGPoint(x: endNotePos.x - next.size/2/noteScale, y: endNotePos.y))	// 左上
-			path.closeSubpath()
+		// 終点の情報を代入
+		if next.position.y < GameScene.horizonY {		// 終点ノーツが描画域内にあるとき
+			long.endPos = next.position
+			long.endWidth = next.size / noteScale
+		} else {										// 終点ノーツが描画域より奥にあるとき
+			let posY = GameScene.horizonY
+			let posX = ((next.position.y - GameScene.horizonY) * position.x + (GameScene.horizonY - position.y) * next.position.x)
+				/ (next.position.y - position.y)			// 始点と終点のx座標を内分
+			
+			long.endPos = CGPoint(x: posX, y: posY)
+			long.endWidth = GameScene.horizon / 7
+		}
+		// 始点の情報を代入
+		if position.y > GameScene.judgeLineY && !isJudged {		// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
+			long.startPos = position
+			long.startWidth = size / noteScale
 		} else {
-			// ロングの始点の中心位置を計算
-			var longStartPos = CGPoint(x: 0 ,y: GameScene.judgeLineY)
+			let posY = GameScene.judgeLineY
+			let posX = ((next.position.y - GameScene.judgeLineY) * position.x + (GameScene.judgeLineY - position.y) * next.position.x)
+				/ (next.position.y - position.y)			// 始点と終点のx座標を内分
 			
-//			let nowPos = (currentTime - GameScene.start) * GameScene.bpm/60		// y座標で比をとると、途中で発散するためbeatから比を求める
-//
-//			//建築予定地
-//			let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60	// y座標で比をとると、途中で発散するためbeatから比を求める
-			
-			let laneDifference:CGFloat = CGFloat(lane - next.lane)				// レーン差(符号込み)
-			let way1 = GameScene.laneWidth * laneDifference						// 判定線でのレーン差分のx座標の差(符号込み)
-			let way2 = -remainingPos / (remainingPos2 - remainingPos)			// 相似比
-			let way3 = (CGFloat(lane) + 3/2) * GameScene.laneWidth			// 始点レーンの中心のx座標
-			longStartPos.x = way3 - way1 * way2
-			
-			path.move   (to: CGPoint(x: longStartPos.x - GameScene.laneWidth/2, y: longStartPos.y))	// 始点、台形の左下
-			path.addLine(to: CGPoint(x: longStartPos.x + GameScene.laneWidth/2, y: longStartPos.y))	// 右下
-			path.addLine(to: CGPoint(x: endNotePos.x + next.size/2/noteScale, y: endNotePos.y))		// 右上
-			path.addLine(to: CGPoint(x: endNotePos.x - next.size/2/noteScale, y: endNotePos.y))		// 左上
-			path.closeSubpath()
-			
-			
-			// longImages.circleを更新
+			long.startPos = CGPoint(x: posX, y: posY)
+			long.startWidth = GameScene.laneWidth
+		}
+		
+		let path = CGMutablePath()      // 台形の外周
+		path.move   (to: CGPoint(x: long.startPos.x - long.startWidth/2, y: long.startPos.y))	// 始点、台形の左下
+		path.addLine(to: CGPoint(x: long.startPos.x + long.startWidth/2, y: long.startPos.y))	// 右下
+		path.addLine(to: CGPoint(x: long.endPos.x   + long.endWidth/2,   y: long.endPos.y))		// 右上
+		path.addLine(to: CGPoint(x: long.endPos.x   - long.endWidth/2,   y: long.endPos.y))		// 左上
+		path.closeSubpath()
+		longImages.long.path = path		// pathを変更(longImage.longの更新完了)
+
+		
+		// longImages.circleを更新
+		if position.y <= GameScene.judgeLineY || isJudged {		// 始点ノーツが判定線を通過した後か、判定された後
 			// 理想軌道の判定線上に緑円を描く
 			// 楕円の縦幅を計算
 			let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance!, 2))
-			let lSquare = pow(horizontalDistance, 2) + pow(GameScene.laneWidth * 9/2 - longStartPos.x, 2)
+			let lSquare = pow(horizontalDistance, 2) + pow(GameScene.laneWidth * 9/2 - long.startPos.x, 2)
 			let denomOfAtan = lSquare + pow(verticalDistance!, 2) - pow(noteScale * GameScene.laneWidth / 2, 2)
 			guard 0 < denomOfAtan else {
 				return
@@ -220,13 +224,9 @@ class TapStart: Note {
 			
 			longImages.circle.yScale = deltaY / GameScene.laneWidth
 			longImages.circle.xScale = noteScale
-			longImages.circle.position = longStartPos
+			longImages.circle.position = long.startPos
 			longImages.circle.zRotation = atan(GameScene.laneWidth * CGFloat(3 - lane) / (horizontalDistance * 8))
-
 		}
-		
-		// longImage.longを更新(pathを変更)
-		longImages.long.path = path
 		
 		
 		// isHiddenを更新
@@ -287,7 +287,6 @@ class Middle: Note {
 	override func update(currentTime: TimeInterval) {
 		
 		let remainingPos = getPositionOnLane(currentTime: currentTime)				// 判定ラインまでの距離(3D)
-		let remainingPos2 = next.getPositionOnLane(currentTime: currentTime)		// 次ノーツの判定ラインまでの距離(3D)
 		
 		// 後続ノーツを先にupdate
 		if remainingPos <= GameScene.laneLength {
@@ -313,45 +312,49 @@ class Middle: Note {
 		setScale(currentTime: currentTime)
 		
 		
-		// longImageをpathのみ更新
-		let path = CGMutablePath()      // 台形の外周
+		// longImage.longを更新
+		var long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)	// 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
 		
-		let startNotePos = position 	// 中心座標
-		let endNotePos = next.position	// 中心座標
-		
-		if startNotePos.y > GameScene.judgeLineY && isJudged == false {	// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
-			path.move   (to: CGPoint(x: startNotePos.x - size/2/noteScale, y: startNotePos.y))  // 始点、台形の左下
-			path.addLine(to: CGPoint(x: startNotePos.x + size/2/noteScale, y: startNotePos.y))	// 右下
-			path.addLine(to: CGPoint(x: endNotePos.x + next.size/2/noteScale, y: endNotePos.y))	// 右上
-			path.addLine(to: CGPoint(x: endNotePos.x - next.size/2/noteScale, y: endNotePos.y))	// 左上
-			path.closeSubpath()
+		// 終点の情報を代入
+		if next.position.y < GameScene.horizonY {		// 終点ノーツが描画域内にあるとき
+			long.endPos = next.position
+			long.endWidth = next.size / noteScale
+		} else {										// 終点ノーツが描画域より奥にあるとき
+			let posY = GameScene.horizonY
+			let posX = ((next.position.y - GameScene.horizonY) * position.x + (GameScene.horizonY - position.y) * next.position.x)
+				/ (next.position.y - position.y)			// 始点と終点のx座標を内分
+			
+			long.endPos = CGPoint(x: posX, y: posY)
+			long.endWidth = GameScene.horizon / 7
+		}
+		// 始点の情報を代入
+		if position.y > GameScene.judgeLineY && !isJudged {		// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
+			long.startPos = position
+			long.startWidth = size / noteScale
 		} else {
-			// ロングの始点の中心位置を計算
-			var longStartPos = CGPoint(x: 0 ,y: GameScene.judgeLineY)
+			let posY = GameScene.judgeLineY
+			let posX = ((next.position.y - GameScene.judgeLineY) * position.x + (GameScene.judgeLineY - position.y) * next.position.x)
+				/ (next.position.y - position.y)			// 始点と終点のx座標を内分
 			
-//			let nowPos = (currentTime - GameScene.start) * GameScene.bpm/60		// y座標で比をとると、途中で発散するためbeatから比を求める
-//
-//			//建築予定地
-//			let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60	// y座標で比をとると、途中で発散するためbeatから比を求める
-			
-			let laneDifference:CGFloat = CGFloat(lane - next.lane)				// レーン差(符号込み)
-			let way1 = GameScene.laneWidth * laneDifference						// 判定線でのレーン差分のx座標の差(符号込み)
-			let way2 = -remainingPos / (remainingPos2 - remainingPos)			// 相似比
-			let way3 = (CGFloat(lane) + 3.0/2) * GameScene.laneWidth			// 始点レーンの中心のx座標
-			longStartPos.x = way3 - way1 * way2
-			
-			path.move   (to: CGPoint(x: longStartPos.x - GameScene.laneWidth/2, y: longStartPos.y))	// 始点、台形の左下
-			path.addLine(to: CGPoint(x: longStartPos.x + GameScene.laneWidth/2, y: longStartPos.y))	// 右下
-			path.addLine(to: CGPoint(x: endNotePos.x + next.size/2/noteScale, y: endNotePos.y))		// 右上
-			path.addLine(to: CGPoint(x: endNotePos.x - next.size/2/noteScale, y: endNotePos.y))		// 左上
-			path.closeSubpath()
-			
-			
-			// longImages.circleを更新
+			long.startPos = CGPoint(x: posX, y: posY)
+			long.startWidth = GameScene.laneWidth
+		}
+		
+		let path = CGMutablePath()      // 台形の外周
+		path.move   (to: CGPoint(x: long.startPos.x - long.startWidth/2, y: long.startPos.y))	// 始点、台形の左下
+		path.addLine(to: CGPoint(x: long.startPos.x + long.startWidth/2, y: long.startPos.y))	// 右下
+		path.addLine(to: CGPoint(x: long.endPos.x   + long.endWidth/2,   y: long.endPos.y))		// 右上
+		path.addLine(to: CGPoint(x: long.endPos.x   - long.endWidth/2,   y: long.endPos.y))		// 左上
+		path.closeSubpath()
+		longImages.long.path = path		// pathを変更(longImage.longの更新完了)
+		
+		
+		// longImages.circleを更新
+		if position.y <= GameScene.judgeLineY || isJudged {		// 始点ノーツが判定線を通過した後か、判定された後
 			// 理想軌道の判定線上に緑円を描く
 			// 楕円の縦幅を計算
 			let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance!, 2))
-			let lSquare = pow(horizontalDistance, 2) + pow(GameScene.laneWidth * 9/2 - longStartPos.x, 2)
+			let lSquare = pow(horizontalDistance, 2) + pow(GameScene.laneWidth * 9/2 - long.startPos.x, 2)
 			let denomOfAtan = lSquare + pow(verticalDistance!, 2) - pow(noteScale * GameScene.laneWidth / 2, 2)
 			guard 0 < denomOfAtan else {
 				return
@@ -360,12 +363,9 @@ class Middle: Note {
 			
 			longImages.circle.yScale = deltaY / GameScene.laneWidth
 			longImages.circle.xScale = noteScale
-			longImages.circle.position = longStartPos
+			longImages.circle.position = long.startPos
 			longImages.circle.zRotation = atan(GameScene.laneWidth * CGFloat(3 - lane) / (horizontalDistance * 8))
 		}
-		
-		// longImages.longを更新(pathを変更)
-		longImages.long.path = path
 		
 		
 		// isHiddenを更新
