@@ -526,13 +526,13 @@ class Note {
 	fileprivate func getPositionOnLane(currentTime: TimeInterval) -> CGFloat {
 	
 		var second: TimeInterval = 0.0
-		var i = GameScene.variableBPMList.count - 1
-		second += (beat - GameScene.variableBPMList[i].startPos) / (GameScene.variableBPMList[i].bpm/60)
-		while(i - 1 >= 0) {
-			second += (GameScene.variableBPMList[i].startPos - GameScene.variableBPMList[i-1].startPos) / (GameScene.variableBPMList[i-1].bpm/60)
+		var i = 0
+		while(i + 1 < GameScene.variableBPMList.count && GameScene.variableBPMList[i + 1].startPos < beat) {
+			second += (GameScene.variableBPMList[i + 1].startPos - GameScene.variableBPMList[i].startPos) / (GameScene.variableBPMList[i].bpm/60)
 			
-			i -= 1
+			i += 1
 		}
+		second += (beat - GameScene.variableBPMList[i].startPos) / (GameScene.variableBPMList[i].bpm/60)
 		second -= (currentTime - GameScene.start)
 		return CGFloat(second) * speed	// 判定線からの水平距離x
 	}
