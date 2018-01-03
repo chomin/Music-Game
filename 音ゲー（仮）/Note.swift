@@ -174,7 +174,7 @@ class TapStart: Note {
 		
 		
 		// longImage.longを更新
-		var long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)	// 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
+		let long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)	// 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
 		
 		// 終点の情報を代入
 		if next.position.y < GameScene.horizonY {		// 終点ノーツが描画域内にあるとき
@@ -313,7 +313,7 @@ class Middle: Note {
 		
 		
 		// longImage.longを更新
-		var long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)	// 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
+		let long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)	// 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
 		
 		// 終点の情報を代入
 		if next.position.y < GameScene.horizonY {		// 終点ノーツが描画域内にあるとき

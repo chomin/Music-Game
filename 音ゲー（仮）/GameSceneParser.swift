@@ -205,79 +205,79 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		// ロングノーツは一時配列に、その他はnotesに格納。その他命令も実行
 		var longNotes1: [Note] = []		// ロングノーツ1を一時的に格納
 		var longNotes2: [Note] = []		// ロングノーツ2を一時的に格納
-		for mainData in processedMainData {
-			let unitBeat = 4.0 / Double(mainData.body.count)	// 1オブジェクトの長さ(拍単位)
-			if let lane = laneMap[mainData.channel] {
+		for (bar, channel, body) in processedMainData {
+			let unitBeat = 4.0 / Double(body.count)	// 1オブジェクトの長さ(拍単位)
+			if let lane = laneMap[channel] {
 				// ノーツ指定チャンネルだったとき
-				for (index, ob) in mainData.body.enumerated() {
+				for (index, ob) in body.enumerated() {
 					switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
 					case .rest:
 						break
 					case .tap:
 						notes.append(
-							Tap     (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Tap     (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .flick:
 						notes.append(
-							Flick   (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Flick   (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .start1:
 						longNotes1.append(
-							TapStart(beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .middle1:
 						longNotes1.append(
-							Middle  (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .end1:
 						longNotes1.append(
-							TapEnd  (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .flickEnd1:
 						longNotes1.append(
-							FlickEnd(beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .start2:
 						longNotes2.append(
-							TapStart(beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .middle2:
 						longNotes2.append(
-							Middle  (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .end2:
 						longNotes2.append(
-							TapEnd  (beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					case .flickEnd2:
 						longNotes2.append(
-							FlickEnd(beatPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
 						)
 					}
 				}
-			} else if mainData.channel == 1 {
+			} else if channel == 1 {
 				// 楽曲開始命令の処理
-				for (index, ob) in mainData.body.enumerated() {
+				for (index, ob) in body.enumerated() {
 					if ob == "10" {
-						musicStartPos = Double(mainData.bar) * 4.0 + unitBeat * Double(index)
+						musicStartPos = Double(bar) * 4.0 + unitBeat * Double(index)
 						break
 					}
 				}
-			} else if mainData.channel == 3 {
+			} else if channel == 3 {
 				// BPM変更命令の処理
-				for (index, ob) in mainData.body.enumerated() {
+				for (index, ob) in body.enumerated() {
 					guard ob != "00" else {
 						continue
 					}
 					if let newBPM = Int(ob, radix: 16) {
-						GameScene.variableBPMList.append((bpm: Double(newBPM), startPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index)))
+						GameScene.variableBPMList.append((bpm: Double(newBPM), startPos: Double(bar) * 4.0 + unitBeat * Double(index)))
 					}
 				}
-			} else if mainData.channel == 8 {
+			} else if channel == 8 {
 				// BPM変更命令の処理(インデックス型テンポ変更)
-				for (index, ob) in mainData.body.enumerated() {
+				for (index, ob) in body.enumerated() {
 					if let newBPM = BPMTable[ob] {
-						GameScene.variableBPMList.append((bpm: Double(newBPM), startPos: Double(mainData.bar) * 4.0 + unitBeat * Double(index)))
+						GameScene.variableBPMList.append((bpm: Double(newBPM), startPos: Double(bar) * 4.0 + unitBeat * Double(index)))
 					}
 				}
 			}
