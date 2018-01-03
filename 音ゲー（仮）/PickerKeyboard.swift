@@ -102,7 +102,7 @@ extension PickerKeyboard: UIKeyInput {
 	
 	 // バックスペースが入力されたときに呼ばれる
 	func deleteBackward() {
-		textStore.remove(at: textStore.characters.index(before: textStore.characters.endIndex))
+		textStore.remove(at: textStore.index(before: textStore.endIndex))
 		setNeedsDisplay()
 	}
 }
