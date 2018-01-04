@@ -154,7 +154,7 @@ class TapStart: Note {
 		
 		// update不要なときはreturn
 		guard ((!isJudged || remainingPos > 0) && remainingPos < GameScene.laneLength)			// 描画域内にあるか、過ぎていても判定前なら更新
-			|| (remainingPos2 > 0 && remainingPos2 < GameScene.laneLength)						// 次ノーツが描画域内にあれば更新(ロングのため)
+			|| (remainingPos < 0 && 0 < remainingPos2)											// ロングノーツが描画域内にあれば更新
 			|| ((!longImages.circle.isHidden || !longImages.long.isHidden) && (next.isJudged || next.position.y < GameScene.judgeLineY))	// longImages消し忘れ防止
 			else {
 			return
