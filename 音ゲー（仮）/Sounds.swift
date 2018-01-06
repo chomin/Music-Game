@@ -114,13 +114,18 @@ class ActionSoundPlayers {
 	private let flick2: SoundSource
 	private let flick3: SoundSource
 	private let flick4: SoundSource
+	private let middle1:   SoundSource
+	private let middle2:   SoundSource
+	private let middle3:   SoundSource
+	private let middle4:   SoundSource
+	
 
 	private let kara1: SoundSource
 	private let kara2: SoundSource
 	
 
 	enum SoundType{
-		case tap, flick, kara
+		case tap, flick, kara, middle
 	}
 	
 	init() {
@@ -130,6 +135,7 @@ class ActionSoundPlayers {
 		// サウンドファイルのパスを生成
 		let tapSoundPath = Bundle.main.path(forResource: "Sounds/タップ", ofType: "wav")!    // mp3,m4a,ogg は不可
 		let flickSoundPath = Bundle.main.path(forResource: "Sounds/フリック", ofType: "wav")!
+		let middleSoundPath = Bundle.main.path(forResource: "Sounds/フリック", ofType: "wav")!	//TODO:いい素材を見つける
 		let karaSoundPath = Bundle.main.path(forResource: "Sounds/空打ち", ofType: "wav")!
 		
 		tap1   = SoundSource(fullFilePath: tapSoundPath)   ?? SoundSource()
@@ -140,6 +146,10 @@ class ActionSoundPlayers {
 		flick2 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
 		flick3 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
 		flick4 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
+		middle1 = SoundSource(fullFilePath: middleSoundPath) ?? SoundSource()
+		middle2 = SoundSource(fullFilePath: middleSoundPath) ?? SoundSource()
+		middle3 = SoundSource(fullFilePath: middleSoundPath) ?? SoundSource()
+		middle4 = SoundSource(fullFilePath: middleSoundPath) ?? SoundSource()
 		kara1  = SoundSource(fullFilePath: karaSoundPath)  ?? SoundSource()
 		kara2  = SoundSource(fullFilePath: karaSoundPath)  ?? SoundSource()
 	}
@@ -156,6 +166,11 @@ class ActionSoundPlayers {
 			else if !flick2.isPlaying { flick2.play() }
 			else if !flick3.isPlaying { flick3.play() }
 			else if !flick4.isPlaying { flick4.play() }
+		case .middle:
+			if      !middle1.isPlaying { middle1.play() }
+			else if !middle2.isPlaying { middle2.play() }
+			else if !middle3.isPlaying { middle3.play() }
+			else if !middle4.isPlaying { middle4.play() }
 		case .kara:
 			if      !kara1.isPlaying { kara1.play() }
 			else if !kara2.isPlaying { kara2.play() }
@@ -171,6 +186,10 @@ class ActionSoundPlayers {
 		flick2.setVolume(value)
 		flick3.setVolume(value)
 		flick4.setVolume(value)
+		middle1.setVolume(value)
+		middle2.setVolume(value)
+		middle3.setVolume(value)
+		middle4.setVolume(value)
 		kara1.setVolume(value)
 		kara2.setVolume(value)
 	}

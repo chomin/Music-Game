@@ -23,10 +23,11 @@ extension GameScene{
 	    case tap, flick, tapStart, middle, tapEnd, flickEnd
 	}
 	
+	
 	func judge(laneIndex:Int, type:NoteType) -> Bool{	  //対象ノーツが実在し、判定したかを返す
-		
+
 		let nextIndex = lanes[laneIndex].nextNoteIndex
-		
+
 		if nextIndex >= lanes[laneIndex].laneNotes.count{//最後まで判定が終わってる
 			return false
 		} else {
@@ -41,7 +42,7 @@ extension GameScene{
 			case .flickEnd: if !(note is FlickEnd) { return false }
 			}
 		}
-		
+
 		switch lanes[laneIndex].timeState {
 		case .parfect:
 			setJudgeLabelText(text: "parfect!!")
@@ -81,7 +82,7 @@ extension GameScene{
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
-		case .miss:
+		case .miss, .passed:
 			setJudgeLabelText(text: "miss!")
 			ResultScene.miss += 1
 			ResultScene.combo = 0
@@ -91,12 +92,12 @@ extension GameScene{
 			return true
 		default: break
 		}
-		
+
 		return false
-		
+
 	}
 	
-	func parfectMiddleJudge(laneIndex:Int) -> Bool{	  //対象ノーツが実在し、判定したかを返す(middleのparfect専用)
+	func parfectMiddleJudge(laneIndex:Int, currentTime: TimeInterval) -> Bool{	  //対象ノーツが実在し、判定したかを返す(middleのparfect専用)
 		
 		let nextIndex = lanes[laneIndex].nextNoteIndex
 		
@@ -106,8 +107,9 @@ extension GameScene{
 			return false
 		}
 		
+		lanes[laneIndex].update(currentTime: currentTime)
 		switch lanes[laneIndex].timeState {
-		case .parfect:
+		case .parfect:	//タップ直後とかでも入ってしまう？（updateとtouchesシリーズは並列処理されている？）
 			setJudgeLabelText(text: "parfect!!")
 			ResultScene.parfect += 1
 			ResultScene.combo += 1
