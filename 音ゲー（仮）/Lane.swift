@@ -27,9 +27,9 @@ class Lane{
 				}
 				
 				switch timeLag {
-				case 0..<0.09:
+				case 0..<0.07:
 					return .Front
-				case -0.09..<0:
+				case -0.07..<0:
 					return .Behind
 				default:
 					return .False
@@ -62,11 +62,11 @@ class Lane{
 				switch timeLag>0 ? timeLag : -timeLag {
 				case 0..<0.05:
 					return .parfect
-				case 0.05..<0.07:
+				case 0.05..<0.06:
 					return .great
-				case 0.07..<0.08:
+				case 0.06..<0.065:
 					return .good
-				case 0.08..<0.09:
+				case 0.065..<0.07:
 					return .bad
 //				case 0.1..<0.125:
 //					return .miss
