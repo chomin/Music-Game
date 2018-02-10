@@ -16,6 +16,7 @@ class Lane{
 	var nextNoteIndex = 0
 	//	var currentTime:TimeInterval = 0.0
 	var timeLag :TimeInterval = 0.0
+	var isTimeLagRenewed = false
 	var laneNotes:[Note] = [] //最初に全部格納する！
 	let laneIndex:Int!
 	//	var isTouched = false
@@ -59,7 +60,7 @@ class Lane{
 //					}
 //				}
 				
-				switch timeLag>0 ? timeLag : -timeLag {
+				switch abs(timeLag){
 				case 0..<0.05:
 					return .parfect
 				case 0.05..<0.06:
@@ -68,8 +69,8 @@ class Lane{
 					return .good
 				case 0.065..<0.07:
 					return .bad
-//				case 0.1..<0.125:
-//					return .miss
+				case 0.07..<0.08:
+					return .miss
 				default:
 					if timeLag > 0{
 						return .still
@@ -97,6 +98,7 @@ class Lane{
 		
 		//timeLagの更新
 		if laneNotes.count > 0 && nextNoteIndex < laneNotes.count{
+			
 			timeLag = GameScene.start - currentTime
 			for (index,i) in GameScene.variableBPMList.enumerated(){
 				if GameScene.variableBPMList.count > index+1 && laneNotes[nextNoteIndex].beat > GameScene.variableBPMList[index+1].startPos{
@@ -107,6 +109,7 @@ class Lane{
 				}
 			}
 			
+			self.isTimeLagRenewed = true	//パース前はtimeLagは更新されないので通知する必要あり
 		}
 	}
 	

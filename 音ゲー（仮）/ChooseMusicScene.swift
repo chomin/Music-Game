@@ -15,6 +15,9 @@ class ChooseMusicScene: SKScene {
 	
 	var picker:PickerKeyboard!
 	let playButton = UIButton()
+	let settingButton = UIButton()
+	let settingImage = UIImage(named: "SettingIcon")
+	let settingImageSelected = UIImage(named: "SettingIconSelected")
 	
 	
 	override func didMove(to view: SKView) {
@@ -31,7 +34,7 @@ class ChooseMusicScene: SKScene {
 		
 		//ボタンの設定
 		playButton.addTarget(self, action: #selector(onClickPlayButton(_:)), for: .touchUpInside)
-		playButton.frame = CGRect(x: 0,y: 0,width:self.frame.width/5 ,height: 50)
+		playButton.frame = CGRect(x: 0,y: 0, width:self.frame.width/5, height: 50)
 		playButton.backgroundColor = UIColor.red
 		playButton.layer.masksToBounds = true
 		playButton.setTitle("この曲で遊ぶ", for: UIControlState())
@@ -42,6 +45,13 @@ class ChooseMusicScene: SKScene {
 		playButton.layer.cornerRadius = 20.0
 		playButton.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72)
 		self.view?.addSubview(playButton)
+		
+		
+		settingButton.setImage(settingImage, for: .normal)
+		settingButton.setImage(settingImageSelected, for: .highlighted)
+		settingButton.addTarget(self, action: #selector(onClickSettingButton(_:)), for: .touchUpInside)
+		settingButton.frame = CGRect(x: self.frame.width*9.4/10,y: self.frame.width*0.1/10, width:self.frame.width/16, height: self.frame.width/16)//yは上からの座標
+		self.view?.addSubview(settingButton)
 	}
 	
 	override func update(_ currentTime: TimeInterval) {
@@ -49,12 +59,12 @@ class ChooseMusicScene: SKScene {
 	}
 	
 	@objc func onClickPlayButton(_ sender : UIButton){
+		//消す
+		hideMainContents()
 		
-		picker.isHidden = true
-		picker.resignFirstResponder()
-		playButton.isHidden = true
+		picker.resignFirstResponder()	//FirstResponderを放棄
 		
-		
+		//移動
 		let scene = GameScene(musicName:picker.textStore ,size: (view?.bounds.size)!)
 		let skView = view as SKView!
 		skView?.showsFPS = true
@@ -65,4 +75,22 @@ class ChooseMusicScene: SKScene {
 
 	}
 	
+	@objc func onClickSettingButton(_ sender : UIButton){
+		//消す
+		hideMainContents()
+		
+		//表示
+	}
+	
+	func showMainContents(){
+		picker.isHidden = false
+		playButton.isHidden = false
+		settingButton.isHidden = false
+	}
+	
+	func hideMainContents(){
+		picker.isHidden = true
+		playButton.isHidden = true
+		settingButton.isHidden = true
+	}
 }

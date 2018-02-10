@@ -14,10 +14,10 @@ import AVFoundation
 class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//
-	let judgeQueue = DispatchQueue(label: "judge_queue")	//キューに入れた処理内容を順番に実行（updateとtouchesシリーズから呼び出されるjudgeの並列処理防止用）
+//	let judgeQueue = DispatchQueue(label: "judge_queue")	//キューに入れた処理内容を順番に実行（updateとtouchesシリーズから呼び出されるjudgeの並列処理防止用）
 	
 	//タッチ情報
-	var allTouches:[(touch:UITouch,didJudgeFlick:Bool)] = []
+	var allTouches:[(touch:UITouch, isJudgeableFlick:Bool, isJudgeableFlickEnd:Bool)] = []
 	
 	//ラベル
 	var judgeLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
@@ -27,23 +27,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	//音楽プレイヤー
 	static var BGM: AVAudioPlayer?
 	let actionSoundSet = ActionSoundPlayers()
-	
-	
-	
-//	var flickSound1:AVAudioPlayer?    //同時に鳴らせるように2つ作る。多すぎると（多分）重いので２つにしておく。やっぱり２つだと遅延も起こるので４つ
-//	var flickSound2:AVAudioPlayer?
-//	var tapSound1:AVAudioPlayer?
-//	var tapSound2:AVAudioPlayer?
-//	var tapSound3:AVAudioPlayer?
-//	var tapSound4:AVAudioPlayer?
-//	var kara1:AVAudioPlayer?
-//	var kara2:AVAudioPlayer?
-//	var tapSoundResevation = 0
-//	var flickSoundResevation = 0
-//	var karaSoundResevation = 0
-//	var nextPlayTapNumber = 1
 
-	
 	
 	//画像(ノーツ以外)
 	var judgeLine:SKShapeNode!
@@ -82,7 +66,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	
 	init(musicName:String ,size:CGSize) {
-        self.musicName = musicName
+		self.musicName = musicName
 		super.init(size:size)
 		
 		// サウンドファイルのパスを生成
@@ -90,7 +74,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		let soundURL:URL = URL(fileURLWithPath: Path)
 		// AVAudioPlayerのインスタンスを作成
 		do {
-			GameScene.BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: nil)
+			GameScene.BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
 		} catch {
 			print("AVAudioPlayerインスタンス作成失敗")
 		}
@@ -101,7 +85,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
-
+	
 	
 	override func didMove(to view: SKView) {
 		
@@ -194,7 +178,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		}
 		
 		//画像、音楽、ラベルの設定
-//		setAllSounds()
+		//		setAllSounds()
 		setImages()
 		
 		// BGMの再生(時間指定)
@@ -232,39 +216,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	override func update(_ currentTime: TimeInterval) {
 		
-		//		//鳴らしそびれた音があれば鳴らす
-		//		if tapSoundResevation > 0{
-		//			print("tap予約発動")
-		//			playSound(type: .tap)
-		//
-		//			tapSoundResevation -= 1
-		//		}
-		//		if flickSoundResevation > 0{
-		//			playSound(type: .flick)
-		//			flickSoundResevation -= 1
-		//		}
-		//		if karaSoundResevation > 0{
-		//			playSound(type: .kara)
-		//			karaSoundResevation -= 1
-		//		}
-		
 		//ラベルの更新
 		comboLabel.text = String(ResultScene.combo)
-		
-		
-		
-		
-		
-		
 		
 		// 各ノーツの位置や大きさを更新
 		for note in notes {
 			note.update(currentTime: currentTime)
 		}
-		
-		
-		
-		
 		
 		// 同時押しラインの更新
 		for i in sameLines{
@@ -279,53 +237,54 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		//判定関係
 		//middleの判定（同じところで長押しのやつ）
-		judgeQueue.async {
+		//		judgeQueue.async {
+		
+		
+		for i in self.allTouches{
+			var pos = i.touch.location(in: self.view)
+			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
 			
-			
-			for i in self.allTouches{
-				var pos = i.touch.location(in: self.view)
-				pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+			if pos.y < self.frame.width/3{    //上界
 				
-				if pos.y < self.frame.width/3{    //上界
+				for j in 0...6{
 					
-					for j in 0...6{
+					let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
+					
+					if pos.x > buttonPos - self.halfBound && pos.x < buttonPos + self.halfBound {//ボタンの範囲
 						
-						let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
-						
-						if pos.x > buttonPos - self.halfBound && pos.x < buttonPos + self.halfBound {//ボタンの範囲
+						if self.parfectMiddleJudge(laneIndex: j, currentTime: currentTime){//middleの判定
 							
-							if self.parfectMiddleJudge(laneIndex: j, currentTime: currentTime){//middleの判定
-								
-								self.actionSoundSet.play(type: .middle)
-								break
-							}
+							self.actionSoundSet.play(type: .middle)
+							break
 						}
 					}
 				}
 			}
+		}
+		//			}
+		
+		
+		
+		//レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
+		
+		for (index,value) in self.lanes.enumerated(){
+			//			lanes[index].currentTime = currentTime
 			
-			
-			
-			//レーンの監視(過ぎて行ってないか)
-			
-			for (index,value) in self.lanes.enumerated(){
-				//			lanes[index].currentTime = currentTime
-				self.lanes[index].update(currentTime: currentTime)
-				if value.timeState == .passed {
-					self.setJudgeLabelText(text: "miss!")
-					ResultScene.miss += 1
-					ResultScene.combo = 0
-					self.removeChildren(in: [self.lanes[index].laneNotes[value.nextNoteIndex].image])	//ここで消しても大丈夫なはず
-					self.lanes[index].laneNotes[value.nextNoteIndex].isJudged = true
-					
-					//次のノーツを格納
-					self.lanes[index].nextNoteIndex += 1
-				}
+			self.lanes[index].update(currentTime: currentTime)
+			if value.timeState == .passed {
+				self.setJudgeLabelText(text: "miss!")
+				ResultScene.miss += 1
+				ResultScene.combo = 0
+				self.removeChildren(in: [self.lanes[index].laneNotes[value.nextNoteIndex].image])	//ここで消しても大丈夫なはず
+				self.lanes[index].laneNotes[value.nextNoteIndex].isJudged = true
+				
+				//次のノーツを格納
+				self.lanes[index].nextNoteIndex += 1
 			}
 		}
 	}
-	
-	
+
+
 	//判定ラベルのテキストを更新（アニメーション付き）
 	func setJudgeLabelText(text:String){
 		
@@ -345,7 +304,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//タッチ関係
 	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-		judgeQueue.async {
+		for i in self.lanes{
+			
+			if !(i.isTimeLagRenewed){ return }
+		}
+		
+//		judgeQueue.async {
 			for i in touches {//すべてのタッチに対して処理する（同時押しなどもあるため）
 				
 				var pos = i.location(in: self.view)
@@ -354,65 +318,104 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				
 				
 				//フリック判定したかを示すBoolを加えてallTouchにタッチ情報を付加
-				self.allTouches.append((i,false))
+				self.allTouches.append((i,true,true))
 				
 				if pos.y < self.frame.width/3{    //上界
 					
-					var doKara = false
-					
-					//				switch pos.x{
-					//				case self.frame.width/6 - halfBound ... self.frame.width*5/18 - halfBound:
-					//
-					//				}
-					
+					//判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
+					var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note)] = []
 					for (index,buttonPos) in self.buttonX.enumerated(){
 						
 						if pos.x >= buttonPos - self.halfBound && pos.x < buttonPos + self.halfBound {//ボタンの範囲
 							
-							//laneのisTouchedを更新
-							//						lanes[index].isTouched = true
+							if (self.lanes[index].timeState == .still)  || (self.lanes[index].timeState == .passed) { continue }
+							
+							let nextIndex = lanes[index].nextNoteIndex
+							if (nextIndex > lanes[index].laneNotes.count-1) { continue }
+							let note = lanes[index].laneNotes[nextIndex]
 							
 							if self.lanes[index].isObserved == .Behind {//middleの判定圏内（後）
-								
-								//parfect時に該当ボタンにいなければ、入ってきた時間で判定
-								if self.judge(laneIndex: index, type: .middle){
-									self.actionSoundSet.play(type: .middle)
-									doKara = false
-									break
-									
-								}
+								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note))
+								continue
 							}
 							
-							if self.judge(laneIndex: index, type: .tap) {//タップの判定
-								
-								self.actionSoundSet.play(type: .tap)
-								doKara = false
-								break
-								
-							}else if self.judge(laneIndex: index, type: .tapStart) {//始点の判定
-								
-								self.actionSoundSet.play(type: .tap)
-								doKara = false
-								break
-								
-							}else if self.lanes[index].timeState == .still{
-								doKara = true
+							
+							if (note is Tap) || (note is Flick) || (note is TapStart) {//flickが最近なら他を無視（ここでは判定しない）
+								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note))
+								continue
 							}
 						}
 					}
 					
-					if doKara == true{//
+					if nearbyNotes.isEmpty {
 						self.actionSoundSet.play(type: .kara)
+					}else{
+						nearbyNotes.sort(by: {$0.timelag < $1.timelag})
+						if (nearbyNotes[0].note is Tap) || (nearbyNotes[0].note is TapStart) {
+							if self.judge(laneIndex: nearbyNotes[0].laneIndex, timeLag: nearbyNotes[0].timelag) {
+								self.actionSoundSet.play(type: .tap)
+								self.allTouches[self.allTouches.count-1].isJudgeableFlick = false	//このタッチでのフリック判定を禁止
+							}else{
+								
+								print("判定失敗:tap")
+							}
+						}
 					}
+						
+						
+						
+					
+					
+//					var doKara = false
+//
+//					for (index,buttonPos) in self.buttonX.enumerated(){
+//
+//						if pos.x >= buttonPos - self.halfBound && pos.x < buttonPos + self.halfBound {//ボタンの範囲
+//
+//
+//
+//							if self.lanes[index].isObserved == .Behind {//middleの判定圏内（後）
+//
+//								//parfect時に該当ボタンにいなければ、入ってきた時間で判定
+//								if self.judge(laneIndex: index, type: .middle){
+//									self.actionSoundSet.play(type: .middle)
+//									doKara = false
+//									break
+//
+//								}
+//							}
+//
+//							if self.judge(laneIndex: index, type: .tap) {//タップの判定
+//
+//								self.actionSoundSet.play(type: .tap)
+//								doKara = false
+//								break
+//
+//							}else if self.judge(laneIndex: index, type: .tapStart) {//始点の判定
+//
+//								self.actionSoundSet.play(type: .tap)
+//								doKara = false
+//								break
+//
+//							}else if self.lanes[index].timeState == .still{
+//								doKara = true
+//							}
+//						}
+//					}
+					
+					
 				}
 			}
-		}
+//		}
 	}
 	
 	override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+		for i in self.lanes{
+			if !(i.isTimeLagRenewed){ return }
+		}
 		
-		judgeQueue.async {
-			
+//		judgeQueue.async {
+		
 			
 			for i in touches{
 				
@@ -434,8 +437,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				
 				if pos.y < self.frame.width/3{    //上界
 					
-					//pposループ
+					//判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
+					var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note)] = []
 					
+					//pposループ
 					for (index,buttonPos) in self.buttonX.enumerated(){
 						if ppos.x >= buttonPos - self.halfBound && ppos.x < buttonPos + self.halfBound{
 							//lane.isTouchedをリセット
@@ -444,7 +449,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 								
 								if self.lanes[index].isObserved == .Front {
 									//parfect時に該当ボタンにいなければ、入ってきた時間で判定
-									if self.judge(laneIndex: index, type: .middle){
+									if self.judge(laneIndex: index, timeLag: lanes[index].timeLag){
 										self.actionSoundSet.play(type: .middle)
 										break
 									}
@@ -453,41 +458,63 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 							}
 						}
 						
-						if moveDistance > 15{	//フリックの判定
+						//フリックの判定
+						let nextIndex = lanes[index].nextNoteIndex
+						if (nextIndex > lanes[index].laneNotes.count-1) { continue }
+						let note = lanes[index].laneNotes[nextIndex]
+						if moveDistance > 10 && self.lanes[index].timeState != .still && self.lanes[index].timeState != .passed {
 							
 							let touchIndex = self.allTouches.index(where: {$0.touch == i})!
-							let didJudgFlick = self.allTouches[touchIndex].didJudgeFlick
+							let isJudgeableFlick = self.allTouches[touchIndex].isJudgeableFlick
+							let isJudgeableFlickEnd = self.allTouches[touchIndex].isJudgeableFlickEnd
+
 							
-							if !didJudgFlick {//ただのフリックは一度だけ判定
-								if self.judge(laneIndex: index, type: .flick) || self.judge(laneIndex: index, type: .flickEnd){
-									self.allTouches[touchIndex].didJudgeFlick = true
-									self.actionSoundSet.play(type: .flick)
-									break
-								}
-							}else if self.judge(laneIndex: index, type: .flickEnd){
-								
+//							if isJudgeableFlick {//ただのフリックは一度だけ判定
+							if ((note is Flick) && isJudgeableFlick) || ((note is FlickEnd) && isJudgeableFlickEnd) {//flickが最近なら他を無視（ここでは判定しない）
+								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note))
+								continue
+							}
+							
+//								if self.judge(laneIndex: index, type: .flick) || self.judge(laneIndex: index, type: .flickEnd){
+//									self.allTouches[touchIndex].isJudgeableFlick = true
+//									self.actionSoundSet.play(type: .flick)
+//									break
+//								}
+//							}else if self.judge(laneIndex: index, type: .flickEnd){
+							
+//								self.actionSoundSet.play(type: .flick)
+//								break
+//							}
+						}
+					}
+					
+					if !(nearbyNotes.isEmpty) {
+					
+						nearbyNotes.sort(by: {$0.timelag < $1.timelag})
+						if (nearbyNotes[0].note is Flick) || (nearbyNotes[0].note is FlickEnd) {
+							if self.judge(laneIndex: nearbyNotes[0].laneIndex, timeLag: nearbyNotes[0].timelag) {
 								self.actionSoundSet.play(type: .flick)
-								break
+								self.allTouches[self.allTouches.count-1].isJudgeableFlick = false	//このタッチでのフリック判定を禁止
+								self.allTouches[self.allTouches.count-1].isJudgeableFlickEnd = false
+							}else{
+								print("判定失敗:flick")
 							}
 						}
 					}
 				}
-				//posループ
-//				for (index,buttonPos) in self.buttonX.enumerated(){
-//					if pos.x >= buttonPos - self.halfBound && pos.x < buttonPos + self.halfBound{
-//						//lane.isTouchedを更新
-//						//						lanes[index].isTouched = true
-//					}
-//				}
+
 				
 			}
-		}
+//		}
 	}
 	
 	override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+		for i in self.lanes{
+			if !(i.isTimeLagRenewed){ return }
+		}
 		
-		judgeQueue.async {
-			
+//		judgeQueue.async {
+		
 			
 			for i in touches {
 				
@@ -507,7 +534,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 							//						lanes[index].isTouched = false
 							if pos.x < buttonPos - self.halfBound || pos.x > buttonPos + self.halfBound{//移動後にレーンから外れていた場合
 								if self.lanes[index].isObserved == .Front {
-									if self.judge(laneIndex: index, type: .middle){
+									if self.judge(laneIndex: index, timeLag: self.lanes[index].timeLag){
 										self.actionSoundSet.play(type: .middle)
 										break
 									}
@@ -523,23 +550,35 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 							//lane.isTouchedをリセット
 							//						lanes[index].isTouched = false
 							if self.lanes[index].isObserved == .Front {
-								if self.judge(laneIndex: index, type: .middle){
+								if self.judge(laneIndex: index, timeLag: self.lanes[index].timeLag){
 									self.actionSoundSet.play(type: .middle)
 									break
 								}
 								
 							}
 							
-							if self.judge(laneIndex: index, type: .tapEnd){//離しの判定
-								
-								self.actionSoundSet.play(type: .tap)
-								break
+							let nextIndex = lanes[index].nextNoteIndex
+							if (nextIndex > lanes[index].laneNotes.count-1) { continue }
+							let note = lanes[index].laneNotes[nextIndex]
+							if (note is TapEnd){
+								if self.judge(laneIndex: index, timeLag: lanes[index].timeLag){//離しの判定
+									
+									self.actionSoundSet.play(type: .tap)
+									break
+								}
+							}else if ((note is Flick) || (note is FlickEnd)) && abs(lanes[index].timeLag)<0.08{	//flickなのにflickせずに離したらmiss
+								setJudgeLabelText(text: "miss!")
+								ResultScene.miss += 1
+								ResultScene.combo = 0
+								self.removeChildren(in: [lanes[index].laneNotes[nextIndex].image])
+								lanes[index].laneNotes[nextIndex].isJudged = true
+								lanes[index].nextNoteIndex += 1
 							}
 						}
 					}
 				}
 			}
-		}
+//		}
 	}
 	
 	

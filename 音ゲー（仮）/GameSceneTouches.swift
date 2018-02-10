@@ -24,27 +24,28 @@ extension GameScene{
 	}
 	
 	
-	func judge(laneIndex:Int, type:NoteType) -> Bool{	  //対象ノーツが実在し、判定したかを返す
+	func judge(laneIndex:Int, timeLag:TimeInterval) -> Bool{	  //対象ノーツが実在し、判定したかを返す.timeLagは（judge呼び出し時ではなく）タッチされた時のものを使用。
 
 		let nextIndex = lanes[laneIndex].nextNoteIndex
 
 		if nextIndex >= lanes[laneIndex].laneNotes.count{//最後まで判定が終わってる
 			return false
-		} else {
-			// 種類が違う場合を弾く(型で判別)
-			let note = lanes[laneIndex].laneNotes[nextIndex]
-			switch type {
-			case .tap:      if !(note is Tap)      { return false }
-			case .flick:    if !(note is Flick)    { return false }
-			case .tapStart: if !(note is TapStart) { return false }
-			case .middle:   if !(note is Middle)   { return false }
-			case .tapEnd:   if !(note is TapEnd)   { return false }
-			case .flickEnd: if !(note is FlickEnd) { return false }
-			}
 		}
+//		else {
+//			// 種類が違う場合を弾く(型で判別)
+//			let note = lanes[laneIndex].laneNotes[nextIndex]
+//			switch type {
+//			case .tap:      if !(note is Tap)      { return false }
+//			case .flick:    if !(note is Flick)    { return false }
+//			case .tapStart: if !(note is TapStart) { return false }
+//			case .middle:   if !(note is Middle)   { return false }
+//			case .tapEnd:   if !(note is TapEnd)   { return false }
+//			case .flickEnd: if !(note is FlickEnd) { return false }
+//			}
+//		}
 
-		switch lanes[laneIndex].timeState {
-		case .parfect:
+		switch abs(timeLag) {
+		case 0..<0.05:
 			setJudgeLabelText(text: "parfect!!")
 			ResultScene.parfect += 1
 			ResultScene.combo += 1
@@ -55,7 +56,7 @@ extension GameScene{
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
-		case .great:
+		case 0.05..<0.06:
 			setJudgeLabelText(text: "great!")
 			ResultScene.great += 1
 			ResultScene.combo += 1
@@ -66,7 +67,7 @@ extension GameScene{
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
-		case .good:
+		case 0.06..<0.065:
 			setJudgeLabelText(text: "good")
 			ResultScene.good += 1
 			ResultScene.combo = 0
@@ -74,7 +75,7 @@ extension GameScene{
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
-		case .bad:
+		case 0.065..<0.07:
 			setJudgeLabelText(text: "bad")
 			ResultScene.bad += 1
 			ResultScene.combo = 0
@@ -82,7 +83,7 @@ extension GameScene{
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
-		case .miss, .passed:
+		case 0.07..<0.08:
 			setJudgeLabelText(text: "miss!")
 			ResultScene.miss += 1
 			ResultScene.combo = 0
@@ -90,10 +91,11 @@ extension GameScene{
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
-		default: break
+		default:
+			return false
+		
 		}
 
-		return false
 
 	}
 	
