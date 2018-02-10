@@ -202,6 +202,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				}
 			}
 		}
+		for i in lanes{
+			i.isSetLaneNotes = true
+		}
 		
 		//		//bpmのstartTimeを計算してセット
 		//		for (index,i) in GameScene.variableBPMList.enumerated(){

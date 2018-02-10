@@ -18,6 +18,7 @@ class Lane{
 	var timeLag :TimeInterval = 0.0
 	var isTimeLagRenewed = false
 	var laneNotes:[Note] = [] //最初に全部格納する！
+	var isSetLaneNotes = false
 	let laneIndex:Int!
 	//	var isTouched = false
 	var isObserved:MiddleObsevationBool {	//middleの判定圏内
@@ -97,19 +98,26 @@ class Lane{
 	func update(currentTime: TimeInterval){
 		
 		//timeLagの更新
-		if laneNotes.count > 0 && nextNoteIndex < laneNotes.count{
-			
-			timeLag = GameScene.start - currentTime
-			for (index,i) in GameScene.variableBPMList.enumerated(){
-				if GameScene.variableBPMList.count > index+1 && laneNotes[nextNoteIndex].beat > GameScene.variableBPMList[index+1].startPos{
-					timeLag += (GameScene.variableBPMList[index+1].startPos - i.startPos)*60/i.bpm
-				}else{
-					timeLag += (laneNotes[nextNoteIndex].beat - i.startPos)*60/i.bpm
-					break
+		if isSetLaneNotes{
+			if laneNotes.count > 0 && nextNoteIndex < laneNotes.count{
+				
+				timeLag = GameScene.start - currentTime
+				for (index,i) in GameScene.variableBPMList.enumerated(){
+					if GameScene.variableBPMList.count > index+1 && laneNotes[nextNoteIndex].beat > GameScene.variableBPMList[index+1].startPos{
+						timeLag += (GameScene.variableBPMList[index+1].startPos - i.startPos)*60/i.bpm
+					}else{
+						timeLag += (laneNotes[nextNoteIndex].beat - i.startPos)*60/i.bpm
+						break
+					}
 				}
+				
+				self.isTimeLagRenewed = true	//パース前はtimeLagは更新されないので通知する必要あり
+				
+			}else{//このレーンが使われない場合
+				
+				self.isTimeLagRenewed = true
+				
 			}
-			
-			self.isTimeLagRenewed = true	//パース前はtimeLagは更新されないので通知する必要あり
 		}
 	}
 	

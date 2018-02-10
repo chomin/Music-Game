@@ -18,6 +18,7 @@ class ChooseMusicScene: SKScene {
 	let settingButton = UIButton()
 	let settingImage = UIImage(named: "SettingIcon")
 	let settingImageSelected = UIImage(named: "SettingIconSelected")
+	var settingLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
 	
 	
 	override func didMove(to view: SKView) {
@@ -52,6 +53,22 @@ class ChooseMusicScene: SKScene {
 		settingButton.addTarget(self, action: #selector(onClickSettingButton(_:)), for: .touchUpInside)
 		settingButton.frame = CGRect(x: self.frame.width*9.4/10,y: self.frame.width*0.1/10, width:self.frame.width/16, height: self.frame.width/16)//yは上からの座標
 		self.view?.addSubview(settingButton)
+		
+		//ラベルの設定
+		settingLabel = {() -> SKLabelNode in
+			let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+			
+			Label.fontSize = self.frame.height/13
+			Label.horizontalAlignmentMode = .center	//中央寄せ
+			Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - settingLabel.fontSize*3/2)
+			Label.fontColor = SKColor.black
+			Label.isHidden = true
+			Label.text = "設定画面"
+			
+			self.addChild(Label)
+			return Label
+		}()
+		
 	}
 	
 	override func update(_ currentTime: TimeInterval) {
@@ -80,6 +97,7 @@ class ChooseMusicScene: SKScene {
 		hideMainContents()
 		
 		//表示
+		showSettingContents()
 	}
 	
 	func showMainContents(){
@@ -92,5 +110,13 @@ class ChooseMusicScene: SKScene {
 		picker.isHidden = true
 		playButton.isHidden = true
 		settingButton.isHidden = true
+	}
+	
+	func showSettingContents(){
+		settingLabel.isHidden = false
+	}
+	
+	func hideSettingContents() {
+		settingLabel.isHidden = true
 	}
 }
