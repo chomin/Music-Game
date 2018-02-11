@@ -14,11 +14,15 @@ import GameplayKit
 class ChooseMusicScene: SKScene {
 	
 	var picker:PickerKeyboard!
-	let playButton = UIButton()
-	let settingButton = UIButton()
+	var playButton = UIButton()
+	var settingButton = UIButton()
 	let settingImage = UIImage(named: "SettingIcon")
 	let settingImageSelected = UIImage(named: "SettingIconSelected")
 	var settingLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
+	var plusButton = UIButton()
+	var plus10Button = UIButton()
+	var minusButton = UIButton()
+	var minus10Button = UIButton()
 	
 	
 	override func didMove(to view: SKView) {
@@ -34,18 +38,25 @@ class ChooseMusicScene: SKScene {
 		
 		
 		//ボタンの設定
-		playButton.addTarget(self, action: #selector(onClickPlayButton(_:)), for: .touchUpInside)
-		playButton.frame = CGRect(x: 0,y: 0, width:self.frame.width/5, height: 50)
-		playButton.backgroundColor = UIColor.red
-		playButton.layer.masksToBounds = true
-		playButton.setTitle("この曲で遊ぶ", for: UIControlState())
-		playButton.setTitleColor(UIColor.white, for: UIControlState())
-		playButton.setTitle("この曲で遊ぶ", for: UIControlState.highlighted)
-		playButton.setTitleColor(UIColor.black, for: UIControlState.highlighted)
-		playButton.isHidden = false
-		playButton.layer.cornerRadius = 20.0
-		playButton.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72)
-		self.view?.addSubview(playButton)
+		playButton = {() -> UIButton in
+			let Button = UIButton()
+			
+			Button.addTarget(self, action: #selector(onClickPlayButton(_:)), for: .touchUpInside)
+			Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/5, height: 50)
+			Button.backgroundColor = UIColor.red
+			Button.layer.masksToBounds = true
+			Button.setTitle("この曲で遊ぶ", for: UIControlState())
+			Button.setTitleColor(UIColor.white, for: UIControlState())
+			Button.setTitle("この曲で遊ぶ", for: UIControlState.highlighted)
+			Button.setTitleColor(UIColor.black, for: UIControlState.highlighted)
+			Button.isHidden = false
+			Button.layer.cornerRadius = 20.0
+			Button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72)
+			self.view?.addSubview(Button)
+			
+			return Button
+		}()
+		
 		
 		
 		settingButton.setImage(settingImage, for: .normal)
