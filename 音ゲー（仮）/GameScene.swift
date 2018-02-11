@@ -34,7 +34,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var sameLines:[(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
 	
 	// 楽曲データ
-    var musicName: String
+	var musicName: String
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
 	static var resignActiveTime:TimeInterval = 0.0
@@ -269,20 +269,17 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		
 		//レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
-		
-		for (index,value) in self.lanes.enumerated(){
-			//			lanes[index].currentTime = currentTime
-			
-			self.lanes[index].update(currentTime: currentTime)
-			if value.timeState == .passed {
-				self.setJudgeLabelText(text: "miss!")
+		for lane in lanes {
+			lane.update(currentTime: currentTime)
+			if lane.timeState == .passed {
+				setJudgeLabelText(text: "miss!")
 				ResultScene.miss += 1
 				ResultScene.combo = 0
-				self.removeChildren(in: [self.lanes[index].laneNotes[value.nextNoteIndex].image])	//ここで消しても大丈夫なはず
-				self.lanes[index].laneNotes[value.nextNoteIndex].isJudged = true
+				self.removeChildren(in: [lane.laneNotes[lane.nextNoteIndex].image])	//ここで消しても大丈夫なはず
+				lane.laneNotes[lane.nextNoteIndex].isJudged = true
 				
 				//次のノーツを格納
-				self.lanes[index].nextNoteIndex += 1
+				lane.nextNoteIndex += 1
 			}
 		}
 	}

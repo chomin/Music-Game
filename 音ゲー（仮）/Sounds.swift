@@ -133,25 +133,25 @@ class ActionSoundPlayers {
 		alureInitDevice(nil, nil)
 		
 		// サウンドファイルのパスを生成
-		let tapSoundPath = Bundle.main.path(forResource: "Sounds/タップ", ofType: "wav")!    // mp3,m4a,ogg は不可
-		let flickSoundPath = Bundle.main.path(forResource: "Sounds/フリック", ofType: "wav")!
+		let tapSoundPath    = Bundle.main.path(forResource: "Sounds/タップ",   ofType: "wav")!   // mp3,m4a,ogg は不可
+		let flickSoundPath  = Bundle.main.path(forResource: "Sounds/フリック", ofType: "wav")!
 		let middleSoundPath = Bundle.main.path(forResource: "Sounds/フリック", ofType: "wav")!	//TODO:いい素材を見つける
-		let karaSoundPath = Bundle.main.path(forResource: "Sounds/空打ち", ofType: "wav")!
+		let karaSoundPath   = Bundle.main.path(forResource: "Sounds/空打ち",   ofType: "wav")!
 		
-		tap1   = SoundSource(fullFilePath: tapSoundPath)   ?? SoundSource()
-		tap2   = SoundSource(fullFilePath: tapSoundPath)   ?? SoundSource()
-		tap3   = SoundSource(fullFilePath: tapSoundPath)   ?? SoundSource()
-		tap4   = SoundSource(fullFilePath: tapSoundPath)   ?? SoundSource()
-		flick1 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
-		flick2 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
-		flick3 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
-		flick4 = SoundSource(fullFilePath: flickSoundPath) ?? SoundSource()
+		tap1    = SoundSource(fullFilePath: tapSoundPath)    ?? SoundSource()
+		tap2    = SoundSource(fullFilePath: tapSoundPath)    ?? SoundSource()
+		tap3    = SoundSource(fullFilePath: tapSoundPath)    ?? SoundSource()
+		tap4    = SoundSource(fullFilePath: tapSoundPath)    ?? SoundSource()
+		flick1  = SoundSource(fullFilePath: flickSoundPath)  ?? SoundSource()
+		flick2  = SoundSource(fullFilePath: flickSoundPath)  ?? SoundSource()
+		flick3  = SoundSource(fullFilePath: flickSoundPath)  ?? SoundSource()
+		flick4  = SoundSource(fullFilePath: flickSoundPath)  ?? SoundSource()
 		middle1 = SoundSource(fullFilePath: middleSoundPath) ?? SoundSource()
 		middle2 = SoundSource(fullFilePath: middleSoundPath) ?? SoundSource()
 		middle3 = SoundSource(fullFilePath: middleSoundPath) ?? SoundSource()
 		middle4 = SoundSource(fullFilePath: middleSoundPath) ?? SoundSource()
-		kara1  = SoundSource(fullFilePath: karaSoundPath)  ?? SoundSource()
-		kara2  = SoundSource(fullFilePath: karaSoundPath)  ?? SoundSource()
+		kara1   = SoundSource(fullFilePath: karaSoundPath)   ?? SoundSource()
+		kara2   = SoundSource(fullFilePath: karaSoundPath)   ?? SoundSource()
 	}
 	
 	func play(type: SoundType) {

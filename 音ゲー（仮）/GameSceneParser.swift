@@ -65,7 +65,6 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		let dataFileType = splittedName[1]
 
 		// 譜面データファイルのパスを取得
-		// iPhone内のパスを指定するように変えてね
 		if let path = Bundle.main.path(forResource: "Sounds/"+dataFileName, ofType: dataFileType) {
 			do {
 		        // ファイルの内容を取得する
