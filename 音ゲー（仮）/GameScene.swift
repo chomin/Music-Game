@@ -423,6 +423,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			
 			for i in touches{
 				
+				let touchIndex = self.allTouches.index(where: {$0.touch == i})!
+				
 				var pos = i.location(in: self.view)
 				var ppos = i.previousLocation(in: self.view)
 				
@@ -466,9 +468,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						let nextIndex = lanes[index].nextNoteIndex
 						if (nextIndex > lanes[index].laneNotes.count-1) { continue }
 						let note = lanes[index].laneNotes[nextIndex]
-						if moveDistance > 10 && self.lanes[index].timeState != .still && self.lanes[index].timeState != .passed {
+						if moveDistance > 12 && self.lanes[index].timeState != .still && self.lanes[index].timeState != .passed {	//10は小さすぎ、15は大きすぎ
 							
-							let touchIndex = self.allTouches.index(where: {$0.touch == i})!
+							
 							let isJudgeableFlick = self.allTouches[touchIndex].isJudgeableFlick
 							let isJudgeableFlickEnd = self.allTouches[touchIndex].isJudgeableFlickEnd
 
@@ -498,8 +500,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						if (nearbyNotes[0].note is Flick) || (nearbyNotes[0].note is FlickEnd) {
 							if self.judge(laneIndex: nearbyNotes[0].laneIndex, timeLag: nearbyNotes[0].timelag) {
 								self.actionSoundSet.play(type: .flick)
-								self.allTouches[self.allTouches.count-1].isJudgeableFlick = false	//このタッチでのフリック判定を禁止
-								self.allTouches[self.allTouches.count-1].isJudgeableFlickEnd = false
+								self.allTouches[touchIndex].isJudgeableFlick = false	//このタッチでのフリック判定を禁止
+								self.allTouches[touchIndex].isJudgeableFlickEnd = false
 							}else{
 								print("判定失敗:flick")
 							}
