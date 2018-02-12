@@ -20,7 +20,10 @@ class PickerKeyboard: UIControl {
 		"残酷な天使のテーゼ",
 		"にめんせい☆ウラオモテライフ！",
 		"READY!!",
-        "自分REST@RT"
+		"自分REST@RT",
+		"Thank You!",
+		"Welcome!!",
+		"Brand New Theater!"
 	]
 
 	var textStore: String = "シュガーソングとビターステップ"	//入力文字列を保存するためのプロパティ
