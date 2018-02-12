@@ -10,8 +10,8 @@ import SpriteKit
 
 class Tap: Note {
 	
-	override init(beatPos beat: Double, lane: Int) {
-		super.init(beatPos: beat, lane: lane)
+	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
 		// imageのインスタンス(白円)を作成
 		self.image = SKShapeNode(circleOfRadius: GameScene.laneWidth / 2)
@@ -58,8 +58,8 @@ class Tap: Note {
 
 class Flick: Note {
 	
-	override init(beatPos beat: Double, lane: Int) {
-		super.init(beatPos: beat, lane: lane)
+	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
 		// imageのインスタンス(マゼンタ三角形)を作成
 		let length = GameScene.laneWidth / 2 // 三角形一辺の長さの半分
@@ -114,8 +114,8 @@ class TapStart: Note {
 	var next = Note()				// 次のノーツ（仮のインスタンス）
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	
-	override init(beatPos beat: Double, lane: Int) {
-		super.init(beatPos: beat, lane: lane)
+	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
 		// imageのインスタンス(緑円)を作成
 		image = SKShapeNode(circleOfRadius: GameScene.laneWidth / 2)
@@ -261,8 +261,8 @@ class Middle: Note {
 		}
 	}
 	
-    override init(beatPos beat: Double, lane: Int) {
-        super.init(beatPos: beat, lane: lane)
+    override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+        super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
 		// imageのインスタンス(緑線分)を作成
 		var points = [
@@ -389,8 +389,8 @@ class Middle: Note {
 
 class TapEnd: Note {
 	
-	override init(beatPos beat: Double, lane: Int) {
-		super.init(beatPos: beat, lane: lane)
+	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
 		// imageのインスタンス(緑円)を作成
 		image = SKShapeNode(circleOfRadius: GameScene.laneWidth / 2)
@@ -431,8 +431,8 @@ class TapEnd: Note {
 
 class FlickEnd: Note {
 	
-	override init(beatPos beat: Double, lane: Int) {
-		super.init(beatPos: beat, lane: lane)
+	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
 		// imageのインスタンス(マゼンタ三角形)を作成
 		let length = GameScene.laneWidth / 2 // 三角形一辺の長さの半分
@@ -504,20 +504,22 @@ class Note {
 	}
 	
 	let noteScale: CGFloat = 1.3	// レーン幅に対するノーツの幅の倍率
-	let speed: CGFloat = 1350.0		// スピード
+	let speed: CGFloat  		// スピード
 	// 立体感を出すための定数
 	let horizontalDistance:CGFloat = GameScene.horizontalDistance		//画面から目までの水平距離a（約5000で10cmほど）
 	let verticalDistance = GameScene.verticalDistance	//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
 														//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
 
 	
-    init(beatPos beat: Double, lane: Int) {
+	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+	  self.speed = 1350.0 * speedRatio
         self.beat = beat
         self.lane = lane
     }
 	init() {
 		self.beat = 0
 		self.lane = 0
+		self.speed = 1350.0
 	}
 	
 	func update(currentTime: TimeInterval) {}    // ノーツの座標等の更新、毎フレーム呼ばれる

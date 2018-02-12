@@ -214,43 +214,43 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 						break
 					case .tap:
 						notes.append(
-							Tap     (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Tap     (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
 						)
 					case .flick:
 						notes.append(
-							Flick   (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Flick   (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
 						)
 					case .start1:
 						longNotes1.append(
-							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
 						)
 					case .middle1:
 						longNotes1.append(
-							Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
 						)
 					case .end1:
 						longNotes1.append(
-							TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
 						)
 					case .flickEnd1:
 						longNotes1.append(
-							FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
 						)
 					case .start2:
 						longNotes2.append(
-							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
 						)
 					case .middle2:
 						longNotes2.append(
-							Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
 						)
 					case .end2:
 						longNotes2.append(
-							TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
 						)
 					case .flickEnd2:
 						longNotes2.append(
-							FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane)
+							FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
 						)
 					}
 				}

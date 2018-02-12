@@ -61,12 +61,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	
 	var halfBound:CGFloat! // 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
+
 	
 	var buttonX:[CGFloat] = []
+
+    	let speedRatio:CGFloat
 	
-	
-	init(musicName:String ,size:CGSize) {
+	init(musicName:String ,size:CGSize, speedRatioInt:UInt) {
 		self.musicName = musicName
+		self.speedRatio = CGFloat(speedRatioInt)/100
 		super.init(size:size)
 		
 		// サウンドファイルのパスを生成
@@ -123,11 +126,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 			Label.fontSize = self.frame.width/36
 			Label.horizontalAlignmentMode = .center	//中央寄せ
 			Label.position = CGPoint(x:self.frame.midX, y:self.frame.width/9*2)
-			Label.fontColor=SKColor.yellow
+			Label.fontColor = SKColor.yellow
 			
 			self.addChild(Label)
 			return Label
 		}()
+		
 		comboLabel = {() -> SKLabelNode in
 			let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
 			
