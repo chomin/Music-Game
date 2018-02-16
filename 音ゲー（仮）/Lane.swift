@@ -21,17 +21,36 @@ class Lane{
 	var isSetLaneNotes = false
 	let laneIndex:Int!
 	//	var isTouched = false
+	
+	var isJudgeRange:Bool{
+		get{
+			guard isTimeLagRenewed else {
+				return false
+			}
+			switch self.getTimeState(timeLag: timeLag) {
+			case .parfect, .great, .good, .bad, .miss:
+				return true
+			default:
+				return false
+			}
+			
+		}
+	}
 	var isObserved:MiddleObsevationBool {	//middleの判定圏内
 		get{
-			if laneNotes.count > 0 && nextNoteIndex < laneNotes.count{
+			if self.isTimeLagRenewed{
+				guard nextNoteIndex < laneNotes.count else{
+					return .False
+				}
+				
 				guard laneNotes[nextNoteIndex] is Middle else {
 					return .False
 				}
 				
 				switch timeLag {
-				case 0..<0.07:
+				case 0..<0.1:
 					return .Front
-				case -0.07..<0:
+				case -0.1..<0:
 					return .Behind
 				default:
 					return .False
@@ -46,39 +65,10 @@ class Lane{
 	
 	var timeState:TimeState{
 		get{
-			if laneNotes.count > 0 && nextNoteIndex < laneNotes.count{
+			if self.isTimeLagRenewed{
 				
-				//				var timeLag = (laneNotes[nextNoteIndex].pos)*60/GameScene.bpm + GameScene.start - currentTime
+				return self.getTimeState(timeLag: timeLag)
 				
-				//建築予定地
-//				var timeLag = GameScene.start - currentTime
-//				for (index,i) in GameScene.variableBPMList.enumerated(){//timeLag計算
-//					if GameScene.variableBPMList.count > index+1 && laneNotes[nextNoteIndex].beat > GameScene.variableBPMList[index+1].startPos{
-//						timeLag += (GameScene.variableBPMList[index+1].startPos - i.startPos)*60/i.bpm
-//					}else{
-//						timeLag += (laneNotes[nextNoteIndex].beat - i.startPos)*60/i.bpm
-//						break
-//					}
-//				}
-				
-				switch abs(timeLag){
-				case 0..<0.05:
-					return .parfect
-				case 0.05..<0.06:
-					return .great
-				case 0.06..<0.065:
-					return .good
-				case 0.065..<0.07:
-					return .bad
-				case 0.07..<0.08:
-					return .miss
-				default:
-					if timeLag > 0{
-						return .still
-					}else{
-						return .passed
-					}
-				}
 			}else{
 				return .still
 			}
@@ -117,6 +107,32 @@ class Lane{
 				
 				self.isTimeLagRenewed = true
 				
+			}
+		}
+	}
+	
+	func getTimeState(timeLag:TimeInterval) -> TimeState{
+		guard self.isTimeLagRenewed else {
+			print("timeLagが不正です")
+			return .still
+		}
+		
+		switch abs(timeLag){
+		case 0..<0.05:
+			return .parfect
+		case 0.05..<0.08:
+			return .great
+		case 0.08..<0.085:
+			return .good
+		case 0.085..<0.09:
+			return .bad
+		case 0.09..<0.1:
+			return .miss
+		default:
+			if timeLag > 0{
+				return .still
+			}else{
+				return .passed
 			}
 		}
 	}

@@ -44,8 +44,8 @@ extension GameScene{
 //			}
 //		}
 
-		switch abs(timeLag) {
-		case 0..<0.05:
+		switch lanes[laneIndex].getTimeState(timeLag: timeLag) {
+		case .parfect:
 			setJudgeLabelText(text: "parfect!!")
 			ResultScene.parfect += 1
 			ResultScene.combo += 1
@@ -56,7 +56,7 @@ extension GameScene{
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
-		case 0.05..<0.06:
+		case .great:
 			setJudgeLabelText(text: "great!")
 			ResultScene.great += 1
 			ResultScene.combo += 1
@@ -67,7 +67,7 @@ extension GameScene{
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
-		case 0.06..<0.065:
+		case .good:
 			setJudgeLabelText(text: "good")
 			ResultScene.good += 1
 			ResultScene.combo = 0
@@ -75,7 +75,7 @@ extension GameScene{
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
-		case 0.065..<0.07:
+		case .bad:
 			setJudgeLabelText(text: "bad")
 			ResultScene.bad += 1
 			ResultScene.combo = 0
@@ -83,7 +83,7 @@ extension GameScene{
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
-		case 0.07..<0.08:
+		case .miss:
 			setJudgeLabelText(text: "miss!")
 			ResultScene.miss += 1
 			ResultScene.combo = 0
