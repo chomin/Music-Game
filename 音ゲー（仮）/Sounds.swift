@@ -193,6 +193,23 @@ class ActionSoundPlayers {
 		kara1.setVolume(value)
 		kara2.setVolume(value)
 	}
+	
+	func stopAll() {
+		tap1.stop()
+		tap2.stop()
+		tap3.stop()
+		tap4.stop()
+		flick1.stop()
+		flick2.stop()
+		flick3.stop()
+		flick4.stop()
+		middle1.stop()
+		middle2.stop()
+		middle3.stop()
+		middle4.stop()
+		kara1.stop()
+		kara2.stop()
+	}
 }
 
 
