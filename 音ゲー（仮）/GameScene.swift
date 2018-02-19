@@ -11,9 +11,6 @@ import SpriteKit
 import GameplayKit
 import AVFoundation
 
-enum TimeState {
-	case miss,bad,good,great,parfect,still,passed
-}
 class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//
@@ -46,29 +43,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var genre = ""				// ジャンル
 	var title = ""				// タイトル
 	var artist = ""				// アーティスト
-//	static var bpm = 132.0			// Beats per Minute
-//	//static var bpm:[(bpm:Double,startPos:Double)] = []	//建築予定地
 	var playLevel = 0			// 難易度
 	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
 	static var variableBPMList: [(bpm: Double, startPos: Double)] = []		// 可変BPM情報
 	var lanes:[Lane] = [Lane(laneIndex:0),Lane(laneIndex:1),Lane(laneIndex:2),Lane(laneIndex:3),Lane(laneIndex:4),Lane(laneIndex:5),Lane(laneIndex:6)]		// レーン
 	
-	static var horizon:CGFloat = 0  	// 水平線の長さ
-	static var horizonY:CGFloat = 0 	// 水平線のy座標
-	static var laneWidth:CGFloat = 0	// 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
-	static var laneLength:CGFloat = 0	// 3D上でのレーン長
-	static var judgeLineY: CGFloat = 0	// 判定線のy座標
-	// 立体感を出すための定数
-	static let horizontalDistance:CGFloat = 250		// 画面から目までの水平距離a（約5000で10cmほど）
-	static var verticalDistance:CGFloat!			// 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
 	
+	let speedRatio:CGFloat
 	
-	var halfBound:CGFloat! // 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
-
-	
-	var buttonX:[CGFloat] = []	//各レーンの中心のx座標
-
-    	let speedRatio:CGFloat
 	
 	init(musicName:String ,size:CGSize, speedRatioInt:UInt) {
 		self.musicName = musicName
@@ -94,24 +76,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	
 	override func didMove(to view: SKView) {
-		
-		halfBound = self.frame.width/10	//1/18~1/9の値にすること
-		GameScene.laneWidth = self.frame.width/9
-		//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
-		GameScene.horizonY = self.frame.height*15/16	//モデル値
-		GameScene.judgeLineY = self.frame.width/9
-		GameScene.verticalDistance = GameScene.horizonY - self.frame.width/14	// GameScene.horizonY - self.frame.width/14
-		
-		let R = sqrt(pow(GameScene.horizontalDistance, 2) + pow(GameScene.verticalDistance!, 2))	// 視点から判定線までの距離(射影する球の半径)
-		let laneHeight = GameScene.horizonY - GameScene.judgeLineY									// レーンの高さ(画面上)
-		GameScene.laneLength = pow(R, 2) / (GameScene.verticalDistance / tan(laneHeight/R) - GameScene.horizontalDistance)	// レーン長(3D)
-		GameScene.horizon = 2 * GameScene.horizontalDistance * atan(GameScene.laneWidth * 7/2 / (GameScene.horizontalDistance + GameScene.laneLength))
-		
-		
-		//ボタンの位置をセット
-		for i in 0...6{
-			buttonX.append(self.frame.width/6 + CGFloat(i)*GameScene.laneWidth)
-		}
+
+		// 寸法に関する定数をセット
+		Dimensions.createInstance(frame: self.frame)
 		
 		//リザルトの初期化
 		ResultScene.parfect = 0
@@ -251,7 +218,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 					
 					let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
 					
-					if pos.x > buttonPos - self.halfBound && pos.x < buttonPos + self.halfBound {//ボタンの範囲
+					if pos.x > buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {//ボタンの範囲
 						
 						if self.parfectMiddleJudge(laneIndex: j, currentTime: currentTime){//middleの判定
 							
@@ -324,9 +291,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 					
 					//判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
 					var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note)] = []
-					for (index,buttonPos) in self.buttonX.enumerated(){
+					for (index,buttonPos) in Dimensions.buttonX.enumerated(){
 						
-						if pos.x >= buttonPos - self.halfBound && pos.x < buttonPos + self.halfBound {//ボタンの範囲
+						if pos.x >= buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {//ボタンの範囲
 							
 							if (self.lanes[index].timeState == .still)  || (self.lanes[index].timeState == .passed) { continue }
 							
@@ -400,10 +367,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 					var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note)] = []
 					
 					//pposループ
-					for (index,buttonPos) in self.buttonX.enumerated(){
-						if ppos.x >= buttonPos - self.halfBound && ppos.x < buttonPos + self.halfBound{
+					for (index,buttonPos) in Dimensions.buttonX.enumerated(){
+						if ppos.x >= buttonPos - Dimensions.halfBound && ppos.x < buttonPos + Dimensions.halfBound{
 							//lane.isTouchedをリセット
-							if pos.x < buttonPos - self.halfBound || pos.x > buttonPos + self.halfBound{//移動後にレーンから外れていた場合
+							if pos.x < buttonPos - Dimensions.halfBound || pos.x > buttonPos + Dimensions.halfBound{//移動後にレーンから外れていた場合
 								//							lanes[index].isTouched = false
 								
 								if self.lanes[index].isObserved == .Front {
@@ -480,11 +447,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				
 				if pos.y < self.frame.width/3{    //上界
 					//pposループ
-					for (index,buttonPos) in self.buttonX.enumerated(){
-						if ppos.x >= buttonPos - self.halfBound && ppos.x < buttonPos + self.halfBound{
+					for (index,buttonPos) in Dimensions.buttonX.enumerated(){
+						if ppos.x >= buttonPos - Dimensions.halfBound && ppos.x < buttonPos + Dimensions.halfBound{
 							//lane.isTouchedをリセット(離すので確定)
 							//						lanes[index].isTouched = false
-							if pos.x < buttonPos - self.halfBound || pos.x > buttonPos + self.halfBound{//移動後にレーンから外れていた場合
+							if pos.x < buttonPos - Dimensions.halfBound || pos.x > buttonPos + Dimensions.halfBound{//移動後にレーンから外れていた場合
 								if self.lanes[index].isObserved == .Front {
 									if self.judge(laneIndex: index, timeLag: self.lanes[index].timeLag){
 										self.actionSoundSet.play(type: .middle)
@@ -498,9 +465,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						}
 					}
 					//posループ
-					for (index,buttonPos) in self.buttonX.enumerated(){
+					for (index,buttonPos) in Dimensions.buttonX.enumerated(){
 						
-						if pos.x >= buttonPos - self.halfBound && pos.x < buttonPos + self.halfBound {//ボタンの範囲
+						if pos.x >= buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {//ボタンの範囲
 							//lane.isTouchedをリセット
 							//						lanes[index].isTouched = false
 							if self.lanes[index].isObserved == .Front {
@@ -567,6 +534,68 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	}
 	
 }
+
+
+// 寸法に関する定数を提供(シングルトン)
+class Dimensions {
+	let horizonLength: CGFloat  // 水平線の長さ
+	let horizonY: CGFloat 		// 水平線のy座標
+	let laneWidth: CGFloat		// 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
+	let laneLength: CGFloat		// 3D上でのレーン長
+	let judgeLineY: CGFloat		// 判定線のy座標
+	let halfBound: CGFloat		// 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
+	var buttonX: [CGFloat]		//各レーンの中心のx座標
+	// 立体感を出すための定数
+	let horizontalDistance: CGFloat = 250	// 画面から目までの水平距離a（約5000で10cmほど）
+	let verticalDistance: CGFloat			// 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
+	let R: CGFloat							// 視点から判定線までの距離(射影する球の半径)
+	
+	private static var instance: Dimensions?	// 唯一のインスタンス
+	
+	private init(frame: CGRect) {
+		self.halfBound = frame.width / 10	// 1/18~1/9の値にすること
+		self.laneWidth = frame.width / 9
+		// モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
+		self.horizonY = frame.height * 15 / 16	// モデル値
+		self.judgeLineY = frame.width / 9
+		self.verticalDistance = horizonY - frame.width / 14
+		self.R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
+		
+		let laneHeight = horizonY - judgeLineY				// レーンの高さ(画面上)
+		self.laneLength = pow(R, 2) / (verticalDistance / tan(laneHeight/R) - horizontalDistance)	// レーン長(3D)
+		self.horizonLength = 2 * horizontalDistance * atan(laneWidth * 7/2 / (horizontalDistance + laneLength))
+		
+		// ボタンの位置をセット
+		buttonX = []
+		for i in 0...6 {
+			buttonX.append(frame.width/6 + CGFloat(i)*laneWidth)
+		}
+	}
+	
+	// これらクラスプロパティから、定数にアクセスする(createInstanceされてなければ全て0)
+	static var horizonLength:      CGFloat  { return Dimensions.instance?.horizonLength      ??  CGFloat(0) }
+	static var horizonY:           CGFloat  { return Dimensions.instance?.horizonY           ??  CGFloat(0) }
+	static var laneWidth:          CGFloat  { return Dimensions.instance?.laneWidth          ??  CGFloat(0) }
+	static var laneLength:         CGFloat  { return Dimensions.instance?.laneLength         ??  CGFloat(0) }
+	static var judgeLineY:         CGFloat  { return Dimensions.instance?.judgeLineY         ??  CGFloat(0) }
+	static var halfBound:          CGFloat  { return Dimensions.instance?.halfBound          ??  CGFloat(0) }
+	static var horizontalDistance: CGFloat  { return Dimensions.instance?.horizontalDistance ??  CGFloat(0) }
+	static var verticalDistance:   CGFloat  { return Dimensions.instance?.verticalDistance   ??  CGFloat(0) }
+	static var R:                  CGFloat  { return Dimensions.instance?.R                  ??  CGFloat(0) }
+	static var buttonX:           [CGFloat] { return Dimensions.instance?.buttonX            ?? [CGFloat]() }
+	
+	// この関数のみが唯一Dimensionsクラスをインスタンス化できる
+	static func createInstance(frame: CGRect) {
+		// 初回のみ有効
+		if self.instance == nil {
+			self.instance = Dimensions(frame: frame)
+		}
+	}
+}
+
+
+
+
 
 
 
