@@ -95,7 +95,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	override func didMove(to view: SKView) {
 		
-		halfBound = self.frame.width/12	//1/18~1/9の値にすること
+		halfBound = self.frame.width/10	//1/18~1/9の値にすること
 		GameScene.laneWidth = self.frame.width/9
 		//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
 		GameScene.horizonY = self.frame.height*15/16	//モデル値
@@ -270,7 +270,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		//レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
 		for lane in lanes {
 			lane.update(currentTime: currentTime)
-			if lane.timeState == .passed {
+			if lane.timeState == .passed && lane.nextNoteIndex < lane.laneNotes.count{
 				setJudgeLabelText(text: "miss!")
 				ResultScene.miss += 1
 				ResultScene.combo = 0
@@ -303,6 +303,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//タッチ関係
 	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+		print("began start")
 		for i in self.lanes{
 			
 			if !(i.isTimeLagRenewed){ return }
@@ -367,9 +368,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				}
 			}
 //		}
+		
+		print("began end")
 	}
 	
 	override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+		print("move start")
+		
 		for i in self.lanes{
 			if !(i.isTimeLagRenewed){ return }
 		}
@@ -418,7 +423,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 						let nextIndex = lanes[index].nextNoteIndex
 						if (nextIndex > lanes[index].laneNotes.count-1) { continue }
 						let note = lanes[index].laneNotes[nextIndex]
-						if moveDistance > 12 && self.lanes[index].timeState != .still && self.lanes[index].timeState != .passed {	//10は小さすぎ、15は大きすぎ
+						if moveDistance > 10 && self.lanes[index].timeState != .still && self.lanes[index].timeState != .passed {
 							
 							
 							let isJudgeableFlick = self.allTouches[touchIndex].isJudgeableFlick
@@ -449,6 +454,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 				
 			}
 //		}
+		
+		print("move end")
 	}
 	
 	override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
