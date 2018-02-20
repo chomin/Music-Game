@@ -19,26 +19,26 @@ class Tap: Note {
 		image.isHidden = true	// 初期状態では隠しておく
 	}
 	
-	override func update(currentTime: TimeInterval) {
+	override func update(_ currentTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
 		
-		let remainingPos = getPositionOnLane(currentTime: currentTime)		// 判定ラインまでの距離(3D)
-		
-		guard (!isJudged && remainingPos < Dimensions.laneLength) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
+		super.update(currentTime, BPMs)
+
+		guard (!isJudged && positionOnLane < Dimensions.laneLength) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
 			return
 		}
 		
 		// x座標とy座標を計算しpositionを変更
-		setPos(currentTime: currentTime)
+		setPos()
 		
 		// 縦と横の大きさを計算し、imageのスケールを変更
-		setScale(currentTime: currentTime)
+		setScale()
 		
 		// ノーツが視点を向くように
-		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (getPositionOnLane(currentTime: currentTime) + Dimensions.horizontalDistance * 8))
+		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (positionOnLane + Dimensions.horizontalDistance * 8))
 		
 		// image.isHiddenを更新
 		if position.y > Dimensions.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
@@ -69,23 +69,23 @@ class Flick: Note {
 		image.isHidden = true	// 初期状態では隠しておく
 	}
 	
-	override func update(currentTime: TimeInterval) {
+	override func update(_ currentTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
 		
-		let remainingPos = getPositionOnLane(currentTime: currentTime)		// 判定ラインまでの距離(3D)
+		super.update(currentTime, BPMs)
 		
-		guard (!isJudged && remainingPos < Dimensions.laneLength) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
+		guard (!isJudged && positionOnLane < Dimensions.laneLength) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
 			return
 		}
 		
 		// x座標とy座標を計算しpositionを変更
-		setPos(currentTime: currentTime)
+		setPos()
 		
 		// スケールを変更
-		setScale(currentTime: currentTime)
+		setScale()
 		
 		// image.isHiddenを更新
 		if position.y > Dimensions.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
@@ -119,19 +119,17 @@ class TapStart: Note {
 		longImages.circle.isHidden = true
 	}
 	
-	override func update(currentTime: TimeInterval) {
-		
-		let remainingPos = getPositionOnLane(currentTime: currentTime)				// 判定ラインまでの距離(3D)
-		let remainingPos2 = next.getPositionOnLane(currentTime: currentTime)		// 次ノーツの判定ラインまでの距離(3D)
+	override func update(_ currentTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+		super.update(currentTime, BPMs)
 
 		// 後続ノーツを先にupdate
-		if remainingPos <= Dimensions.laneLength {
-			next.update(currentTime: currentTime)
+		if positionOnLane <= Dimensions.laneLength {
+			next.update(currentTime, BPMs)
 		}
 		
 		// update不要なときはreturn
-		guard ((!isJudged || remainingPos > 0) && remainingPos < Dimensions.laneLength)			// 描画域内にあるか、過ぎていても判定前なら更新
-			|| (remainingPos < 0 && 0 < remainingPos2)											// ロングノーツが描画域内にあれば更新
+		guard ((!isJudged || positionOnLane > 0) && positionOnLane < Dimensions.laneLength)			// 描画域内にあるか、過ぎていても判定前なら更新
+			|| (positionOnLane < 0 && 0 < next.positionOnLane)										// ロングノーツが描画域内にあれば更新
 			|| ((!longImages.circle.isHidden || !longImages.long.isHidden) && (next.isJudged || next.position.y < Dimensions.judgeLineY))	// longImages消し忘れ防止
 			else {
 			return
@@ -139,15 +137,15 @@ class TapStart: Note {
 		
 		
 		// x座標とy座標を計算しpositionを変更
-		setPos(currentTime: currentTime)
+		setPos()
 		
 		
 		// 縦と横の大きさを計算し、imageのスケールを変更
-		setScale(currentTime: currentTime)
+		setScale()
 		
 		
 		// ノーツが視点を向くように
-		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (getPositionOnLane(currentTime: currentTime) + Dimensions.horizontalDistance * 8))
+		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (positionOnLane + Dimensions.horizontalDistance * 8))
 		
 		
 		// longImage.longを更新
@@ -238,7 +236,7 @@ class Middle: Note {
 	}
 	
     override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
-        	super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 	
 		self.isJudgeable = false
 	
@@ -262,13 +260,12 @@ class Middle: Note {
 		longImages.circle.isHidden = true
     }
 
-	override func update(currentTime: TimeInterval) {
-		
-		let remainingPos = getPositionOnLane(currentTime: currentTime)				// 判定ラインまでの距離(3D)
+	override func update(_ currentTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+		super.update(currentTime, BPMs)
 		
 		// 後続ノーツを先にupdate
-		if remainingPos <= Dimensions.laneLength {
-			next.update(currentTime: currentTime)
+		if positionOnLane <= Dimensions.laneLength {
+			next.update(currentTime, BPMs)
 		}
 		
 		// update不要なときはreturn
@@ -278,12 +275,11 @@ class Middle: Note {
 	
 		
 		// x座標とy座標を計算しpositionを変更
-		setPos(currentTime: currentTime)
+		setPos()
 		
 		
 		// スケールを変更
-		setScale(currentTime: currentTime)
-		
+		setScale()
 		
 		// longImage.longを更新
 		let long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)	// 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
@@ -372,20 +368,22 @@ class TapEnd: Note {
 		image.isHidden = true	// 初期状態では隠しておく
 	}
 	
-	override func update(currentTime: TimeInterval) {
+	override func update(_ currentTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
 		
+		super.update(currentTime, BPMs)
+		
 		// x座標とy座標を計算しpositionを変更
-		setPos(currentTime: currentTime)
+		setPos()
 		
 		// 縦と横の大きさを計算し、imageのスケールを変更
-		setScale(currentTime: currentTime)
+		setScale()
 		
 		// ノーツが視点を向くように
-		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (getPositionOnLane(currentTime: currentTime) + Dimensions.horizontalDistance * 8))
+		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (positionOnLane + Dimensions.horizontalDistance * 8))
 
 		// image.isHiddenを更新
 		if position.y > Dimensions.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
@@ -418,17 +416,19 @@ class FlickEnd: Note {
 		image.isHidden = true	// 初期状態では隠しておく
 	}
 	
-	override func update(currentTime: TimeInterval) {
+	override func update(_ currentTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
-		}		
+		}
+		
+		super.update(currentTime, BPMs)
 		
 		// x座標とy座標を計算しpositionを変更
-		setPos(currentTime: currentTime)
+		setPos()
 		
 		// 縦と横の大きさを計算し、imageのスケールを変更
-		setScale(currentTime: currentTime)
+		setScale()
 		
 		// image.isHiddenを更新
 		if position.y > Dimensions.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
@@ -443,14 +443,14 @@ class FlickEnd: Note {
 // ノーツ基本クラス
 class Note {
 	
-	let beat: Double				// "拍"単位！小節ではない！！！
+	let beat: Double			// "拍"単位！小節ではない！！！
 	let lane: Int				// レーンのインデックス(0始まり)
 
 	var image = SKShapeNode()	// ノーツの画像
 	var size: CGFloat = 0		// ノーツの横幅
 	var isJudged = false		// 判定済みかどうか
-	var isJudgeable = true		//判定可能かどうか。初期状態では始点系のみtrue
-	var position: CGPoint {		// ノーツの座標
+	var isJudgeable = true		// 判定可能かどうか。初期状態では始点系のみtrue
+	var position: CGPoint {		// ノーツの画面上の座標
 		get {
 			return image.position
 		}
@@ -458,9 +458,9 @@ class Note {
 			image.position = newValue
 		}
 	}
-	
-	let noteScale: CGFloat = 1.3	// レーン幅に対するノーツの幅の倍率
-	let speed: CGFloat  		// スピード
+	var positionOnLane: CGFloat	= 0.0	// ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
+	let noteScale: CGFloat = 1.3		// レーン幅に対するノーツの幅の倍率
+	let speed: CGFloat  				// スピード
 
 	
 	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
@@ -473,38 +473,37 @@ class Note {
 		self.lane = 0
 		self.speed = 1350.0
 	}
-	
-	func update(currentTime: TimeInterval) {}    // ノーツの座標等の更新、毎フレーム呼ばれる
+	// ノーツの座標等の更新、毎フレーム呼ばれる
+	func update(_ currentTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+		setPositionOnLane(currentTime, BPMs)
+	}
 	
 	// 時刻から3D空間レーン上のノーツ座標を得る
-	fileprivate func getPositionOnLane(currentTime: TimeInterval) -> CGFloat {
+	private func setPositionOnLane(_ currentTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 	
 		var second: TimeInterval = 0.0
 		var i = 0
-		while(i + 1 < GameScene.variableBPMList.count && GameScene.variableBPMList[i + 1].startPos < beat) {
-			second += (GameScene.variableBPMList[i + 1].startPos - GameScene.variableBPMList[i].startPos) / (GameScene.variableBPMList[i].bpm/60)
+		while i + 1 < BPMs.count && BPMs[i + 1].startPos < beat {
+			second += (BPMs[i + 1].startPos - BPMs[i].startPos) / (BPMs[i].bpm/60)
 			
 			i += 1
 		}
-		second += (beat - GameScene.variableBPMList[i].startPos) / (GameScene.variableBPMList[i].bpm/60)
+		second += (beat - BPMs[i].startPos) / (BPMs[i].bpm/60)
 		second -= (currentTime - GameScene.start)
-		return CGFloat(second) * speed	// 判定線からの水平距離x
+		self.positionOnLane = CGFloat(second) * speed	// 判定線からの水平距離x
 	}
 	
 	// ノーツの座標を設定
-	fileprivate func setPos(currentTime: TimeInterval) {
+	fileprivate func setPos() {
 		
 		/* y座標の計算 */
 		
-		
-		let fypos = getPositionOnLane(currentTime: currentTime)	  // 判定線からの水平距離x
-		
 		// 球面?に投写
-		let denomOfAtan = pow(Dimensions.R, 2) + Dimensions.horizontalDistance * fypos		// atanの分母
+		let denomOfAtan = pow(Dimensions.R, 2) + Dimensions.horizontalDistance * positionOnLane		// atanの分母
 		guard 0 < denomOfAtan else {	// atan内の分母が0になるのを防止
 			return
 		}
-		let posY = Dimensions.R * atan(Dimensions.verticalDistance * fypos / denomOfAtan) + Dimensions.judgeLineY
+		let posY = Dimensions.R * atan(Dimensions.verticalDistance * positionOnLane / denomOfAtan) + Dimensions.judgeLineY
 		
 		
 		/* x座標の計算 */
@@ -522,16 +521,15 @@ class Note {
 	}
 	
 	// ノーツのスケールを設定
-	fileprivate func setScale(currentTime: TimeInterval) {
+	fileprivate func setScale() {
 		
-		// ノーツの横幅を計算(改善点: fyposとRはsetPos関数でも計算されている。上手く計算を1度で済ませたい。)
-		let fypos = getPositionOnLane(currentTime: currentTime)									// 判定線からの水平距離x
+		// ノーツの横幅を計算
 		let grad = (Dimensions.horizonLength/7 - Dimensions.laneWidth) / (Dimensions.horizonY - Dimensions.judgeLineY)	// 傾き
 		self.size = noteScale * (grad * (position.y - Dimensions.horizonY) + Dimensions.horizonLength/7)
 
 		// ノーツの横幅と縦幅をscaleで設定
 		if self is Tap || self is TapStart || self is TapEnd {		// 楕円
-			let lSquare = pow(Dimensions.horizontalDistance + fypos, 2) + pow(Dimensions.laneWidth * CGFloat(3 - lane), 2)
+			let lSquare = pow(Dimensions.horizontalDistance + positionOnLane, 2) + pow(Dimensions.laneWidth * CGFloat(3 - lane), 2)
 			let denomOfAtan = lSquare + pow(Dimensions.verticalDistance, 2) - pow(noteScale * Dimensions.laneWidth / 2, 2)				// atan内の分母
 			guard 0 < denomOfAtan else {	// atan内の分母が0になるのを防止
 				return
