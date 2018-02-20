@@ -27,23 +27,25 @@ extension GameScene{
 	func judge(laneIndex:Int, timeLag:TimeInterval) -> Bool{	  //対象ノーツが実在し、判定したかを返す.timeLagは（judge呼び出し時ではなく）タッチされた時のものを使用。
 
 		let nextIndex = lanes[laneIndex].nextNoteIndex
+		let judgeNote = lanes[laneIndex].laneNotes[nextIndex]
 
-		if nextIndex >= lanes[laneIndex].laneNotes.count{//最後まで判定が終わってる
+		guard judgeNote.isJudgeable else {
 			return false
 		}
-//		else {
-//			// 種類が違う場合を弾く(型で判別)
-//			let note = lanes[laneIndex].laneNotes[nextIndex]
-//			switch type {
-//			case .tap:      if !(note is Tap)      { return false }
-//			case .flick:    if !(note is Flick)    { return false }
-//			case .tapStart: if !(note is TapStart) { return false }
-//			case .middle:   if !(note is Middle)   { return false }
-//			case .tapEnd:   if !(note is TapEnd)   { return false }
-//			case .flickEnd: if !(note is FlickEnd) { return false }
-//			}
-//		}
+		
+		guard nextIndex < lanes[laneIndex].laneNotes.count else {//最後まで判定が終わってる
+			return false
+		}
 
+		
+		if judgeNote is TapStart {
+			let note = judgeNote as! TapStart
+			note.next.isJudgeable = true
+		}else if judgeNote is Middle {
+			let note = judgeNote as! Middle
+			note.next.isJudgeable = true
+		}
+		
 		switch lanes[laneIndex].getTimeState(timeLag: timeLag) {
 		case .parfect:
 			setJudgeLabelText(text: "parfect!!")
@@ -52,8 +54,8 @@ extension GameScene{
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
-			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			self.removeChildren(in: [judgeNote.image])
+			judgeNote.isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .great:
@@ -63,32 +65,32 @@ extension GameScene{
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
-			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			self.removeChildren(in: [judgeNote.image])
+			judgeNote.isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .good:
 			setJudgeLabelText(text: "good")
 			ResultScene.good += 1
 			ResultScene.combo = 0
-			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
-			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			self.removeChildren(in: [judgeNote.image])
+			judgeNote.isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .bad:
 			setJudgeLabelText(text: "bad")
 			ResultScene.bad += 1
 			ResultScene.combo = 0
-			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
-			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			self.removeChildren(in: [judgeNote.image])
+			judgeNote.isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .miss:
 			setJudgeLabelText(text: "miss!")
 			ResultScene.miss += 1
 			ResultScene.combo = 0
-			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
-			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			self.removeChildren(in: [judgeNote.image])
+			judgeNote.isJudged = true
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		default:

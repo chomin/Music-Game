@@ -238,8 +238,10 @@ class Middle: Note {
 	}
 	
     override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
-        super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
-		
+        	super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+	
+		self.isJudgeable = false
+	
 		// imageのインスタンス(緑線分)を作成
 		var points = [
 			CGPoint(x: 0.0, y: 0.0),
@@ -362,6 +364,8 @@ class TapEnd: Note {
 	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
+		self.isJudgeable = false
+		
 		// imageのインスタンス(緑円)を作成
 		image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
 		image.fillColor = UIColor.green
@@ -396,6 +400,8 @@ class FlickEnd: Note {
 	
 	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+		
+		self.isJudgeable = false
 		
 		// imageのインスタンス(マゼンタ三角形)を作成
 		let length = Dimensions.laneWidth / 2 // 三角形一辺の長さの半分
@@ -443,6 +449,7 @@ class Note {
 	var image = SKShapeNode()	// ノーツの画像
 	var size: CGFloat = 0		// ノーツの横幅
 	var isJudged = false		// 判定済みかどうか
+	var isJudgeable = true		//判定可能かどうか。初期状態では始点系のみtrue
 	var position: CGPoint {		// ノーツの座標
 		get {
 			return image.position
@@ -537,96 +544,5 @@ class Note {
 			image.setScale(size / Dimensions.laneWidth)
 		}
 	}
-
-	
-	
-//	// 各noteの座標と画像をセット
-//		func setPosOld (note:Note, currentTime: TimeInterval)  {
-//
-//		//スピードの設定
-//		var speed: CGFloat = 1700.0
-//
-//
-//		//立体感を出すための定数
-//		let horizontalDistance:CGFloat = 470	//画面から目までの水平距離a（約5000で10cmほど）
-//		let verticalDistance = GameScene.horizonY	//画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
-//													//モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
-//
-//
-//
-//
-//
-//
-//
-//		// y座標の計算
-//
-//		let fypos = (CGFloat(60*note.pos/GameScene.bpm) - CGFloat(currentTime - GameScene.start)) * speed	  //判定線からの水平距離x
-//
-//		// 球面?に投写
-//		let R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))		// 視点から判定線までの距離(射影する球の半径)
-//		let denomOfAtan = pow(R, 2) + horizontalDistance * fypos				// atanの分母
-//		guard 0 < denomOfAtan else {	// atan内の分母が0になるのを防止
-//			return
-//		}
-//		let y = R * atan(verticalDistance * fypos / denomOfAtan) + GameScene.judgeLineY
-//
-//
-//		// 大きさと形の変更(楕円は描き直し,その他は拡大のみ)
-//
-//		// 楕円の横幅を計算
-//		let grad = (GameScene.horizon/7 - GameScene.laneWidth) / (GameScene.horizonY - GameScene.judgeLineY)	// 傾き
-//		let diameter = noteScale * (grad * (y - GameScene.horizonY) + GameScene.horizon/7)
-//
-//		note.size = diameter
-//
-//		//画面に現れるノーツの、描き直し（楕円）及び拡大（線、三角形）
-//		if y < GameScene.horizonY && note.isJudged == false{//判定後はremoveされている(エラーになる)。その後もlongImageの計算に位置だけ必要なので、呼び出されうる。
-//			if note.type == .tap || note.type == .tapEnd {//楕円
-//				//楕円の縦幅を計算
-//				let lSquare = pow(horizontalDistance + fypos, 2) + pow(GameScene.laneWidth*CGFloat(3-note.lane), 2)
-//
-//				let deltaY = R * atan(noteScale * GameScene.laneWidth * verticalDistance / (lSquare + pow(verticalDistance, 2) - pow(noteScale*GameScene.laneWidth/2, 2)))
-//
-//
-//				// ノーツイメージをセット
-//				if note.type == .tapStart {
-//
-//					self.removeChildren(in: [note.image])
-//					note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
-//					note.image.fillColor = .white
-//					self.addChild(note.image)
-//				}else if note.type == .tapEnd || note.type == .tap{
-//					self.removeChildren(in: [note.image])
-//					note.image = SKShapeNode(ellipseOf: CGSize(width:diameter, height:deltaY))
-//					note.image.fillColor = .green
-//					self.addChild(note.image)
-//				}
-//			}else{//線と三角形
-//				note.image.setScale(diameter/GameScene.laneWidth)
-//			}
-//		}
-		
-		//向きの変更
-		
-//
-//		//座標の設定
-//		var xpos:CGFloat
-//
-//		let b = GameScene.horizonY - GameScene.judgeLineY   							// 水平線から判定線までの2D上の距離
-//		let c = CGFloat(3 - note.lane) * (GameScene.laneWidth - GameScene.horizon/7)	// 水平線上と判定線上でのx座標のずれ
-//		let a = c / b
-//		xpos = GameScene.laneWidth * 3/2 + CGFloat(note.lane) * GameScene.laneWidth		// 判定線上でのx座標
-//		xpos += (y - GameScene.judgeLineY) * a										// 判定線から離れている分補正
-//
-//
-//
-//		if note.type == .middle{ // 線のときだけずらす(開始点がposition)→長さの半分だけずらすように！
-//			xpos -= diameter/2
-//		}
-//
-//		note.image.position = CGPoint(x:xpos ,y:y)//描写した後でないと反映されない
-//	}
-
-
 }
 
