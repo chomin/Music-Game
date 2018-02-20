@@ -277,7 +277,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 	
 	//タッチ関係
 	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-		print("began start")
+//		print("began start")
 		for i in self.lanes{
 			
 			if !(i.isTimeLagRenewed){ return }
@@ -297,25 +297,26 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 				if pos.y < self.frame.width/3{    //上界
 					
 					//判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
-					var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note)] = []
-					for (index,buttonPos) in Dimensions.buttonX.enumerated(){
+					var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note, distanceToButton:CGFloat)] = []
+					for (index,buttonPosX) in Dimensions.buttonX.enumerated(){
 						
-						if pos.x >= buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {//ボタンの範囲
+						if pos.x >= buttonPosX - Dimensions.halfBound && pos.x < buttonPosX + Dimensions.halfBound {//ボタンの範囲
 							
 							if (self.lanes[index].timeState == .still)  || (self.lanes[index].timeState == .passed) { continue }
 							
 							let nextIndex = lanes[index].nextNoteIndex
 							if (nextIndex > lanes[index].laneNotes.count-1) { continue }
 							let note = lanes[index].laneNotes[nextIndex]
+							let distanceToButton = sqrt(pow(pos.x - buttonPosX, 2) + pow(pos.y - Dimensions.judgeLineY, 2))
 							
 							if self.lanes[index].isObserved == .Behind {//middleの判定圏内（後）
-								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note))
+								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note, distanceToButton: distanceToButton))
 								continue
 							}
 							
 							
 							if (note is Tap) || (note is Flick) || (note is TapStart) {//flickが最近なら他を無視（ここでは判定しない）
-								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note))
+								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note, distanceToButton: distanceToButton))
 								continue
 							}
 						}
@@ -324,7 +325,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 					if nearbyNotes.isEmpty {
 						self.actionSoundSet.play(type: .kara)
 					}else{
-						nearbyNotes.sort(by: {$0.timelag < $1.timelag})
+						nearbyNotes.sort { (A,B) -> Bool in
+							if A.timelag == B.timelag { return A.distanceToButton < B.distanceToButton }
+							
+							return A.timelag < B.timelag
+						}
+						
 						if (nearbyNotes[0].note is Tap) || (nearbyNotes[0].note is TapStart) || (nearbyNotes[0].note is Middle){
 							if self.judge(laneIndex: nearbyNotes[0].laneIndex, timeLag: nearbyNotes[0].timelag) {
 								self.actionSoundSet.play(type: .tap)
@@ -343,11 +349,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 			}
 //		}
 		
-		print("began end")
+//		print("began end")
 	}
 	
 	override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-		print("move start")
+//		print("move start")
 		
 		for i in self.lanes{
 			if !(i.isTimeLagRenewed){ return }
@@ -371,13 +377,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 				if pos.y < self.frame.width/3{    //上界
 					
 					//判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
-					var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note)] = []
+					var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note, distanceToButton: CGFloat)] = []
 					
 					//pposループ
-					for (index,buttonPos) in Dimensions.buttonX.enumerated(){
-						if ppos.x >= buttonPos - Dimensions.halfBound && ppos.x < buttonPos + Dimensions.halfBound{
+					for (index,buttonPosX) in Dimensions.buttonX.enumerated(){
+						if ppos.x >= buttonPosX - Dimensions.halfBound && ppos.x < buttonPosX + Dimensions.halfBound{
 							//lane.isTouchedをリセット
-							if pos.x < buttonPos - Dimensions.halfBound || pos.x > buttonPos + Dimensions.halfBound{//移動後にレーンから外れていた場合
+							if pos.x < buttonPosX - Dimensions.halfBound || pos.x > buttonPosX + Dimensions.halfBound{//移動後にレーンから外れていた場合
 								//							lanes[index].isTouched = false
 								
 								if self.lanes[index].isObserved == .Front {
@@ -404,7 +410,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 							let isJudgeableFlickEnd = self.allTouches[touchIndex].isJudgeableFlickEnd
 
 							if ((note is Flick) && isJudgeableFlick) || ((note is FlickEnd) && isJudgeableFlickEnd) {//flickが最近なら他を無視（ここでは判定しない）
-								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note))
+								let distanceToButton = sqrt(pow(ppos.x - buttonPosX, 2) + pow(ppos.y - Dimensions.judgeLineY, 2))
+								
+								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note, distanceToButton: distanceToButton))
 								continue
 							}
 						}
@@ -412,7 +420,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 					
 					if !(nearbyNotes.isEmpty) {
 					
-						nearbyNotes.sort(by: {$0.timelag < $1.timelag})
+						nearbyNotes.sort { (A,B) -> Bool in
+							if A.timelag == B.timelag { return A.distanceToButton < B.distanceToButton }
+							
+							return A.timelag < B.timelag
+						}
 						if (nearbyNotes[0].note is Flick) || (nearbyNotes[0].note is FlickEnd) {
 							if self.judge(laneIndex: nearbyNotes[0].laneIndex, timeLag: nearbyNotes[0].timelag) {
 								self.actionSoundSet.play(type: .flick)
@@ -429,7 +441,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 			}
 //		}
 		
-		print("move end")
+//		print("move end")
 	}
 	
 	override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -495,6 +507,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 									
 									self.actionSoundSet.play(type: .tap)
 									break
+								}else{
+									print("離しの判定に失敗")
 								}
 							}else if ((note is Flick) || (note is FlickEnd)) && lanes[index].isJudgeRange{	//flickなのにflickせずに離したらmiss
 								setJudgeLabelText(text: "miss!")

@@ -38,13 +38,9 @@ extension GameScene{
 		}
 
 		
-		if judgeNote is TapStart {
-			let note = judgeNote as! TapStart
-			note.next.isJudgeable = true
-		}else if judgeNote is Middle {
-			let note = judgeNote as! Middle
-			note.next.isJudgeable = true
-		}
+		
+		
+		
 		
 		switch lanes[laneIndex].getTimeState(timeLag: timeLag) {
 		case .parfect:
@@ -56,6 +52,7 @@ extension GameScene{
 			}
 			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
+			setNextIsJudgeable(judgeNote: judgeNote)
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .great:
@@ -67,6 +64,7 @@ extension GameScene{
 			}
 			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
+			setNextIsJudgeable(judgeNote: judgeNote)
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .good:
@@ -75,6 +73,7 @@ extension GameScene{
 			ResultScene.combo = 0
 			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
+			setNextIsJudgeable(judgeNote: judgeNote)
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .bad:
@@ -83,6 +82,7 @@ extension GameScene{
 			ResultScene.combo = 0
 			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
+			setNextIsJudgeable(judgeNote: judgeNote)
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .miss:
@@ -91,6 +91,7 @@ extension GameScene{
 			ResultScene.combo = 0
 			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
+			setNextIsJudgeable(judgeNote: judgeNote)
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		default:
@@ -122,6 +123,7 @@ extension GameScene{
 			}
 			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
 			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
+			setNextIsJudgeable(judgeNote: lanes[laneIndex].laneNotes[nextIndex])
 			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		default: break
@@ -129,5 +131,15 @@ extension GameScene{
 		
 		return false
 		
+	}
+	
+	func setNextIsJudgeable(judgeNote:Note)  {
+		if judgeNote is TapStart {
+			let note = judgeNote as! TapStart
+			note.next.isJudgeable = true
+		}else if judgeNote is Middle {
+			let note = judgeNote as! Middle
+			note.next.isJudgeable = true
+		}
 	}
 }
