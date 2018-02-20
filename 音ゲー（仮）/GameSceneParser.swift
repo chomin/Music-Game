@@ -119,7 +119,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			"GENRE":     { value in self.genre     = value },
 			"TITLE":     { value in self.title     = value },
 			"ARTIST":    { value in self.artist    = value },
-			"BPM":       { value in if let num = Double(value) { GameScene.variableBPMList.append((num, 0.0)) } },
+			"BPM":       { value in if let num = Double(value) { GameScene.variableBPMList = [(num, 0.0)] } },
 			"PLAYLEVEL": { value in if let num = Int(value) { self.playLevel   = num } },
 			"VOLWAV":    { value in if let num = Int(value) { self.volWav      = num } }
 		]

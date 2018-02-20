@@ -15,7 +15,7 @@ extension GameScene{
 		
 		//レーンの境目の線の描写
 		for i in 0...7{
-			var points = [CGPoint(x:self.frame.width*CGFloat(i+1)/9 ,y:self.frame.width/9) ,CGPoint(x:self.frame.width/2 - GameScene.horizon/2 + CGFloat(i)*GameScene.horizon/7 ,y:GameScene.horizonY)]
+			var points = [CGPoint(x:self.frame.width*CGFloat(i+1)/9 ,y:self.frame.width/9) ,CGPoint(x:self.frame.width/2 - Dimensions.horizonLength/2 + CGFloat(i)*Dimensions.horizonLength/7 ,y:Dimensions.horizonY)]
 			let line = SKShapeNode(points: &points, count: points.count)
 			
 			line.lineWidth = 1.0
@@ -200,7 +200,7 @@ extension GameScene{
 	
 	func paintSameLine(i:Note,j:Note){
 		//同時押しラインの描写
-		var lPoint = [CGPoint(x:0,y:0), CGPoint(x: CGFloat(j.lane - i.lane) * GameScene.laneWidth, y :0)]
+		var lPoint = [CGPoint(x:0,y:0), CGPoint(x: CGFloat(j.lane - i.lane) * Dimensions.laneWidth, y :0)]
 		let line = SKShapeNode(points: &lPoint, count: lPoint.count)
 		line.lineWidth = 3.0
 		line.strokeColor = UIColor.white

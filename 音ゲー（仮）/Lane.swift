@@ -8,6 +8,10 @@
 
 import SpriteKit
 
+enum TimeState {
+	case miss,bad,good,great,parfect,still,passed
+}
+
 enum MiddleObsevationBool{
 	case Front, Behind, False
 }
