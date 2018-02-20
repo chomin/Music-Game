@@ -25,13 +25,6 @@ class Tap: Note {
 			return
 		}
 		
-//		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)		// あと何拍で判定ラインに乗るか
-//
-//		//建築予定地
-//		//建築予定地
-//		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
-//		let remainingBeat = beat - nowPos		// あと何拍で判定ラインに乗るか
-		
 		let remainingPos = getPositionOnLane(currentTime: currentTime)		// 判定ラインまでの距離(3D)
 		
 		guard (!isJudged && remainingPos < GameScene.laneLength) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
@@ -81,12 +74,6 @@ class Flick: Note {
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
-		
-//		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // あと何拍で判定ラインに乗るか
-//
-//		//建築予定地
-//		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
-//		let remainingBeat = beat - nowPos		// あと何拍で判定ラインに乗るか
 		
 		let remainingPos = getPositionOnLane(currentTime: currentTime)		// 判定ラインまでの距離(3D)
 		
@@ -141,16 +128,6 @@ class TapStart: Note {
 		if remainingPos <= GameScene.laneLength {
 			next.update(currentTime: currentTime)
 		}
-		
-//		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)			// あと何拍で判定ラインに乗るか
-//		let remainingBeat2 = next.pos - ((currentTime - GameScene.start) * GameScene.bpm/60)    // 次ノーツがあと何拍で判定ラインに乗るか
-//
-//		//建築予定地
-//		//建築予定地
-//		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
-//		let remainingBeat = beat - nowPos		// あと何拍で判定ラインに乗るか
-//		let remainingBeat2 = next.beat - nowPos		// あと何拍で判定ラインに乗るか
-		
 		
 		// update不要なときはreturn
 		guard ((!isJudged || remainingPos > 0) && remainingPos < GameScene.laneLength)			// 描画域内にあるか、過ぎていても判定前なら更新
@@ -292,11 +269,6 @@ class Middle: Note {
 		if remainingPos <= GameScene.laneLength {
 			next.update(currentTime: currentTime)
 		}
-
-//		//建築予定地//建築予定地
-//		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
-//		let remainingBeat = beat - nowPos		// あと何拍で判定ラインに乗るか
-//		let remainingBeat2 = next.beat - nowPos	// あと何拍で判定ラインに乗るか
 		
 		// update不要なときはreturn
 		guard !(isJudged && image.isHidden && longImages.circle.isHidden && longImages.long.isHidden) else {		// 通過後のノーツはreturn
@@ -404,13 +376,6 @@ class TapEnd: Note {
 			return
 		}
 		
-//		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene.bpm/60)		// あと何拍で判定ラインに乗るか
-//
-//		//建築予定地
-//		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
-//		let remainingBeat = beat - nowPos		// あと何拍で判定ラインに乗るか
-		
-		
 		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
 		
@@ -453,13 +418,7 @@ class FlickEnd: Note {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
-		}
-//		let remainingBeat = pos - ((currentTime - GameScene.start) * GameScene./60)		// あと何拍で判定ラインに乗るか
-//
-//		//建築予定地
-//		let nowPos = GameScene.variableBPMList[bpmIndex].startPos + (currentTime - GameScene.variableBPMList[bpmIndex].startTime!) * GameScene.variableBPMList[bpmIndex].bpm/60
-//		let remainingBeat = beat - nowPos		// あと何拍で判定ラインに乗るか
-		
+		}		
 		
 		// x座標とy座標を計算しpositionを変更
 		setPos(currentTime: currentTime)
@@ -482,15 +441,7 @@ class Note {
 	
 	let beat: Double				// "拍"単位！小節ではない！！！
 	let lane: Int				// レーンのインデックス(0始まり)
-//	var bpmIndex:Int{	//建築予定地
-//		get{
-//			var index = GameScene.variableBPMList.count - 1
-//			while beat < GameScene.variableBPMList[index].startPos{
-//				index -= 1
-//			}
-//			return index
-//		}
-//	}
+
 	var image = SKShapeNode()	// ノーツの画像
 	var size: CGFloat = 0		// ノーツの横幅
 	var isJudged = false		// 判定済みかどうか
@@ -544,19 +495,6 @@ class Note {
 		
 		/* y座標の計算 */
 		
-		
-//		//建築予定地
-//		var fypos:CGFloat = 0.0	// 判定線からの水平距離x(bpm変更後のものをちゃんと計算し直すべき？)
-//		for i in 0...bpmIndex{
-//			if i == bpmIndex{
-//				fypos += CGFloat(60*(beat - GameScene.variableBPMList[i].startPos)/GameScene.variableBPMList[i].bpm)
-//			}else{
-//				fypos += CGFloat(60*(GameScene.variableBPMList[i+1].startPos - GameScene.variableBPMList[i].startPos)/GameScene.variableBPMList[i].bpm)
-//			}
-//		}
-//		fypos -= CGFloat(currentTime - GameScene.start)
-//		fypos *= speed
-	
 		
 		let fypos = getPositionOnLane(currentTime: currentTime)	  // 判定線からの水平距離x
 		
