@@ -11,10 +11,13 @@ import SpriteKit
 import GameplayKit
 import AVFoundation
 
-class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
+class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーをするシーン
 	
 	//
 //	let judgeQueue = DispatchQueue(label: "judge_queue")	//キューに入れた処理内容を順番に実行（updateとtouchesシリーズから呼び出されるjudgeの並列処理防止用）
+	
+	//appの起動、終了等に関するデリゲート
+	var appDelegate: AppDelegate!
 	
 	//タッチ情報
 	var allTouches:[(touch:UITouch, isJudgeableFlick:Bool, isJudgeableFlickEnd:Bool)] = []
@@ -25,7 +28,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	let JLScale:CGFloat = 1.25	//拡大縮小アニメーションの倍率
 	
 	//音楽プレイヤー
-	static var BGM: AVAudioPlayer?
+	var BGM: AVAudioPlayer?
 	let actionSoundSet = ActionSoundPlayers()
 
 	
@@ -37,7 +40,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	var musicName: String
 	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
 	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
-	static var resignActiveTime:TimeInterval = 0.0
+	var resignActiveTime:TimeInterval = 0.0
 	var musicStartPos = 1.0	  //BGM開始の"拍"！
 	var playLebel = 0
 	var genre = ""				// ジャンル
@@ -62,12 +65,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		let soundURL:URL = URL(fileURLWithPath: Path)
 		// AVAudioPlayerのインスタンスを作成
 		do {
-			GameScene.BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
+			BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
 		} catch {
 			print("AVAudioPlayerインスタンス作成失敗")
 		}
 		// バッファに保持していつでも再生できるようにする
-		GameScene.BGM?.prepareToPlay()
+		BGM?.prepareToPlay()
 	}
 	
 	required init?(coder aDecoder: NSCoder) {
@@ -76,7 +79,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	
 	override func didMove(to view: SKView) {
-
+		
+		
+		appDelegate = UIApplication.shared.delegate as! AppDelegate //AppDelegateのインスタンスを取得
+		appDelegate.gsDelegate = self	//子（AppDelegate）の設定しているdelegateを自身にもセット
+		
 		// 寸法に関する定数をセット
 		Dimensions.createInstance(frame: self.frame)
 		
@@ -157,8 +164,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		
 		// BGMの再生(時間指定)
 		GameScene.start = CACurrentMediaTime()
-		GameScene.BGM?.play(atTime: GameScene.start + (musicStartPos/GameScene.variableBPMList[0].bpm)*60)	//建築予定地
-		GameScene.BGM?.delegate = self
+		BGM?.play(atTime: GameScene.start + (musicStartPos/GameScene.variableBPMList[0].bpm)*60)	//建築予定地
+		BGM?.delegate = self
 		
 		//各レーンにノーツをセット
 		for note in notes{
@@ -507,8 +514,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 	
 	//再生終了時の呼び出しメソッド
 	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {//playしたクラスと同じクラスに入れる必要あり？
-		if player as AVAudioPlayer! == GameScene.BGM{
-			GameScene.BGM = nil	//別のシーンでアプリを再開したときに鳴るのを防止
+		if player as AVAudioPlayer! == BGM{
+			BGM = nil	//別のシーンでアプリを再開したときに鳴るのを防止
 			let scene = ResultScene(size: (view?.bounds.size)!)
 			let skView = view as SKView!
 			skView?.showsFPS = true
@@ -523,14 +530,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate {//音ゲーをするシーン
 		print("\(player)で\(String(describing: error))")
 	}
 	
+	
+	
 	//アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
-	static func willResignActive(){
-		
+	func applicationWillResignActive() {
+		resignActiveTime = CACurrentMediaTime()
+		BGM?.pause()
 	}
 	
 	//アプリを再開したときに呼ばれる
-	static func didBecomeActive(){
-		
+	func applicationDidBecomeActive() {
+		BGM?.play()
+		GameScene.start += CACurrentMediaTime() - resignActiveTime
 	}
 	
 }

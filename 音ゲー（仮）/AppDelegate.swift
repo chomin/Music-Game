@@ -8,9 +8,16 @@
 
 import UIKit
 
+protocol GSAppDelegate {//子（呼び出し元)がAppDelegateクラス、親がGameSceneクラス
+	func applicationWillResignActive()
+	func applicationDidBecomeActive()
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+	var gsDelegate: GSAppDelegate?
+	
 	var window: UIWindow?
 	
 
@@ -25,8 +32,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		print("move from active to inactive state")
 		
-		GameScene.resignActiveTime = CACurrentMediaTime()
-		GameScene.BGM?.pause()
+		self.gsDelegate?.applicationWillResignActive()
+		
+		
 	}
 
 	func applicationDidEnterBackground(_ application: UIApplication) {
@@ -45,9 +53,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 		print("DidBecomeActive")
 		
-		GameScene.BGM?.play()
-
-		GameScene.start += CACurrentMediaTime() - GameScene.resignActiveTime
+		self.gsDelegate?.applicationDidBecomeActive()
+		
 //        GameScene.BGM?.currentTime -= 3    //3秒巻き戻し
 	}
 
