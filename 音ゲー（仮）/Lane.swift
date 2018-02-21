@@ -89,13 +89,13 @@ class Lane{
 		fatalError("init(coder:) has not been implemented")
 	}
 	
-	func update(_ currentTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]){
+	func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]){
 		
 		//timeLagの更新
 		if isSetLaneNotes{
 			if laneNotes.count > 0 && nextNoteIndex < laneNotes.count{
 				
-				timeLag = GameScene.start - currentTime
+				timeLag = -passedTime
 				for (index,i) in BPMs.enumerated(){
 					if BPMs.count > index+1 && laneNotes[nextNoteIndex].beat > BPMs[index+1].startPos{
 						timeLag += (BPMs[index+1].startPos - i.startPos)*60/i.bpm

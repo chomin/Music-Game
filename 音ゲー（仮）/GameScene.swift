@@ -33,30 +33,30 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 
 	
 	//画像(ノーツ以外)
-	var judgeLine:SKShapeNode!
-	var sameLines:[(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
+	var judgeLine: SKShapeNode!
+	var sameLines: [(note:Note,line:SKShapeNode)] = []	//連動する始点側のノーツと同時押しライン
 	
 	// 楽曲データ
-//	var musicName: String	// 曲名を表示したりするかもしれないのでコメントアウトにとどめる
-	var notes:[Note] = []	//ノーツの" 始 点 "の集合。参照型！
-	static var start:TimeInterval = 0.0	  //シーン移動した時の時間
-	var resignActiveTime:TimeInterval = 0.0
-	var musicStartPos = 1.0	  //BGM開始の"拍"！
-	var playLebel = 0
+	var musicName: String		// 曲名を表示したりするかもしれないのでコメントアウトにとどめる
+	var notes:[Note] = []		// ノーツの" 始 点 "の集合。参照型！(配列は値型じゃ？)
+	var musicStartPos = 1.0	  	// BGM開始の"拍"！
 	var genre = ""				// ジャンル
 	var title = ""				// タイトル
 	var artist = ""				// アーティスト
 	var playLevel = 0			// 難易度
 	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
 	var BPMs: [(bpm: Double, startPos: Double)] = []		// 可変BPM情報
-	var lanes:[Lane] = [Lane(laneIndex:0),Lane(laneIndex:1),Lane(laneIndex:2),Lane(laneIndex:3),Lane(laneIndex:4),Lane(laneIndex:5),Lane(laneIndex:6)]		// レーン
+	
+	var startTime: TimeInterval = 0.0	// シーン移動した時の時間
+	var resignActiveTime: TimeInterval = 0.0
+	var lanes: [Lane] = [Lane(laneIndex:0),Lane(laneIndex:1),Lane(laneIndex:2),Lane(laneIndex:3),Lane(laneIndex:4),Lane(laneIndex:5),Lane(laneIndex:6)]		// レーン
 	
 	
 	let speedRatio:CGFloat
 	
 	
 	init(musicName:String ,size:CGSize, speedRatioInt:UInt) {
-//		self.musicName = musicName
+		self.musicName = musicName
 		self.speedRatio = CGFloat(speedRatioInt)/100
 		super.init(size:size)
 		
@@ -71,21 +71,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		}
 		// バッファに保持していつでも再生できるようにする
 		BGM?.prepareToPlay()
-		
-		
-		//notesにノーツの"　始　点　"を入れる(nobuの仕事)
-		do {
-			try parse(fileName: musicName + ".bms")
-		}
-		catch FileError.invalidName     (let msg) { print(msg) }
-		catch FileError.notFound        (let msg) { print(msg) }
-		catch FileError.readFailed      (let msg) { print(msg) }
-		catch ParseError.lackOfData     (let msg) { print(msg) }
-		catch ParseError.invalidValue   (let msg) { print(msg) }
-		catch ParseError.noLongNoteStart(let msg) { print(msg) }
-		catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
-		catch ParseError.unexpected     (let msg) { print(msg) }
-		catch                                     { print("未知のエラー") }
 	}
 	
 	required init?(coder aDecoder: NSCoder) {
@@ -101,6 +86,20 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		// 寸法に関する定数をセット
 		Dimensions.createInstance(frame: self.frame)
 		
+		// notesにノーツの"　始　点　"を入れる(必ずcreateInstanceの後に実行)
+		do {
+			try parse(fileName: musicName + ".bms")
+		}
+		catch FileError.invalidName     (let msg) { print(msg) }
+		catch FileError.notFound        (let msg) { print(msg) }
+		catch FileError.readFailed      (let msg) { print(msg) }
+		catch ParseError.lackOfData     (let msg) { print(msg) }
+		catch ParseError.invalidValue   (let msg) { print(msg) }
+		catch ParseError.noLongNoteStart(let msg) { print(msg) }
+		catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
+		catch ParseError.unexpected     (let msg) { print(msg) }
+		catch                                     { print("未知のエラー") }
+
 		//リザルトの初期化
 		ResultScene.parfect = 0
 		ResultScene.great = 0
@@ -163,8 +162,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		setImages()
 		
 		// BGMの再生(時間指定)
-		GameScene.start = CACurrentMediaTime()
-		BGM?.play(atTime: GameScene.start + (musicStartPos/BPMs[0].bpm)*60)	//建築予定地
+		startTime = CACurrentMediaTime()
+		BGM?.play(atTime: startTime + (musicStartPos/BPMs[0].bpm)*60)	//建築予定地
 		BGM?.delegate = self
 		
 		//各レーンにノーツをセット
@@ -196,7 +195,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		
 		// 各ノーツの位置や大きさを更新
 		for note in notes {
-			note.update(currentTime, BPMs)
+			note.update(passedTime: currentTime - startTime, BPMs)
 		}
 		
 		// 同時押しラインの更新
@@ -206,7 +205,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 			i.line.isHidden = i.note.image.isHidden
 			
 			// 大きさも変更
-			i.line.setScale(i.note.image.xScale / i.note.noteScale)
+			i.line.setScale(i.note.image.xScale / Note.scale)
 		}
 		
 		
@@ -243,7 +242,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		
 		//レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
 		for lane in lanes {
-			lane.update(currentTime, BPMs)
+			lane.update(passedTime: currentTime - startTime, BPMs)
 			if lane.timeState == .passed && lane.nextNoteIndex < lane.laneNotes.count{
 				setJudgeLabelText(text: "miss!")
 				ResultScene.miss += 1
@@ -555,7 +554,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 	//アプリを再開したときに呼ばれる
 	func applicationDidBecomeActive() {
 		BGM?.play()
-		GameScene.start += CACurrentMediaTime() - resignActiveTime
+		startTime += CACurrentMediaTime() - resignActiveTime
 	}
 	
 }
