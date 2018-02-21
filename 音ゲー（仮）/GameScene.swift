@@ -453,7 +453,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 			
 			for i in touches {
 				
-//				let touchIndex = self.allTouches.index(where: {$0.touch == i})!
+				let touchIndex = self.allTouches.index(where: {$0.touch == i})!
 				
 				var pos = i.location(in: self.view)
 				var ppos = i.previousLocation(in: self.view)
@@ -461,7 +461,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 				pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
 				ppos.y = self.frame.height - ppos.y
 				
-				self.allTouches.remove(at: self.allTouches.index(where: {$0.touch == i})!)
 				
 				if pos.y < self.frame.width/3{    //上界
 					//pposループ
@@ -509,7 +508,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 								}else{
 									print("離しの判定に失敗")
 								}
-							}else if ((note is Flick) || (note is FlickEnd)) && lanes[index].isJudgeRange{	//flickなのにflickせずに離したらmiss
+							}else if ((note is Flick && self.allTouches[touchIndex].isJudgeableFlick) || (note is FlickEnd && self.allTouches[touchIndex].isJudgeableFlickEnd)) && lanes[index].isJudgeRange  {	//flickなのにflickせずに離したらmiss
 								setJudgeLabelText(text: "miss!")
 								ResultScene.miss += 1
 								ResultScene.combo = 0
@@ -520,6 +519,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 						}
 					}
 				}
+				
+				
+				self.allTouches.remove(at: self.allTouches.index(where: {$0.touch == i})!)
 			}
 //		}
 	}
