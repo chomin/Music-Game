@@ -112,7 +112,7 @@ extension GameScene{
 			return false
 		}
 		
-		lanes[laneIndex].update(passedTime: currentTime - startTime, BPMs)
+		lanes[laneIndex].update(passedTime: BGM.currentTime + BGMOffsetTime, BPMs)
 		switch lanes[laneIndex].timeState {
 		case .parfect:	//タップ直後とかでも入ってしまう？（updateとtouchesシリーズは並列処理されている？）
 			setJudgeLabelText(text: "parfect!!")
