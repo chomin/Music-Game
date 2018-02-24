@@ -17,11 +17,11 @@ enum MiddleObsevationBool{
 }
 
 class Lane{
-	var nextNoteIndex = 0
+//	var nextNoteIndex = 0	//なぜこの形式にした？できれば使わない形にしたい。
 	//	var currentTime:TimeInterval = 0.0
 	var timeLag :TimeInterval = 0.0
 	var isTimeLagRenewed = false
-	var laneNotes:[Note] = [] //最初に全部格納する！
+	var laneNotes:[Note] = [] //最初に全部格納する！(開放時はnil代入でもいいが、removeFirstの方がいい)
 	var isSetLaneNotes = false
 	let laneIndex:Int!
 	//	var isTouched = false
@@ -43,13 +43,20 @@ class Lane{
 	var isObserved:MiddleObsevationBool {	//middleの判定圏内
 		get{
 			if self.isTimeLagRenewed{
-				guard nextNoteIndex < laneNotes.count else{
+//				guard nextNoteIndex < laneNotes.count else{
+//					return .False
+//				}
+				
+				guard laneNotes.count > 0 else {
+					return .False
+				}
+				guard laneNotes.first is Middle else {
 					return .False
 				}
 				
-				guard laneNotes[nextNoteIndex] is Middle else {
-					return .False
-				}
+//				guard laneNotes[nextNoteIndex] is Middle else {
+//					return .False
+//				}
 				
 				switch timeLag {
 				case 0..<0.1:
@@ -93,14 +100,14 @@ class Lane{
 		
 		//timeLagの更新
 		if isSetLaneNotes{
-			if laneNotes.count > 0 && nextNoteIndex < laneNotes.count{
+			if laneNotes.count > 0 {
 				
 				timeLag = -passedTime
 				for (index,i) in BPMs.enumerated(){
-					if BPMs.count > index+1 && laneNotes[nextNoteIndex].beat > BPMs[index+1].startPos{
+					if BPMs.count > index+1 && laneNotes[0].beat > BPMs[index+1].startPos{
 						timeLag += (BPMs[index+1].startPos - i.startPos)*60/i.bpm
 					}else{
-						timeLag += (laneNotes[nextNoteIndex].beat - i.startPos)*60/i.bpm
+						timeLag += (laneNotes[0].beat - i.startPos)*60/i.bpm
 						break
 					}
 				}

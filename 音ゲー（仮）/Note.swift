@@ -225,6 +225,7 @@ class TapStart: Note {
 class Middle: Note {
 
 	var next = Note()				// 次のノーツ（仮のインスタンス）
+	unowned var before = Note()
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	override var position: CGPoint {								// positionを左端ではなく線の中点にするためオーバーライド
 		get {
@@ -235,7 +236,7 @@ class Middle: Note {
 		}
 	}
 	
-    override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 	
 		self.isJudgeable = false
@@ -357,6 +358,9 @@ class Middle: Note {
 
 class TapEnd: Note {
 	
+	unowned var start = Note()	//循環参照防止の為unowned参照にする
+	unowned var before = Note()
+	
 	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
@@ -395,6 +399,9 @@ class TapEnd: Note {
 }
 
 class FlickEnd: Note {
+	
+	unowned var start = Note()
+	unowned var before = Note()
 	
 	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
@@ -441,7 +448,7 @@ class FlickEnd: Note {
 
 
 // ノーツ基本クラス
-class Note {
+class Note {	//強参照はGameScene.notes[]とNote.nextのみにすること
 	
 	let beat: Double			// "拍"単位！小節ではない！！！
 	let lane: Int				// レーンのインデックス(0始まり)
@@ -472,6 +479,10 @@ class Note {
 		self.beat = 0
 		self.lane = 0
 		self.speed = 1350.0
+	}
+	
+	deinit {
+		print("Noteが解放されました:\(self)")
 	}
 	// ノーツの座標等の更新、毎フレーム呼ばれる
 	func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {

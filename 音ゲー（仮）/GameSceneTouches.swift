@@ -24,25 +24,29 @@ extension GameScene{
 	}
 	
 	
-	func judge(laneIndex:Int, timeLag:TimeInterval) -> Bool{	  //対象ノーツが実在し、判定したかを返す.timeLagは（judge呼び出し時ではなく）タッチされた時のものを使用。
+	func judge(lane:Lane, timeLag:TimeInterval) -> Bool{	  //対象ノーツが実在し、判定したかを返す.timeLagは（judge呼び出し時ではなく）タッチされた時のものを使用。
 
-		let nextIndex = lanes[laneIndex].nextNoteIndex
-		let judgeNote = lanes[laneIndex].laneNotes[nextIndex]
+		guard lane.laneNotes.count > 0 else {
+			return false
+		}
+		
+//		let nextIndex = lanes[laneIndex].nextNoteIndex
+		let judgeNote = lane.laneNotes[0]
 
 		guard judgeNote.isJudgeable else {
 			return false
 		}
 		
-		guard nextIndex < lanes[laneIndex].laneNotes.count else {//最後まで判定が終わってる
-			return false
-		}
+//		guard nextIndex < lanes[laneIndex].laneNotes.count else {//最後まで判定が終わってる
+//			return false
+//		}
 
 		
 		
 		
 		
 		
-		switch lanes[laneIndex].getTimeState(timeLag: timeLag) {
+		switch lane.getTimeState(timeLag: timeLag) {
 		case .parfect:
 			setJudgeLabelText(text: "parfect!!")
 			ResultScene.parfect += 1
@@ -50,10 +54,11 @@ extension GameScene{
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-			self.removeChildren(in: [judgeNote.image])
+//			self.removeChildren(in: [judgeNote.image])	//GameSceneからのNote.imageへの参照を削除
 			judgeNote.isJudged = true
 			setNextIsJudgeable(judgeNote: judgeNote)
-			lanes[laneIndex].nextNoteIndex += 1
+			releaseNote(lane: lane)
+//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .great:
 			setJudgeLabelText(text: "great!")
@@ -62,37 +67,41 @@ extension GameScene{
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-			self.removeChildren(in: [judgeNote.image])
+//			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
 			setNextIsJudgeable(judgeNote: judgeNote)
-			lanes[laneIndex].nextNoteIndex += 1
+			releaseNote(lane: lane)
+//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .good:
 			setJudgeLabelText(text: "good")
 			ResultScene.good += 1
 			ResultScene.combo = 0
-			self.removeChildren(in: [judgeNote.image])
+//			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
 			setNextIsJudgeable(judgeNote: judgeNote)
-			lanes[laneIndex].nextNoteIndex += 1
+			releaseNote(lane: lane)
+//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .bad:
 			setJudgeLabelText(text: "bad")
 			ResultScene.bad += 1
 			ResultScene.combo = 0
-			self.removeChildren(in: [judgeNote.image])
+//			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
 			setNextIsJudgeable(judgeNote: judgeNote)
-			lanes[laneIndex].nextNoteIndex += 1
+			releaseNote(lane: lane)
+//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .miss:
 			setJudgeLabelText(text: "miss!")
 			ResultScene.miss += 1
 			ResultScene.combo = 0
-			self.removeChildren(in: [judgeNote.image])
+//			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
 			setNextIsJudgeable(judgeNote: judgeNote)
-			lanes[laneIndex].nextNoteIndex += 1
+			releaseNote(lane: lane)
+//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		default:
 			return false
@@ -102,18 +111,18 @@ extension GameScene{
 
 	}
 	
-	func parfectMiddleJudge(laneIndex:Int, currentTime: TimeInterval) -> Bool{	  //対象ノーツが実在し、判定したかを返す(middleのparfect専用)
+	func parfectMiddleJudge(lane:Lane, currentTime: TimeInterval) -> Bool{	  //対象ノーツが実在し、判定したかを返す(middleのparfect専用)
 		
-		let nextIndex = lanes[laneIndex].nextNoteIndex
+//		let nextIndex = lanes[laneIndex].nextNoteIndex
 		
-		if nextIndex >= lanes[laneIndex].laneNotes.count{//最後まで判定が終わってる
+		if lane.laneNotes.count == 0 {//最後まで判定が終わってる
 			return false
-		}else if !(lanes[laneIndex].laneNotes[nextIndex] is Middle){//種類が違う
+		}else if !(lane.laneNotes[0] is Middle){//種類が違う
 			return false
 		}
 		
-		lanes[laneIndex].update(passedTime: currentTime - startTime, BPMs)
-		switch lanes[laneIndex].timeState {
+		lane.update(passedTime: currentTime - startTime, BPMs)
+		switch lane.timeState {
 		case .parfect:	//タップ直後とかでも入ってしまう？（updateとtouchesシリーズは並列処理されている？）
 			setJudgeLabelText(text: "parfect!!")
 			ResultScene.parfect += 1
@@ -121,16 +130,26 @@ extension GameScene{
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-			self.removeChildren(in: [lanes[laneIndex].laneNotes[nextIndex].image])
-			lanes[laneIndex].laneNotes[nextIndex].isJudged = true
-			setNextIsJudgeable(judgeNote: lanes[laneIndex].laneNotes[nextIndex])
-			lanes[laneIndex].nextNoteIndex += 1
+//			self.removeChildren(in: [lanes[laneIndex].laneNotes[0].image])
+			lane.laneNotes[0].isJudged = true
+			setNextIsJudgeable(judgeNote: lane.laneNotes[0])
+			releaseNote(lane: lane)
+//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		default: break
 		}
 		
 		return false
 		
+	}
+	
+	func missJudge(lane: Lane){
+		setJudgeLabelText(text: "miss!")
+		ResultScene.miss += 1
+		ResultScene.combo = 0
+//		self.removeChildren(in: [lanes[laneIndex].laneNotes[0].image])
+		lane.laneNotes[0].isJudged = true
+		releaseNote(lane: lane)
 	}
 	
 	func setNextIsJudgeable(judgeNote:Note)  {
@@ -141,5 +160,52 @@ extension GameScene{
 			let note = judgeNote as! Middle
 			note.next.isJudgeable = true
 		}
+	}
+	
+	func releaseNote(lane: Lane){//ノーツや同時押し線、関連ノードを開放する
+		self.removeChildren(in: [lane.laneNotes[0].image])	//GameSceneからのNote.imageへの参照を削除
+		if let note = lane.laneNotes.first! as? TapEnd{		//GameSceneからのロングimageへの参照を削除
+			if let before = note.before as? Middle {
+				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
+			}else if let before = note.before as? TapStart {
+				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
+			}else{
+				print("beforeに入っているものが不正です")
+			}
+			
+		}else if let note = lane.laneNotes.first! as? FlickEnd{		//GameSceneからのロングimageへの参照を削除
+			if let before = note.before as? Middle {
+				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
+			}else if let before = note.before as? TapStart {
+				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
+			}else{
+				print("beforeに入っているものが不正です")
+			}
+			
+		}else if let note = lane.laneNotes.first! as? Middle{
+			if let before = note.before as? Middle {
+				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
+			}else if let before = note.before as? TapStart {
+				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
+			}else{
+				print("beforeに入っているものが不正です")
+			}
+		}
+		if let i = sameLines.index(where: {$0.note === lane.laneNotes.first!}){	//同時押し線を解放
+			self.removeChildren(in: [sameLines[i].line])
+			sameLines.remove(at: i)
+		}
+		if let note = lane.laneNotes.first! as? TapEnd{		//始点から終点まで、連鎖的に参照を削除
+			let index = notes.index(where: {$0 === note.start})
+			notes.remove(at: index!)
+		}else if let note = lane.laneNotes.first! as? FlickEnd{
+			let index = notes.index(where: {$0 === note.start})
+			notes.remove(at: index!)
+		}else if lane.laneNotes.first! is Tap || lane.laneNotes.first! is Flick{
+			let index = notes.index(where: {$0 === lane.laneNotes.first!})
+			notes.remove(at: index!)
+		}
+		lane.laneNotes.removeFirst()					//レーンからの参照を削除
+		
 	}
 }

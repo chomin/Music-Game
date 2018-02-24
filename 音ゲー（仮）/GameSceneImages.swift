@@ -111,7 +111,7 @@ extension GameScene{
 		line.position.x = i.position.x	//ここでは不要？
 		line.zPosition = -1
 		self.addChild(line)
-		sameLines.append((i,line))
+		sameLines.append(SameLine(note: i,line: line))
 		
 	}
 	

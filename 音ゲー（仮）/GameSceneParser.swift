@@ -297,6 +297,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		var i = 0
 		while i < longNotes1.count {
 			if longNotes1[i] is TapStart {
+				let start = longNotes1[i]
 				notes.append(longNotes1[i])
 				while !(longNotes1[i] is TapEnd) && !(longNotes1[i] is FlickEnd) {
 					guard i + 1 < longNotes1.count else {
@@ -310,12 +311,22 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 						longNotes1[i] = temp
 					} else if let temp = longNotes1[i] as? Middle {
 						temp.next = longNotes1[i + 1]
+						temp.before = longNotes1[i - 1]
 						longNotes1[i] = temp
 					} else {
 						throw ParseError.unexpected("予期せぬエラー")
 					}
 					
 					i += 1
+				}
+				if let temp = longNotes1[i] as? TapEnd {
+					temp.start = start
+					temp.before = longNotes1[i - 1]
+				}else if let temp = longNotes1[i] as? FlickEnd {
+					temp.start = start
+					temp.before = longNotes1[i - 1]
+				}else{
+					throw ParseError.unexpected("予期せぬエラー")
 				}
 				i += 1
 			} else {
@@ -326,6 +337,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		i = 0
 		while i < longNotes2.count {
 			if longNotes2[i] is TapStart {
+				let start = longNotes2[i]
 				notes.append(longNotes2[i])
 				while !(longNotes2[i] is TapEnd) && !(longNotes2[i] is FlickEnd) {
 					guard i + 1 < longNotes2.count else {
@@ -339,12 +351,22 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 						longNotes2[i] = temp
 					} else if let temp = longNotes2[i] as? Middle {
 						temp.next = longNotes2[i + 1]
+						temp.before = longNotes2[i - 1]
 						longNotes2[i] = temp
 					} else {
 						throw ParseError.unexpected("予期せぬエラー")
 					}
 					
 					i += 1
+				}
+				if let temp = longNotes2[i] as? TapEnd {
+					temp.start = start
+					temp.before = longNotes2[i - 1]
+				}else if let temp = longNotes2[i] as? FlickEnd {
+					temp.start = start
+					temp.before = longNotes2[i - 1]
+				}else{
+					throw ParseError.unexpected("予期せぬエラー")
 				}
 				i += 1
 			} else {
