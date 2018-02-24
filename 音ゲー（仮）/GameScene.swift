@@ -28,13 +28,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 	let JLScale:CGFloat = 1.25	//拡大縮小アニメーションの倍率
 	
 	//音楽プレイヤー
-	var BGM: AVAudioPlayer?
+	var BGM: AVAudioPlayer!
 	let actionSoundSet = ActionSoundPlayers()
 
 	
 	//画像(ノーツ以外)
 	var judgeLine: SKShapeNode!
 	var sameLines: [SameLine] = []	//連動する始点側のノーツと同時押しライン
+
 	
 	// 楽曲データ
 	var musicName: String		// 曲名を表示したりするかもしれないのでコメントアウトにとどめる
@@ -47,8 +48,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
 	var BPMs: [(bpm: Double, startPos: Double)] = []		// 可変BPM情報
 	
-	var startTime: TimeInterval = 0.0	// シーン移動した時の時間
-	var resignActiveTime: TimeInterval = 0.0
+//	var startTime: TimeInterval = 0.0	// シーン移動した時の時間
+	var BGMOffsetTime: TimeInterval = 0.0	// 経過時間とBGM.currentTimeのずれ。一定
+//	var resignActiveTime: TimeInterval = 0.0
 	var lanes: [Lane] = [Lane(laneIndex:0),Lane(laneIndex:1),Lane(laneIndex:2),Lane(laneIndex:3),Lane(laneIndex:4),Lane(laneIndex:5),Lane(laneIndex:6)]		// レーン
 	
 	
@@ -68,9 +70,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 			BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
 		} catch {
 			print("AVAudioPlayerインスタンス作成失敗")
+			exit(1)
 		}
 		// バッファに保持していつでも再生できるようにする
-		BGM?.prepareToPlay()
+		BGM.prepareToPlay()
 	}
 	
 	required init?(coder aDecoder: NSCoder) {
@@ -157,14 +160,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 			}
 		}
 		
-		//画像、音楽、ラベルの設定
-		//		setAllSounds()
+		// 画像の設定
 		setImages()
 		
 		// BGMの再生(時間指定)
-		startTime = CACurrentMediaTime()
-		BGM?.play(atTime: startTime + (musicStartPos/BPMs[0].bpm)*60)	//建築予定地
-		BGM?.delegate = self
+//		startTime = CACurrentMediaTime()
+		BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
+		BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)	//建築予定地
+		BGM.delegate = self
 		
 		//各レーンにノーツをセット
 		for note in notes{
@@ -195,17 +198,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		
 		// 各ノーツの位置や大きさを更新
 		for note in notes {
-			note.update(passedTime: currentTime - startTime, BPMs)
+			note.update(passedTime: BGM.currentTime + BGMOffsetTime, BPMs)
 		}
 		
 		// 同時押しラインの更新
-		for i in sameLines{
+		for sameLine in sameLines{
+			let (note1, note2, line) = (sameLine.note1, sameLine.note2, sameLine.line)
 			// 同時押しラインを移動
-			i.line.position = i.note.position
-			i.line.isHidden = i.note.image.isHidden
+			line.position = note1.position
+			line.isHidden = note1.image.isHidden || note2.image.isHidden
 			
 			// 大きさも変更
-			i.line.setScale(i.note.image.xScale / Note.scale)
+			line.setScale(note1.image.xScale / Note.scale)
 		}
 		
 		
@@ -242,8 +246,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		
 		//レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
 		for lane in lanes {
-			lane.update(passedTime: currentTime - startTime, BPMs)
+			lane.update(passedTime: BGM.currentTime + BGMOffsetTime, BPMs)
 			if lane.timeState == .passed && lane.laneNotes.count > 0{
+
 				
 				missJudge(lane: lane)
 //				setJudgeLabelText(text: "miss!")
@@ -555,14 +560,50 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 	
 	//アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
 	func applicationWillResignActive() {
-		resignActiveTime = CACurrentMediaTime()
-		BGM?.pause()
+//		// 以下2つの処理はできるだけ同時に行う
+		BGM.pause()
+//		resignActiveTime = CACurrentMediaTime()
+		
+		// 表示されているノーツを非表示に
+		for note in notes {
+			note.image.isHidden = true
+			if let start = note as? TapStart {
+				start.longImages.long.isHidden = true
+				start.longImages.circle.isHidden = true
+				var following = start.next
+				while true {
+					if let middle = following as? Middle {
+						middle.image.isHidden = true
+						middle.longImages.long.isHidden = true
+						middle.longImages.circle.isHidden = true
+						following = middle.next
+					} else {
+						following.image.isHidden = true
+						break
+					}
+				}
+			}
+		}
+		// 途中まで判定したロングノーツがあれば最後まで判定済みに
+		for note in notes {
+			if let start = note as? TapStart, start.isJudged {
+				var following = start.next
+				while let middle = following as? Middle {
+					middle.isJudged = true
+					following = middle.next
+				}
+				following.isJudged = true
+			}
+		}
 	}
 	
 	//アプリを再開したときに呼ばれる
 	func applicationDidBecomeActive() {
-		BGM?.play()
-		startTime += CACurrentMediaTime() - resignActiveTime
+		actionSoundSet.stopAll()
+		BGM.currentTime -= 3	// 3秒巻き戻し
+//		// 以下2つの処理はできるだけ同時にこの順序で行う
+		BGM.play()
+//		startTime += CACurrentMediaTime() - resignActiveTime + 3
 	}
 	
 }
@@ -628,7 +669,8 @@ class Dimensions {
 
 
 struct SameLine {
-	unowned var note:Note
+	unowned var note1:Note
+	unowned var note2:Note
 	var line:SKShapeNode
 }
 

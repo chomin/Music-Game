@@ -119,10 +119,13 @@ extension GameScene{
 			return false
 		}else if !(lane.laneNotes[0] is Middle){//種類が違う
 			return false
+		}else if !(lane.laneNotes[0].isJudgeable){
+			return false
 		}
-		
-		lane.update(passedTime: currentTime - startTime, BPMs)
+
+		lane.update(passedTime: BGM.currentTime + BGMOffsetTime, BPMs)
 		switch lane.timeState {
+
 		case .parfect:	//タップ直後とかでも入ってしまう？（updateとtouchesシリーズは並列処理されている？）
 			setJudgeLabelText(text: "parfect!!")
 			ResultScene.parfect += 1
@@ -143,13 +146,20 @@ extension GameScene{
 		
 	}
 	
-	func missJudge(lane: Lane){
+	@discardableResult
+	func missJudge(lane: Lane) -> Bool{
+		guard lane.laneNotes[0].isJudgeable else {
+			return false
+		}
+		
 		setJudgeLabelText(text: "miss!")
 		ResultScene.miss += 1
 		ResultScene.combo = 0
 //		self.removeChildren(in: [lanes[laneIndex].laneNotes[0].image])
 		lane.laneNotes[0].isJudged = true
+		setNextIsJudgeable(judgeNote: lane.laneNotes[0])
 		releaseNote(lane: lane)
+		return true
 	}
 	
 	func setNextIsJudgeable(judgeNote:Note)  {
@@ -191,7 +201,10 @@ extension GameScene{
 				print("beforeに入っているものが不正です")
 			}
 		}
-		if let i = sameLines.index(where: {$0.note === lane.laneNotes.first!}){	//同時押し線を解放
+		if let i = sameLines.index(where: {$0.note1 === lane.laneNotes.first!}){	//同時押し線を解放
+			self.removeChildren(in: [sameLines[i].line])
+			sameLines.remove(at: i)
+		}else if let i = sameLines.index(where: {$0.note2 === lane.laneNotes.first!}){	//同時押し線を解放
 			self.removeChildren(in: [sameLines[i].line])
 			sameLines.remove(at: i)
 		}

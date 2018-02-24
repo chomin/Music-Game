@@ -108,11 +108,11 @@ extension GameScene{
 		let line = SKShapeNode(points: &lPoint, count: lPoint.count)
 		line.lineWidth = 3.0
 		line.strokeColor = UIColor.white
-		line.position.x = i.position.x	//ここでは不要？
 		line.zPosition = -1
 		self.addChild(line)
-		sameLines.append(SameLine(note: i,line: line))
-		
+
+		sameLines.append(SameLine(note1: i, note2:j, line: line))
+
 	}
 	
 

@@ -54,8 +54,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		print("DidBecomeActive")
 		
 		self.gsDelegate?.applicationDidBecomeActive()
-		
-//        GameScene.BGM?.currentTime -= 3    //3秒巻き戻し
 	}
 
 	func applicationWillTerminate(_ application: UIApplication) {
