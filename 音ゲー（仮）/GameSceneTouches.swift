@@ -173,39 +173,12 @@ extension GameScene{
 	}
 	
 	func releaseNote(lane: Lane){//ノーツや同時押し線、関連ノードを開放する
-		self.removeChildren(in: [lane.laneNotes[0].image])	//GameSceneからのNote.imageへの参照を削除
-		if let note = lane.laneNotes.first! as? TapEnd{		//GameSceneからのロングimageへの参照を削除
-			if let before = note.before as? Middle {
-				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
-			}else if let before = note.before as? TapStart {
-				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
-			}else{
-				print("beforeに入っているものが不正です")
-			}
-			
-		}else if let note = lane.laneNotes.first! as? FlickEnd{		//GameSceneからのロングimageへの参照を削除
-			if let before = note.before as? Middle {
-				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
-			}else if let before = note.before as? TapStart {
-				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
-			}else{
-				print("beforeに入っているものが不正です")
-			}
-			
-		}else if let note = lane.laneNotes.first! as? Middle{
-			if let before = note.before as? Middle {
-				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
-			}else if let before = note.before as? TapStart {
-				self.removeChildren(in: [before.longImages.long, before.longImages.circle])
-			}else{
-				print("beforeに入っているものが不正です")
-			}
-		}
+
 		if let i = sameLines.index(where: {$0.note1 === lane.laneNotes.first!}){	//同時押し線を解放
-			self.removeChildren(in: [sameLines[i].line])
+
 			sameLines.remove(at: i)
 		}else if let i = sameLines.index(where: {$0.note2 === lane.laneNotes.first!}){	//同時押し線を解放
-			self.removeChildren(in: [sameLines[i].line])
+
 			sameLines.remove(at: i)
 		}
 		if let note = lane.laneNotes.first! as? TapEnd{		//始点から終点まで、連鎖的に参照を削除

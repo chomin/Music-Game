@@ -668,10 +668,20 @@ class Dimensions {
 
 
 
-struct SameLine {
+class SameLine {
 	unowned var note1:Note
 	unowned var note2:Note
 	var line:SKShapeNode
+	
+	init(note1: Note, note2: Note, line: SKShapeNode) {
+		self.note1 = note1
+		self.note2 = note2
+		self.line = line
+	}
+	
+	deinit {
+		self.line.removeFromParent()
+	}
 }
 
 
