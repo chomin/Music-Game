@@ -230,7 +230,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 					
 					if pos.x > buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {//ボタンの範囲
 						
-						if self.parfectMiddleJudge(lane: lanes[index], currentTime: currentTime){//middleの判定
+						if self.parfectMiddleJudge(lane: lanes[j], currentTime: currentTime){//middleの判定
 							
 							self.actionSoundSet.play(type: .middle)
 							self.allTouches[index].isJudgeableFlickEnd = true
