@@ -14,7 +14,7 @@ import AVFoundation
 class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーをするシーン
 	
 	//
-//	let judgeQueue = DispatchQueue(label: "judge_queue")	//キューに入れた処理内容を順番に実行（updateとtouchesシリーズから呼び出されるjudgeの並列処理防止用）
+	let judgeQueue = DispatchQueue(label: "judge_queue")	//キューに入れた処理内容を順番に実行(FPS落ち対策)
 	
 	//appの起動、終了等に関するデリゲート
 	var appDelegate: AppDelegate!
@@ -164,7 +164,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		setImages()
 		
 		// BGMの再生(時間指定)
-//		startTime = CACurrentMediaTime()
+		//		startTime = CACurrentMediaTime()
 		BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
 		BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)	//建築予定地
 		BGM.delegate = self
@@ -215,56 +215,47 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		
 		//判定関係
 		//middleの判定（同じところで長押しのやつ）
-		//		judgeQueue.async {
-		
-		
-		for (index,value) in self.allTouches.enumerated(){
-			var pos = value.touch.location(in: self.view)
-			pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+		judgeQueue.sync {
 			
-			if pos.y < self.frame.width/3{    //上界
+			
+			for (index,value) in self.allTouches.enumerated(){
+				var pos = value.touch.location(in: self.view)
+				pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
 				
-				for j in 0...6{
+				if pos.y < self.frame.width/3{    //上界
 					
-					let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
-					
-					if pos.x > buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {//ボタンの範囲
+					for j in 0...6{
 						
-						if self.parfectMiddleJudge(lane: lanes[j], currentTime: currentTime){//middleの判定
+						let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
+						
+						if pos.x > buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {//ボタンの範囲
 							
-							self.actionSoundSet.play(type: .middle)
-							self.allTouches[index].isJudgeableFlickEnd = true
-							break
+							if self.parfectMiddleJudge(lane: self.lanes[j], currentTime: currentTime){//middleの判定
+								
+								self.actionSoundSet.play(type: .middle)
+								self.allTouches[index].isJudgeableFlickEnd = true
+								break
+							}
 						}
 					}
 				}
 			}
-		}
-		//			}
-		
-		
-		
-		//レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
-		for lane in lanes {
-			lane.update(passedTime: BGM.currentTime + BGMOffsetTime, BPMs)
-			if lane.timeState == .passed && lane.laneNotes.count > 0{
-
-				
-				missJudge(lane: lane)
-//				setJudgeLabelText(text: "miss!")
-//				ResultScene.miss += 1
-//				ResultScene.combo = 0
-//				self.removeChildren(in: [lane.laneNotes[0].image])	//ここで消しても大丈夫なはず
-//				lane.laneNotes[0].isJudged = true
-//				releaseNote(laneIndex: index)
-				
-//				//次のノーツを格納
-//				lane.nextNoteIndex += 1
+			
+			
+			
+			//レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
+			for lane in self.lanes {
+				lane.update(passedTime: self.BGM.currentTime + self.BGMOffsetTime, self.BPMs)
+				if lane.timeState == .passed && lane.laneNotes.count > 0{
+					
+					self.missJudge(lane: lane)
+				}
 			}
 		}
+		
 	}
-
-
+	
+	
 	//判定ラベルのテキストを更新（アニメーション付き）
 	func setJudgeLabelText(text:String){
 		
@@ -290,7 +281,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 			if !(i.isTimeLagRenewed){ return }
 		}
 		
-//		judgeQueue.async {
+		judgeQueue.sync {
 			for i in touches {//すべてのタッチに対して処理する（同時押しなどもあるため）
 				
 				var pos = i.location(in: self.view)
@@ -312,8 +303,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 							if (self.lanes[index].timeState == .still)  || (self.lanes[index].timeState == .passed) { continue }
 							
 //							let nextIndex = lanes[index].nextNoteIndex
-							if (lanes[index].laneNotes.count == 0) { continue }
-							let note = lanes[index].laneNotes[0]
+							if (self.lanes[index].laneNotes.count == 0) { continue }
+							let note = self.lanes[index].laneNotes[0]
 							let distanceToButton = sqrt(pow(pos.x - buttonPosX, 2) + pow(pos.y - Dimensions.judgeLineY, 2))
 							
 							if self.lanes[index].isObserved == .Behind {//middleの判定圏内（後）
@@ -339,7 +330,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 						}
 						
 						if (nearbyNotes[0].note is Tap) || (nearbyNotes[0].note is TapStart) || (nearbyNotes[0].note is Middle){
-							if self.judge(lane: lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag) {
+							if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag) {
 								self.actionSoundSet.play(type: .tap)
 								self.allTouches[self.allTouches.count-1].isJudgeableFlick = false	//このタッチでのフリック判定を禁止
 								
@@ -354,8 +345,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 					}
 				}
 			}
-//		}
-		
+		}
+	
 //		print("began end")
 	}
 	
@@ -366,7 +357,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 			if !(i.isTimeLagRenewed){ return }
 		}
 		
-//		judgeQueue.async {
+		judgeQueue.sync {
 		
 			
 			for i in touches{
@@ -395,7 +386,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 								
 								if self.lanes[index].isObserved == .Front {
 									//parfect時に該当ボタンにいなければ、入ってきた時間で判定
-									if self.judge(lane: lanes[index], timeLag: lanes[index].timeLag){
+									if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
 										self.actionSoundSet.play(type: .middle)
 										self.allTouches[touchIndex].isJudgeableFlickEnd = true
 										
@@ -408,8 +399,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 						
 						//フリックの判定
 //						let nextIndex = lanes[index].nextNoteIndex
-						if (lanes[index].laneNotes.count == 0) { continue }
-						let note = lanes[index].laneNotes[0]
+						if (self.lanes[index].laneNotes.count == 0) { continue }
+						let note = self.lanes[index].laneNotes[0]
 						if moveDistance > 10 && self.lanes[index].timeState != .still && self.lanes[index].timeState != .passed {
 							
 							
@@ -433,7 +424,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 							return A.timelag < B.timelag
 						}
 						if (nearbyNotes[0].note is Flick) || (nearbyNotes[0].note is FlickEnd) {
-							if self.judge(lane: lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag) {
+							if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag) {
 								self.actionSoundSet.play(type: .flick)
 								self.allTouches[touchIndex].isJudgeableFlick = false	//このタッチでのフリック判定を禁止
 								self.allTouches[touchIndex].isJudgeableFlickEnd = false
@@ -446,7 +437,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 
 				
 			}
-//		}
+		}
 		
 //		print("move end")
 	}
@@ -456,7 +447,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 			if !(i.isTimeLagRenewed){ return }
 		}
 		
-//		judgeQueue.async {
+		judgeQueue.sync {
 		
 			
 			for i in touches {
@@ -478,7 +469,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 							//						lanes[index].isTouched = false
 							if pos.x < buttonPos - Dimensions.halfBound || pos.x > buttonPos + Dimensions.halfBound{//移動後にレーンから外れていた場合
 								if self.lanes[index].isObserved == .Front {
-									if self.judge(lane: lanes[index], timeLag: self.lanes[index].timeLag){
+									if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
 										self.actionSoundSet.play(type: .middle)
 //										self.allTouches[touchIndex].isJudgeableFlickEnd = true	//離すから不要
 										
@@ -496,7 +487,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 							//lane.isTouchedをリセット
 							//						lanes[index].isTouched = false
 							if self.lanes[index].isObserved == .Front {
-								if self.judge(lane: lanes[index], timeLag: self.lanes[index].timeLag){
+								if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
 									self.actionSoundSet.play(type: .middle)
 //									self.allTouches[touchIndex].isJudgeableFlickEnd = true　//離すから不要
 									
@@ -506,26 +497,20 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 							}
 							
 //							let nextIndex = lanes[index].nextNoteIndex
-							if (lanes[index].laneNotes.count == 0) { continue }
-							let note = lanes[index].laneNotes[0]
+							if (self.lanes[index].laneNotes.count == 0) { continue }
+							let note = self.lanes[index].laneNotes[0]
 							if (note is TapEnd){
-								if self.judge(lane: lanes[index], timeLag: lanes[index].timeLag){//離しの判定
+								if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){//離しの判定
 									
 									self.actionSoundSet.play(type: .tap)
 									break
 								}else{
 									print("離しの判定に失敗")
 								}
-							}else if ((note is Flick && self.allTouches[touchIndex].isJudgeableFlick) || (note is FlickEnd && self.allTouches[touchIndex].isJudgeableFlickEnd)) && lanes[index].isJudgeRange  {	//flickなのにflickせずに離したらmiss
+							}else if ((note is Flick && self.allTouches[touchIndex].isJudgeableFlick) || (note is FlickEnd && self.allTouches[touchIndex].isJudgeableFlickEnd)) && self.lanes[index].isJudgeRange  {	//flickなのにflickせずに離したらmiss
 								
-								missJudge(lane: lanes[index])
-//								setJudgeLabelText(text: "miss!")
-//								ResultScene.miss += 1
-//								ResultScene.combo = 0
-//								self.removeChildren(in: [lanes[index].laneNotes[0].image])
-//								lanes[index].laneNotes[0].isJudged = true
-//								releaseNote(laneIndex: index)
-//								lanes[index].nextNoteIndex += 1
+								self.missJudge(lane: self.lanes[index])
+//
 							}
 						}
 					}
@@ -534,7 +519,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 				
 				self.allTouches.remove(at: self.allTouches.index(where: {$0.touch == i})!)
 			}
-//		}
+		}
 	}
 	
 	

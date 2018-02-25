@@ -24,28 +24,22 @@ extension GameScene{
 	}
 	
 	
+	
+	
 	func judge(lane:Lane, timeLag:TimeInterval) -> Bool{	  //対象ノーツが実在し、判定したかを返す.timeLagは（judge呼び出し時ではなく）タッチされた時のものを使用。
-
+		
+		
 		guard lane.laneNotes.count > 0 else {
 			return false
 		}
 		
-//		let nextIndex = lanes[laneIndex].nextNoteIndex
 		let judgeNote = lane.laneNotes[0]
 
 		guard judgeNote.isJudgeable else {
 			return false
 		}
 		
-//		guard nextIndex < lanes[laneIndex].laneNotes.count else {//最後まで判定が終わってる
-//			return false
-//		}
-
-		
-		
-		
-		
-		
+	
 		switch lane.getTimeState(timeLag: timeLag) {
 		case .parfect:
 			setJudgeLabelText(text: "parfect!!")
@@ -54,11 +48,9 @@ extension GameScene{
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-//			self.removeChildren(in: [judgeNote.image])	//GameSceneからのNote.imageへの参照を削除
 			judgeNote.isJudged = true
 			setNextIsJudgeable(judgeNote: judgeNote)
 			releaseNote(lane: lane)
-//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .great:
 			setJudgeLabelText(text: "great!")
@@ -67,53 +59,43 @@ extension GameScene{
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-//			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
 			setNextIsJudgeable(judgeNote: judgeNote)
 			releaseNote(lane: lane)
-//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .good:
 			setJudgeLabelText(text: "good")
 			ResultScene.good += 1
 			ResultScene.combo = 0
-//			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
 			setNextIsJudgeable(judgeNote: judgeNote)
 			releaseNote(lane: lane)
-//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .bad:
 			setJudgeLabelText(text: "bad")
 			ResultScene.bad += 1
 			ResultScene.combo = 0
-//			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
 			setNextIsJudgeable(judgeNote: judgeNote)
 			releaseNote(lane: lane)
-//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		case .miss:
 			setJudgeLabelText(text: "miss!")
 			ResultScene.miss += 1
 			ResultScene.combo = 0
-//			self.removeChildren(in: [judgeNote.image])
 			judgeNote.isJudged = true
 			setNextIsJudgeable(judgeNote: judgeNote)
 			releaseNote(lane: lane)
-//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		default:
 			return false
 		
 		}
 
-
+		
 	}
 	
 	func parfectMiddleJudge(lane:Lane, currentTime: TimeInterval) -> Bool{	  //対象ノーツが実在し、判定したかを返す(middleのparfect専用)
-		
-//		let nextIndex = lanes[laneIndex].nextNoteIndex
 		
 		if lane.laneNotes.count == 0 {//最後まで判定が終わってる
 			return false
@@ -126,22 +108,19 @@ extension GameScene{
 		lane.update(passedTime: BGM.currentTime + BGMOffsetTime, BPMs)
 		switch lane.timeState {
 
-		case .parfect:	//タップ直後とかでも入ってしまう？（updateとtouchesシリーズは並列処理されている？）
+		case .parfect:
 			setJudgeLabelText(text: "parfect!!")
 			ResultScene.parfect += 1
 			ResultScene.combo += 1
 			if ResultScene.combo > ResultScene.maxCombo{
 				ResultScene.maxCombo += 1
 			}
-//			self.removeChildren(in: [lanes[laneIndex].laneNotes[0].image])
 			lane.laneNotes[0].isJudged = true
 			setNextIsJudgeable(judgeNote: lane.laneNotes[0])
 			releaseNote(lane: lane)
-//			lanes[laneIndex].nextNoteIndex += 1
 			return true
 		default: break
 		}
-		
 		return false
 		
 	}
@@ -155,7 +134,6 @@ extension GameScene{
 		setJudgeLabelText(text: "miss!")
 		ResultScene.miss += 1
 		ResultScene.combo = 0
-//		self.removeChildren(in: [lanes[laneIndex].laneNotes[0].image])
 		lane.laneNotes[0].isJudged = true
 		setNextIsJudgeable(judgeNote: lane.laneNotes[0])
 		releaseNote(lane: lane)
