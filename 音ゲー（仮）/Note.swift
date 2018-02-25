@@ -10,18 +10,23 @@ import SpriteKit
 
 class Tap: Note {
 	
-	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat, BPMs: [(bpm: Double, startPos: Double)]) {
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
 		// imageのインスタンス(白円)を作成
 		self.image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
 		image.fillColor = UIColor.white
 		image.isHidden = true	// 初期状態では隠しておく
+		
+		setAppearTime(BPMs: BPMs)//appearTimeの設定
 	}
 	
 	override func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
+			return
+		}
+		guard passedTime > self.appearTime else {
 			return
 		}
 		
@@ -38,7 +43,7 @@ class Tap: Note {
 		setScale()
 		
 		// ノーツが視点を向くように
-		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (positionOnLane + Dimensions.horizontalDistance * 8))
+		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (positionOnLane + Dimensions.horizontalDistance * 8))
 		
 		// image.isHiddenを更新
 		if position.y > Dimensions.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
@@ -51,7 +56,7 @@ class Tap: Note {
 
 class Flick: Note {
 	
-	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat, BPMs: [(bpm: Double, startPos: Double)]) {
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
 		// imageのインスタンス(マゼンタ三角形)を作成
@@ -67,11 +72,16 @@ class Flick: Note {
 		image.lineWidth = 3.0
 		image.fillColor = UIColor.magenta
 		image.isHidden = true	// 初期状態では隠しておく
+		
+		setAppearTime(BPMs: BPMs)
 	}
 	
 	override func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
+			return
+		}
+		guard passedTime > self.appearTime else {
 			return
 		}
 		
@@ -98,10 +108,14 @@ class Flick: Note {
 
 class TapStart: Note {
 	
-	var next = Note()				// 次のノーツ（仮のインスタンス）
+	var next = Note()	{								// 次のノーツ（仮のインスタンス）
+		didSet{
+			next.appearTime = self.appearTime
+		}
+	}
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	
-	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat, BPMs: [(bpm: Double, startPos: Double)]) {
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 		
 		// imageのインスタンス(緑円)を作成
@@ -117,6 +131,8 @@ class TapStart: Note {
 		longImages.long.isHidden = true
 		longImages.circle.fillColor = UIColor.green
 		longImages.circle.isHidden = true
+		
+		setAppearTime(BPMs: BPMs)
 	}
 	
 	deinit {
@@ -125,6 +141,9 @@ class TapStart: Note {
 	}
 	
 	override func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+		guard passedTime > self.appearTime else {
+			return
+		}
 		super.update(passedTime: passedTime, BPMs)
 
 		// 後続ノーツを先にupdate
@@ -150,7 +169,7 @@ class TapStart: Note {
 		
 		
 		// ノーツが視点を向くように
-		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (positionOnLane + Dimensions.horizontalDistance * 8))
+		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (positionOnLane + Dimensions.horizontalDistance * 8))
 		
 		
 		// longImage.longを更新
@@ -204,7 +223,7 @@ class TapStart: Note {
 			longImages.circle.yScale = deltaY / Dimensions.laneWidth
 			longImages.circle.xScale = Note.scale
 			longImages.circle.position = long.startPos
-			longImages.circle.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (Dimensions.horizontalDistance * 8))
+			longImages.circle.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (Dimensions.horizontalDistance * 8))
 		}
 		
 		
@@ -229,8 +248,11 @@ class TapStart: Note {
 
 class Middle: Note {
 
-	var next = Note()				// 次のノーツ（仮のインスタンス）
-//	unowned var before = Note()
+	var next = Note()	{								// 次のノーツ（仮のインスタンス）
+		didSet{
+			next.appearTime = self.appearTime
+		}
+	}
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	override var position: CGPoint {								// positionを左端ではなく線の中点にするためオーバーライド
 		get {
@@ -242,6 +264,7 @@ class Middle: Note {
 	}
 	
 	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+		
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
 	
 		self.isJudgeable = false
@@ -272,6 +295,9 @@ class Middle: Note {
 	}
 
 	override func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+		guard passedTime > self.appearTime else {
+			return
+		}
 		super.update(passedTime: passedTime, BPMs)
 		
 		// 後続ノーツを先にupdate
@@ -343,7 +369,7 @@ class Middle: Note {
 			longImages.circle.yScale = deltaY / Dimensions.laneWidth
 			longImages.circle.xScale = Note.scale
 			longImages.circle.position = long.startPos
-			longImages.circle.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (Dimensions.horizontalDistance * 8))
+			longImages.circle.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (Dimensions.horizontalDistance * 8))
 		}
 		
 		
@@ -369,7 +395,6 @@ class Middle: Note {
 class TapEnd: Note {
 	
 	unowned var start = Note()	//循環参照防止の為unowned参照にする
-//	unowned var before = Note()
 	
 	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
@@ -387,6 +412,9 @@ class TapEnd: Note {
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
+		guard passedTime > self.appearTime else {
+			return
+		}
 		
 		super.update(passedTime: passedTime, BPMs)
 		
@@ -397,7 +425,7 @@ class TapEnd: Note {
 		setScale()
 		
 		// ノーツが視点を向くように
-		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - lane) / (positionOnLane + Dimensions.horizontalDistance * 8))
+		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (positionOnLane + Dimensions.horizontalDistance * 8))
 
 		// image.isHiddenを更新
 		if position.y > Dimensions.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
@@ -411,7 +439,6 @@ class TapEnd: Note {
 class FlickEnd: Note {
 	
 	unowned var start = Note()
-//	unowned var before = Note()
 	
 	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
 		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
@@ -458,10 +485,10 @@ class FlickEnd: Note {
 
 
 // ノーツ基本クラス
-class Note {	//強参照はGameScene.notes[]とNote.nextのみにすること
+class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]のみにすること
 	
 	let beat: Double			// "拍"単位！小節ではない！！！
-	let lane: Int				// レーンのインデックス(0始まり)
+	let laneIndex: Int				// レーンのインデックス(0始まり)
 
 	var image = SKShapeNode()	// ノーツの画像
 	var size: CGFloat = 0		// ノーツの横幅
@@ -478,22 +505,23 @@ class Note {	//強参照はGameScene.notes[]とNote.nextのみにすること
 	var positionOnLane: CGFloat	= 0.0		// ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
 	static let scale: CGFloat = 1.3			// レーン幅に対するノーツの幅の倍率
 	let speed: CGFloat  					// スピード
+	
+	var appearTime: TimeInterval = 0		//判定線を超える予定時刻。これ以降にposの計算&更新を行う。始点系はinit()で、その他はnextのdidSetで設定する。
 
 	
 	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
 	  self.speed = 1350.0 * speedRatio
         self.beat = beat
-        self.lane = lane
+        self.laneIndex = lane
     }
 	init() {
 		self.beat = 0
-		self.lane = 0
+		self.laneIndex = 0
 		self.speed = 1350.0
 	}
 	
 	deinit {
 		self.image.removeFromParent()
-//		print("Noteが解放されました:\(self)")
 	}
 	// ノーツの座標等の更新、毎フレーム呼ばれる
 	func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
@@ -521,7 +549,7 @@ class Note {	//強参照はGameScene.notes[]とNote.nextのみにすること
 		/* y座標の計算 */
 		
 		// 球面?に投写
-		let denomOfAtan = pow(Dimensions.R, 2) + Dimensions.horizontalDistance * positionOnLane		// atanの分母
+		let denomOfAtan = pow(Dimensions.R, 2) + Dimensions.horizontalDistance * positionOnLane		// atanの分母(denominator)
 		guard 0 < denomOfAtan else {	// atan内の分母が0になるのを防止
 			return
 		}
@@ -533,8 +561,8 @@ class Note {	//強参照はGameScene.notes[]とNote.nextのみにすること
 		var posX: CGFloat
 		
 		let b = Dimensions.horizonY - Dimensions.judgeLineY   								// 水平線から判定線までの2D上の距離
-		let c = CGFloat(3 - lane) * (Dimensions.laneWidth - Dimensions.horizonLength/7)		// 水平線上と判定線上でのx座標のずれ
-		posX = Dimensions.laneWidth * 3/2 + CGFloat(lane) * Dimensions.laneWidth			// 判定線上でのx座標
+		let c = CGFloat(3 - laneIndex) * (Dimensions.laneWidth - Dimensions.horizonLength/7)		// 水平線上と判定線上でのx座標のずれ
+		posX = Dimensions.laneWidth * 3/2 + CGFloat(laneIndex) * Dimensions.laneWidth			// 判定線上でのx座標
 		posX += (posY - Dimensions.judgeLineY) * (c/b)										// 判定線から離れている分補正
 		
 		
@@ -551,7 +579,7 @@ class Note {	//強参照はGameScene.notes[]とNote.nextのみにすること
 
 		// ノーツの横幅と縦幅をscaleで設定
 		if self is Tap || self is TapStart || self is TapEnd {		// 楕円
-			let lSquare = pow(Dimensions.horizontalDistance + positionOnLane, 2) + pow(Dimensions.laneWidth * CGFloat(3 - lane), 2)
+			let lSquare = pow(Dimensions.horizontalDistance + positionOnLane, 2) + pow(Dimensions.laneWidth * CGFloat(3 - laneIndex), 2)
 			let denomOfAtan = lSquare + pow(Dimensions.verticalDistance, 2) - pow(Note.scale * Dimensions.laneWidth / 2, 2)				// atan内の分母
 			guard 0 < denomOfAtan else {	// atan内の分母が0になるのを防止
 				return
@@ -562,6 +590,21 @@ class Note {	//強参照はGameScene.notes[]とNote.nextのみにすること
 			image.yScale = deltaY / Dimensions.laneWidth
 		} else {		// 線と三角形
 			image.setScale(size / Dimensions.laneWidth)
+		}
+	}
+	
+	fileprivate func setAppearTime(BPMs: [(bpm: Double, startPos: Double)]) {
+		
+		let tmpTan = tan((Dimensions.horizonY-Dimensions.judgeLineY)/Dimensions.R)
+		self.appearTime = TimeInterval(-pow(Dimensions.R,2) * tmpTan / self.speed / (Dimensions.verticalDistance - Dimensions.horizontalDistance*tmpTan))
+		
+		for (index,i) in BPMs.enumerated(){
+			if BPMs.count > index+1 && self.beat > BPMs[index+1].startPos{
+				self.appearTime += (BPMs[index+1].startPos - i.startPos)*60/i.bpm
+			}else{
+				self.appearTime += (self.beat - i.startPos)*60/i.bpm
+				break
+			}
 		}
 	}
 }

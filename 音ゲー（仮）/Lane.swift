@@ -17,14 +17,11 @@ enum MiddleObsevationBool{
 }
 
 class Lane{
-//	var nextNoteIndex = 0	//なぜこの形式にした？できれば使わない形にしたい。
-	//	var currentTime:TimeInterval = 0.0
 	var timeLag :TimeInterval = 0.0
 	var isTimeLagRenewed = false
-	var laneNotes:[Note] = [] //最初に全部格納する！(開放時はnil代入でもいいが、removeFirstの方がいい)
+	var laneNotes:[Note] = [] //最初に全部格納する！
 	var isSetLaneNotes = false
 	let laneIndex:Int!
-	//	var isTouched = false
 	
 	var isJudgeRange:Bool{
 		get{
@@ -40,24 +37,16 @@ class Lane{
 			
 		}
 	}
-	var isObserved:MiddleObsevationBool {	//middleの判定圏内
+	var isObserved:MiddleObsevationBool {	//middleの判定圏内かどうかを返す
 		get{
 			if self.isTimeLagRenewed{
-//				guard nextNoteIndex < laneNotes.count else{
-//					return .False
-//				}
-				
 				guard laneNotes.count > 0 else {
 					return .False
 				}
 				guard laneNotes.first is Middle else {
 					return .False
 				}
-				
-//				guard laneNotes[nextNoteIndex] is Middle else {
-//					return .False
-//				}
-				
+	
 				switch timeLag {
 				case 0..<0.1:
 					return .Front

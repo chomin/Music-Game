@@ -104,7 +104,7 @@ extension GameScene{
 	
 	func paintSameLine(i:Note,j:Note){
 		//同時押しラインの描写
-		var lPoint = [CGPoint(x:0,y:0), CGPoint(x: CGFloat(j.lane - i.lane) * Dimensions.laneWidth, y :0)]
+		var lPoint = [CGPoint(x:0,y:0), CGPoint(x: CGFloat(j.laneIndex - i.laneIndex) * Dimensions.laneWidth, y :0)]
 		let line = SKShapeNode(points: &lPoint, count: lPoint.count)
 		line.lineWidth = 3.0
 		line.strokeColor = UIColor.white

@@ -171,12 +171,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		
 		//各レーンにノーツをセット
 		for note in notes{
-			lanes[note.lane].laneNotes.append(note)
+			lanes[note.laneIndex].laneNotes.append(note)
 			
 			if let start = note as? TapStart {
 				var following = start.next
 				while(true) {
-					lanes[following.lane].laneNotes.append(following)
+					lanes[following.laneIndex].laneNotes.append(following)
 					if let middle = following as? Middle {
 						following = middle.next
 					} else {

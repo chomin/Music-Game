@@ -214,15 +214,15 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 						break
 					case .tap:
 						notes.append(
-							Tap     (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+							Tap     (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
 						)
 					case .flick:
 						notes.append(
-							Flick   (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+							Flick   (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
 						)
 					case .start1:
 						longNotes1.append(
-							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
 						)
 					case .middle1:
 						longNotes1.append(
@@ -238,7 +238,7 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 						)
 					case .start2:
 						longNotes2.append(
-							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
 						)
 					case .middle2:
 						longNotes2.append(
