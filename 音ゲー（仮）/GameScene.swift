@@ -39,7 +39,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 	
 	// 楽曲データ
 	var musicName: String		// 曲名を表示したりするかもしれないのでコメントアウトにとどめる
-	var notes:[Note] = []		// ノーツの" 始 点 "の集合。参照型！(配列は値型じゃ？(多分中身が参照型って言いたかってんけど、ややこしいから消しといて))
+	var notes:[Note] = []		// ノーツの" 始 点 "の集合。
 	var musicStartPos = 1.0	  	// BGM開始の"拍"！
 	var genre = ""				// ジャンル
 	var title = ""				// タイトル
@@ -48,8 +48,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 	var volWav = 100			// 音量を現段階のn%として出力するか(TODO: 未実装)
 	var BPMs: [(bpm: Double, startPos: Double)] = []		// 可変BPM情報
 	
-//	var startTime: TimeInterval = 0.0	// シーン移動した時の時間
-	var BGMOffsetTime: TimeInterval = 0.0	// 経過時間とBGM.currentTimeのずれ。一定
+	private var startTime: TimeInterval = 0.0		// シーン移動した時の時間
+	var passedTime: TimeInterval = 0.0				// 経過時間
+	private var BGMOffsetTime: TimeInterval = 0.0	// 経過時間とBGM.currentTimeのずれ。一定
 //	var resignActiveTime: TimeInterval = 0.0
 	var lanes: [Lane] = [Lane(laneIndex:0),Lane(laneIndex:1),Lane(laneIndex:2),Lane(laneIndex:3),Lane(laneIndex:4),Lane(laneIndex:5),Lane(laneIndex:6)]		// レーン
 	
@@ -164,7 +165,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		setImages()
 		
 		// BGMの再生(時間指定)
-		//		startTime = CACurrentMediaTime()
+		startTime = CACurrentMediaTime()
 		BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
 		BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)	//建築予定地
 		BGM.delegate = self
@@ -193,12 +194,19 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 	
 	override func update(_ currentTime: TimeInterval) {
 		
+		// 経過時間の更新
+		if BGM.currentTime > 0 {
+			self.passedTime = BGM.currentTime + BGMOffsetTime
+		} else {
+			self.passedTime = CACurrentMediaTime() - startTime
+		}
+		
 		//ラベルの更新
 		comboLabel.text = String(ResultScene.combo)
 		
 		// 各ノーツの位置や大きさを更新
 		for note in notes {
-			note.update(passedTime: BGM.currentTime + BGMOffsetTime, BPMs)
+			note.update(passedTime, BPMs)
 		}
 		
 		// 同時押しラインの更新
@@ -245,7 +253,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 			
 			//レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
 			for lane in self.lanes {
-				lane.update(passedTime: self.BGM.currentTime + self.BGMOffsetTime, self.BPMs)
+				lane.update(passedTime, self.BPMs)
 				if lane.timeState == .passed && lane.laneNotes.count > 0{
 					
 					self.missJudge(lane: lane)
@@ -545,10 +553,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 	
 	//アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
 	func applicationWillResignActive() {
-//		// 以下2つの処理はできるだけ同時に行う
-		BGM.pause()
-//		resignActiveTime = CACurrentMediaTime()
-		
+		BGM?.pause()
+		setJudgeLabelText(text: "")
+
 		// 表示されているノーツを非表示に
 		for note in notes {
 			note.image.isHidden = true
@@ -585,10 +592,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 	//アプリを再開したときに呼ばれる
 	func applicationDidBecomeActive() {
 		actionSoundSet.stopAll()
-		BGM.currentTime -= 3	// 3秒巻き戻し
-//		// 以下2つの処理はできるだけ同時にこの順序で行う
-		BGM.play()
-//		startTime += CACurrentMediaTime() - resignActiveTime + 3
+		BGM?.currentTime -= 3	// 3秒巻き戻し
+		BGM?.play()
 	}
 	
 }

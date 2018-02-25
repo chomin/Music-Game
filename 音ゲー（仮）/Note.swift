@@ -19,13 +19,13 @@ class Tap: Note {
 		image.isHidden = true	// 初期状態では隠しておく
 	}
 	
-	override func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
 		
-		super.update(passedTime: passedTime, BPMs)
+		super.update(passedTime, BPMs)
 
 		guard (!isJudged && positionOnLane < Dimensions.laneLength) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
 			return
@@ -69,13 +69,13 @@ class Flick: Note {
 		image.isHidden = true	// 初期状態では隠しておく
 	}
 	
-	override func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
 		
-		super.update(passedTime: passedTime, BPMs)
+		super.update(passedTime, BPMs)
 		
 		guard (!isJudged && positionOnLane < Dimensions.laneLength) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
 			return
@@ -124,12 +124,12 @@ class TapStart: Note {
 		self.longImages.circle.removeFromParent()
 	}
 	
-	override func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
-		super.update(passedTime: passedTime, BPMs)
+	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+		super.update(passedTime, BPMs)
 
 		// 後続ノーツを先にupdate
 		if positionOnLane <= Dimensions.laneLength {
-			next.update(passedTime: passedTime, BPMs)
+			next.update(passedTime, BPMs)
 		}
 		
 		// update不要なときはreturn
@@ -271,12 +271,12 @@ class Middle: Note {
 		self.longImages.circle.removeFromParent()
 	}
 
-	override func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
-		super.update(passedTime: passedTime, BPMs)
+	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+		super.update(passedTime, BPMs)
 		
 		// 後続ノーツを先にupdate
 		if positionOnLane <= Dimensions.laneLength {
-			next.update(passedTime: passedTime, BPMs)
+			next.update(passedTime, BPMs)
 		}
 		
 		// update不要なときはreturn
@@ -382,13 +382,13 @@ class TapEnd: Note {
 		image.isHidden = true	// 初期状態では隠しておく
 	}
 	
-	override func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
 		
-		super.update(passedTime: passedTime, BPMs)
+		super.update(passedTime, BPMs)
 		
 		// x座標とy座標を計算しpositionを変更
 		setPos()
@@ -433,13 +433,13 @@ class FlickEnd: Note {
 		image.isHidden = true	// 初期状態では隠しておく
 	}
 	
-	override func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
 		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
 			return
 		}
 		
-		super.update(passedTime: passedTime, BPMs)
+		super.update(passedTime, BPMs)
 		
 		// x座標とy座標を計算しpositionを変更
 		setPos()
@@ -496,7 +496,7 @@ class Note {	//強参照はGameScene.notes[]とNote.nextのみにすること
 //		print("Noteが解放されました:\(self)")
 	}
 	// ノーツの座標等の更新、毎フレーム呼ばれる
-	func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+	func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		setPositionOnLane(passedTime, BPMs)
 	}
 	

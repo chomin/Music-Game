@@ -96,7 +96,7 @@ class Lane{
 		fatalError("init(coder:) has not been implemented")
 	}
 	
-	func update(passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]){
+	func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]){
 		
 		//timeLagの更新
 		if isSetLaneNotes{
