@@ -105,7 +105,7 @@ extension GameScene{
 			return false
 		}
 
-		lane.update(passedTime: BGM.currentTime + BGMOffsetTime, BPMs)
+		lane.update(passedTime, BPMs)
 		switch lane.timeState {
 
 		case .parfect:
