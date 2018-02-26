@@ -23,7 +23,8 @@ class PickerKeyboard: UIControl {
 		"自分REST@RT",
 		"Thank You!",
 		"Welcome!!",
-		"Brand New Theater!"
+		"Brand New Theater!",
+		"ぼなぺてぃーとS"
 	]
 
 	var textStore: String = "シュガーソングとビターステップ"	//入力文字列を保存するためのプロパティ
