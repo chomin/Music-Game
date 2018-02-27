@@ -209,49 +209,51 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 			if let lane = laneMap[channel] {
 				// ノーツ指定チャンネルだったとき
 				for (index, ob) in body.enumerated() {
-					switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
-					case .rest:
-						break
-					case .tap:
-						notes.append(
-							Tap     (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
-						)
-					case .flick:
-						notes.append(
-							Flick   (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
-						)
-					case .start1:
-						longNotes1.append(
+					autoreleasepool{
+						switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
+						case .rest:
+							break
+						case .tap:
+							notes.append(
+								Tap     (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
+							)
+						case .flick:
+							notes.append(
+								Flick   (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
+							)
+						case .start1:
+							longNotes1.append(
 							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
-						)
-					case .middle1:
-						longNotes1.append(
-							Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
-						)
-					case .end1:
-						longNotes1.append(
-							TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
-						)
-					case .flickEnd1:
-						longNotes1.append(
-							FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
-						)
-					case .start2:
-						longNotes2.append(
-							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
-						)
-					case .middle2:
-						longNotes2.append(
-							Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
-						)
-					case .end2:
-						longNotes2.append(
-							TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
-						)
-					case .flickEnd2:
-						longNotes2.append(
-							FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
-						)
+							)
+						case .middle1:
+							longNotes1.append(
+								Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+							)
+						case .end1:
+							longNotes1.append(
+								TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+							)
+						case .flickEnd1:
+							longNotes1.append(
+								FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+							)
+						case .start2:
+							longNotes2.append(
+								TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: 	self.BPMs)
+							)
+						case .middle2:
+							longNotes2.append(
+								Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+							)
+						case .end2:
+							longNotes2.append(
+								TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+							)
+						case .flickEnd2:
+							longNotes2.append(
+								FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+							)
+						}
 					}
 				}
 			} else if channel == 1 {

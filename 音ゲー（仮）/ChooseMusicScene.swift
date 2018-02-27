@@ -220,13 +220,15 @@ class ChooseMusicScene: SKScene {
 		picker.resignFirstResponder()	//FirstResponderを放棄
 		
 		//移動
-		let scene = GameScene(musicName:picker.textStore ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
-		let skView = view as SKView!
-		skView?.showsFPS = true
-		skView?.showsNodeCount = true
-		skView?.ignoresSiblingOrder = true
-		scene.scaleMode = .resizeFill
-		skView?.presentScene(scene)  // GameSceneに移動
+		autoreleasepool{
+			let scene = GameScene(musicName:picker.textStore ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
+			let skView = view as SKView!
+			skView?.showsFPS = true
+			skView?.showsNodeCount = true
+			skView?.ignoresSiblingOrder = true
+			scene.scaleMode = .resizeFill
+			skView?.presentScene(scene)  // GameSceneに移動
+		}
 
 	}
 	
