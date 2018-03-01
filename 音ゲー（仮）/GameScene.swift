@@ -167,7 +167,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		// BGMの再生(時間指定)
 		startTime = CACurrentMediaTime()
 		BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
-		BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)	//建築予定地
+		BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  //建築予定地
 		BGM.delegate = self
 		
 		//各レーンにノーツをセット
