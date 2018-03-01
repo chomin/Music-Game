@@ -545,17 +545,10 @@ class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
 			
 			i += 1
 		}
-<<<<<<< HEAD
-		remainingTime += (beat - BPMs[i].startPos) / (BPMs[i].bpm/60)
+        remainingTime += (beat - BPMs[i].startPos) / (BPMs[i].bpm/60)
 		remainingTime -= passedTime
 		self.positionOnLane = CGFloat(remainingTime) * speed	// 判定線からの水平距離x
     }
-=======
-		second += (beat - BPMs[i].startPos) / (BPMs[i].bpm/60)
-		second -= passedTime
-		self.positionOnLane = CGFloat(second) * speed	// 判定線からの水平距離x
-	}
->>>>>>> parent of 8307904... リファクタリング
 	
 	// ノーツの座標を設定
 	fileprivate func setPos() {
