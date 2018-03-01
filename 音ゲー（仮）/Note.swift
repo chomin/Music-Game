@@ -10,20 +10,18 @@ import SpriteKit
 
 class Tap: Note {
 	
-	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat, BPMs: [(bpm: Double, startPos: Double)]) {
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+    override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 		
 		// imageのインスタンス(白円)を作成
 		self.image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
 		image.fillColor = UIColor.white
-		image.isHidden = true	// 初期状態では隠しておく
-		
-		setAppearTime(BPMs: BPMs)//appearTimeの設定
+		image.isHidden = true   // 初期状態では隠しておく
 	}
 	
 	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
-		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
+		guard !(image.isHidden && isJudged) else {      // 通過後のノーツはreturn
 			return
 		}
 		guard passedTime > self.appearTime else {
@@ -32,7 +30,7 @@ class Tap: Note {
 		
 		super.update(passedTime, BPMs)
 
-		guard (!isJudged && positionOnLane < Dimensions.laneLength) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
+		guard (!isJudged && positionOnLane < Dimensions.laneLength) || (isJudged && !image.isHidden) else {     // 判定後と判定前で場合分け
 			return
 		}
 		
@@ -46,7 +44,7 @@ class Tap: Note {
 		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (positionOnLane + Dimensions.horizontalDistance * 8))
 		
 		// image.isHiddenを更新
-		if position.y > Dimensions.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
+		if position.y > Dimensions.horizonY || isJudged {       // 水平線より上、判定済みのものは隠す
 			image.isHidden = true
 		} else {
 			image.isHidden = false
@@ -56,11 +54,11 @@ class Tap: Note {
 
 class Flick: Note {
 	
-	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat, BPMs: [(bpm: Double, startPos: Double)]) {
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 		
 		// imageのインスタンス(マゼンタ三角形)を作成
-		let length = Dimensions.laneWidth / 2 // 三角形一辺の長さの半分
+		let length = Dimensions.laneWidth / 2   // 三角形一辺の長さの半分
 		// 始点から終点までの４点を指定(2点を一致させ三角形に).
 		var points = [
 			CGPoint(x: length,  y: 0.0),
@@ -71,14 +69,12 @@ class Flick: Note {
 		self.image = SKShapeNode(points: &points, count: points.count)
 		image.lineWidth = 3.0
 		image.fillColor = UIColor.magenta
-		image.isHidden = true	// 初期状態では隠しておく
-		
-		setAppearTime(BPMs: BPMs)
+		image.isHidden = true   // 初期状態では隠しておく
 	}
 	
 	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
-		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
+		guard !(image.isHidden && isJudged) else {      // 通過後のノーツはreturn
 			return
 		}
 		guard passedTime > self.appearTime else {
@@ -87,7 +83,7 @@ class Flick: Note {
 		
 		super.update(passedTime, BPMs)
 		
-		guard (!isJudged && positionOnLane < Dimensions.laneLength) || (isJudged && !image.isHidden) else {		// 判定後と判定前で場合分け
+		guard (!isJudged && positionOnLane < Dimensions.laneLength) || (isJudged && !image.isHidden) else {     // 判定後と判定前で場合分け
 			return
 		}
 		
@@ -98,7 +94,7 @@ class Flick: Note {
 		setScale()
 		
 		// image.isHiddenを更新
-		if position.y > Dimensions.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
+		if position.y > Dimensions.horizonY || isJudged {       // 水平線より上、判定済みのものは隠す
 			image.isHidden = true
 		} else {
 			image.isHidden = false
@@ -108,20 +104,16 @@ class Flick: Note {
 
 class TapStart: Note {
 	
-	var next = Note()	{								// 次のノーツ（仮のインスタンス）
-		didSet{
-			next.appearTime = self.appearTime
-		}
-	}
-	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
+	var next = Note()                                               // 次のノーツ（仮のインスタンス）
+	var longImages = (long: SKShapeNode(), circle: SKShapeNode())   // このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	
-	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat, BPMs: [(bpm: Double, startPos: Double)]) {
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 		
 		// imageのインスタンス(緑円)を作成
 		image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
 		image.fillColor = UIColor.green
-		image.isHidden = true	// 初期状態では隠しておく
+		image.isHidden = true   // 初期状態では隠しておく
 		
 		// longImagesのインスタンスを作成
 		self.longImages = (SKShapeNode(path: CGMutablePath()), SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2))
@@ -131,8 +123,6 @@ class TapStart: Note {
 		longImages.long.isHidden = true
 		longImages.circle.fillColor = UIColor.green
 		longImages.circle.isHidden = true
-		
-		setAppearTime(BPMs: BPMs)
 	}
 	
 	deinit {
@@ -154,9 +144,9 @@ class TapStart: Note {
 		}
 		
 		// update不要なときはreturn
-		guard ((!isJudged || positionOnLane > 0) && positionOnLane < Dimensions.laneLength)			// 描画域内にあるか、過ぎていても判定前なら更新
-			|| (positionOnLane < 0 && 0 < next.positionOnLane)										// ロングノーツが描画域内にあれば更新
-			|| ((!longImages.circle.isHidden || !longImages.long.isHidden) && (next.isJudged || next.position.y < Dimensions.judgeLineY))	// longImages消し忘れ防止
+		guard ((!isJudged || positionOnLane > 0) && positionOnLane < Dimensions.laneLength)         // 描画域内にあるか、過ぎていても判定前なら更新
+			|| (positionOnLane < 0 && 0 < next.positionOnLane)                                      // ロングノーツが描画域内にあれば更新
+			|| ((!longImages.circle.isHidden || !longImages.long.isHidden) && (next.isJudged || next.position.y < Dimensions.judgeLineY))   // longImages消し忘れ防止
 			else {
 			return
 		}
@@ -175,44 +165,44 @@ class TapStart: Note {
 		
 		
 		// longImage.longを更新
-		let long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)	// 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
+		let long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)  // 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
 		
 		// 終点の情報を代入
-		if next.position.y < Dimensions.horizonY {		// 終点ノーツが描画域内にあるとき
+		if next.position.y < Dimensions.horizonY {      // 終点ノーツが描画域内にあるとき
 			long.endPos = next.position
 			long.endWidth = next.size / Note.scale
-		} else {										// 終点ノーツが描画域より奥にあるとき
+		} else {                                        // 終点ノーツが描画域より奥にあるとき
 			let posY = Dimensions.horizonY
 			let posX = ((next.position.y - Dimensions.horizonY) * position.x + (Dimensions.horizonY - position.y) * next.position.x)
-				/ (next.position.y - position.y)			// 始点と終点のx座標を内分
+				/ (next.position.y - position.y)            // 始点と終点のx座標を内分
 			
 			long.endPos = CGPoint(x: posX, y: posY)
 			long.endWidth = Dimensions.horizonLength / 7
 		}
 		// 始点の情報を代入
-		if position.y > Dimensions.judgeLineY && !isJudged {		// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
+		if position.y > Dimensions.judgeLineY && !isJudged {        // 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
 			long.startPos = position
 			long.startWidth = size / Note.scale
 		} else {
 			let posY = Dimensions.judgeLineY
 			let posX = ((next.position.y - Dimensions.judgeLineY) * position.x + (Dimensions.judgeLineY - position.y) * next.position.x)
-				/ (next.position.y - position.y)			// 始点と終点のx座標を内分
+				/ (next.position.y - position.y)                // 始点と終点のx座標を内分
 			
 			long.startPos = CGPoint(x: posX, y: posY)
 			long.startWidth = Dimensions.laneWidth
 		}
 		
-		let path = CGMutablePath()      // 台形の外周
-		path.move   (to: CGPoint(x: long.startPos.x - long.startWidth/2, y: long.startPos.y))	// 始点、台形の左下
-		path.addLine(to: CGPoint(x: long.startPos.x + long.startWidth/2, y: long.startPos.y))	// 右下
-		path.addLine(to: CGPoint(x: long.endPos.x   + long.endWidth/2,   y: long.endPos.y))		// 右上
-		path.addLine(to: CGPoint(x: long.endPos.x   - long.endWidth/2,   y: long.endPos.y))		// 左上
+		let path = CGMutablePath()              // 台形の外周
+		path.move   (to: CGPoint(x: long.startPos.x - long.startWidth/2, y: long.startPos.y))   // 始点、台形の左下
+		path.addLine(to: CGPoint(x: long.startPos.x + long.startWidth/2, y: long.startPos.y))   // 右下
+		path.addLine(to: CGPoint(x: long.endPos.x   + long.endWidth/2,   y: long.endPos.y))     // 右上
+		path.addLine(to: CGPoint(x: long.endPos.x   - long.endWidth/2,   y: long.endPos.y))     // 左上
 		path.closeSubpath()
-		longImages.long.path = path		// pathを変更(longImage.longの更新完了)
+		longImages.long.path = path     // pathを変更(longImage.longの更新完了)
 
 		
 		// longImages.circleを更新
-		if position.y <= Dimensions.judgeLineY || isJudged {		// 始点ノーツが判定線を通過した後か、判定された後
+		if position.y <= Dimensions.judgeLineY || isJudged {        // 始点ノーツが判定線を通過した後か、判定された後
 			// 理想軌道の判定線上に緑円を描く
 			// 楕円の縦幅を計算
 			let lSquare = pow(Dimensions.horizontalDistance, 2) + pow(Dimensions.laneWidth * 9/2 - long.startPos.x, 2)
@@ -230,7 +220,7 @@ class TapStart: Note {
 		
 		
 		// isHiddenを更新
-		if position.y >= Dimensions.horizonY || position.y < Dimensions.judgeLineY || isJudged {		// 水平線より上、判定済みのものは隠す(判定線超えたら引き継ぐ)
+		if position.y >= Dimensions.horizonY || position.y < Dimensions.judgeLineY || isJudged {        // 水平線より上、判定済みのものは隠す(判定線超えたら引き継ぐ)
 			image.isHidden = true
 		} else {
 			image.isHidden = false
@@ -250,13 +240,9 @@ class TapStart: Note {
 
 class Middle: Note {
 
-	var next = Note()	{								// 次のノーツ（仮のインスタンス）
-		didSet{
-			next.appearTime = self.appearTime
-		}
-	}
-	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
-	override var position: CGPoint {								// positionを左端ではなく線の中点にするためオーバーライド
+	var next = Note()                                               // 次のノーツ（仮のインスタンス）
+	var longImages = (long: SKShapeNode(), circle: SKShapeNode())   // このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
+	override var position: CGPoint {                                // positionを左端ではなく線の中点にするためオーバーライド
 		get {
 			return CGPoint(x: image.position.x + size / 2, y: image.position.y)
 		}
@@ -265,9 +251,9 @@ class Middle: Note {
 		}
 	}
 	
-	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
 		
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 	
 		self.isJudgeable = false
 	
@@ -279,7 +265,7 @@ class Middle: Note {
 		self.image = SKShapeNode(points: &points, count: points.count)
 		image.lineWidth = 5.0
 		image.strokeColor = UIColor.green
-		image.isHidden = true	// 初期状態では隠しておく
+		image.isHidden = true   // 初期状態では隠しておく
 		
 		// longImagesのインスタンスを作成
 		self.longImages = (SKShapeNode(path: CGMutablePath()), SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2))
@@ -310,7 +296,7 @@ class Middle: Note {
 		}
 		
 		// update不要なときはreturn
-		guard !(isJudged && image.isHidden && longImages.circle.isHidden && longImages.long.isHidden) else {		// 通過後のノーツはreturn
+		guard !(isJudged && image.isHidden && longImages.circle.isHidden && longImages.long.isHidden) else {        // 通過後のノーツはreturn
 			return
 		}
 	
@@ -323,44 +309,44 @@ class Middle: Note {
 		setScale()
 		
 		// longImage.longを更新
-		let long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)	// 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
+		let long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)  // 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
 		
 		// 終点の情報を代入
-		if next.position.y < Dimensions.horizonY {		// 終点ノーツが描画域内にあるとき
+		if next.position.y < Dimensions.horizonY {      // 終点ノーツが描画域内にあるとき
 			long.endPos = next.position
 			long.endWidth = next.size / Note.scale
-		} else {										// 終点ノーツが描画域より奥にあるとき
+		} else {                                        // 終点ノーツが描画域より奥にあるとき
 			let posY = Dimensions.horizonY
 			let posX = ((next.position.y - Dimensions.horizonY) * position.x + (Dimensions.horizonY - position.y) * next.position.x)
-				/ (next.position.y - position.y)			// 始点と終点のx座標を内分
+				/ (next.position.y - position.y)            // 始点と終点のx座標を内分
 			
 			long.endPos = CGPoint(x: posX, y: posY)
 			long.endWidth = Dimensions.horizonLength / 7
 		}
 		// 始点の情報を代入
-		if position.y > Dimensions.judgeLineY && !isJudged {		// 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
+		if position.y > Dimensions.judgeLineY && !isJudged {        // 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
 			long.startPos = position
 			long.startWidth = size / Note.scale
 		} else {
 			let posY = Dimensions.judgeLineY
 			let posX = ((next.position.y - Dimensions.judgeLineY) * position.x + (Dimensions.judgeLineY - position.y) * next.position.x)
-				/ (next.position.y - position.y)			// 始点と終点のx座標を内分
+				/ (next.position.y - position.y)            // 始点と終点のx座標を内分
 			
 			long.startPos = CGPoint(x: posX, y: posY)
 			long.startWidth = Dimensions.laneWidth
 		}
 		
-		let path = CGMutablePath()      // 台形の外周
-		path.move   (to: CGPoint(x: long.startPos.x - long.startWidth/2, y: long.startPos.y))	// 始点、台形の左下
-		path.addLine(to: CGPoint(x: long.startPos.x + long.startWidth/2, y: long.startPos.y))	// 右下
-		path.addLine(to: CGPoint(x: long.endPos.x   + long.endWidth/2,   y: long.endPos.y))		// 右上
-		path.addLine(to: CGPoint(x: long.endPos.x   - long.endWidth/2,   y: long.endPos.y))		// 左上
+		let path = CGMutablePath()          // 台形の外周
+		path.move   (to: CGPoint(x: long.startPos.x - long.startWidth/2, y: long.startPos.y))   // 始点、台形の左下
+		path.addLine(to: CGPoint(x: long.startPos.x + long.startWidth/2, y: long.startPos.y))   // 右下
+		path.addLine(to: CGPoint(x: long.endPos.x   + long.endWidth/2,   y: long.endPos.y))     // 右上
+		path.addLine(to: CGPoint(x: long.endPos.x   - long.endWidth/2,   y: long.endPos.y))     // 左上
 		path.closeSubpath()
-		longImages.long.path = path		// pathを変更(longImage.longの更新完了)
+		longImages.long.path = path     // pathを変更(longImage.longの更新完了)
 		
 		
 		// longImages.circleを更新
-		if position.y <= Dimensions.judgeLineY || isJudged {		// 始点ノーツが判定線を通過した後か、判定された後
+		if position.y <= Dimensions.judgeLineY || isJudged {        // 始点ノーツが判定線を通過した後か、判定された後
 			// 理想軌道の判定線上に緑円を描く
 			// 楕円の縦幅を計算
 			let lSquare = pow(Dimensions.horizontalDistance, 2) + pow(Dimensions.laneWidth * 9/2 - long.startPos.x, 2)
@@ -378,7 +364,7 @@ class Middle: Note {
 		
 		
 		// isHiddenを更新
-		if position.y >= Dimensions.horizonY || position.y < Dimensions.judgeLineY || isJudged {		// 水平線より上、判定済みのものは隠す。判定線超えたら引き継ぐ
+		if position.y >= Dimensions.horizonY || position.y < Dimensions.judgeLineY || isJudged {        // 水平線より上、判定済みのものは隠す。判定線超えたら引き継ぐ
 			image.isHidden = true
 		} else {
 			image.isHidden = false
@@ -398,22 +384,22 @@ class Middle: Note {
 
 class TapEnd: Note {
 	
-	unowned var start = Note()	//循環参照防止の為unowned参照にする
+	unowned var start = Note()      // 循環参照防止の為unowned参照にする
 	
-	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 		
 		self.isJudgeable = false
 		
 		// imageのインスタンス(緑円)を作成
 		image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
 		image.fillColor = UIColor.green
-		image.isHidden = true	// 初期状態では隠しておく
+		image.isHidden = true   // 初期状態では隠しておく
 	}
 	
 	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
-		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
+		guard !(image.isHidden && isJudged) else {      // 通過後のノーツはreturn
 			return
 		}
 		guard passedTime > self.appearTime else {
@@ -432,7 +418,7 @@ class TapEnd: Note {
 		image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (positionOnLane + Dimensions.horizontalDistance * 8))
 
 		// image.isHiddenを更新
-		if position.y > Dimensions.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
+		if position.y > Dimensions.horizonY || isJudged {       // 水平線より上、判定済みのものは隠す
 			image.isHidden = true
 		} else {
 			image.isHidden = false
@@ -444,13 +430,13 @@ class FlickEnd: Note {
 	
 	unowned var start = Note()
 	
-	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 		
 		self.isJudgeable = false
 		
 		// imageのインスタンス(マゼンタ三角形)を作成
-		let length = Dimensions.laneWidth / 2 // 三角形一辺の長さの半分
+		let length = Dimensions.laneWidth / 2   // 三角形一辺の長さの半分
 		// 始点から終点までの４点を指定(2点を一致させ三角形に).
 		var points = [
 			CGPoint(x: length,  y: 0.0),
@@ -461,12 +447,12 @@ class FlickEnd: Note {
 		image = SKShapeNode(points: &points, count: points.count)
 		image.lineWidth = 3.0
 		image.fillColor = UIColor.magenta
-		image.isHidden = true	// 初期状態では隠しておく
+		image.isHidden = true   // 初期状態では隠しておく
 	}
 	
 	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
-		guard !(image.isHidden && isJudged) else {		// 通過後のノーツはreturn
+		guard !(image.isHidden && isJudged) else {          // 通過後のノーツはreturn
 			return
 		}
 		
@@ -479,7 +465,7 @@ class FlickEnd: Note {
 		setScale()
 		
 		// image.isHiddenを更新
-		if position.y > Dimensions.horizonY || isJudged {		// 水平線より上、判定済みのものは隠す
+		if position.y > Dimensions.horizonY || isJudged {       // 水平線より上、判定済みのものは隠す
 			image.isHidden = true
 		} else {
 			image.isHidden = false
@@ -489,16 +475,16 @@ class FlickEnd: Note {
 
 
 // ノーツ基本クラス
-class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]のみにすること
+class Note {    // 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]のみにすること
 	
-	let beat: Double			// "拍"単位！小節ではない！！！
-	let laneIndex: Int				// レーンのインデックス(0始まり)
+	let beat: Double            // "拍"単位！小節ではない！！！
+	let laneIndex: Int          // レーンのインデックス(0始まり)
 
-	var image = SKShapeNode()	// ノーツの画像
-	var size: CGFloat = 0		// ノーツの横幅
-	var isJudged = false		// 判定済みかどうか
-	var isJudgeable = true		// 判定可能かどうか。初期状態では始点系のみtrue
-	var position: CGPoint {		// ノーツの画面上の座標
+	var image = SKShapeNode()   // ノーツの画像
+	var size: CGFloat = 0       // ノーツの横幅
+	var isJudged = false        // 判定済みかどうか
+	var isJudgeable = true      // 判定可能かどうか。初期状態では始点系のみtrue
+	var position: CGPoint {     // ノーツの画面上の座標
 		get {
 			return image.position
 		}
@@ -506,22 +492,23 @@ class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
 			image.position = newValue
 		}
 	}
-	var positionOnLane: CGFloat	= 0.0		// ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
-	static let scale: CGFloat = 1.3			// レーン幅に対するノーツの幅の倍率
-	let speed: CGFloat  					// スピード
-	
-	var appearTime: TimeInterval = 0		//判定線を超える予定時刻。これ以降にposの計算&更新を行う。始点系はinit()で、その他はnextのdidSetで設定する。
+	var positionOnLane: CGFloat	= 0.0       // ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
+	static let scale: CGFloat = 1.3         // レーン幅に対するノーツの幅の倍率
+	let speed: CGFloat                      // スピード
+	let appearTime: TimeInterval            // 判定線を超える予定時刻。これ以降にposの計算&更新を行う。始点系はinit()で、その他はnextのdidSetで設定する。
 
 	
-	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
-	  self.speed = 1350.0 * speedRatio
+	init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+		self.speed = 1350.0 * speedRatio
         self.beat = beat
-        self.laneIndex = lane
+        self.laneIndex = laneIndex
+        self.appearTime = appearTime
     }
 	init() {
 		self.beat = 0
 		self.laneIndex = 0
 		self.speed = 1350.0
+        self.appearTime = 0
 	}
 	
 	deinit {
@@ -544,7 +531,7 @@ class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
 		}
 		second += (beat - BPMs[i].startPos) / (BPMs[i].bpm/60)
 		second -= passedTime
-		self.positionOnLane = CGFloat(second) * speed	// 判定線からの水平距離x
+		self.positionOnLane = CGFloat(second) * speed   // 判定線からの水平距離x
 	}
 	
 	// ノーツの座標を設定
@@ -553,8 +540,8 @@ class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
 		/* y座標の計算 */
 		
 		// 球面?に投写
-		let denomOfAtan = pow(Dimensions.R, 2) + Dimensions.horizontalDistance * positionOnLane		// atanの分母(denominator)
-		guard 0 < denomOfAtan else {	// atan内の分母が0になるのを防止
+		let denomOfAtan = pow(Dimensions.R, 2) + Dimensions.horizontalDistance * positionOnLane     // atanの分母(denominator)
+		guard 0 < denomOfAtan else {    // atan内の分母が0になるのを防止
 			return
 		}
 		let posY = Dimensions.R * atan(Dimensions.verticalDistance * positionOnLane / denomOfAtan) + Dimensions.judgeLineY
@@ -564,10 +551,10 @@ class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
 		
 		var posX: CGFloat
 		
-		let b = Dimensions.horizonY - Dimensions.judgeLineY   								// 水平線から判定線までの2D上の距離
-		let c = CGFloat(3 - laneIndex) * (Dimensions.laneWidth - Dimensions.horizonLength/7)		// 水平線上と判定線上でのx座標のずれ
-		posX = Dimensions.laneWidth * 3/2 + CGFloat(laneIndex) * Dimensions.laneWidth			// 判定線上でのx座標
-		posX += (posY - Dimensions.judgeLineY) * (c/b)										// 判定線から離れている分補正
+		let b = Dimensions.horizonY - Dimensions.judgeLineY                                     // 水平線から判定線までの2D上の距離
+		let c = CGFloat(3 - laneIndex) * (Dimensions.laneWidth - Dimensions.horizonLength/7)    // 水平線上と判定線上でのx座標のずれ
+		posX = Dimensions.laneWidth * 3/2 + CGFloat(laneIndex) * Dimensions.laneWidth           // 判定線上でのx座標
+		posX += (posY - Dimensions.judgeLineY) * (c/b)                                          // 判定線から離れている分補正
 		
 		
 		// 座標を反映
@@ -578,37 +565,22 @@ class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
 	fileprivate func setScale() {
 		
 		// ノーツの横幅を計算
-		let grad = (Dimensions.horizonLength/7 - Dimensions.laneWidth) / (Dimensions.horizonY - Dimensions.judgeLineY)	// 傾き
+		let grad = (Dimensions.horizonLength/7 - Dimensions.laneWidth) / (Dimensions.horizonY - Dimensions.judgeLineY)  // 傾き
 		self.size = Note.scale * (grad * (position.y - Dimensions.horizonY) + Dimensions.horizonLength/7)
 
 		// ノーツの横幅と縦幅をscaleで設定
-		if self is Tap || self is TapStart || self is TapEnd {		// 楕円
+		if self is Tap || self is TapStart || self is TapEnd {      // 楕円
 			let lSquare = pow(Dimensions.horizontalDistance + positionOnLane, 2) + pow(Dimensions.laneWidth * CGFloat(3 - laneIndex), 2)
-			let denomOfAtan = lSquare + pow(Dimensions.verticalDistance, 2) - pow(Note.scale * Dimensions.laneWidth / 2, 2)				// atan内の分母
-			guard 0 < denomOfAtan else {	// atan内の分母が0になるのを防止
+			let denomOfAtan = lSquare + pow(Dimensions.verticalDistance, 2) - pow(Note.scale * Dimensions.laneWidth / 2, 2)         // atan内の分母
+			guard 0 < denomOfAtan else {    // atan内の分母が0になるのを防止
 				return
 			}
 			let deltaY = Dimensions.R * atan(Note.scale * Dimensions.laneWidth * Dimensions.verticalDistance / denomOfAtan)
 
 			image.xScale = size / Dimensions.laneWidth
 			image.yScale = deltaY / Dimensions.laneWidth
-		} else {		// 線と三角形
+		} else {        // 線と三角形
 			image.setScale(size / Dimensions.laneWidth)
-		}
-	}
-	
-	fileprivate func setAppearTime(BPMs: [(bpm: Double, startPos: Double)]) {
-		
-		let tmpTan = tan((Dimensions.horizonY-Dimensions.judgeLineY)/Dimensions.R)
-		self.appearTime = TimeInterval(-pow(Dimensions.R,2) * tmpTan / self.speed / (Dimensions.verticalDistance - Dimensions.horizontalDistance*tmpTan))
-		
-		for (index,i) in BPMs.enumerated(){
-			if BPMs.count > index+1 && self.beat > BPMs[index+1].startPos{
-				self.appearTime += (BPMs[index+1].startPos - i.startPos)*60/i.bpm
-			}else{
-				self.appearTime += (self.beat - i.startPos)*60/i.bpm
-				break
-			}
 		}
 	}
 }
