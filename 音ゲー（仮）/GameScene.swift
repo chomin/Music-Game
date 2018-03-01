@@ -7,7 +7,7 @@
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
 //
 
-//ベータ世界線
+//ガンマ世界線
 
 import SpriteKit
 import GameplayKit
