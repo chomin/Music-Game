@@ -455,6 +455,9 @@ class FlickEnd: Note {
 		guard !(image.isHidden && isJudged) else {          // 通過後のノーツはreturn
 			return
 		}
+		guard passedTime > self.appearTime else {
+			return
+		}
 		
 		super.update(passedTime, BPMs)
 		
@@ -522,17 +525,17 @@ class Note {    // 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]�
 	// 時刻から3D空間レーン上のノーツ座標を得る
 	private func setPositionOnLane(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 	
-		var second: TimeInterval = 0.0
+		var remainingTime: TimeInterval = 0.0	//判定線所雨に乗る時刻ー現在時刻
 		var i = 0
 		while i + 1 < BPMs.count && BPMs[i + 1].startPos < beat {
-			second += (BPMs[i + 1].startPos - BPMs[i].startPos) / (BPMs[i].bpm/60)
+			remainingTime += (BPMs[i + 1].startPos - BPMs[i].startPos) / (BPMs[i].bpm/60)
 			
 			i += 1
 		}
-		second += (beat - BPMs[i].startPos) / (BPMs[i].bpm/60)
-		second -= passedTime
-		self.positionOnLane = CGFloat(second) * speed   // 判定線からの水平距離x
-	}
+		remainingTime += (beat - BPMs[i].startPos) / (BPMs[i].bpm/60)
+		remainingTime -= passedTime
+		self.positionOnLane = CGFloat(remainingTime) * speed	// 判定線からの水平距離x
+    }
 	
 	// ノーツの座標を設定
 	fileprivate func setPos() {
