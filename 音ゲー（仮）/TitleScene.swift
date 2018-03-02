@@ -12,15 +12,15 @@ import SpriteKit
 import GameplayKit
 
 class TitleScene: SKScene {
-	
-	
-	override func didMove(to view: SKView) {
-		
-		
-	}
-	
-	
-	override func update(_ currentTime: TimeInterval) {
-		// Called before each frame is rendered
-	}
+    
+    
+    override func didMove(to view: SKView) {
+        
+        
+    }
+    
+    
+    override func update(_ currentTime: TimeInterval) {
+        // Called before each frame is rendered
+    }
 }
