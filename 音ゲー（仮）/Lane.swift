@@ -16,7 +16,7 @@ enum MiddleObsevationBool{
 	case Front, Behind, False
 }
 
-class Lane{ //分岐した２
+class Lane{ 
 	var timeLag :TimeInterval = 0.0
 	var isTimeLagRenewed = false
 	var laneNotes:[Note] = [] //最初に全部格納する！
