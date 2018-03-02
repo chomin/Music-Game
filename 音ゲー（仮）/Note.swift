@@ -12,9 +12,9 @@ class Tap: Note {
     
     let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+    init(beatPos beat: Double, laneIndex: Int, appearTime: TimeInterval) {
         self.appearTime = appearTime
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio)
+        super.init(beatPos: beat, laneIndex: laneIndex)
         
         // imageのインスタンス(白円)を作成
         self.image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
@@ -22,7 +22,7 @@ class Tap: Note {
         image.isHidden = true   // 初期状態では隠しておく
     }
     
-    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)], _ speedRatio: CGFloat) {
         // update不要なときはreturn
         guard passedTime > appearTime else {            // 描画領域外のノーツはreturn
             return
@@ -31,7 +31,7 @@ class Tap: Note {
             return
         }
         
-        super.update(passedTime, BPMs)
+        super.update(passedTime, BPMs, speedRatio)
         
         // x座標とy座標を計算しpositionを変更
         setPos()
@@ -55,9 +55,9 @@ class Flick: Note {
     
     let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
-    init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+    init(beatPos beat: Double, laneIndex: Int, appearTime: TimeInterval) {
         self.appearTime = appearTime
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio)
+        super.init(beatPos: beat, laneIndex: laneIndex)
         
         // imageのインスタンス(マゼンタ三角形)を作成
         let length = Dimensions.laneWidth / 2   // 三角形一辺の長さの半分
@@ -75,7 +75,7 @@ class Flick: Note {
         
     }
     
-    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)], _ speedRatio: CGFloat) {
         // update不要なときはreturn
         guard passedTime > appearTime else {            // 描画領域外のノーツはreturn
             return
@@ -84,7 +84,7 @@ class Flick: Note {
             return
         }
 
-        super.update(passedTime, BPMs)
+        super.update(passedTime, BPMs, speedRatio)
         
         // x座標とy座標を計算しpositionを変更
         setPos()
@@ -107,9 +107,9 @@ class TapStart: Note {
     var longImages = (long: SKShapeNode(), circle: SKShapeNode())   // このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
     let appearTime: TimeInterval                                    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
-    init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+    init(beatPos beat: Double, laneIndex: Int, appearTime: TimeInterval) {
         self.appearTime = appearTime
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio)
+        super.init(beatPos: beat, laneIndex: laneIndex)
         
         // imageのインスタンス(緑円)を作成
         image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
@@ -132,16 +132,16 @@ class TapStart: Note {
     }
     
     
-    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)], _ speedRatio: CGFloat) {
         // update不要なときはreturn
         guard passedTime > appearTime else {            // 描画領域外のノーツはreturn
             return
         }
         
-        super.update(passedTime, BPMs)
+        super.update(passedTime, BPMs, speedRatio)
         
         // 後続ノーツを先にupdate
-        next.update(passedTime, BPMs)
+        next.update(passedTime, BPMs, speedRatio)
         
         // update不要なときはreturn
         guard !isJudged || positionOnLane > 0                           // 描画域内にあるか、過ぎていても判定前なら更新
@@ -251,8 +251,8 @@ class Middle: Note {
         }
     }
     
-    override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat) {
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio)
+    override init(beatPos beat: Double, laneIndex: Int) {
+        super.init(beatPos: beat, laneIndex: laneIndex)
         
         self.isJudgeable = false
         
@@ -282,13 +282,13 @@ class Middle: Note {
     }
     
     
-    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)], _ speedRatio: CGFloat) {
         
-        super.update(passedTime, BPMs)
+        super.update(passedTime, BPMs, speedRatio)
         
         // 後続ノーツを先にupdate
         if positionOnLane <= Dimensions.laneLength {
-            next.update(passedTime, BPMs)
+            next.update(passedTime, BPMs, speedRatio)
         }
         
         // update不要なときはreturn
@@ -382,8 +382,8 @@ class TapEnd: Note {
     
     unowned var start = Note()  // 循環参照防止の為unowned参照にする
     
-    override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat) {
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio)
+    override init(beatPos beat: Double, laneIndex: Int) {
+        super.init(beatPos: beat, laneIndex: laneIndex)
         
         self.isJudgeable = false
         
@@ -393,13 +393,13 @@ class TapEnd: Note {
         image.isHidden = true   // 初期状態では隠しておく
     }
     
-    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)], _ speedRatio: CGFloat) {
         // update不要なときはreturn
         guard !(image.isHidden && isJudged) else {      // 通過後のノーツはreturn
             return
         }
         
-        super.update(passedTime, BPMs)
+        super.update(passedTime, BPMs, speedRatio)
         
         // x座標とy座標を計算しpositionを変更
         setPos()
@@ -423,8 +423,8 @@ class FlickEnd: Note {
     
     unowned var start = Note()
     
-    override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat) {
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio)
+    override init(beatPos beat: Double, laneIndex: Int) {
+        super.init(beatPos: beat, laneIndex: laneIndex)
         
         self.isJudgeable = false
         
@@ -443,13 +443,13 @@ class FlickEnd: Note {
         image.isHidden = true   // 初期状態では隠しておく
     }
     
-    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+    override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)], _ speedRatio: CGFloat) {
         // update不要なときはreturn
         guard !(image.isHidden && isJudged) else {      // 通過後のノーツはreturn
             return
         }
         
-        super.update(passedTime, BPMs)
+        super.update(passedTime, BPMs, speedRatio)
         
         // x座標とy座標を計算しpositionを変更
         setPos()
@@ -486,40 +486,43 @@ class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
     }
     var positionOnLane: CGFloat	= 0.0   // ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
     static let scale: CGFloat = 1.3     // レーン幅に対するノーツの幅の倍率
-    let speed: CGFloat                  // スピード
     
     
-    init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat) {
-        self.speed = 1350.0 * speedRatio
+    init(beatPos beat: Double, laneIndex: Int) {
         self.beat = beat
-        self.laneIndex = laneIndex    }
+        self.laneIndex = laneIndex
+    }
     init() {
         self.beat = 0
         self.laneIndex = 0
-        self.speed = 1350.0    }
+    }
     
     deinit {
         self.image.removeFromParent()
     }
     
     // ノーツの座標等の更新、毎フレーム呼ばれる
-    func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
-        setPositionOnLane(passedTime, BPMs)
+    func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)], _ speedRatio: CGFloat) {
+        setPositionOnLane(passedTime, BPMs, speedRatio)
     }
     
     // 時刻から3D空間レーン上のノーツ座標を得る
-    private func setPositionOnLane(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+    private func setPositionOnLane(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)], _ speedRatio: CGFloat) {
         
-        var remainingTime: TimeInterval = 0.0   // 判定線所雨に乗る時刻 - 現在時刻
+        // passedTimeを現在のbeatに変換する
+        var timeSum: TimeInterval = 0
         var i = 0
-        while i + 1 < BPMs.count && BPMs[i + 1].startPos < beat {
-            remainingTime += (BPMs[i + 1].startPos - BPMs[i].startPos) / (BPMs[i].bpm/60)
-            
+        while i + 1 < BPMs.count {
+            let intervalTime = TimeInterval((BPMs[i + 1].startPos - BPMs[i].startPos) / (BPMs[i].bpm/60))
+            if timeSum + intervalTime > passedTime {
+                break
+            }
+            timeSum += intervalTime
             i += 1
         }
-        remainingTime += (beat - BPMs[i].startPos) / (BPMs[i].bpm/60)
-        remainingTime -= passedTime
-        self.positionOnLane = CGFloat(remainingTime) * speed    // 判定線からの水平距離x
+        let currentBeat = BPMs[i].startPos + (passedTime - timeSum) * BPMs[i].bpm / 60  // 判定線上における現在の経過beat
+        
+        self.positionOnLane = CGFloat(beat - currentBeat) * 500 * speedRatio        // beat差に応じて位置を設定
     }
     
     // ノーツの座標を設定

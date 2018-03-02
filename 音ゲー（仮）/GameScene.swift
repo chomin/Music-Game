@@ -55,7 +55,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
     private var BGMOffsetTime: TimeInterval = 0.0   // 経過時間とBGM.currentTimeのずれ。一定
     let lanes: [Lane] = [Lane(laneIndex: 0), Lane(laneIndex: 1), Lane(laneIndex: 2), Lane(laneIndex: 3), Lane(laneIndex: 4), Lane(laneIndex: 5), Lane(laneIndex: 6)]     // レーン
     
-    let speedRatio: CGFloat
+    private let speedRatio: CGFloat
     
     
     init(musicName: String, size: CGSize, speedRatioInt: UInt) {
@@ -206,7 +206,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
         
         // 各ノーツの位置や大きさを更新
         for note in notes {
-            note.update(passedTime, BPMs)
+            note.update(passedTime, BPMs, speedRatio)
         }
         
         // 同時押しラインの更新
