@@ -499,7 +499,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
                         
                         if pos.x >= buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {  // ボタンの範囲
                             
-                            if self.lanes[index].isObserved == .Front { // 早めに指を離した場合
+                                              if self.lanes[index].isObserved == .Front { // 早めに指を離した場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag) {
                                     self.actionSoundSet.play(type: .middle)
                                     break
@@ -538,10 +538,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
     
     // 再生終了時の呼び出しメソッド
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {    // playしたクラスと同じクラスに入れる必要あり？
-        if player as AVAudioPlayer! == BGM {
+        if player as AVAudioPlayer? == BGM {
             BGM = nil   // 別のシーンでアプリを再開したときに鳴るのを防止
             let scene = ResultScene(size: (view?.bounds.size)!)
-            let skView = view as SKView!
+            let skView = view as SKView?
             skView?.showsFPS = true
             skView?.showsNodeCount = true
             skView?.ignoresSiblingOrder = true

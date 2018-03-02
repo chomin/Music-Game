@@ -183,7 +183,7 @@ class ChooseMusicScene: SKScene {
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
             Label.fontSize = iconButtonSize * 0.8
-            Label.horizontalAlignmentMode = .center //中央寄せ
+            Label.horizontalAlignmentMode = .center//中央寄せ
             Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY - iconButtonSize*0.8)
             Label.fontColor = SKColor.black
             Label.isHidden = true
@@ -222,7 +222,7 @@ class ChooseMusicScene: SKScene {
         //移動
         autoreleasepool{
             let scene = GameScene(musicName:picker.textStore ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
-            let skView = view as SKView!
+            let skView = view as SKView?
             skView?.showsFPS = true
             skView?.showsNodeCount = true
             skView?.ignoresSiblingOrder = true
