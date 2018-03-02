@@ -52,33 +52,6 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 	}
 
 
-
-	// ファイルの読み込み
-	private func readFile(fileName: String) throws -> [String] {
-
-		// ファイル名を名前と拡張子に分割
-		guard fileName.contains(".") else {
-			throw FileError.invalidName("ファイル名には拡張子を指定してください")
-		}
-		let splittedName = fileName.components(separatedBy: ".")
-		let dataFileName = splittedName[0]
-		let dataFileType = splittedName[1]
-
-		// 譜面データファイルのパスを取得
-		if let path = Bundle.main.path(forResource: "Sounds/"+dataFileName, ofType: dataFileType) {
-			do {
-		        // ファイルの内容を取得する
-		        let content = try String(contentsOfFile: path, encoding: String.Encoding.shiftJIS)
-
-		        return content.components(separatedBy: .newlines)
-		    } catch {
-				throw FileError.readFailed("ファイルの内容取得に失敗")
-		    }
-		} else {
-			throw FileError.notFound("指定されたファイルが見つかりません")
-		}
-	}
-
 	// 渡されたファイルを読んでnotes配列を作成
 	func parse(fileName: String) throws {
 
@@ -202,56 +175,61 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		}
 
 		// ロングノーツは一時配列に、その他はnotesに格納。その他命令も実行
-		var longNotes1: [Note] = []		// ロングノーツ1を一時的に格納
-		var longNotes2: [Note] = []		// ロングノーツ2を一時的に格納
+		var longNotes1: [Note] = []	    // ロングノーツ1を一時的に格納
+		var longNotes2: [Note] = []	    // ロングノーツ2を一時的に格納
+        var startBeat1 = 0.0            // 始点のbeatを一時的に格納
+        var startBeat2 = 0.0            // 始点のbeatを一時的に格納
 		for (bar, channel, body) in processedMainData {
-			let unitBeat = 4.0 / Double(body.count)	// 1オブジェクトの長さ(拍単位)
+			let unitBeat = 4.0 / Double(body.count) // 1オブジェクトの長さ(拍単位)
 			if let lane = laneMap[channel] {
 				// ノーツ指定チャンネルだったとき
 				for (index, ob) in body.enumerated() {
 					autoreleasepool{
+                        let beat = Double(bar) * 4.0 + unitBeat * Double(index)
 						switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
 						case .rest:
 							break
 						case .tap:
 							notes.append(
-								Tap     (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
+								Tap     (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(beat))
 							)
 						case .flick:
 							notes.append(
-								Flick   (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
+								Flick   (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(beat))
 							)
 						case .start1:
+                            startBeat1 = beat
 							longNotes1.append(
-							TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: self.BPMs)
+                                TapStart(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat1))
 							)
 						case .middle1:
 							longNotes1.append(
-								Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+								Middle  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat1))
 							)
 						case .end1:
 							longNotes1.append(
-								TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+								TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat1))
 							)
 						case .flickEnd1:
 							longNotes1.append(
-								FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+								FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat1))
 							)
 						case .start2:
+                            startBeat2 = beat
 							longNotes2.append(
-								TapStart(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio, BPMs: 	self.BPMs)
+								TapStart(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat2))
 							)
 						case .middle2:
 							longNotes2.append(
-								Middle  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+								Middle  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat2))
 							)
 						case .end2:
 							longNotes2.append(
-								TapEnd  (beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+								TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat2))
 							)
 						case .flickEnd2:
 							longNotes2.append(
-								FlickEnd(beatPos: Double(bar) * 4.0 + unitBeat * Double(index), lane: lane, speedRatio: speedRatio)
+								FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat2))
 							)
 						}
 					}
@@ -379,4 +357,50 @@ extension GameScene{//bmsファイルを読み込む(nobu-gがつくってくれ
 		// 時間順にソート
 		notes.sort(by: { $0.beat < $1.beat })
 	}
+    
+    
+    // ファイルの読み込み
+    private func readFile(fileName: String) throws -> [String] {
+        
+        // ファイル名を名前と拡張子に分割
+        guard fileName.contains(".") else {
+            throw FileError.invalidName("ファイル名には拡張子を指定してください")
+        }
+        let splittedName = fileName.components(separatedBy: ".")
+        let dataFileName = splittedName[0]
+        let dataFileType = splittedName[1]
+        
+        // 譜面データファイルのパスを取得
+        if let path = Bundle.main.path(forResource: "Sounds/"+dataFileName, ofType: dataFileType) {
+            do {
+                // ファイルの内容を取得する
+                let content = try String(contentsOfFile: path, encoding: String.Encoding.shiftJIS)
+                
+                return content.components(separatedBy: .newlines)
+            } catch {
+                throw FileError.readFailed("ファイルの内容取得に失敗")
+            }
+        } else {
+            throw FileError.notFound("指定されたファイルが見つかりません")
+        }
+    }
+    
+    
+    // ノーツが画面上に現れる時刻を返す(updateするかの判定に使用)
+    private func getAppearTime(_ beat: Double) -> TimeInterval {
+        
+        let tmpTan = tan((Dimensions.horizonY-Dimensions.judgeLineY)/Dimensions.R)
+        var appearTime = TimeInterval(-pow(Dimensions.R,2) * tmpTan / self.speed / (Dimensions.verticalDistance - Dimensions.horizontalDistance*tmpTan))
+        
+        for (index,bpm) in BPMs.enumerated() {
+            if BPMs.count > index + 1 && beat > BPMs[index + 1].startPos {
+                appearTime += (BPMs[index + 1].startPos - bpm.startPos) * 60 / bpm.bpm
+            } else {
+                appearTime += (beat - bpm.startPos)*60/bpm.bpm
+                break
+            }
+        }
+        
+        return appearTime
+    }
 }

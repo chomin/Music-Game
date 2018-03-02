@@ -10,15 +10,13 @@ import SpriteKit
 
 class Tap: Note {
 	
-	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat, BPMs: [(bpm: Double, startPos: Double)]) {
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 		
 		// imageのインスタンス(白円)を作成
 		self.image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
 		image.fillColor = UIColor.white
 		image.isHidden = true	// 初期状態では隠しておく
-		
-		setAppearTime(BPMs: BPMs)//appearTimeの設定
 	}
 	
 	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
@@ -56,8 +54,8 @@ class Tap: Note {
 
 class Flick: Note {
 	
-	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat, BPMs: [(bpm: Double, startPos: Double)]) {
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 		
 		// imageのインスタンス(マゼンタ三角形)を作成
 		let length = Dimensions.laneWidth / 2 // 三角形一辺の長さの半分
@@ -72,9 +70,8 @@ class Flick: Note {
 		image.lineWidth = 3.0
 		image.fillColor = UIColor.magenta
 		image.isHidden = true	// 初期状態では隠しておく
-		
-		setAppearTime(BPMs: BPMs)
-	}
+        
+    }
 	
 	override func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
 		// update不要なときはreturn
@@ -108,15 +105,11 @@ class Flick: Note {
 
 class TapStart: Note {
 	
-	var next = Note()	{								// 次のノーツ（仮のインスタンス）
-		didSet{
-			next.appearTime = self.appearTime
-		}
-	}
+	var next = Note()								// 次のノーツ（仮のインスタンス）
 	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
 	
-	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat, BPMs: [(bpm: Double, startPos: Double)]) {
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 		
 		// imageのインスタンス(緑円)を作成
 		image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
@@ -131,8 +124,6 @@ class TapStart: Note {
 		longImages.long.isHidden = true
 		longImages.circle.fillColor = UIColor.green
 		longImages.circle.isHidden = true
-		
-		setAppearTime(BPMs: BPMs)
 	}
 	
 	deinit {
@@ -250,13 +241,9 @@ class TapStart: Note {
 
 class Middle: Note {
 
-	var next = Note()	{								// 次のノーツ（仮のインスタンス）
-		didSet{
-			next.appearTime = self.appearTime
-		}
-	}
-	var longImages = (long: SKShapeNode(), circle: SKShapeNode())	// このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
-	override var position: CGPoint {								// positionを左端ではなく線の中点にするためオーバーライド
+	var next = Note()                               // 次のノーツ（仮のインスタンス）
+	var longImages = (long: SKShapeNode(), circle: SKShapeNode())   // このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
+	override var position: CGPoint {                                // positionを左端ではなく線の中点にするためオーバーライド
 		get {
 			return CGPoint(x: image.position.x + size / 2, y: image.position.y)
 		}
@@ -265,9 +252,9 @@ class Middle: Note {
 		}
 	}
 	
-	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
 		
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 	
 		self.isJudgeable = false
 	
@@ -400,8 +387,8 @@ class TapEnd: Note {
 	
 	unowned var start = Note()	//循環参照防止の為unowned参照にする
 	
-	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 		
 		self.isJudgeable = false
 		
@@ -444,8 +431,8 @@ class FlickEnd: Note {
 	
 	unowned var start = Note()
 	
-	override init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
-		super.init(beatPos: beat, lane: lane, speedRatio:speedRatio)
+	override init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+		super.init(beatPos: beat, laneIndex: laneIndex, speedRatio:speedRatio, appearTime: appearTime)
 		
 		self.isJudgeable = false
 		
@@ -516,10 +503,11 @@ class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
 	var appearTime: TimeInterval = 0		//判定線を超える予定時刻。これ以降にposの計算&更新を行う。始点系はinit()で、その他はnextのdidSetで設定する。
 
 	
-	init(beatPos beat: Double, lane: Int, speedRatio:CGFloat) {
-	  self.speed = 1350.0 * speedRatio
+	init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
+        self.speed = 1350.0 * speedRatio
         self.beat = beat
-        self.laneIndex = lane
+        self.laneIndex = laneIndex
+        self.appearTime = appearTime
     }
 	init() {
 		self.beat = 0
@@ -597,21 +585,6 @@ class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
 			image.yScale = deltaY / Dimensions.laneWidth
 		} else {		// 線と三角形
 			image.setScale(size / Dimensions.laneWidth)
-		}
-	}
-	
-	fileprivate func setAppearTime(BPMs: [(bpm: Double, startPos: Double)]) {
-		
-		let tmpTan = tan((Dimensions.horizonY-Dimensions.judgeLineY)/Dimensions.R)
-		self.appearTime = TimeInterval(-pow(Dimensions.R,2) * tmpTan / self.speed / (Dimensions.verticalDistance - Dimensions.horizontalDistance*tmpTan))
-		
-		for (index,i) in BPMs.enumerated(){
-			if BPMs.count > index+1 && self.beat > BPMs[index+1].startPos{
-				self.appearTime += (BPMs[index+1].startPos - i.startPos)*60/i.bpm
-			}else{
-				self.appearTime += (self.beat - i.startPos)*60/i.bpm
-				break
-			}
 		}
 	}
 }
