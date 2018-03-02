@@ -283,242 +283,259 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {//音ゲーを�
 		judgeLabel.run(seq)
 	}
 	
-	//タッチ関係
-	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//		print("began start")
-		for i in self.lanes{
-			
-			if !(i.isTimeLagRenewed){ return }
-		}
-		
-		judgeQueue.sync {
-			for i in touches {//すべてのタッチに対して処理する（同時押しなどもあるため）
-				
-				var pos = i.location(in: self.view)
-				
-				pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
-				
-				
-				//フリック判定したかを示すBoolを加えてallTouchにタッチ情報を付加
-				self.allTouches.append((i,true,false))	//(touch,isJudgeableFlick,isJudgeableFlickEnd)
-				
-				if pos.y < self.frame.width/3{    //上界
-					
-					//判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
-					var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note, distanceToButton:CGFloat)] = []
-					for (index,buttonPosX) in Dimensions.buttonX.enumerated(){
-						
-						if pos.x >= buttonPosX - Dimensions.halfBound && pos.x < buttonPosX + Dimensions.halfBound {//ボタンの範囲
-							
-							if (self.lanes[index].timeState == .still)  || (self.lanes[index].timeState == .passed) { continue }
-							
-							if (self.lanes[index].laneNotes.count == 0) { continue }
-							let note = self.lanes[index].laneNotes[0]
-							let distanceToButton = sqrt(pow(pos.x - buttonPosX, 2) + pow(pos.y - Dimensions.judgeLineY, 2))
-							
-							if self.lanes[index].isObserved == .Behind {//middleの判定圏内（後）
-								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note, distanceToButton: distanceToButton))
-								continue
-							}
-							
-							
-							if (note is Tap) || (note is Flick) || (note is TapStart) {//flickが最近なら他を無視（ここでは判定しない）
-								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note, distanceToButton: distanceToButton))
-								continue
-							}
-						}
-					}
-					
-					if nearbyNotes.isEmpty {
-						self.actionSoundSet.play(type: .kara)
-					}else{
-						nearbyNotes.sort { (A,B) -> Bool in
-							if A.timelag == B.timelag { return A.distanceToButton < B.distanceToButton }
-							
-							return A.timelag < B.timelag
-						}
-						
-						if (nearbyNotes[0].note is Tap) || (nearbyNotes[0].note is TapStart) || (nearbyNotes[0].note is Middle){
-							if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag) {
-								self.actionSoundSet.play(type: .tap)
-								self.allTouches[self.allTouches.count-1].isJudgeableFlick = false	//このタッチでのフリック判定を禁止
-								
-								if nearbyNotes[0].note is TapStart {
-									self.allTouches[self.allTouches.count-1].isJudgeableFlickEnd = true
-								}
-							}else{
-								
-								print("判定失敗:tap")
-							}
-						}
-					}
-				}
-			}
-		}
-	
-//		print("began end")
-	}
-	
-	override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-//		print("move start")
-		
-		for i in self.lanes{
-			if !(i.isTimeLagRenewed){ return }
-		}
-		
-		judgeQueue.sync {
-		
-			
-			for i in touches{
-				
-				let touchIndex = self.allTouches.index(where: {$0.touch == i})!
-				
-				var pos = i.location(in: self.view)
-				var ppos = i.previousLocation(in: self.view)
-				
-				let moveDistance = sqrt(pow(pos.x-ppos.x, 2) + pow(pos.y-ppos.y, 2))
-				
-				pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
-				ppos.y = self.frame.height - ppos.y
-				
-				if pos.y < self.frame.width/3{    //上界
-					
-					//判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
-					var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note, distanceToButton: CGFloat)] = []
-					
-					//pposループ
-					for (index,buttonPosX) in Dimensions.buttonX.enumerated(){
-						if ppos.x >= buttonPosX - Dimensions.halfBound && ppos.x < buttonPosX + Dimensions.halfBound{
-							//lane.isTouchedをリセット
-							if pos.x < buttonPosX - Dimensions.halfBound || pos.x > buttonPosX + Dimensions.halfBound{//移動後にレーンから外れていた場合
-								
-								if self.lanes[index].isObserved == .Front {
-									//parfect時に該当ボタンにいなければ、入ってきた時間で判定
-									if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
-										self.actionSoundSet.play(type: .middle)
-										self.allTouches[touchIndex].isJudgeableFlickEnd = true
-										
-										break
-									}
-								}
-								
-							}
-						}
-						
-						//フリックの判定
-						if (self.lanes[index].laneNotes.count == 0) { continue }
-						let note = self.lanes[index].laneNotes[0]
-						if moveDistance > 10 && self.lanes[index].timeState != .still && self.lanes[index].timeState != .passed {
-							
-							
-							let isJudgeableFlick = self.allTouches[touchIndex].isJudgeableFlick
-							let isJudgeableFlickEnd = self.allTouches[touchIndex].isJudgeableFlickEnd
+    //タッチ関係
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        //        print("began start")
+        for i in self.lanes{
+            
+            if !(i.isTimeLagRenewed){ return }
+        }
+        
+        judgeQueue.sync {
+            for i in touches {//すべてのタッチに対して処理する（同時押しなどもあるため）
+                
+                var pos = i.location(in: self.view)
+                
+                pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+                
+                
+                //フリック判定したかを示すBoolを加えてallTouchにタッチ情報を付加
+                self.allTouches.append((i,true,false))    //(touch,isJudgeableFlick,isJudgeableFlickEnd)
+                
+                if pos.y < self.frame.width/3{    //上界
+                    
+                    //判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
+                    var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note, distanceToButton:CGFloat)] = []
+                    for (index,buttonPosX) in Dimensions.buttonX.enumerated(){
+                        
+                        if pos.x >= buttonPosX - Dimensions.halfBound && pos.x < buttonPosX + Dimensions.halfBound {//ボタンの範囲
+                            
+                            if (self.lanes[index].timeState == .still)  || (self.lanes[index].timeState == .passed) { continue }
+                            
+                            if (self.lanes[index].laneNotes.count == 0) { continue }
+                            let note = self.lanes[index].laneNotes[0]
+                            let distanceToButton = sqrt(pow(pos.x - buttonPosX, 2) + pow(pos.y - Dimensions.judgeLineY, 2))
+                            
+                            if self.lanes[index].isObserved == .Behind {//middleの判定圏内（後）
+                                nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note, distanceToButton: distanceToButton))
+                                continue
+                            }
+                            
+                            
+                            if (note is Tap) || (note is Flick) || (note is TapStart) {//flickが最近なら他を無視（ここでは判定しない）
+                                nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note, distanceToButton: distanceToButton))
+                                continue
+                            }
+                        }
+                    }
+                    
+                    if nearbyNotes.isEmpty {
+                        self.actionSoundSet.play(type: .kara)
+                    }else{
+                        nearbyNotes.sort { (A,B) -> Bool in
+                            if A.timelag == B.timelag { return A.distanceToButton < B.distanceToButton }
+                            
+                            return A.timelag < B.timelag
+                        }
+                        
+                        if (nearbyNotes[0].note is Tap) || (nearbyNotes[0].note is TapStart) || (nearbyNotes[0].note is Middle){
+                            if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag) {
+                                self.actionSoundSet.play(type: .tap)
+                                self.allTouches[self.allTouches.count-1].isJudgeableFlick = false    //このタッチでのフリック判定を禁止
+                                
+                                if nearbyNotes[0].note is TapStart {
+                                    self.allTouches[self.allTouches.count-1].isJudgeableFlickEnd = true
+                                }
+                            }else{
+                                
+                                print("判定失敗:tap")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        //        print("began end")
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        //        print("move start")
+        
+        for i in self.lanes{
+            if !(i.isTimeLagRenewed){ return }
+        }
+        
+        judgeQueue.sync {
+            
+            
+            for i in touches{
+                
+                let touchIndex = self.allTouches.index(where: {$0.touch == i})!
+                
+                var pos = i.location(in: self.view)
+                var ppos = i.previousLocation(in: self.view)
+                
+                let moveDistance = sqrt(pow(pos.x-ppos.x, 2) + pow(pos.y-ppos.y, 2))
+                
+                pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+                ppos.y = self.frame.height - ppos.y
+                
+                if pos.y < self.frame.width/3{    //上界
+                    
+                    //判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
+                    var nearbyNotes:[(laneIndex:Int, timelag:TimeInterval, note:Note, distanceToButton: CGFloat)] = []
+                    
+                    //pposループ
+                    for (index,buttonPosX) in Dimensions.buttonX.enumerated(){
+                        if ppos.x >= buttonPosX - Dimensions.halfBound && ppos.x < buttonPosX + Dimensions.halfBound{
+                            //lane.isTouchedをリセット
+                            if pos.x < buttonPosX - Dimensions.halfBound || pos.x > buttonPosX + Dimensions.halfBound{//移動後にレーンから外れていた場合は、外れる直前にいた時間で判定
+                                
+                                if self.lanes[index].isObserved == .Front {
+                                    if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
+                                        self.actionSoundSet.play(type: .middle)
+                                        self.allTouches[touchIndex].isJudgeableFlickEnd = true
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                        
+                        //フリックの判定
+                        if (self.lanes[index].laneNotes.count == 0) { continue }
+                        let note = self.lanes[index].laneNotes[0]
+                        if moveDistance > 10 && self.lanes[index].timeState != .still && self.lanes[index].timeState != .passed {
+                            
+                            
+                            let isJudgeableFlick = self.allTouches[touchIndex].isJudgeableFlick
+                            let isJudgeableFlickEnd = self.allTouches[touchIndex].isJudgeableFlickEnd
+                            
+                            if ((note is Flick) && isJudgeableFlick) || ((note is FlickEnd) && isJudgeableFlickEnd) {
+                                let distanceToButton = sqrt(pow(ppos.x - buttonPosX, 2) + pow(ppos.y - Dimensions.judgeLineY, 2))
+                                
+                                nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note, distanceToButton: distanceToButton))
+                                continue
+                            }
+                        }
+                    }
+                    
+                    if !(nearbyNotes.isEmpty) {
+                        
+                        nearbyNotes.sort { (A,B) -> Bool in
+                            if A.timelag == B.timelag { return A.distanceToButton < B.distanceToButton }
+                            
+                            return A.timelag < B.timelag
+                        }
+                        if (nearbyNotes[0].note is Flick) || (nearbyNotes[0].note is FlickEnd) {
+                            if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag) {
+                                self.actionSoundSet.play(type: .flick)
+                                self.allTouches[touchIndex].isJudgeableFlick = false    //このタッチでのフリック判定を禁止
+                                self.allTouches[touchIndex].isJudgeableFlickEnd = false
+                            }else{
+                                print("判定失敗:flick")    //二重判定防止に成功した時とか
+                            }
+                        }
+                    }
+                    
+                    
+                    //posループ
+                    for (index,buttonPosX) in Dimensions.buttonX.enumerated(){
+                        if pos.x >= buttonPosX - Dimensions.halfBound && pos.x < buttonPosX + Dimensions.halfBound{
+                            
+                            if self.lanes[index].isObserved == .Behind {//入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
+                                if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
+                                    self.actionSoundSet.play(type: .middle)
+                                    self.allTouches[touchIndex].isJudgeableFlickEnd = true  //TODO:次がFlickEndの場合のみに変更
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                
+            }
+        }
+        
+        //        print("move end")
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for i in self.lanes{
+            if !(i.isTimeLagRenewed){ return }
+        }
+        
+        judgeQueue.sync {
+            
+            
+            for i in touches {
+                
+                let touchIndex = self.allTouches.index(where: {$0.touch == i})!
+                
+                var pos = i.location(in: self.view)
+                var ppos = i.previousLocation(in: self.view)
+                
+                pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
+                ppos.y = self.frame.height - ppos.y
+                
+                
+                if pos.y < self.frame.width/3{    //上界
+                    //pposループ
+                    for (index,buttonPos) in Dimensions.buttonX.enumerated(){
+                        if ppos.x >= buttonPos - Dimensions.halfBound && ppos.x < buttonPos + Dimensions.halfBound{
+                            if pos.x < buttonPos - Dimensions.halfBound || pos.x > buttonPos + Dimensions.halfBound{//移動後にレーンから外れていた場合
+                                if self.lanes[index].isObserved == .Front {
+                                    if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
+                                        self.actionSoundSet.play(type: .middle)
+                                        
+                                        break
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+                    //posループ
+                    for (index,buttonPos) in Dimensions.buttonX.enumerated(){
+                        
+                        if pos.x >= buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {//ボタンの範囲
+                            
+                            if self.lanes[index].isObserved == .Front { //早めに指を離した場合
+                                if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
+                                    self.actionSoundSet.play(type: .middle)
+                                    break
+                                }
+                            }else if self.lanes[index].isObserved == .Behind {//入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
+                                if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
+                                    self.actionSoundSet.play(type: .middle)
+                                    break
+                                }
+                            }
+                            
+                            if (self.lanes[index].laneNotes.count == 0) { continue }
+                            let note = self.lanes[index].laneNotes[0]
+                            if (note is TapEnd){
+                                if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){//離しの判定
+                                    
+                                    self.actionSoundSet.play(type: .tap)
+                                    break
+                                }
+                            }else if ((note is Flick && self.allTouches[touchIndex].isJudgeableFlick) || (note is FlickEnd && self.allTouches[touchIndex].isJudgeableFlickEnd)) && self.lanes[index].isJudgeRange  {    //flickなのにflickせずに離したらmiss
+                                
+                                self.missJudge(lane: self.lanes[index])
+                                //
+                            }
+                        }
+                    }
+                }
+                
+                
+                self.allTouches.remove(at: self.allTouches.index(where: {$0.touch == i})!)
+            }
+        }
+    }
 
-							if ((note is Flick) && isJudgeableFlick) || ((note is FlickEnd) && isJudgeableFlickEnd) {
-								let distanceToButton = sqrt(pow(ppos.x - buttonPosX, 2) + pow(ppos.y - Dimensions.judgeLineY, 2))
-								
-								nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note, distanceToButton: distanceToButton))
-								continue
-							}
-						}
-					}
-					
-					if !(nearbyNotes.isEmpty) {
-					
-						nearbyNotes.sort { (A,B) -> Bool in
-							if A.timelag == B.timelag { return A.distanceToButton < B.distanceToButton }
-							
-							return A.timelag < B.timelag
-						}
-						if (nearbyNotes[0].note is Flick) || (nearbyNotes[0].note is FlickEnd) {
-							if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag) {
-								self.actionSoundSet.play(type: .flick)
-								self.allTouches[touchIndex].isJudgeableFlick = false	//このタッチでのフリック判定を禁止
-								self.allTouches[touchIndex].isJudgeableFlickEnd = false
-							}else{
-								print("判定失敗:flick")	//二重判定防止に成功した時とか
-							}
-						}
-					}
-				}
-
-				
-			}
-		}
-		
-//		print("move end")
-	}
-	
-	override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-		for i in self.lanes{
-			if !(i.isTimeLagRenewed){ return }
-		}
-		
-		judgeQueue.sync {
-		
-			
-			for i in touches {
-				
-				let touchIndex = self.allTouches.index(where: {$0.touch == i})!
-				
-				var pos = i.location(in: self.view)
-				var ppos = i.previousLocation(in: self.view)
-				
-				pos.y = self.frame.height - pos.y //上下逆転(画面下からのy座標に変換)
-				ppos.y = self.frame.height - ppos.y
-				
-				
-				if pos.y < self.frame.width/3{    //上界
-					//pposループ
-					for (index,buttonPos) in Dimensions.buttonX.enumerated(){
-						if ppos.x >= buttonPos - Dimensions.halfBound && ppos.x < buttonPos + Dimensions.halfBound{
-							if pos.x < buttonPos - Dimensions.halfBound || pos.x > buttonPos + Dimensions.halfBound{//移動後にレーンから外れていた場合
-								if self.lanes[index].isObserved == .Front {
-									if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
-										self.actionSoundSet.play(type: .middle)
-										
-										break
-									}
-								}
-							}
-							
-						}
-					}
-					//posループ
-					for (index,buttonPos) in Dimensions.buttonX.enumerated(){
-						
-						if pos.x >= buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {//ボタンの範囲
-							
-							if self.lanes[index].isObserved == .Front {
-								if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){
-									self.actionSoundSet.play(type: .middle)
-									break
-								}
-								
-							}
-
-							if (self.lanes[index].laneNotes.count == 0) { continue }
-							let note = self.lanes[index].laneNotes[0]
-							if (note is TapEnd){
-								if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag){//離しの判定
-									
-									self.actionSoundSet.play(type: .tap)
-									break
-								}
-							}else if ((note is Flick && self.allTouches[touchIndex].isJudgeableFlick) || (note is FlickEnd && self.allTouches[touchIndex].isJudgeableFlickEnd)) && self.lanes[index].isJudgeRange  {	//flickなのにflickせずに離したらmiss
-								
-								self.missJudge(lane: self.lanes[index])
-//
-							}
-						}
-					}
-				}
-				
-				
-				self.allTouches.remove(at: self.allTouches.index(where: {$0.touch == i})!)
-			}
-		}
-	}
 	
 	
 	//再生終了時の呼び出しメソッド
