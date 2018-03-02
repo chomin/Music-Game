@@ -177,8 +177,6 @@ extension GameScene {   // bmsファイルを読み込む
         // ロングノーツは一時配列に、その他はnotesに格納。その他命令も実行
         var longNotes1: [Note] = []     // ロングノーツ1を一時的に格納
         var longNotes2: [Note] = []	    // ロングノーツ2を一時的に格納
-        var startBeat1 = 0.0            // 始点のbeatを一時的に格納
-        var startBeat2 = 0.0            // 始点のbeatを一時的に格納
         for (bar, channel, body) in processedMainData {
             let unitBeat = 4.0 / Double(body.count) // 1オブジェクトの長さ(拍単位)
             if let lane = laneMap[channel] {
@@ -198,38 +196,36 @@ extension GameScene {   // bmsファイルを読み込む
                                 Flick   (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(beat))
                             )
                         case .start1:
-                            startBeat1 = beat
                             longNotes1.append(
-                                TapStart(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat1))
+                                TapStart(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(beat))
                             )
                         case .middle1:
                             longNotes1.append(
-                                Middle  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat1))
+                                Middle  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
                             )
                         case .end1:
                             longNotes1.append(
-                                TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat1))
+                                TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
                             )
                         case .flickEnd1:
                             longNotes1.append(
-                                FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat1))
+                                FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
                             )
                         case .start2:
-                            startBeat2 = beat
                             longNotes2.append(
-                                TapStart(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat2))
+                                TapStart(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(beat))
                             )
                         case .middle2:
                             longNotes2.append(
-                                Middle  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat2))
+                                Middle  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
                             )
                         case .end2:
                             longNotes2.append(
-                                TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat2))
+                                TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
                             )
                         case .flickEnd2:
                             longNotes2.append(
-                                FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(startBeat2))
+                                FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
                             )
                         }
                     }
@@ -388,15 +384,13 @@ extension GameScene {   // bmsファイルを読み込む
     
     // ノーツが画面上に現れる時刻を返す(updateするかの判定に使用)
     private func getAppearTime(_ beat: Double) -> TimeInterval {
+        var appearTime = TimeInterval(Dimensions.laneLength / self.speed)   // レーン端から端までかかる時間
         
-        let tmpTan = tan((Dimensions.horizonY-Dimensions.judgeLineY)/Dimensions.R)
-        var appearTime = TimeInterval(-pow(Dimensions.R,2) * tmpTan / self.speed / (Dimensions.verticalDistance - Dimensions.horizontalDistance*tmpTan))
-        
-        for (index,bpm) in BPMs.enumerated() {
+        for (index, bpm) in BPMs.enumerated() {
             if BPMs.count > index + 1 && beat > BPMs[index + 1].startPos {
                 appearTime += (BPMs[index + 1].startPos - bpm.startPos) * 60 / bpm.bpm
             } else {
-                appearTime += (beat - bpm.startPos)*60/bpm.bpm
+                appearTime += (beat - bpm.startPos) * 60 / bpm.bpm
                 break
             }
         }
