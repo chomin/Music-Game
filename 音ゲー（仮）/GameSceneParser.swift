@@ -189,43 +189,43 @@ extension GameScene {   // bmsファイルを読み込む
                             break
                         case .tap:
                             notes.append(
-                                Tap     (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(beat))
+                                Tap     (beatPos: beat, laneIndex: lane, appearTime: getAppearTime(beat))
                             )
                         case .flick:
                             notes.append(
-                                Flick   (beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(beat))
+                                Flick   (beatPos: beat, laneIndex: lane, appearTime: getAppearTime(beat))
                             )
                         case .start1:
                             longNotes1.append(
-                                TapStart(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(beat))
+                                TapStart(beatPos: beat, laneIndex: lane, appearTime: getAppearTime(beat))
                             )
                         case .middle1:
                             longNotes1.append(
-                                Middle  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
+                                Middle  (beatPos: beat, laneIndex: lane)
                             )
                         case .end1:
                             longNotes1.append(
-                                TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
+                                TapEnd  (beatPos: beat, laneIndex: lane)
                             )
                         case .flickEnd1:
                             longNotes1.append(
-                                FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
+                                FlickEnd(beatPos: beat, laneIndex: lane)
                             )
                         case .start2:
                             longNotes2.append(
-                                TapStart(beatPos: beat, laneIndex: lane, speedRatio: speedRatio, appearTime: getAppearTime(beat))
+                                TapStart(beatPos: beat, laneIndex: lane, appearTime: getAppearTime(beat))
                             )
                         case .middle2:
                             longNotes2.append(
-                                Middle  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
+                                Middle  (beatPos: beat, laneIndex: lane)
                             )
                         case .end2:
                             longNotes2.append(
-                                TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
+                                TapEnd  (beatPos: beat, laneIndex: lane)
                             )
                         case .flickEnd2:
                             longNotes2.append(
-                                FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: speedRatio)
+                                FlickEnd(beatPos: beat, laneIndex: lane)
                             )
                         }
                     }
