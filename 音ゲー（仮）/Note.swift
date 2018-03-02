@@ -10,7 +10,7 @@ import SpriteKit
 
 class Tap: Note {
     
-    let appearTime: TimeInterval        // 判定線を超える予定時刻。これ以降にposの計算&更新を行う。
+    let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
     init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
         self.appearTime = appearTime
@@ -33,6 +33,10 @@ class Tap: Note {
         
         super.update(passedTime, BPMs)
         
+        guard (!isJudged && positionOnLane < Dimensions.laneLength) || (isJudged && !image.isHidden) else {     // 判定後と判定前で場合分け
+            return
+        }
+        
         // x座標とy座標を計算しpositionを変更
         setPos()
         
@@ -53,7 +57,7 @@ class Tap: Note {
 
 class Flick: Note {
     
-    let appearTime: TimeInterval        // 判定線を超える予定時刻。これ以降にposの計算&更新を行う。
+    let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
     init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
         self.appearTime = appearTime
@@ -105,7 +109,7 @@ class TapStart: Note {
     
     var next = Note()                                               // 次のノーツ（仮のインスタンス）
     var longImages = (long: SKShapeNode(), circle: SKShapeNode())   // このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
-    let appearTime: TimeInterval                                    // 判定線を超える予定時刻。これ以降にposの計算&更新を行う。
+    let appearTime: TimeInterval                                    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
     init(beatPos beat: Double, laneIndex: Int, speedRatio:CGFloat, appearTime: TimeInterval) {
         self.appearTime = appearTime

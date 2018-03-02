@@ -384,7 +384,7 @@ extension GameScene {   // bmsファイルを読み込む
     
     // ノーツが画面上に現れる時刻を返す(updateするかの判定に使用)
     private func getAppearTime(_ beat: Double) -> TimeInterval {
-        var appearTime = TimeInterval(Dimensions.laneLength / self.speed)   // レーン端から端までかかる時間
+        var appearTime = TimeInterval(-Dimensions.laneLength / self.speed)   // レーン端から端までかかる時間
         
         for (index, bpm) in BPMs.enumerated() {
             if BPMs.count > index + 1 && beat > BPMs[index + 1].startPos {
