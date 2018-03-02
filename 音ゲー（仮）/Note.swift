@@ -33,6 +33,10 @@ class Tap: Note {
         
         super.update(passedTime, BPMs)
         
+        guard (!isJudged && positionOnLane < Dimensions.laneLength) || (isJudged && !image.isHidden) else {     // 判定後と判定前で場合分け
+            return
+        }
+        
         // x座標とy座標を計算しpositionを変更
         setPos()
         
