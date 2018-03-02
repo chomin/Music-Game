@@ -132,7 +132,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
             Label.fontSize = self.frame.width / 18
             Label.horizontalAlignmentMode = .center // 中央寄せ
             Label.position = CGPoint(x: self.frame.width - Label.fontSize*2, y: self.frame.height*3/4)
-            Label.fontColor=SKColor.white
+            Label.fontColor = SKColor.white
             
             self.addChild(Label)
             return Label
