@@ -12,8 +12,15 @@
 import SpriteKit
 import GameplayKit
 import AVFoundation
+import youtube_ios_player_helper    //今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
 
-class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲーをするシーン
+enum playMode {
+    case BGM,YouTube
+}
+
+class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {    // 音ゲーをするシーン
+    
+    var playMode:playMode
     
     //
     let judgeQueue = DispatchQueue(label: "judge_queue")    // キューに入れた処理内容を順番に実行(FPS落ち対策)
@@ -32,6 +39,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
     // 音楽プレイヤー
     var BGM: AVAudioPlayer!
     let actionSoundSet = ActionSoundPlayers()
+    
+    //YouTubeプレイヤー
+    var playerView : YTPlayerView!
     
     
     // 画像(ノーツ以外)
@@ -61,20 +71,38 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
     init(musicName: String, size: CGSize, speedRatioInt: UInt) {
         self.musicName = musicName
         self.speedRatio = CGFloat(speedRatioInt) / 100
-        super.init(size: size)
         
-        // サウンドファイルのパスを生成
-        let Path = Bundle.main.path(forResource: "Sounds/" + musicName, ofType: "mp3")!     // m4a,oggは不可
-        let soundURL = URL(fileURLWithPath: Path)
-        // AVAudioPlayerのインスタンスを作成
-        do {
-            BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
-        } catch {
-            print("AVAudioPlayerインスタンス作成失敗")
-            exit(1)
+        
+        //TODO:曲の種類についての列挙型を作り、ファイル名の読み込みなどに使うStringはそのrawvalueにしたい。
+        if musicName.suffix(9) == "(youtube)" {
+            self.playMode = .YouTube
+            super.init(size: size)
+            
+            self.playerView = YTPlayerView(frame: self.frame)
+            //詳しい使い方はJump to Definitionへ
+            self.playerView.load(withVideoId: "R3shsgKbd_M", playerVars: ["autoplay":1, "controls":0, "playsinline":1, "rel":0, "showinfo":0])
+            
+           
+            
+            
+        }else{
+            self.playMode = .BGM
+            super.init(size: size)
+            // サウンドファイルのパスを生成
+            let Path = Bundle.main.path(forResource: "Sounds/" + musicName, ofType: "mp3")!     // m4a,oggは不可
+            let soundURL = URL(fileURLWithPath: Path)
+            // AVAudioPlayerのインスタンスを作成
+            do {
+                BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
+            } catch {
+                print("AVAudioPlayerインスタンス作成失敗")
+                exit(1)
+            }
+            // バッファに保持していつでも再生できるようにする
+            BGM.prepareToPlay()
         }
-        // バッファに保持していつでも再生できるようにする
-        BGM.prepareToPlay()
+        
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -164,11 +192,26 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
         // 画像の設定
         setImages()
         
-        // BGMの再生(時間指定)
-        startTime = CACurrentMediaTime()
-        BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
-        BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  //建築予定地
-        BGM.delegate = self
+       
+        
+        if self.playMode == .BGM{
+            // BGMの再生(時間指定)
+            startTime = CACurrentMediaTime()
+            BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
+            BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  //建築予定地
+            BGM.delegate = self
+            self.backgroundColor = .black
+        }else{
+            //TODO:YouTubeの再生時間の設定など
+            playerView.delegate = self
+            view.superview!.addSubview(playerView)
+            
+            
+            view.superview!.sendSubview(toBack: playerView)
+            view.superview!.bringSubview(toFront: self.view!)
+            self.backgroundColor = UIColor(white: 0, alpha: 0.7)
+            self.view?.backgroundColor = .clear
+        }
         
         // 各レーンにノーツをセット
         for note in notes{
@@ -195,12 +238,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
     override func update(_ currentTime: TimeInterval) {
         
         // 経過時間の更新
-        if BGM.currentTime > 0 {
-            self.passedTime = BGM.currentTime + BGMOffsetTime
-        } else {
-            self.passedTime = CACurrentMediaTime() - startTime
+        if self.playMode == .BGM{
+            if BGM.currentTime > 0 {
+                self.passedTime = BGM.currentTime + BGMOffsetTime
+            } else {
+                self.passedTime = CACurrentMediaTime() - startTime
+            }
+        }else{
+            //TODO
         }
-        
         // ラベルの更新
         comboLabel.text = String(ResultScene.combo)
         
@@ -554,11 +600,33 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
         print("\(player)で\(String(describing: error))")
     }
     
+    func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
+        switch (state) {
+            
+        case YTPlayerState.ended:
+            let scene = ResultScene(size: (view?.bounds.size)!)
+            let skView = view as SKView?
+            skView?.showsFPS = true
+            skView?.showsNodeCount = true
+            skView?.ignoresSiblingOrder = true
+            scene.scaleMode = .resizeFill
+            skView?.presentScene(scene)     // ResultSceneに移動
+        default:
+            break
+        }
+    }
     
+    func playerViewDidBecomeReady(_ playerView: YTPlayerView) {
+        playerView.playVideo()
+    }
     
     // アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
-        BGM?.pause()
+        if self.playMode == .BGM{
+            BGM?.pause()
+        }else{
+            //TODO
+        }
         setJudgeLabelText(text: "")
         
         // 表示されているノーツを非表示に
@@ -597,8 +665,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
     //アプリを再開したときに呼ばれる
     func applicationDidBecomeActive() {
         actionSoundSet.stopAll()
+        if self.playMode == .BGM{
         BGM?.currentTime -= 3   // 3秒巻き戻し
         BGM?.play()
+        }else{
+            //TODO
+        }
     }
     
 }

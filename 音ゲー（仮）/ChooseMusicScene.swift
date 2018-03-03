@@ -222,7 +222,9 @@ class ChooseMusicScene: SKScene {
         //移動
         autoreleasepool{
             let scene = GameScene(musicName:picker.textStore ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
-            let skView = view as SKView?
+           
+            
+            let skView = view as SKView?    //このviewはGameViewControllerのskView2
             skView?.showsFPS = true
             skView?.showsNodeCount = true
             skView?.ignoresSiblingOrder = true
