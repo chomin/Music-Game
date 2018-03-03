@@ -195,6 +195,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         startTime = CACurrentMediaTime()
         BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
         
+        self.view?.isMultipleTouchEnabled = true    //恐らくデフォルトではfalseになってる
+        self.view?.superview?.isMultipleTouchEnabled = true
+        
         if self.playMode == .BGM{
             // BGMの再生(時間指定)
             
@@ -217,8 +220,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             self.view?.superview?.isUserInteractionEnabled = true
             playerView.isUserInteractionEnabled = false
             
-            self.view?.isMultipleTouchEnabled = true    //恐らくデフォルトではfalseになってる
-            self.view?.superview?.isMultipleTouchEnabled = true
+            
         }
         
         // 各レーンにノーツをセット
