@@ -80,7 +80,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             self.playerView = YTPlayerView(frame: self.frame)
             //詳しい使い方はJump to Definitionへ
-            self.playerView.load(withVideoId: "R3shsgKbd_M", playerVars: ["autoplay":1, "controls":0, "playsinline":1, "rel":0, "showinfo":0])
+            self.playerView.load(withVideoId: "1NYUKIZCV5k", playerVars: ["autoplay":1, "controls":0, "playsinline":1, "rel":0, "showinfo":0])
             
            
             
@@ -192,24 +192,25 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         // 画像の設定
         setImages()
         
-       
+        startTime = CACurrentMediaTime()
+        BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
         
         if self.playMode == .BGM{
             // BGMの再生(時間指定)
-            startTime = CACurrentMediaTime()
-            BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
+            
             BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  //建築予定地
             BGM.delegate = self
             self.backgroundColor = .black
         }else{
             //TODO:YouTubeの再生時間の設定など
+            
             playerView.delegate = self
             view.superview!.addSubview(playerView)
             
             
             view.superview!.sendSubview(toBack: playerView)
             view.superview!.bringSubview(toFront: self.view!)
-            self.backgroundColor = UIColor(white: 0, alpha: 0.7)
+            self.backgroundColor = UIColor(white: 0, alpha: 0.5)
             self.view?.backgroundColor = .clear
         }
         
@@ -245,6 +246,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.passedTime = CACurrentMediaTime() - startTime
             }
         }else{
+            if playerView.currentTime() > 0 {
+                self.passedTime = TimeInterval(playerView.currentTime()) + BGMOffsetTime
+            } else {
+                self.passedTime = CACurrentMediaTime() - startTime
+            }
             //TODO
         }
         // ラベルの更新
@@ -604,6 +610,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         switch (state) {
             
         case YTPlayerState.ended:
+            playerView.removeFromSuperview()
+//            self.playerView = nil
             let scene = ResultScene(size: (view?.bounds.size)!)
             let skView = view as SKView?
             skView?.showsFPS = true
@@ -616,8 +624,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
     }
     
-    func playerViewDidBecomeReady(_ playerView: YTPlayerView) {
-        playerView.playVideo()
+    func playerViewDidBecomeReady(_ playerView: YTPlayerView) { //読み込み完了後に呼び出される
+        DispatchQueue.main.asyncAfter(deadline: .now() + BGMOffsetTime) {
+            playerView.playVideo()
+        }
+        startTime = CACurrentMediaTime()
     }
     
     // アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
