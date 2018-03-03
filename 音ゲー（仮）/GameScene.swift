@@ -212,6 +212,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             view.superview!.bringSubview(toFront: self.view!)
             self.backgroundColor = UIColor(white: 0, alpha: 0.5)
             self.view?.backgroundColor = .clear
+            
+            self.view?.isUserInteractionEnabled = true
+            self.view?.superview?.isUserInteractionEnabled = true
+            playerView.isUserInteractionEnabled = false
+            
+            self.view?.isMultipleTouchEnabled = true    //恐らくデフォルトではfalseになってる
+            self.view?.superview?.isMultipleTouchEnabled = true
         }
         
         // 各レーンにノーツをセット
@@ -279,7 +286,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             
             for (index,value) in self.allTouches.enumerated() {
-                var pos = value.touch.location(in: self.view)
+                var pos = value.touch.location(in: self.view?.superview)
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
                 
                 if pos.y < self.frame.width/3 {     // 上界
@@ -344,7 +351,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         judgeQueue.sync {
             for i in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 
-                var pos = i.location(in: self.view)
+                var pos = i.location(in: self.view?.superview)
                 
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
                 
@@ -423,8 +430,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 
                 let touchIndex = self.allTouches.index(where: { $0.touch == i } )!
                 
-                var pos = i.location(in: self.view)
-                var ppos = i.previousLocation(in: self.view)
+                var pos = i.location(in: self.view?.superview)
+                var ppos = i.previousLocation(in: self.view?.superview)
                 
                 let moveDistance = sqrt(pow(pos.x-ppos.x, 2) + pow(pos.y-ppos.y, 2))
                 
@@ -523,8 +530,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 
                 let touchIndex = self.allTouches.index(where: { $0.touch == i } )!
                 
-                var pos = i.location(in: self.view)
-                var ppos = i.previousLocation(in: self.view)
+                var pos = i.location(in: self.view?.superview)
+                var ppos = i.previousLocation(in: self.view?.superview)
                 
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
                 ppos.y = self.frame.height - ppos.y
