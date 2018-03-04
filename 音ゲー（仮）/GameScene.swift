@@ -261,7 +261,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             } else {
                 self.passedTime = CACurrentMediaTime() - startTime
             }
-            //TODO
         }
         // ラベルの更新
         comboLabel.text = String(ResultScene.combo)
@@ -646,7 +645,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         if self.playMode == .bgm{
             BGM?.pause()
         }else{
-            //TODO
+            playerView.pauseVideo()
         }
         setJudgeLabelText(text: "")
         
@@ -687,10 +686,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     func applicationDidBecomeActive() {
         actionSoundSet.stopAll()
         if self.playMode == .bgm{
-        BGM?.currentTime -= 3   // 3秒巻き戻し
-        BGM?.play()
+            BGM?.currentTime -= 3   // 3秒巻き戻し
+            BGM?.play()
         }else{
-            //TODO
+            playerView.seek(toSeconds: playerView.currentTime()-3, allowSeekAhead: true)
+            playerView.playVideo()
         }
     }
     
