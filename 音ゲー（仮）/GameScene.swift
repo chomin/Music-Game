@@ -15,7 +15,7 @@ import AVFoundation
 import youtube_ios_player_helper    //今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
 
 enum playMode {
-    case BGM,YouTube
+    case bgm,YouTube
 }
 
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {    // 音ゲーをするシーン
@@ -68,39 +68,39 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private let speedRatio: CGFloat
     
     
-    init(musicName: String, size: CGSize, speedRatioInt: UInt) {
+    init(musicName: String, videoID: String, size: CGSize, speedRatioInt: UInt) {   //YouTube用
         self.musicName = musicName
         self.speedRatio = CGFloat(speedRatioInt) / 100
+        self.playMode = .YouTube
+        
+        super.init(size: size)
+        
+        self.playerView = YTPlayerView(frame: self.frame)
+        //詳しい使い方はJump to Definitionへ
+        self.playerView.load(withVideoId: videoID, playerVars: ["autoplay":1, "controls":0, "playsinline":1, "rel":0, "showinfo":0])
+    }
+    
+    init(musicName: String, size: CGSize, speedRatioInt: UInt) {    //BGM用
+        self.musicName = musicName
+        self.speedRatio = CGFloat(speedRatioInt) / 100
+        self.playMode = .bgm
         
         
-        //TODO:曲の種類についての列挙型を作り、ファイル名の読み込みなどに使うStringはそのrawvalueにしたい。
-        if musicName.suffix(9) == "(youtube)" {
-            self.playMode = .YouTube
-            super.init(size: size)
-            
-            self.playerView = YTPlayerView(frame: self.frame)
-            //詳しい使い方はJump to Definitionへ
-            self.playerView.load(withVideoId: "1NYUKIZCV5k", playerVars: ["autoplay":1, "controls":0, "playsinline":1, "rel":0, "showinfo":0])
-            
-           
-            
-            
-        }else{
-            self.playMode = .BGM
-            super.init(size: size)
-            // サウンドファイルのパスを生成
-            let Path = Bundle.main.path(forResource: "Sounds/" + musicName, ofType: "mp3")!     // m4a,oggは不可
-            let soundURL = URL(fileURLWithPath: Path)
-            // AVAudioPlayerのインスタンスを作成
-            do {
-                BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
-            } catch {
-                print("AVAudioPlayerインスタンス作成失敗")
-                exit(1)
-            }
-            // バッファに保持していつでも再生できるようにする
-            BGM.prepareToPlay()
+        super.init(size: size)
+        
+        // サウンドファイルのパスを生成
+        let Path = Bundle.main.path(forResource: "Sounds/" + musicName, ofType: "mp3")!     // m4a,oggは不可
+        let soundURL = URL(fileURLWithPath: Path)
+        // AVAudioPlayerのインスタンスを作成
+        do {
+            BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
+        } catch {
+            print("AVAudioPlayerインスタンス作成失敗")
+            exit(1)
         }
+        // バッファに保持していつでも再生できるようにする
+        BGM.prepareToPlay()
+        
         
         
     }
@@ -198,7 +198,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.view?.isMultipleTouchEnabled = true    //恐らくデフォルトではfalseになってる
         self.view?.superview?.isMultipleTouchEnabled = true
         
-        if self.playMode == .BGM{
+        if self.playMode == .bgm{
             // BGMの再生(時間指定)
             
             BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  //建築予定地
@@ -248,7 +248,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     override func update(_ currentTime: TimeInterval) {
         
         // 経過時間の更新
-        if self.playMode == .BGM{
+        if self.playMode == .bgm{
             if BGM.currentTime > 0 {
                 self.passedTime = BGM.currentTime + BGMOffsetTime
             } else {
@@ -642,7 +642,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     // アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
-        if self.playMode == .BGM{
+        if self.playMode == .bgm{
             BGM?.pause()
         }else{
             //TODO
@@ -685,7 +685,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     //アプリを再開したときに呼ばれる
     func applicationDidBecomeActive() {
         actionSoundSet.stopAll()
-        if self.playMode == .BGM{
+        if self.playMode == .bgm{
         BGM?.currentTime -= 3   // 3秒巻き戻し
         BGM?.play()
         }else{

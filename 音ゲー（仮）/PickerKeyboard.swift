@@ -26,7 +26,7 @@ class PickerKeyboard: UIControl {
         "Brand New Theater!",
         "ぼなぺてぃーとS",
         "LEVEL5-Judgelight-",
-        "LEVEL5-Judgelight-(youtube)"
+        "LEVEL5-Judgelight-(YouTube)"
     ]
     
     var textStore: String = "シュガーソングとビターステップ"   // 入力文字列を保存するためのプロパティ

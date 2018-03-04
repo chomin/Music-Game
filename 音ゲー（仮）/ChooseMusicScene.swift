@@ -15,7 +15,13 @@ enum Keys:String {
     case speedRatioInt = "SpeedRatioInt"
 }
 
+
+
+
 class ChooseMusicScene: SKScene {
+    
+    //VideoIDの辞書
+    let videoIDDictionary = ["LEVEL5-Judgelight-":"1NYUKIZCV5k"]
     
     var picker:PickerKeyboard!
     
@@ -57,7 +63,6 @@ class ChooseMusicScene: SKScene {
     override func didMove(to view: SKView) {
         
         defaults.register(defaults: [Keys.speedRatioInt.rawValue : 100])    // 初期値を設定(値がすでに入ってる場合は無視される)
-        
         
         iconButtonSize = self.frame.width/16
         speedsPosY = iconButtonSize*3
@@ -220,17 +225,26 @@ class ChooseMusicScene: SKScene {
         picker.resignFirstResponder()   //FirstResponderを放棄
         
         //移動
-        autoreleasepool{
-            let scene = GameScene(musicName:picker.textStore ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
-           
+        let scene: GameScene
+        if picker.textStore.suffix(9) == "(YouTube)"{
+            var musicName = picker.textStore
+            musicName.removeLast(9)
             
-            let skView = view as SKView?    //このviewはGameViewControllerのskView2
-            skView?.showsFPS = true
-            skView?.showsNodeCount = true
-            skView?.ignoresSiblingOrder = true
-            scene.scaleMode = .resizeFill
-            skView?.presentScene(scene)  // GameSceneに移動
+            scene = GameScene(musicName:musicName, videoID: videoIDDictionary[musicName]!, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
+        }else{
+            scene = GameScene(musicName:picker.textStore ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
         }
+        
+       
+        
+        
+        let skView = view as SKView?    //このviewはGameViewControllerのskView2
+        skView?.showsFPS = true
+        skView?.showsNodeCount = true
+        skView?.ignoresSiblingOrder = true
+        scene.scaleMode = .resizeFill
+        skView?.presentScene(scene)  // GameSceneに移動
+        
         
     }
     
