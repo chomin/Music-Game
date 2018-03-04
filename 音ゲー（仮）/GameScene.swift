@@ -192,20 +192,21 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         // 画像の設定
         setImages()
         
-        startTime = CACurrentMediaTime()
+        
         BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
         
         self.view?.isMultipleTouchEnabled = true    //恐らくデフォルトではfalseになってる
         self.view?.superview?.isMultipleTouchEnabled = true
         
         if self.playMode == .bgm{
+            startTime = CACurrentMediaTime()
             // BGMの再生(時間指定)
             
             BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  //建築予定地
             BGM.delegate = self
             self.backgroundColor = .black
         }else{
-            //TODO:YouTubeの再生時間の設定など
+            startTime = TimeInterval(pow(10.0, 308.0))  //Doubleのほぼ最大値。ロードが終わるまで。
             
             playerView.delegate = self
             view.superview!.addSubview(playerView)
