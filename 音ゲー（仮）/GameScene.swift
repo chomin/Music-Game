@@ -77,7 +77,19 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         self.playerView = YTPlayerView(frame: self.frame)
         //詳しい使い方はJump to Definitionへ
-        self.playerView.load(withVideoId: videoID, playerVars: ["autoplay":1, "controls":0, "playsinline":1, "rel":0, "showinfo":0])
+        if !(self.playerView.load(withVideoId: videoID, playerVars: ["autoplay":1, "controls":0, "playsinline":1, "rel":0, "showinfo":0])){
+            print("ロードに失敗")
+            
+            //bgmモードへ移行
+            let scene = GameScene(musicName:self.musicName ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.speedRatio*100))
+            let skView = view as SKView?    //このviewはGameViewControllerのskView2
+            skView?.showsFPS = true
+            skView?.showsNodeCount = true
+            skView?.ignoresSiblingOrder = true
+            scene.scaleMode = .resizeFill
+            skView?.presentScene(scene)  // GameSceneに移動
+        }
+        
     }
     
     init(musicName: String, size: CGSize, speedRatioInt: UInt) {    //BGM用
@@ -618,7 +630,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
         switch (state) {
             
-        case YTPlayerState.ended:
+        case .ended:
             playerView.removeFromSuperview()
 //            self.playerView = nil
             let scene = ResultScene(size: (view?.bounds.size)!)
@@ -628,6 +640,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             skView?.ignoresSiblingOrder = true
             scene.scaleMode = .resizeFill
             skView?.presentScene(scene)     // ResultSceneに移動
+            
+        case .unknown:
+            print("unknown")
         default:
             break
         }
@@ -639,6 +654,23 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         startTime = CACurrentMediaTime()
     }
+    
+    func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {   //エラー処理
+        print(error)
+        
+        //bgmモードへ移行
+        let scene = GameScene(musicName:self.musicName ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.speedRatio*100))
+        let skView = view as SKView?    //このviewはGameViewControllerのskView2
+        skView?.showsFPS = true
+        skView?.showsNodeCount = true
+        skView?.ignoresSiblingOrder = true
+        scene.scaleMode = .resizeFill
+        skView?.presentScene(scene)  // GameSceneに移動
+        
+    }
+    
+    
+    
     
     // アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
