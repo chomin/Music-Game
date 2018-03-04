@@ -12,8 +12,15 @@
 import SpriteKit
 import GameplayKit
 import AVFoundation
+import youtube_ios_player_helper    //今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
 
-class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲーをするシーン
+enum PlayMode {
+    case BGM,YouTube
+}
+
+class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {    // 音ゲーをするシーン
+    
+    var playMode:PlayMode
     
     //
     let judgeQueue = DispatchQueue(label: "judge_queue")    // キューに入れた処理内容を順番に実行(FPS落ち対策)
@@ -32,6 +39,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
     // 音楽プレイヤー
     var BGM: AVAudioPlayer!
     let actionSoundSet = ActionSoundPlayers()
+    
+    //YouTubeプレイヤー
+    var playerView : YTPlayerView!
     
     
     // 画像(ノーツ以外)
@@ -58,9 +68,36 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
     private let speedRatio: CGFloat
     
     
-    init(musicName: String, size: CGSize, speedRatioInt: UInt) {
+    init(musicName: String, videoID: String, size: CGSize, speedRatioInt: UInt) {   //YouTube用
         self.musicName = musicName
         self.speedRatio = CGFloat(speedRatioInt) / 100
+        self.playMode = .YouTube
+        
+        super.init(size: size)
+        
+        self.playerView = YTPlayerView(frame: self.frame)
+        //詳しい使い方はJump to Definitionへ
+        if !(self.playerView.load(withVideoId: videoID, playerVars: ["autoplay":1, "controls":0, "playsinline":1, "rel":0, "showinfo":0])){
+            print("ロードに失敗")
+            
+            //BGMモードへ移行
+            let scene = GameScene(musicName:self.musicName ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.speedRatio*100))
+            let skView = view as SKView?    //このviewはGameViewControllerのskView2
+            skView?.showsFPS = true
+            skView?.showsNodeCount = true
+            skView?.ignoresSiblingOrder = true
+            scene.scaleMode = .resizeFill
+            skView?.presentScene(scene)  // GameSceneに移動
+        }
+        
+    }
+    
+    init(musicName: String, size: CGSize, speedRatioInt: UInt) {    //BGM用
+        self.musicName = musicName
+        self.speedRatio = CGFloat(speedRatioInt) / 100
+        self.playMode = .BGM
+        
+        
         super.init(size: size)
         
         // サウンドファイルのパスを生成
@@ -75,6 +112,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
         }
         // バッファに保持していつでも再生できるようにする
         BGM.prepareToPlay()
+        
+        
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -164,11 +204,37 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
         // 画像の設定
         setImages()
         
-        // BGMの再生(時間指定)
-        startTime = CACurrentMediaTime()
+        
         BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
-        BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  //建築予定地
-        BGM.delegate = self
+        
+        self.view?.isMultipleTouchEnabled = true    //恐らくデフォルトではfalseになってる
+        self.view?.superview?.isMultipleTouchEnabled = true
+        
+        if self.playMode == .BGM{
+            startTime = CACurrentMediaTime()
+            // BGMの再生(時間指定)
+            
+            BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  //建築予定地
+            BGM.delegate = self
+            self.backgroundColor = .black
+        }else{
+            startTime = TimeInterval(pow(10.0, 308.0))  //Doubleのほぼ最大値。ロードが終わるまで。
+            
+            playerView.delegate = self
+            view.superview!.addSubview(playerView)
+            
+            
+            view.superview!.sendSubview(toBack: playerView)
+            view.superview!.bringSubview(toFront: self.view!)
+            self.backgroundColor = UIColor(white: 0, alpha: 0.5)
+            self.view?.backgroundColor = .clear
+            
+            self.view?.isUserInteractionEnabled = true
+            self.view?.superview?.isUserInteractionEnabled = true
+            playerView.isUserInteractionEnabled = false
+            
+            
+        }
         
         // 各レーンにノーツをセット
         for note in notes{
@@ -195,12 +261,19 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
     override func update(_ currentTime: TimeInterval) {
         
         // 経過時間の更新
-        if BGM.currentTime > 0 {
-            self.passedTime = BGM.currentTime + BGMOffsetTime
-        } else {
-            self.passedTime = CACurrentMediaTime() - startTime
+        if self.playMode == .BGM{
+            if BGM.currentTime > 0 {
+                self.passedTime = BGM.currentTime + BGMOffsetTime
+            } else {
+                self.passedTime = CACurrentMediaTime() - startTime
+            }
+        }else{
+            if playerView.currentTime() > 0 {
+                self.passedTime = TimeInterval(playerView.currentTime()) + BGMOffsetTime
+            } else {
+                self.passedTime = CACurrentMediaTime() - startTime
+            }
         }
-        
         // ラベルの更新
         comboLabel.text = String(ResultScene.combo)
         
@@ -227,7 +300,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
             
             
             for (index,value) in self.allTouches.enumerated() {
-                var pos = value.touch.location(in: self.view)
+                var pos = value.touch.location(in: self.view?.superview)
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
                 
                 if pos.y < self.frame.width/3 {     // 上界
@@ -292,7 +365,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
         judgeQueue.sync {
             for i in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 
-                var pos = i.location(in: self.view)
+                var pos = i.location(in: self.view?.superview)
                 
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
                 
@@ -371,8 +444,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
                 
                 let touchIndex = self.allTouches.index(where: { $0.touch == i } )!
                 
-                var pos = i.location(in: self.view)
-                var ppos = i.previousLocation(in: self.view)
+                var pos = i.location(in: self.view?.superview)
+                var ppos = i.previousLocation(in: self.view?.superview)
                 
                 let moveDistance = sqrt(pow(pos.x-ppos.x, 2) + pow(pos.y-ppos.y, 2))
                 
@@ -471,8 +544,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
                 
                 let touchIndex = self.allTouches.index(where: { $0.touch == i } )!
                 
-                var pos = i.location(in: self.view)
-                var ppos = i.previousLocation(in: self.view)
+                var pos = i.location(in: self.view?.superview)
+                var ppos = i.previousLocation(in: self.view?.superview)
                 
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
                 ppos.y = self.frame.height - ppos.y
@@ -554,11 +627,58 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
         print("\(player)で\(String(describing: error))")
     }
     
+    func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
+        switch (state) {
+            
+        case .ended:
+            playerView.removeFromSuperview()
+//            self.playerView = nil
+            let scene = ResultScene(size: (view?.bounds.size)!)
+            let skView = view as SKView?
+            skView?.showsFPS = true
+            skView?.showsNodeCount = true
+            skView?.ignoresSiblingOrder = true
+            scene.scaleMode = .resizeFill
+            skView?.presentScene(scene)     // ResultSceneに移動
+            
+        case .unknown:
+            print("unknown")
+        default:
+            break
+        }
+    }
+    
+    func playerViewDidBecomeReady(_ playerView: YTPlayerView) { //読み込み完了後に呼び出される
+        DispatchQueue.main.asyncAfter(deadline: .now() + BGMOffsetTime) {
+            playerView.playVideo()
+        }
+        startTime = CACurrentMediaTime()
+    }
+    
+    func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {   //エラー処理
+        print(error)
+        
+        //BGMモードへ移行
+        let scene = GameScene(musicName:self.musicName ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.speedRatio*100))
+        let skView = view as SKView?    //このviewはGameViewControllerのskView2
+        skView?.showsFPS = true
+        skView?.showsNodeCount = true
+        skView?.ignoresSiblingOrder = true
+        scene.scaleMode = .resizeFill
+        skView?.presentScene(scene)  // GameSceneに移動
+        
+    }
+    
+    
     
     
     // アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
-        BGM?.pause()
+        if self.playMode == .BGM{
+            BGM?.pause()
+        }else{
+            playerView.pauseVideo()
+        }
         setJudgeLabelText(text: "")
         
         // 表示されているノーツを非表示に
@@ -597,8 +717,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, GSAppDelegate {    // 音ゲー
     //アプリを再開したときに呼ばれる
     func applicationDidBecomeActive() {
         actionSoundSet.stopAll()
-        BGM?.currentTime -= 3   // 3秒巻き戻し
-        BGM?.play()
+        if self.playMode == .BGM{
+            BGM?.currentTime -= 3   // 3秒巻き戻し
+            BGM?.play()
+        }else{
+            playerView.seek(toSeconds: playerView.currentTime()-3, allowSeekAhead: true)
+            playerView.playVideo()
+        }
     }
     
 }

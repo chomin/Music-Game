@@ -175,8 +175,9 @@ extension GameScene {   // bmsファイルを読み込む
         }
         
         // ロングノーツは一時配列に、その他はnotesに格納。その他命令も実行
-        var longNotes1: [Note] = []     // ロングノーツ1を一時的に格納
-        var longNotes2: [Note] = []	    // ロングノーツ2を一時的に格納
+        var longNotes1: [Note] = []         // ロングノーツ1を一時的に格納
+        var longNotes2: [Note] = []	        // ロングノーツ2を一時的に格納
+        var musicStartPosSet: [Double] = [] //musicStartPosを一時的に格納
         for (bar, channel, body) in processedMainData {
             let unitBeat = 4.0 / Double(body.count) // 1オブジェクトの長さ(拍単位)
             if let lane = laneMap[channel] {
@@ -234,7 +235,7 @@ extension GameScene {   // bmsファイルを読み込む
                 // 楽曲開始命令の処理
                 for (index, ob) in body.enumerated() {
                     if ob == "10" {
-                        musicStartPos = Double(bar) * 4.0 + unitBeat * Double(index)
+                        musicStartPosSet.append(Double(bar) * 4.0 + unitBeat * Double(index))
                         break
                     }
                 }
@@ -256,6 +257,13 @@ extension GameScene {   // bmsファイルを読み込む
                     }
                 }
             }
+        }
+        
+        //musicStartPosを格納
+        if self.playMode == .BGM {
+            self.musicStartPos = musicStartPosSet[0]
+        }else {
+            self.musicStartPos = musicStartPosSet[1]
         }
         
         // ロングノーツを時間順にソート(同じ場合は.tapEnd or .flickEnd < .tapStart)
