@@ -260,7 +260,7 @@ extension GameScene {   // bmsファイルを読み込む
         }
         
         //musicStartPosを格納
-        if self.playMode == .bgm {
+        if self.playMode == .BGM {
             self.musicStartPos = musicStartPosSet[0]
         }else {
             self.musicStartPos = musicStartPosSet[1]

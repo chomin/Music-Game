@@ -20,7 +20,7 @@ enum PlayMode {
 
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {    // 音ゲーをするシーン
     
-    var playMode:playMode
+    var playMode:PlayMode
     
     //
     let judgeQueue = DispatchQueue(label: "judge_queue")    // キューに入れた処理内容を順番に実行(FPS落ち対策)
@@ -80,7 +80,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         if !(self.playerView.load(withVideoId: videoID, playerVars: ["autoplay":1, "controls":0, "playsinline":1, "rel":0, "showinfo":0])){
             print("ロードに失敗")
             
-            //bgmモードへ移行
+            //BGMモードへ移行
             let scene = GameScene(musicName:self.musicName ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.speedRatio*100))
             let skView = view as SKView?    //このviewはGameViewControllerのskView2
             skView?.showsFPS = true
@@ -95,7 +95,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     init(musicName: String, size: CGSize, speedRatioInt: UInt) {    //BGM用
         self.musicName = musicName
         self.speedRatio = CGFloat(speedRatioInt) / 100
-        self.playMode = .bgm
+        self.playMode = .BGM
         
         
         super.init(size: size)
@@ -210,7 +210,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.view?.isMultipleTouchEnabled = true    //恐らくデフォルトではfalseになってる
         self.view?.superview?.isMultipleTouchEnabled = true
         
-        if self.playMode == .bgm{
+        if self.playMode == .BGM{
             startTime = CACurrentMediaTime()
             // BGMの再生(時間指定)
             
@@ -261,7 +261,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     override func update(_ currentTime: TimeInterval) {
         
         // 経過時間の更新
-        if self.playMode == .bgm{
+        if self.playMode == .BGM{
             if BGM.currentTime > 0 {
                 self.passedTime = BGM.currentTime + BGMOffsetTime
             } else {
@@ -658,7 +658,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {   //エラー処理
         print(error)
         
-        //bgmモードへ移行
+        //BGMモードへ移行
         let scene = GameScene(musicName:self.musicName ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.speedRatio*100))
         let skView = view as SKView?    //このviewはGameViewControllerのskView2
         skView?.showsFPS = true
@@ -674,7 +674,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     // アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
-        if self.playMode == .bgm{
+        if self.playMode == .BGM{
             BGM?.pause()
         }else{
             playerView.pauseVideo()
@@ -717,7 +717,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     //アプリを再開したときに呼ばれる
     func applicationDidBecomeActive() {
         actionSoundSet.stopAll()
-        if self.playMode == .bgm{
+        if self.playMode == .BGM{
             BGM?.currentTime -= 3   // 3秒巻き戻し
             BGM?.play()
         }else{
