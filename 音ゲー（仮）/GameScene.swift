@@ -14,8 +14,8 @@ import GameplayKit
 import AVFoundation
 import youtube_ios_player_helper    //今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
 
-enum playMode {
-    case bgm,YouTube
+enum PlayMode {
+    case BGM,YouTube
 }
 
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {    // 音ゲーをするシーン
