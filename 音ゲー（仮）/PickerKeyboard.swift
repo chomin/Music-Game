@@ -14,17 +14,22 @@ class PickerKeyboard: UIControl {
     var data = [
         "シュガーソングとビターステップ",
         "ようこそジャパリパークへ",
+        "ようこそジャパリパークへ(YouTube)",
         "オラシオン",
+        "オラシオン(YouTube)",
         "This game",
         "SAKURAスキップ",
+        "SAKURAスキップ(YouTube)",
         "残酷な天使のテーゼ",
         "にめんせい☆ウラオモテライフ！",
+        "にめんせい☆ウラオモテライフ！(YouTube)",
         "READY!!",
         "自分REST@RT",
         "Thank You!",
         "Welcome!!",
         "Brand New Theater!",
         "ぼなぺてぃーとS",
+//        "ぼなぺてぃーとS(YouTube)",
         "LEVEL5-Judgelight-",
         "LEVEL5-Judgelight-(YouTube)"
     ]
