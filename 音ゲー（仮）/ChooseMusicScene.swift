@@ -20,8 +20,12 @@ enum Keys:String {
 
 class ChooseMusicScene: SKScene {
     
-    //VideoIDの辞書
-    let videoIDDictionary = ["LEVEL5-Judgelight-":"1NYUKIZCV5k"]
+    //VideoIDの辞書(https://www.youtube.com/watch?v=************の***********部分)
+    let videoIDDictionary = ["LEVEL5-Judgelight-":"1NYUKIZCV5k", "ぼなぺてぃーとS":"LOajYHKEHG8", "SAKURAスキップ":"dBwwipunJcw", "オラシオン":"6kQzRm21N_g", "にめんせい☆ウラオモテライフ！":"TyMx4pu7kA0", "ようこそジャパリパークへ":"xkMdLcB_vNU"]
+    /*
+     "ぼなぺてぃーとS": 埋め込み許可されているアニメ版が見つからず
+     
+    */
     
     var picker:PickerKeyboard!
     
