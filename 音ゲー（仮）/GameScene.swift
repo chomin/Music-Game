@@ -42,6 +42,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     //YouTubeプレイヤー
     var playerView : YTPlayerView!
+    var isReadyPlayerView = false
     
     
     // 画像(ノーツ以外)
@@ -268,7 +269,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.passedTime = CACurrentMediaTime() - startTime
             }
         }else{
-            if playerView.currentTime() > 0 {
+            if isReadyPlayerView  { //currentTime>0は最初から成り立つ？
                 self.passedTime = TimeInterval(playerView.currentTime()) + BGMOffsetTime
             } else {
                 self.passedTime = CACurrentMediaTime() - startTime
@@ -649,6 +650,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     func playerViewDidBecomeReady(_ playerView: YTPlayerView) { //読み込み完了後に呼び出される
+        
+        self.isReadyPlayerView = true
         DispatchQueue.main.asyncAfter(deadline: .now() + BGMOffsetTime) {
             playerView.playVideo()
         }
