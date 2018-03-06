@@ -7,7 +7,7 @@
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
 //
 
-//ガンマ世界線
+
 
 import SpriteKit
 import GameplayKit
@@ -388,7 +388,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                             let note = self.lanes[index].laneNotes[0]
                             let distanceToButton = sqrt(pow(pos.x - buttonPosX, 2) + pow(pos.y - Dimensions.judgeLineY, 2))
                             
-                            if self.lanes[index].isObserved == .Behind {    // middleの判定圏内（後）
+                            if self.lanes[index].isObservingMiddle == .Behind {    // middleの判定圏内（後）
                                 nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: note, distanceToButton: distanceToButton))
                                 continue
                             }
@@ -464,7 +464,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                             //lane.isTouchedをリセット
                             if pos.x < buttonPosX - Dimensions.halfBound || pos.x > buttonPosX + Dimensions.halfBound { //移動後にレーンから外れていた場合は、外れる直前にいた時間で判定
                                 
-                                if self.lanes[index].isObserved == .Front {
+                                if self.lanes[index].isObservingMiddle == .Front {
                                     if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag) {
                                         self.actionSoundSet.play(type: .middle)
                                         self.allTouches[touchIndex].isJudgeableFlickEnd = true
@@ -515,7 +515,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     for (index, buttonPosX) in Dimensions.buttonX.enumerated() {
                         if pos.x >= buttonPosX - Dimensions.halfBound && pos.x < buttonPosX + Dimensions.halfBound {
                             
-                            if self.lanes[index].isObserved == .Behind {    // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
+                            if self.lanes[index].isObservingMiddle == .Behind {    // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag) {
                                     self.actionSoundSet.play(type: .middle)
                                     self.allTouches[touchIndex].isJudgeableFlickEnd = true  // TODO: 次がFlickEndの場合のみに変更
@@ -557,7 +557,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     for (index, buttonPos) in Dimensions.buttonX.enumerated() {
                         if ppos.x >= buttonPos - Dimensions.halfBound && ppos.x < buttonPos + Dimensions.halfBound {
                             if pos.x < buttonPos - Dimensions.halfBound || pos.x > buttonPos + Dimensions.halfBound {   //  移動後にレーンから外れていた場合
-                                if self.lanes[index].isObserved == .Front {
+                                if self.lanes[index].isObservingMiddle == .Front {
                                     if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag) {
                                         self.actionSoundSet.play(type: .middle)
                                         
@@ -573,12 +573,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                         
                         if pos.x >= buttonPos - Dimensions.halfBound && pos.x < buttonPos + Dimensions.halfBound {  // ボタンの範囲
                             
-                                              if self.lanes[index].isObserved == .Front { // 早めに指を離した場合
+                                              if self.lanes[index].isObservingMiddle == .Front { // 早めに指を離した場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag) {
                                     self.actionSoundSet.play(type: .middle)
                                     break
                                 }
-                            } else if self.lanes[index].isObserved == .Behind { // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
+                            } else if self.lanes[index].isObservingMiddle == .Behind { // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag) {
                                     self.actionSoundSet.play(type: .middle)
                                     break
@@ -745,6 +745,12 @@ class Dimensions {
     let horizontalDistance: CGFloat = 250   // 画面から目までの水平距離a（約5000で10cmほど）
     let verticalDistance: CGFloat           // 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
     let R: CGFloat                          // 視点から判定線までの距離(射影する球の半径)
+    //判定時間の範囲（各々0からの時間。全範囲の半分）
+    let parfectHalfRange: TimeInterval
+    let greatHalfRange: TimeInterval
+    let goodHalfRange: TimeInterval
+    let badHalfRange: TimeInterval
+    let missHalfRange: TimeInterval
     
     private static var instance: Dimensions?    // 唯一のインスタンス
     
@@ -765,19 +771,30 @@ class Dimensions {
         for i in 0...6 {
             buttonX.append(frame.width/6 + CGFloat(i)*laneWidth)
         }
+        
+        self.parfectHalfRange = 0.05
+        self.greatHalfRange = 0.08
+        self.goodHalfRange = 0.085
+        self.badHalfRange = 0.09
+        self.missHalfRange = 0.1
     }
     
     // これらクラスプロパティから、定数にアクセスする(createInstanceされてなければ全て0)
-    static var horizonLength:      CGFloat  { return Dimensions.instance?.horizonLength      ??  CGFloat(0) }
-    static var horizonY:           CGFloat  { return Dimensions.instance?.horizonY           ??  CGFloat(0) }
-    static var laneWidth:          CGFloat  { return Dimensions.instance?.laneWidth          ??  CGFloat(0) }
-    static var laneLength:         CGFloat  { return Dimensions.instance?.laneLength         ??  CGFloat(0) }
-    static var judgeLineY:         CGFloat  { return Dimensions.instance?.judgeLineY         ??  CGFloat(0) }
-    static var halfBound:          CGFloat  { return Dimensions.instance?.halfBound          ??  CGFloat(0) }
-    static var horizontalDistance: CGFloat  { return Dimensions.instance?.horizontalDistance ??  CGFloat(0) }
-    static var verticalDistance:   CGFloat  { return Dimensions.instance?.verticalDistance   ??  CGFloat(0) }
-    static var R:                  CGFloat  { return Dimensions.instance?.R                  ??  CGFloat(0) }
-    static var buttonX:           [CGFloat] { return Dimensions.instance?.buttonX            ?? [CGFloat]() }
+    static var horizonLength:      CGFloat      { return Dimensions.instance?.horizonLength      ??  CGFloat(0)      }
+    static var horizonY:           CGFloat      { return Dimensions.instance?.horizonY           ??  CGFloat(0)      }
+    static var laneWidth:          CGFloat      { return Dimensions.instance?.laneWidth          ??  CGFloat(0)      }
+    static var laneLength:         CGFloat      { return Dimensions.instance?.laneLength         ??  CGFloat(0)      }
+    static var judgeLineY:         CGFloat      { return Dimensions.instance?.judgeLineY         ??  CGFloat(0)      }
+    static var halfBound:          CGFloat      { return Dimensions.instance?.halfBound          ??  CGFloat(0)      }
+    static var horizontalDistance: CGFloat      { return Dimensions.instance?.horizontalDistance ??  CGFloat(0)      }
+    static var verticalDistance:   CGFloat      { return Dimensions.instance?.verticalDistance   ??  CGFloat(0)      }
+    static var R:                  CGFloat      { return Dimensions.instance?.R                  ??  CGFloat(0)      }
+    static var buttonX:           [CGFloat]     { return Dimensions.instance?.buttonX            ?? [CGFloat]()      }
+    static var parfectHalfRange:   TimeInterval { return Dimensions.instance?.parfectHalfRange   ??  TimeInterval(0) }
+    static var greatHalfRange:     TimeInterval { return Dimensions.instance?.greatHalfRange     ??  TimeInterval(0) }
+    static var goodHalfRange:      TimeInterval { return Dimensions.instance?.goodHalfRange      ??  TimeInterval(0) }
+    static var badHalfRange:       TimeInterval { return Dimensions.instance?.badHalfRange       ??  TimeInterval(0) }
+    static var missHalfRange:      TimeInterval { return Dimensions.instance?.missHalfRange      ??  TimeInterval(0) }
     
     // この関数のみが唯一Dimensionsクラスをインスタンス化できる
     static func createInstance(frame: CGRect) {

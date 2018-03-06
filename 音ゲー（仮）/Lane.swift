@@ -9,11 +9,11 @@
 import SpriteKit
 
 enum TimeState {
-    case miss,bad,good,great,parfect,still,passed
+    case miss, bad, good, great, parfect, still, passed
 }
 
-enum MiddleObsevationBool{
-    case Front, Behind, False
+enum MiddleObsevationTimeState{
+    case front, behind, otherwise
 }
 
 class Lane{ 
@@ -25,53 +25,47 @@ class Lane{
     
     var isJudgeRange:Bool{
         get{
-            guard isTimeLagRenewed else {
-                return false
-            }
+            guard isTimeLagRenewed else { return false }
+            
             switch self.getTimeState(timeLag: timeLag) {
-            case .parfect, .great, .good, .bad, .miss:
-                return true
-            default:
-                return false
+            case .parfect, .great, .good, .bad, .miss : return true
+            default                                   : return false
             }
             
         }
     }
-    var isObserved:MiddleObsevationBool {   // middleの判定圏内かどうかを返す
+    var isObservingMiddle:MiddleObsevationTimeState {   // middleの判定圏内かどうかを返す
         get{
-            if self.isTimeLagRenewed{
-                guard laneNotes.count > 0 else {
-                    return .False
-                }
-                guard laneNotes.first is Middle else {
-                    return .False
-                }
-                
-                switch timeLag {
-                case 0..<0.1:
-                    return .Front
-                case -0.1..<0:
-                    return .Behind
-                default:
-                    return .False
-                }
-                
-            }else{
-                return .False
+            guard self.isTimeLagRenewed,
+                  laneNotes.count > 0       else { return .otherwise }
+            guard laneNotes.first is Middle else { return .otherwise }
+            
+            switch timeLag {
+            case  Dimensions.parfectHalfRange ..<  Dimensions.missHalfRange    : return .front
+            case -Dimensions.missHalfRange    ..< -Dimensions.parfectHalfRange : return .behind
+            default                                                            : return .otherwise
             }
         }
     }
     
-    
-    var timeState:TimeState{
+    var isObservingFlick:Bool { //フリックの判定を我慢しなければならない時間帯
         get{
-            if self.isTimeLagRenewed{
-                
-                return self.getTimeState(timeLag: timeLag)
-                
-            }else{
-                return .still
-            }
+            guard self.isTimeLagRenewed,
+                  laneNotes.count > 0         else { return false }
+            guard laneNotes.first is Flick ||
+                  laneNotes.first is FlickEnd else { return false }
+            
+            return timeLag > Dimensions.parfectHalfRange &&
+                   timeLag < Dimensions.missHalfRange
+        }
+    }
+    
+    
+    var timeState:TimeState{    //このインスタンスのtimeLagについてのtimeStateを取得するためのプロパティ
+        get{
+            guard self.isTimeLagRenewed else { return .still }
+            
+            return self.getTimeState(timeLag: timeLag)
         }
     }
     
@@ -89,6 +83,7 @@ class Lane{
         
         // timeLagの更新
         if isSetLaneNotes{
+            
             if laneNotes.count > 0 {
                 
                 timeLag = -passedTime
@@ -100,14 +95,9 @@ class Lane{
                         break
                     }
                 }
-                
-                self.isTimeLagRenewed = true    // パース前はtimeLagは更新されないので通知する必要あり
-                
-            }else{  // このレーンが使われない場合
-                
-                self.isTimeLagRenewed = true
-                
             }
+            
+            self.isTimeLagRenewed = true    // パース前はtimeLagは更新されないので(このレーンが使われない場合でも)通知する必要あり.
         }
     }
     
@@ -118,24 +108,13 @@ class Lane{
         }
         
         switch abs(timeLag){
-        case 0..<0.05:
-            return .parfect
-        case 0.05..<0.08:
-            return .great
-        case 0.08..<0.085:
-            return .good
-        case 0.085..<0.09:
-            return .bad
-        case 0.09..<0.1:
-            return .miss
-        default:
-            if timeLag > 0{
-                return .still
-            }else{
-                return .passed
-            }
+        case 0                              ..< Dimensions.parfectHalfRange  : return .parfect
+        case Dimensions.parfectHalfRange    ..< Dimensions.greatHalfRange    : return .great
+        case Dimensions.greatHalfRange      ..< Dimensions.goodHalfRange     : return .good
+        case Dimensions.goodHalfRange       ..< Dimensions.badHalfRange      : return .bad
+        case Dimensions.badHalfRange        ..< Dimensions.missHalfRange     : return .miss
+        default                                                              : if timeLag > 0 { return .still  }
+                                                                               else           { return .passed }
         }
     }
-    
-    
 }
