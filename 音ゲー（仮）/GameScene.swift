@@ -40,18 +40,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var BGM: AVAudioPlayer!
     let actionSoundSet = ActionSoundPlayers()
     
-    //YouTubeプレイヤー
+    // YouTubeプレイヤー
     var playerView : YTPlayerView!
     var isReadyPlayerView = false
-    
     
     // 画像(ノーツ以外)
     var judgeLine: SKShapeNode!
     var sameLines: [SameLine] = []  // 連動する始点側のノーツと同時押しライン
     
-    
     // 楽曲データ
-    var musicName: String       // 曲名を表示したりするかもしれないのでコメントアウトにとどめる
+    var musicName: String       // 曲名
     var notes: [Note] = []      // ノーツの" 始 点 "の集合。
     var musicStartPos = 1.0     // BGM開始の"拍"！
     var genre = ""              // ジャンル
@@ -64,7 +62,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var startTime: TimeInterval = 0.0       // シーン移動した時の時間
     var passedTime: TimeInterval = 0.0              // 経過時間
     private var BGMOffsetTime: TimeInterval = 0.0   // 経過時間とBGM.currentTimeのずれ。一定
-    let lanes: [Lane] = [Lane(laneIndex: 0), Lane(laneIndex: 1), Lane(laneIndex: 2), Lane(laneIndex: 3), Lane(laneIndex: 4), Lane(laneIndex: 5), Lane(laneIndex: 6)]     // レーン
+    let lanes = [Lane(laneIndex: 0), Lane(laneIndex: 1), Lane(laneIndex: 2), Lane(laneIndex: 3), Lane(laneIndex: 4), Lane(laneIndex: 5), Lane(laneIndex: 6)]     // レーン
     
     private let speedRatio: CGFloat
     
@@ -128,6 +126,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         appDelegate = UIApplication.shared.delegate as! AppDelegate // AppDelegateのインスタンスを取得
         appDelegate.gsDelegate = self   // 子(AppDelegate)の設定しているdelegateを自身にもセット
         
+        self.view?.isMultipleTouchEnabled = true    // 恐らくデフォルトではfalseになってる
+        self.view?.superview?.isMultipleTouchEnabled = true
+        
         // 寸法に関する定数をセット
         Dimensions.createInstance(frame: self.frame)
         
@@ -144,6 +145,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
         catch ParseError.unexpected     (let msg) { print(msg) }
         catch                                     { print("未知のエラー") }
+        
+        // Noteクラスのクラスプロパティを設定
+        let duration = (playMode == .BGM) ? BGM.duration : playerView.duration()
+        Note.setConstants(BPMs, speedRatio, duration)
         
         //リザルトの初期化
         ResultScene.parfect = 0
@@ -207,14 +212,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         
         BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
-        
-        self.view?.isMultipleTouchEnabled = true    //恐らくデフォルトではfalseになってる
-        self.view?.superview?.isMultipleTouchEnabled = true
-        
+
         if self.playMode == .BGM{
             startTime = CACurrentMediaTime()
             // BGMの再生(時間指定)
-            
             BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  //建築予定地
             BGM.delegate = self
             self.backgroundColor = .black
@@ -280,7 +281,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // 各ノーツの位置や大きさを更新
         for note in notes {
-            note.update(passedTime, BPMs, speedRatio)
+            note.update(passedTime)
         }
         
         // 同時押しラインの更新
