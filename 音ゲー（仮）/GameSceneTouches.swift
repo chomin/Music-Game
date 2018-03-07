@@ -120,14 +120,15 @@ extension GameScene: FlickJudgeDelegate {
         
         guard lane.storedFlickJudge != (nil, nil) else { return }
         
-        let touchIndex = self.allTouches.index(where: { $0.touch == lane.storedFlickJudge.touch } )!
-        
-       guard self.allTouches[touchIndex].storedFlickJudgeLaneIndex != nil else { return }
-        
-        if judge(lane: lane, timeLag: lane.storedFlickJudge.time!, touch: self.allTouches[touchIndex]){
-            self.actionSoundSet.play(type: .flick)
-        }else {
-            print("storedFlickJudgeに失敗")
+        if let touchIndex = self.allTouches.index(where: { $0.touch == lane.storedFlickJudge.touch } ) {//allTouchesからタッチ情報が消えていないか確認（TODO:消えている場合の状況確認）
+            
+            guard self.allTouches[touchIndex].storedFlickJudgeLaneIndex != nil else { return }
+            
+            if judge(lane: lane, timeLag: lane.storedFlickJudge.time!, touch: self.allTouches[touchIndex]){
+                self.actionSoundSet.play(type: .flick)
+            }else {
+                print("storedFlickJudgeに失敗")
+            }
         }
     }
     
