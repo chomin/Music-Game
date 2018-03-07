@@ -8,6 +8,10 @@
 
 import SpriteKit
 
+protocol FlickJudgeDelegate {   //parfect終了時に保存されているflickJudgeを行う
+    func storedFlickJudge(lane: Lane)
+}
+
 enum TimeState {
     case miss, bad, good, great, parfect, still, passed
 }
@@ -22,6 +26,7 @@ class Lane{
     var laneNotes:[Note] = []   // 最初に全部格納する！
     var isSetLaneNotes = false
     let laneIndex:Int!
+    var fjDelegate:FlickJudgeDelegate!
     
     var isJudgeRange:Bool{
         get{
@@ -48,7 +53,7 @@ class Lane{
         }
     }
     
-    var isObservingFlick:Bool { //フリックの判定を我慢しなければならない時間帯
+    var isWaitForParfectFlickTime:Bool { //parfectまで待つ時間帯かどうかを返す。（もっといい名前あったら変えて）
         get{
             guard self.isTimeLagRenewed,
                   laneNotes.count > 0         else { return false }
@@ -60,8 +65,9 @@ class Lane{
         }
     }
     
+    var storedFlickJudge:(time:TimeInterval?, touch: UITouch?)
     
-    var timeState:TimeState{    //このインスタンスのtimeLagについてのtimeStateを取得するためのプロパティ
+    var timeState:TimeState{    //このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
         get{
             guard self.isTimeLagRenewed else { return .still }
             
@@ -87,13 +93,24 @@ class Lane{
             if laneNotes.count > 0 {
                 
                 timeLag = -passedTime
+                
                 for (index,i) in BPMs.enumerated(){
-                    if BPMs.count > index+1 && laneNotes[0].beat > BPMs[index+1].startPos{
+                    if BPMs.count > index+1 &&
+                        laneNotes[0].beat > BPMs[index+1].startPos{
+                        
                         timeLag += (BPMs[index+1].startPos - i.startPos)*60/i.bpm
+                        
                     }else{
+                        
                         timeLag += (laneNotes[0].beat - i.startPos)*60/i.bpm
                         break
                     }
+                }
+                
+                //storedFlickJudgeの判定
+                if timeLag < -Dimensions.parfectHalfRange &&
+                    self.storedFlickJudge != (nil, nil) {
+                    self.fjDelegate?.storedFlickJudge(lane: self)
                 }
             }
             
