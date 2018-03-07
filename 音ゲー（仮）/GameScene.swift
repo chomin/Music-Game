@@ -790,7 +790,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
 }
 
 
-// 寸法に関する定数を提供(シングルトン)
+// 寸法に関する定数を提供(シングルトン)。self.frameをもとに決定される。
 class Dimensions {
     let horizonLength: CGFloat  // 水平線の長さ
     let horizonY: CGFloat       // 水平線のy座標
@@ -803,12 +803,7 @@ class Dimensions {
     let horizontalDistance: CGFloat = 250   // 画面から目までの水平距離a（約5000で10cmほど）
     let verticalDistance: CGFloat           // 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
     let R: CGFloat                          // 視点から判定線までの距離(射影する球の半径)
-    //判定時間の範囲（各々0からの時間。全範囲の半分）
-    let parfectHalfRange: TimeInterval
-    let greatHalfRange: TimeInterval
-    let goodHalfRange: TimeInterval
-    let badHalfRange: TimeInterval
-    let missHalfRange: TimeInterval
+   
     
     private static var instance: Dimensions?    // 唯一のインスタンス
     
@@ -829,30 +824,21 @@ class Dimensions {
         for i in 0...6 {
             buttonX.append(frame.width/6 + CGFloat(i)*laneWidth)
         }
-        
-        self.parfectHalfRange = 0.05
-        self.greatHalfRange = 0.08
-        self.goodHalfRange = 0.085
-        self.badHalfRange = 0.09
-        self.missHalfRange = 0.1
+ 
     }
     
     // これらクラスプロパティから、定数にアクセスする(createInstanceされてなければ全て0)
-    static var horizonLength:      CGFloat      { return Dimensions.instance?.horizonLength      ??  CGFloat(0)      }
-    static var horizonY:           CGFloat      { return Dimensions.instance?.horizonY           ??  CGFloat(0)      }
-    static var laneWidth:          CGFloat      { return Dimensions.instance?.laneWidth          ??  CGFloat(0)      }
-    static var laneLength:         CGFloat      { return Dimensions.instance?.laneLength         ??  CGFloat(0)      }
-    static var judgeLineY:         CGFloat      { return Dimensions.instance?.judgeLineY         ??  CGFloat(0)      }
-    static var halfBound:          CGFloat      { return Dimensions.instance?.halfBound          ??  CGFloat(0)      }
-    static var horizontalDistance: CGFloat      { return Dimensions.instance?.horizontalDistance ??  CGFloat(0)      }
-    static var verticalDistance:   CGFloat      { return Dimensions.instance?.verticalDistance   ??  CGFloat(0)      }
-    static var R:                  CGFloat      { return Dimensions.instance?.R                  ??  CGFloat(0)      }
-    static var buttonX:           [CGFloat]     { return Dimensions.instance?.buttonX            ?? [CGFloat]()      }
-    static var parfectHalfRange:   TimeInterval { return Dimensions.instance?.parfectHalfRange   ??  TimeInterval(0) }
-    static var greatHalfRange:     TimeInterval { return Dimensions.instance?.greatHalfRange     ??  TimeInterval(0) }
-    static var goodHalfRange:      TimeInterval { return Dimensions.instance?.goodHalfRange      ??  TimeInterval(0) }
-    static var badHalfRange:       TimeInterval { return Dimensions.instance?.badHalfRange       ??  TimeInterval(0) }
-    static var missHalfRange:      TimeInterval { return Dimensions.instance?.missHalfRange      ??  TimeInterval(0) }
+    static var horizonLength:      CGFloat  { return Dimensions.instance?.horizonLength      ??  CGFloat(0) }
+    static var horizonY:           CGFloat  { return Dimensions.instance?.horizonY           ??  CGFloat(0) }
+    static var laneWidth:          CGFloat  { return Dimensions.instance?.laneWidth          ??  CGFloat(0) }
+    static var laneLength:         CGFloat  { return Dimensions.instance?.laneLength         ??  CGFloat(0) }
+    static var judgeLineY:         CGFloat  { return Dimensions.instance?.judgeLineY         ??  CGFloat(0) }
+    static var halfBound:          CGFloat  { return Dimensions.instance?.halfBound          ??  CGFloat(0) }
+    static var horizontalDistance: CGFloat  { return Dimensions.instance?.horizontalDistance ??  CGFloat(0) }
+    static var verticalDistance:   CGFloat  { return Dimensions.instance?.verticalDistance   ??  CGFloat(0) }
+    static var R:                  CGFloat  { return Dimensions.instance?.R                  ??  CGFloat(0) }
+    static var buttonX:           [CGFloat] { return Dimensions.instance?.buttonX            ?? [CGFloat]() }
+
     
     // この関数のみが唯一Dimensionsクラスをインスタンス化できる
     static func createInstance(frame: CGRect) {

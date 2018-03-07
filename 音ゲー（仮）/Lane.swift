@@ -20,7 +20,15 @@ enum MiddleObsevationTimeState{
     case front, behind, otherwise
 }
 
-class Lane{ 
+class Lane{
+    
+    //判定時間に関する定数群
+    private let parfectHalfRange = 0.05
+    private let greatHalfRange = 0.08
+    private let goodHalfRange = 0.085
+    private let badHalfRange = 0.09
+    private let missHalfRange = 0.1
+    
     var timeLag :TimeInterval = 0.0
     var isTimeLagRenewed = false
     var laneNotes:[Note] = []   // 最初に全部格納する！
@@ -46,9 +54,9 @@ class Lane{
             guard laneNotes.first is Middle else { return .otherwise }
             
             switch timeLag {
-            case  Dimensions.parfectHalfRange ..<  Dimensions.missHalfRange    : return .front
-            case -Dimensions.missHalfRange    ..< -Dimensions.parfectHalfRange : return .behind
-            default                                                            : return .otherwise
+            case  parfectHalfRange ..<  missHalfRange    : return .front
+            case -missHalfRange    ..< -parfectHalfRange : return .behind
+            default                                      : return .otherwise
             }
         }
     }
@@ -60,8 +68,8 @@ class Lane{
             guard laneNotes.first is Flick ||
                   laneNotes.first is FlickEnd else { return false }
             
-            return timeLag > Dimensions.parfectHalfRange &&
-                   timeLag < Dimensions.missHalfRange
+            return timeLag > parfectHalfRange &&
+                   timeLag < missHalfRange
         }
     }
     
@@ -108,7 +116,7 @@ class Lane{
                 }
                 
                 //storedFlickJudgeの判定
-                if timeLag < -Dimensions.parfectHalfRange &&
+                if timeLag < -parfectHalfRange &&
                     self.storedFlickJudge != (nil, nil) {
                     self.fjDelegate?.storedFlickJudge(lane: self)
                 }
@@ -125,13 +133,13 @@ class Lane{
         }
         
         switch abs(timeLag){
-        case 0                              ..< Dimensions.parfectHalfRange  : return .parfect
-        case Dimensions.parfectHalfRange    ..< Dimensions.greatHalfRange    : return .great
-        case Dimensions.greatHalfRange      ..< Dimensions.goodHalfRange     : return .good
-        case Dimensions.goodHalfRange       ..< Dimensions.badHalfRange      : return .bad
-        case Dimensions.badHalfRange        ..< Dimensions.missHalfRange     : return .miss
-        default                                                              : if timeLag > 0 { return .still  }
-                                                                               else           { return .passed }
+        case 0                ..< parfectHalfRange  : return .parfect
+        case parfectHalfRange ..< greatHalfRange    : return .great
+        case greatHalfRange   ..< goodHalfRange     : return .good
+        case goodHalfRange    ..< badHalfRange      : return .bad
+        case badHalfRange     ..< missHalfRange     : return .miss
+        default                                     : if timeLag > 0 { return .still  }
+                                                      else           { return .passed }
         }
     }
 }
