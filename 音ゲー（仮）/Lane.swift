@@ -8,70 +8,78 @@
 
 import SpriteKit
 
+protocol FlickJudgeDelegate {   //parfect終了時に保存されているflickJudgeを行う
+    func storedFlickJudge(lane: Lane)
+}
+
 enum TimeState {
-    case miss,bad,good,great,parfect,still,passed
+    case miss, bad, good, great, parfect, still, passed
 }
 
-enum MiddleObsevationBool{
-    case Front, Behind, False
+enum MiddleObsevationTimeState{
+    case front, behind, otherwise
 }
 
-class Lane{ 
+class Lane{
+    
+    //判定時間に関する定数群
+    private let parfectHalfRange = 0.05
+    private let greatHalfRange = 0.08
+    private let goodHalfRange = 0.085
+    private let badHalfRange = 0.09
+    private let missHalfRange = 0.1
+    
     var timeLag :TimeInterval = 0.0
     var isTimeLagRenewed = false
     var laneNotes:[Note] = []   // 最初に全部格納する！
     var isSetLaneNotes = false
     let laneIndex:Int!
+    var fjDelegate:FlickJudgeDelegate!
     
     var isJudgeRange:Bool{
         get{
-            guard isTimeLagRenewed else {
-                return false
-            }
+            guard isTimeLagRenewed else { return false }
+            
             switch self.getTimeState(timeLag: timeLag) {
-            case .parfect, .great, .good, .bad, .miss:
-                return true
-            default:
-                return false
+            case .parfect, .great, .good, .bad, .miss : return true
+            default                                   : return false
             }
             
         }
     }
-    var isObserved:MiddleObsevationBool {   // middleの判定圏内かどうかを返す
+    var isObservingMiddle:MiddleObsevationTimeState {   // middleの判定圏内かどうかを返す
         get{
-            if self.isTimeLagRenewed{
-                guard laneNotes.count > 0 else {
-                    return .False
-                }
-                guard laneNotes.first is Middle else {
-                    return .False
-                }
-                
-                switch timeLag {
-                case 0..<0.1:
-                    return .Front
-                case -0.1..<0:
-                    return .Behind
-                default:
-                    return .False
-                }
-                
-            }else{
-                return .False
+            guard self.isTimeLagRenewed,
+                  laneNotes.count > 0       else { return .otherwise }
+            guard laneNotes.first is Middle else { return .otherwise }
+            
+            switch timeLag {
+            case  parfectHalfRange ..<  missHalfRange    : return .front
+            case -missHalfRange    ..< -parfectHalfRange : return .behind
+            default                                      : return .otherwise
             }
         }
     }
     
-    
-    var timeState:TimeState{
+    var isWaitForParfectFlickTime:Bool { //parfectまで待つ時間帯かどうかを返す。（もっといい名前あったら変えて）
         get{
-            if self.isTimeLagRenewed{
-                
-                return self.getTimeState(timeLag: timeLag)
-                
-            }else{
-                return .still
-            }
+            guard self.isTimeLagRenewed,
+                  laneNotes.count > 0         else { return false }
+            guard laneNotes.first is Flick ||
+                  laneNotes.first is FlickEnd else { return false }
+            
+            return timeLag > parfectHalfRange &&
+                   timeLag < missHalfRange
+        }
+    }
+    
+    var storedFlickJudge:(time:TimeInterval?, touch: UITouch?)
+    
+    var timeState:TimeState{    //このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
+        get{
+            guard self.isTimeLagRenewed else { return .still }
+            
+            return self.getTimeState(timeLag: timeLag)
         }
     }
     
@@ -89,25 +97,32 @@ class Lane{
         
         // timeLagの更新
         if isSetLaneNotes{
+            
             if laneNotes.count > 0 {
                 
                 timeLag = -passedTime
+                
                 for (index,i) in BPMs.enumerated(){
-                    if BPMs.count > index+1 && laneNotes[0].beat > BPMs[index+1].startPos{
+                    if BPMs.count > index+1 &&
+                        laneNotes[0].beat > BPMs[index+1].startPos{
+                        
                         timeLag += (BPMs[index+1].startPos - i.startPos)*60/i.bpm
+                        
                     }else{
+                        
                         timeLag += (laneNotes[0].beat - i.startPos)*60/i.bpm
                         break
                     }
                 }
                 
-                self.isTimeLagRenewed = true    // パース前はtimeLagは更新されないので通知する必要あり
-                
-            }else{  // このレーンが使われない場合
-                
-                self.isTimeLagRenewed = true
-                
+                //storedFlickJudgeの判定
+                if timeLag < -parfectHalfRange &&
+                    self.storedFlickJudge != (nil, nil) {
+                    self.fjDelegate?.storedFlickJudge(lane: self)
+                }
             }
+            
+            self.isTimeLagRenewed = true    // パース前はtimeLagは更新されないので(このレーンが使われない場合でも)通知する必要あり.
         }
     }
     
@@ -118,24 +133,13 @@ class Lane{
         }
         
         switch abs(timeLag){
-        case 0..<0.05:
-            return .parfect
-        case 0.05..<0.08:
-            return .great
-        case 0.08..<0.085:
-            return .good
-        case 0.085..<0.09:
-            return .bad
-        case 0.09..<0.1:
-            return .miss
-        default:
-            if timeLag > 0{
-                return .still
-            }else{
-                return .passed
-            }
+        case 0                ..< parfectHalfRange  : return .parfect
+        case parfectHalfRange ..< greatHalfRange    : return .great
+        case greatHalfRange   ..< goodHalfRange     : return .good
+        case goodHalfRange    ..< badHalfRange      : return .bad
+        case badHalfRange     ..< missHalfRange     : return .miss
+        default                                     : if timeLag > 0 { return .still  }
+                                                      else           { return .passed }
         }
     }
-    
-    
 }
