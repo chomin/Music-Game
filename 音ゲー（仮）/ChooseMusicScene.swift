@@ -21,7 +21,7 @@ enum Keys:String {
 class ChooseMusicScene: SKScene {
     
     //VideoIDの辞書(https://www.youtube.com/watch?v=************の***********部分)
-    let videoIDDictionary = ["LEVEL5-Judgelight-":"1NYUKIZCV5k", "ぼなぺてぃーとS":"LOajYHKEHG8", "SAKURAスキップ":"dBwwipunJcw", "オラシオン":"6kQzRm21N_g", "にめんせい☆ウラオモテライフ！":"TyMx4pu7kA0", "ようこそジャパリパークへ":"xkMdLcB_vNU"]
+    let videoIDDictionary = ["LEVEL5-Judgelight-":"1NYUKIZCV5k", "ぼなぺてぃーとS":"LOajYHKEHG8", "SAKURAスキップ":"dBwwipunJcw", "オラシオン":"6kQzRm21N_g", "ウラシオン":"fF6c1gqutjs", "にめんせい☆ウラオモテライフ！":"TyMx4pu7kA0", "ようこそジャパリパークへ":"xkMdLcB_vNU"]
     /*
      "ぼなぺてぃーとS": 埋め込み許可されているアニメ版が見つからず
      
@@ -233,6 +233,11 @@ class ChooseMusicScene: SKScene {
         if picker.textStore.suffix(9) == "(YouTube)"{
             var musicName = picker.textStore
             musicName.removeLast(9)
+            
+            //ネタバレ注意！
+            if musicName == "オラシオン" &&
+                (defaults.integer(forKey: Keys.speedRatioInt.rawValue) <= 21 ||
+                defaults.integer(forKey: Keys.speedRatioInt.rawValue) >= 201) { musicName = "ウラシオン" }
             
             scene = GameScene(musicName:musicName, videoID: videoIDDictionary[musicName]!, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
         }else{

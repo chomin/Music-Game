@@ -15,7 +15,7 @@ import AVFoundation
 import youtube_ios_player_helper    //今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
 
 enum PlayMode {
-    case BGM,YouTube
+    case BGM,YouTube, YouTube2
 }
 
 class GSTouch { //参照型として扱いたい
@@ -101,9 +101,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     
     init(musicName: String, videoID: String, size: CGSize, speedRatioInt: UInt) {   //YouTube用
-        self.musicName = musicName
+        if musicName == "ウラシオン" {
+            self.musicName = "オラシオン"
+            self.playMode = .YouTube2
+        }else{
+            self.musicName =  musicName
+            self.playMode = .YouTube
+        }
         self.speedRatio = CGFloat(speedRatioInt) / 100
-        self.playMode = .YouTube
+        
         
         super.init(size: size)
         

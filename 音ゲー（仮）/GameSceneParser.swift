@@ -260,10 +260,13 @@ extension GameScene {   // bmsファイルを読み込む
         }
         
         //musicStartPosを格納
-        if self.playMode == .BGM {
+        switch self.playMode {
+        case .BGM:
             self.musicStartPos = musicStartPosSet[0]
-        }else {
+        case .YouTube:
             self.musicStartPos = musicStartPosSet[1]
+        case .YouTube2:
+            self.musicStartPos = musicStartPosSet[2]
         }
         
         // ロングノーツを時間順にソート(同じ場合は.tapEnd or .flickEnd < .tapStart)
