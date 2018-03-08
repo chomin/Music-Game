@@ -28,7 +28,7 @@ extension GameScene: FlickJudgeDelegate {
     
     
     
-    func judge(lane: Lane, timeLag: TimeInterval, touch: GSTouch) -> Bool {     // 対象ノーツが実在し、判定したかを返す.timeLagは（judge呼び出し時ではなく）タッチされた時のものを使用。
+    func judge(lane: Lane, timeLag: TimeInterval, touch: GSTouch?) -> Bool {     // 対象ノーツが実在し、判定したかを返す.timeLagは（judge呼び出し時ではなく）タッチされた時のものを使用。
         
         
         guard lane.laneNotes.count > 0 else { return false }
@@ -40,19 +40,19 @@ extension GameScene: FlickJudgeDelegate {
         
         switch judgeNote {
         case is Flick, is FlickEnd:
-            touch.isJudgeableFlick = false    // このタッチでのフリック判定を禁止
-            touch.isJudgeableFlickEnd = false
+            touch?.isJudgeableFlick = false    // このタッチでのフリック判定を禁止
+            touch?.isJudgeableFlickEnd = false
             
             //storedFlickJudgeに関する処理
-            touch.storedFlickJudgeLaneIndex = nil
+            touch?.storedFlickJudgeLaneIndex = nil
             lane.storedFlickJudge = (nil, nil)
         case is Tap:
-            touch.isJudgeableFlick = false
-            touch.isJudgeableFlickEnd = false
+            touch?.isJudgeableFlick = false
+            touch?.isJudgeableFlickEnd = false
             
         case is TapStart, is Middle:
-            touch.isJudgeableFlick = false
-            touch.isJudgeableFlickEnd = true
+            touch?.isJudgeableFlick = false
+            touch?.isJudgeableFlickEnd = true
        
         default: break
             
@@ -120,13 +120,13 @@ extension GameScene: FlickJudgeDelegate {
         
         guard lane.storedFlickJudge != (nil, nil) else { return }
         
-        let touchIndex = self.allTouches.index(where: { $0.touch == lane.storedFlickJudge.touch } )!
-        
-       guard self.allTouches[touchIndex].storedFlickJudgeLaneIndex != nil else { return }
-        
-        if judge(lane: lane, timeLag: lane.storedFlickJudge.time!, touch: self.allTouches[touchIndex]){
+       
+        if judge(lane: lane, timeLag: lane.storedFlickJudge.time!,
+                 touch: self.allTouches.first(where: { $0.touch == lane.storedFlickJudge.touch })){ //（laneから呼び出され、すでに指が離れている場合はtouchはnilになる）
+            
             self.actionSoundSet.play(type: .flick)
         }else {
+            
             print("storedFlickJudgeに失敗")
         }
     }
