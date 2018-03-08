@@ -553,7 +553,7 @@ class Note {	//強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         }
         let currentBeat = Note.BPMs[i].startPos + (passedTime - timeSum) * Note.BPMs[i].bpm / 60    // 判定線上における現在の経過beat
         
-        self.positionOnLane = CGFloat(beat - currentBeat) * Note.beatSpeed      // beat差に応じて位置を設定
+        self.positionOnLane = CGFloat(beat - currentBeat) * Note.beatSpeed      // beat差に応じて位置を設定。（BPMが大きいところではbeat差が早く縮む）
     }
     
     // ノーツの座標を設定

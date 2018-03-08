@@ -180,7 +180,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         catch                                     { print("未知のエラー") }
         
         // Noteクラスのクラスプロパティを設定
-        let duration = (playMode == .BGM) ? BGM.duration : playerView.duration()
+        let duration = (playMode == .BGM) ? BGM.duration : playerView.duration()    //BGM,映像の長さ
         Note.setConstants(BPMs, speedRatio, duration)
         
         //リザルトの初期化
@@ -400,6 +400,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         judgeQueue.sync {
+            
             for i in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 
                 var pos = i.location(in: self.view?.superview)
@@ -475,10 +476,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         judgeQueue.sync {
             
-            
             for i in touches {
                 
-                let touchIndex = self.allTouches.index(where: { $0.touch == i } )!
+                let touchIndex = self.allTouches.index(where: { $0.touch == i } )!  //ここでnil発生!?
                 
                 var pos = i.location(in: self.view?.superview)
                 var ppos = i.previousLocation(in: self.view?.superview)
