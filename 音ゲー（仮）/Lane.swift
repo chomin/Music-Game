@@ -30,7 +30,7 @@ class Lane{
     private let missHalfRange = 0.1
     
     var timeLag :TimeInterval = 0.0
-    var isTimeLagRenewed = false
+    var isTimeLagSet = false
     var laneNotes:[Note] = []   // 最初に全部格納する！
     var isSetLaneNotes = false
     let laneIndex:Int!
@@ -38,7 +38,7 @@ class Lane{
     
     var isJudgeRange:Bool{
         get{
-            guard isTimeLagRenewed else { return false }
+            guard isTimeLagSet else { return false }
             
             switch self.getTimeState(timeLag: timeLag) {
             case .parfect, .great, .good, .bad, .miss : return true
@@ -49,7 +49,7 @@ class Lane{
     }
     var isObservingMiddle:MiddleObsevationTimeState {   // middleの判定圏内かどうかを返す
         get{
-            guard self.isTimeLagRenewed,
+            guard self.isTimeLagSet,
                   laneNotes.count > 0       else { return .otherwise }
             guard laneNotes.first is Middle else { return .otherwise }
             
@@ -63,7 +63,7 @@ class Lane{
     
     var isWaitForParfectFlickTime:Bool { //parfectまで待つ時間帯かどうかを返す。（もっといい名前あったら変えて）
         get{
-            guard self.isTimeLagRenewed,
+            guard self.isTimeLagSet,
                   laneNotes.count > 0         else { return false }
             guard laneNotes.first is Flick ||
                   laneNotes.first is FlickEnd else { return false }
@@ -77,7 +77,7 @@ class Lane{
     
     var timeState:TimeState{    //このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
         get{
-            guard self.isTimeLagRenewed else { return .still }
+            guard self.isTimeLagSet else { return .still }
             
             return self.getTimeState(timeLag: timeLag)
         }
@@ -122,12 +122,12 @@ class Lane{
                 }
             }
             
-            self.isTimeLagRenewed = true    // パース前はtimeLagは更新されないので(このレーンが使われない場合でも)通知する必要あり.
+            self.isTimeLagSet = true    // パース前はtimeLagは更新されないので(このレーンが使われない場合でも)通知する必要あり.
         }
     }
     
     func getTimeState(timeLag:TimeInterval) -> TimeState{
-        guard self.isTimeLagRenewed else {
+        guard self.isTimeLagSet else {
             print("timeLagが不正です")
             return .still
         }

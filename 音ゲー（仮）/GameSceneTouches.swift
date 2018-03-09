@@ -15,20 +15,19 @@ extension GameScene: FlickJudgeDelegate {
         //        print("began start")
         for i in self.lanes {
             
-            if !(i.isTimeLagRenewed) { return }
+            guard i.isTimeLagSet else { return }
         }
         
         judgeQueue.sync {
             
-            for i in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
+            for touch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 
-                var pos = i.location(in: self.view?.superview)
+                var pos = touch.location(in: self.view?.superview)
                 
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
                 
-                
                 // フリック判定したかを示すBoolを加えてallTouchにタッチ情報を付加
-                self.allTouches.append(GSTouch(touch: i, isJudgeableFlick: true, isJudgeableFlickEnd: false, storedFlickJudgeLaneIndex: nil))
+                self.allTouches.append(GSTouch(touch: touch, isJudgeableFlick: true, isJudgeableFlickEnd: false, storedFlickJudgeLaneIndex: nil))
                 
                 if pos.y < self.frame.width/3 {     // 上界
                     
@@ -90,7 +89,7 @@ extension GameScene: FlickJudgeDelegate {
         //        print("move start")
         
         for i in self.lanes {
-            guard i.isTimeLagRenewed else { return }
+            guard i.isTimeLagSet else { return }
         }
         
         judgeQueue.sync {
@@ -204,7 +203,7 @@ extension GameScene: FlickJudgeDelegate {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         for i in self.lanes{
-            if !(i.isTimeLagRenewed) { return }
+            if !(i.isTimeLagSet) { return }
         }
         
         judgeQueue.sync {
@@ -304,7 +303,6 @@ extension GameScene: FlickJudgeDelegate {
     
     
     func judge(lane: Lane, timeLag: TimeInterval, touch: GSTouch?) -> Bool {     // 対象ノーツが実在し、判定したかを返す.timeLagは（judge呼び出し時ではなく）タッチされた時のものを使用。
-        
         
         guard lane.laneNotes.count > 0 else { return false }
         
