@@ -149,7 +149,7 @@ extension GameScene {   // bmsファイルを読み込む
             
             let components = str.components(separatedBy: ":")
             
-            guard components.count >= 2 && components[0].count == 5 else {  // 条件に合わない場合に処理を抜けるコードをシンプルに記述するために用意された構文(falseのときにelse以下が実行される。return、break、throwのいずれかを必ず記述しなければならない。)
+            guard components.count >= 2 && components[0].count == 5 else {
                 throw ParseError.lackOfData("データが欠損しています: #\(str)")
             }
             

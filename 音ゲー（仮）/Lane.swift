@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-protocol FlickJudgeDelegate {   //parfect終了時に保存されているflickJudgeを行う
+protocol FlickJudgeDelegate {   // parfect終了時に保存されているflickJudgeを行う
     func storedFlickJudge(lane: Lane)
 }
 
@@ -16,28 +16,29 @@ enum TimeState {
     case miss, bad, good, great, parfect, still, passed
 }
 
-enum MiddleObsevationTimeState{
-    case front, behind, otherwise
+enum ObsevationTimeState {
+    case before, after, otherwise
 }
 
-class Lane{
+class Lane {
     
     //判定時間に関する定数群
-    private let parfectHalfRange = 0.05
-    private let greatHalfRange = 0.08
-    private let goodHalfRange = 0.085
-    private let badHalfRange = 0.09
-    private let missHalfRange = 0.1
+    private let parfectUpperBorder = 0.05
+    private let greatUpperBorder = 0.08
+    private let goodUpperBorder = 0.085
+    private let badUpperBorder = 0.09
+    private let missUpperBorder = 0.1
     
-    var timeLag :TimeInterval = 0.0
+    var timeLag: TimeInterval = 0.0
     var isTimeLagSet = false
-    var laneNotes:[Note] = []   // 最初に全部格納する！
+    var laneNotes: [Note] = []   // 最初に全部格納する！
     var isSetLaneNotes = false
-    let laneIndex:Int!
-    var fjDelegate:FlickJudgeDelegate!
-    
-    var isJudgeRange:Bool{
-        get{
+    let laneIndex: Int!
+    var fjDelegate: FlickJudgeDelegate!
+    var storedFlickJudge: (time: TimeInterval, touch: UITouch)? // (判定予定時間(movedが呼ばれた時間), タッチ情報)
+
+    var isJudgeRange: Bool {
+        get {
             guard isTimeLagSet else { return false }
             
             switch self.getTimeState(timeLag: timeLag) {
@@ -47,33 +48,34 @@ class Lane{
             
         }
     }
-    var isObservingMiddle:MiddleObsevationTimeState {   // middleの判定圏内かどうかを返す
-        get{
+    
+    // 次の判定ノーツがmiddleで、判定圏内にあり、perfectでなければ、その前後で.beforeか.afterを返す
+    // それ以外の場合は.otherwiseを返す
+    var middleObservationTimeState: ObsevationTimeState {
+        get {
             guard self.isTimeLagSet,
-                  laneNotes.count > 0       else { return .otherwise }
-            guard laneNotes.first is Middle else { return .otherwise }
+                  !(laneNotes.isEmpty)       else { return .otherwise }
+            guard laneNotes.first is Middle  else { return .otherwise }
             
             switch timeLag {
-            case  parfectHalfRange ..<  missHalfRange    : return .front
-            case -missHalfRange    ..< -parfectHalfRange : return .behind
-            default                                      : return .otherwise
+            case  parfectUpperBorder ..<  missUpperBorder:    return .before
+            case -missUpperBorder    ..< -parfectUpperBorder: return .after
+            default:                                          return .otherwise
             }
         }
     }
     
-    var isWaitForParfectFlickTime:Bool { //parfectまで待つ時間帯かどうかを返す。（もっといい名前あったら変えて）
-        get{
+    //  次の判定ノーツがフリックで、前半判定圏内にあり、perfectでなければtrue。その他の場合falseを返す
+    var isFlickAndBefore: Bool {
+        get {
             guard self.isTimeLagSet,
-                  laneNotes.count > 0         else { return false }
+                  !(laneNotes.isEmpty)        else { return false }
             guard laneNotes.first is Flick ||
                   laneNotes.first is FlickEnd else { return false }
             
-            return timeLag > parfectHalfRange &&
-                   timeLag < missHalfRange
+            return Range(parfectUpperBorder ..< missUpperBorder).contains(timeLag)
         }
     }
-    
-    var storedFlickJudge:(time:TimeInterval?, touch: UITouch?)
     
     var timeState:TimeState{    //このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
         get{
@@ -98,7 +100,7 @@ class Lane{
         // timeLagの更新
         if isSetLaneNotes{
             
-            if laneNotes.count > 0 {
+            if !(laneNotes.isEmpty) {
                 
                 timeLag = -passedTime
                 
@@ -116,8 +118,8 @@ class Lane{
                 }
                 
                 //storedFlickJudgeの判定
-                if timeLag < -parfectHalfRange &&
-                    self.storedFlickJudge != (nil, nil) {
+                if timeLag < -parfectUpperBorder &&
+                    self.storedFlickJudge != nil {
                     self.fjDelegate?.storedFlickJudge(lane: self)
                 }
             }
@@ -126,18 +128,19 @@ class Lane{
         }
     }
     
-    func getTimeState(timeLag:TimeInterval) -> TimeState{
+    // timeLagに対応する判定を返す
+    func getTimeState(timeLag: TimeInterval) -> TimeState {
         guard self.isTimeLagSet else {
             print("timeLagが不正です")
             return .still
         }
         
-        switch abs(timeLag){
-        case 0                ..< parfectHalfRange  : return .parfect
-        case parfectHalfRange ..< greatHalfRange    : return .great
-        case greatHalfRange   ..< goodHalfRange     : return .good
-        case goodHalfRange    ..< badHalfRange      : return .bad
-        case badHalfRange     ..< missHalfRange     : return .miss
+        switch abs(timeLag) {
+        case 0                ..< parfectUpperBorder  : return .parfect
+        case parfectUpperBorder ..< greatUpperBorder    : return .great
+        case greatUpperBorder   ..< goodUpperBorder     : return .good
+        case goodUpperBorder    ..< badUpperBorder      : return .bad
+        case badUpperBorder     ..< missUpperBorder     : return .miss
         default                                     : if timeLag > 0 { return .still  }
                                                       else           { return .passed }
         }
