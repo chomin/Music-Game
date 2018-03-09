@@ -18,7 +18,8 @@ enum PlayMode {
     case BGM,YouTube, YouTube2
 }
 
-class GSTouch { //参照型として扱いたい
+// 判定関係のフラグ付きタッチ情報
+class GSTouch { // 参照型として扱いたい
     let touch: UITouch
     var isJudgeableFlick: Bool
     var isJudgeableFlickEnd: Bool
@@ -32,7 +33,7 @@ class GSTouch { //参照型として扱いたい
     }
 }
 
-
+// 同時押し線の画像情報
 class SameLine {
     unowned var note1:Note
     unowned var note2:Note
@@ -278,7 +279,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // 各レーンにノーツをセット
-        for note in notes{
+        for note in notes {
             lanes[note.laneIndex].laneNotes.append(note)
             
             if let start = note as? TapStart {
@@ -293,7 +294,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 }
             }
         }
-        for i in lanes{ //レーンの設定
+        for i in lanes { // レーンの設定
             i.isSetLaneNotes = true
             i.fjDelegate = self
         }
@@ -303,13 +304,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     override func update(_ currentTime: TimeInterval) {
         
         // 経過時間の更新
-        if self.playMode == .BGM{
+        if self.playMode == .BGM {
             if BGM.currentTime > 0 {
                 self.passedTime = BGM.currentTime + BGMOffsetTime
             } else {
                 self.passedTime = CACurrentMediaTime() - startTime
             }
-        }else{
+        } else {
             if isReadyPlayerView  { //currentTime>0は最初から成り立つ？
                 self.passedTime = TimeInterval(playerView.currentTime()) + BGMOffsetTime
             } else {
@@ -342,24 +343,24 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             
             for (index,value) in self.allTouches.enumerated() {
+                
                 var pos = value.touch.location(in: self.view?.superview)
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
                 
-                if pos.y < self.frame.width/3 {     // 上界
+                guard pos.y < self.frame.width/3 else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
+                    continue
+                }
+                
+                for i in 0...6 {
                     
-                    for j in 0...6 {
+                    if pos.x > Dimensions.buttonX[i] - Dimensions.halfBound &&
+                        pos.x < Dimensions.buttonX[i] + Dimensions.halfBound {   // ボタンの範囲
                         
-                        let buttonPos = self.frame.width/6 + CGFloat(j)*self.frame.width/9
-                        
-                        if pos.x > buttonPos - Dimensions.halfBound &&
-                            pos.x < buttonPos + Dimensions.halfBound {   // ボタンの範囲
+                        if self.parfectMiddleJudge(lane: self.lanes[i]) { // middleの判定
                             
-                            if self.parfectMiddleJudge(lane: self.lanes[j], currentTime: currentTime) { // middleの判定
-                                
-                                self.actionSoundSet.play(type: .middle)
-                                self.allTouches[index].isJudgeableFlickEnd = true
-                                break
-                            }
+                            self.actionSoundSet.play(type: .middle)
+                            self.allTouches[index].isJudgeableFlickEnd = true
+                            break
                         }
                     }
                 }
@@ -369,8 +370,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             // レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
             for lane in self.lanes {
-                lane.update(passedTime, self.BPMs)
-                if lane.timeState == .passed && lane.laneNotes.count > 0 {
+                lane.update(passedTime, self.BPMs)          // TODO: parfectMiddleJudgeとか他のところでも呼ばれてるから統一した方がいい？
+                if lane.timeState == .passed && !(lane.laneNotes.isEmpty) {
                     
                     self.missJudge(lane: lane)
                 }
