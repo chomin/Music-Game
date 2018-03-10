@@ -138,10 +138,10 @@ extension GameScene: FlickJudgeDelegate {
                         self.lanes[index].timeState != .passed {
                         
                         
-                        let isJudgeableFlick = self.allTouches[touchIndex].isJudgeableFlick         // エイリアス
-                        let isJudgeableFlickEnd = self.allTouches[touchIndex].isJudgeableFlickEnd   // エイリアス
+                        let touch = self.allTouches[touchIndex] // エイリアス
                         
-                        if ((judgeNote is Flick) && isJudgeableFlick) || ((judgeNote is FlickEnd) && isJudgeableFlickEnd) {
+                        if ((judgeNote is Flick) && touch.isJudgeableFlick) ||
+                            ((judgeNote is FlickEnd) && touch.isJudgeableFlickEnd) {
                             // ソート開始!
                             let distanceToButton = sqrt(pow(ppos.x - buttonPosX, 2) + pow(ppos.y - Dimensions.judgeLineY, 2))
                             
