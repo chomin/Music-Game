@@ -305,6 +305,13 @@ extension GameScene: FlickJudgeDelegate {
     
     
     // 受け取ったLaneの先頭ノーツを判定する。失敗したらfalseを返す。引数でtimeLagを渡すのは（judge呼び出し時ではなく）タッチされた時のものを使用するため。
+    ///受け取ったLaneの先頭ノーツを判定する。
+    ///
+    /// - Parameters:
+    ///   - lane: 判定対象のレーン
+    ///   - timeLag: 判定したいノーツの正しい時間と実際に叩かれた時間との差。（judge呼び出し時ではなく）タッチされた時のものを使用する。
+    ///   - touch: ノーツを叩いたGSTouchインスタンス。GameSceneから解放されていたらnilを入れること。
+    /// - Returns: 成否をBoolで返す
     func judge(lane: Lane, timeLag: TimeInterval, touch: GSTouch?) -> Bool {
         
         guard !(lane.laneNotes.isEmpty) else { return false }
