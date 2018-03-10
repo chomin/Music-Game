@@ -12,17 +12,17 @@
 import SpriteKit
 import GameplayKit
 import AVFoundation
-import youtube_ios_player_helper    //今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
+import youtube_ios_player_helper    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
 
 enum PlayMode {
-    case BGM,YouTube, YouTube2
+    case BGM, YouTube, YouTube2
 }
 
 // 判定関係のフラグ付きタッチ情報
 class GSTouch { // 参照型として扱いたい
     let touch: UITouch
-    var isJudgeableFlick: Bool
-    var isJudgeableFlickEnd: Bool
+    var isJudgeableFlick: Bool      // このタッチでのフリック判定を許すor許さない
+    var isJudgeableFlickEnd: Bool   // 上記のFlickEndバージョン
     var storedFlickJudgeLaneIndex: Int?
     
     init(touch: UITouch, isJudgeableFlick: Bool, isJudgeableFlickEnd: Bool, storedFlickJudgeLaneIndex: Int?) {
@@ -54,7 +54,7 @@ class SameLine {
 
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {    // 音ゲーをするシーン
     
-    var playMode:PlayMode
+    var playMode: PlayMode
     
     //
     let judgeQueue = DispatchQueue(label: "judge_queue")    // キューに入れた処理内容を順番に実行(FPS落ち対策)
@@ -101,11 +101,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private let speedRatio: CGFloat
     
     
-    init(musicName: String, videoID: String, size: CGSize, speedRatioInt: UInt) {   //YouTube用
+    init(musicName: String, videoID: String, size: CGSize, speedRatioInt: UInt) {   // YouTube用
         if musicName == "ウラシオン" {
             self.musicName = "オラシオン"
             self.playMode = .YouTube2
-        }else{
+        } else {
             self.musicName =  musicName
             self.playMode = .YouTube
         }
@@ -115,13 +115,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         super.init(size: size)
         
         self.playerView = YTPlayerView(frame: self.frame)
-        //詳しい使い方はJump to Definitionへ
-        if !(self.playerView.load(withVideoId: videoID, playerVars: ["autoplay":1, "controls":0, "playsinline":1, "rel":0, "showinfo":0])){
+        // 詳しい使い方はJump to Definitionへ
+        if !(self.playerView.load(withVideoId: videoID, playerVars: ["autoplay": 1, "controls": 0, "playsinline": 1, "rel": 0, "showinfo": 0])) {
             print("ロードに失敗")
             
-            //BGMモードへ移行
-            let scene = GameScene(musicName:self.musicName ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.speedRatio*100))
-            let skView = view as SKView?    //このviewはGameViewControllerのskView2
+            // BGMモードへ移行
+            let scene = GameScene(musicName: self.musicName, size: (view?.bounds.size)!, speedRatioInt: UInt(self.speedRatio*100))
+            let skView = view as SKView?    // このviewはGameViewControllerのskView2
             skView?.showsFPS = true
             skView?.showsNodeCount = true
             skView?.ignoresSiblingOrder = true
@@ -131,7 +131,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
     }
     
-    init(musicName: String, size: CGSize, speedRatioInt: UInt) {    //BGM用
+    init(musicName: String, size: CGSize, speedRatioInt: UInt) {    // BGM用
         self.musicName = musicName
         self.speedRatio = CGFloat(speedRatioInt) / 100
         self.playMode = .BGM
@@ -187,7 +187,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         catch                                     { print("未知のエラー") }
         
         // Noteクラスのクラスプロパティを設定
-        let duration = (playMode == .BGM) ? BGM.duration : playerView.duration()    //BGM,映像の長さ
+        let duration = (playMode == .BGM) ? BGM.duration : playerView.duration()    // BGMまたは映像の長さ
         Note.setConstants(BPMs, speedRatio, duration)
         
         //リザルトの初期化
@@ -200,7 +200,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         ResultScene.maxCombo = 0
         
         // ラベルの設定
-        judgeLabel = {() -> SKLabelNode in
+        judgeLabel = { () -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
             Label.fontSize = self.frame.width / 36
@@ -212,7 +212,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             return Label
         }()
         
-        comboLabel = {() -> SKLabelNode in
+        comboLabel = { () -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
             Label.fontSize = self.frame.width / 18
@@ -253,14 +253,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
 
-        if self.playMode == .BGM{
+        if self.playMode == .BGM {
             startTime = CACurrentMediaTime()
             // BGMの再生(時間指定)
-            BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  //建築予定地
+            BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  // 建築予定地
             BGM.delegate = self
             self.backgroundColor = .black
-        }else{
-            startTime = TimeInterval(pow(10.0, 308.0))  //Doubleのほぼ最大値。ロードが終わるまで。
+        } else {
+            startTime = TimeInterval(pow(10.0, 308.0))  // Doubleのほぼ最大値。ロードが終わるまで。
             
             playerView.delegate = self
             view.superview!.addSubview(playerView)
@@ -523,7 +523,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
 }
 
 
-// 寸法に関する定数を提供(シングルトン)。self.frameをもとに決定される。
+// 寸法に関する定数を提供(シングルトン)。GameSceneのframeをもとに決定される。
 class Dimensions {
     let horizonLength: CGFloat  // 水平線の長さ
     let horizonY: CGFloat       // 水平線のy座標
@@ -537,7 +537,6 @@ class Dimensions {
     let verticalDistance: CGFloat           // 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
     let R: CGFloat                          // 視点から判定線までの距離(射影する球の半径)
    
-    
     private static var instance: Dimensions?    // 唯一のインスタンス
     
     private init(frame: CGRect) {
@@ -557,7 +556,6 @@ class Dimensions {
         for i in 0...6 {
             buttonX.append(frame.width/6 + CGFloat(i)*laneWidth)
         }
- 
     }
     
     // これらクラスプロパティから、定数にアクセスする(createInstanceされてなければ全て0)
@@ -572,7 +570,6 @@ class Dimensions {
     static var R:                  CGFloat  { return Dimensions.instance?.R                  ??  CGFloat(0) }
     static var buttonX:           [CGFloat] { return Dimensions.instance?.buttonX            ?? [CGFloat]() }
 
-    
     // この関数のみが唯一Dimensionsクラスをインスタンス化できる
     static func createInstance(frame: CGRect) {
         // 初回のみ有効
