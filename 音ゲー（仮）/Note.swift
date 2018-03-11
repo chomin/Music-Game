@@ -10,15 +10,17 @@ import SpriteKit
 
 class Tap: Note {
     
-    let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
+    let isLarge: Bool               // 大ノーツかどうか
+    let appearTime: TimeInterval    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(beatPos beat: Double, laneIndex: Int, appearTime: TimeInterval) {
+    init(beatPos beat: Double, laneIndex: Int, isLarge: Bool, appearTime: TimeInterval) {
+        self.isLarge = isLarge
         self.appearTime = appearTime
         super.init(beatPos: beat, laneIndex: laneIndex)
         
-        // imageのインスタンス(白円)を作成
+        // imageのインスタンス(白円or黄円)を作成
         self.image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
-        image.fillColor = UIColor.white
+        image.fillColor = isLarge ? UIColor.yellow : UIColor.white
         image.isHidden = true   // 初期状態では隠しておく
     }
     
@@ -105,15 +107,17 @@ class TapStart: Note {
     
     var next = Note()                                               // 次のノーツ（仮のインスタンス）
     var longImages = (long: SKShapeNode(), circle: SKShapeNode())   // このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
+    let isLarge: Bool                                               // 大ノーツかどうか
     let appearTime: TimeInterval                                    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
-    init(beatPos beat: Double, laneIndex: Int, appearTime: TimeInterval) {
+    init(beatPos beat: Double, laneIndex: Int, isLarge: Bool, appearTime: TimeInterval) {
+        self.isLarge = isLarge
         self.appearTime = appearTime
         super.init(beatPos: beat, laneIndex: laneIndex)
         
-        // imageのインスタンス(緑円)を作成
+        // imageのインスタンス(緑円or黄円)を作成
         image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
-        image.fillColor = UIColor.green
+        image.fillColor = isLarge ? UIColor.yellow : UIColor.green
         image.isHidden = true	// 初期状態では隠しておく
         
         // longImagesのインスタンスを作成
@@ -381,15 +385,17 @@ class Middle: Note {
 class TapEnd: Note {
     
     unowned var start = Note()  // 循環参照防止の為unowned参照にする
+    let isLarge: Bool           // 大ノーツかどうか
     
-    override init(beatPos beat: Double, laneIndex: Int) {
+    init(beatPos beat: Double, laneIndex: Int, isLarge: Bool) {
+        self.isLarge = isLarge
         super.init(beatPos: beat, laneIndex: laneIndex)
         
         self.isJudgeable = false
         
-        // imageのインスタンス(緑円)を作成
+        // imageのインスタンス(緑円or黄円)を作成
         image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
-        image.fillColor = UIColor.green
+        image.fillColor = isLarge ? UIColor.yellow : UIColor.green
         image.isHidden = true   // 初期状態では隠しておく
     }
     
