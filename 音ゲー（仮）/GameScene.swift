@@ -63,7 +63,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var appDelegate: AppDelegate!
     
     // タッチ情報
-    var allTouches: [GSTouch] = []
+    var allGSTouches: [GSTouch] = []
     
     // ラベル
     var judgeLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")
@@ -342,7 +342,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         judgeQueue.sync {
             
             
-            for (touchIndex,value) in self.allTouches.enumerated() {
+            for (touchIndex,value) in self.allGSTouches.enumerated() {
                 
                 var pos = value.touch.location(in: self.view?.superview)
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
@@ -358,7 +358,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                         if self.parfectMiddleJudge(lane: self.lanes[laneIndex]) { // middleの判定
                             
                             self.actionSoundSet.play(type: .middle)
-                            self.allTouches[touchIndex].isJudgeableFlickEnd = true
+                            self.allGSTouches[touchIndex].isJudgeableFlickEnd = true
                             break
                         }
                     }

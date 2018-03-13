@@ -35,7 +35,7 @@ class Lane {
     var isSetLaneNotes = false
     let laneIndex: Int!
     var fjDelegate: FlickJudgeDelegate!
-    var storedFlickJudge: (time: TimeInterval, touch: UITouch)? // (判定予定時間(movedが呼ばれた時間), タッチ情報)
+    var storedFlickJudgeInformation: (time: TimeInterval, touch: UITouch)? // (判定予定時間(movedが呼ばれた時間), タッチ情報)
 
     var isJudgeRange: Bool {
         get {
@@ -119,7 +119,7 @@ class Lane {
                 
                 //storedFlickJudgeの判定
                 if timeLag < -parfectUpperBorder &&
-                    self.storedFlickJudge != nil {
+                    self.storedFlickJudgeInformation != nil {
                     self.fjDelegate?.storedFlickJudge(lane: self)
                 }
             }
