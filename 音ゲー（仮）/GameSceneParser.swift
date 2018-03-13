@@ -144,6 +144,7 @@ extension GameScene {   // bmsファイルを読み込む
             case end1L     = "0D"
             case start2L   = "0E"
             case end2L     = "0F"
+            case tapLL     = "0G"
         }
         
         // メインデータ1行を小節番号・チャンネル・データのタプルに分解
@@ -253,7 +254,11 @@ extension GameScene {   // bmsファイルを読み込む
                             longNotes2.append(
                                 TapEnd  (beatPos: beat, laneIndex: lane, isLarge: true)
                             )
-}
+                        case .tapLL:
+                            notes.append(
+                                Tap     (beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat))
+                            )
+                        }
                     }
                 }
             } else if channel == 1 {
