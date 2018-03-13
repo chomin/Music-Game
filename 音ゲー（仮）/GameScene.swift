@@ -523,22 +523,23 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
 
 // 寸法に関する定数を提供(シングルトン)。GameSceneのframeをもとに決定される。
 class Dimensions {
-    let horizonLength: CGFloat  // 水平線の長さ
-    let horizonY: CGFloat       // 水平線のy座標
-    let laneWidth: CGFloat      // 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
-    let laneLength: CGFloat     // 3D上でのレーン長
-    let judgeLineY: CGFloat     // 判定線のy座標
-    let buttonUpperHeight: CGFloat  //ボタンの高さ(上の境界のy座標)
-    var buttonX: [CGFloat] = [] // 各レーンの中心のx座標
-    var judgeXRanges: [Range<CGFloat>] = [] //各レーンの判定をするx座標についての範囲
+    //インスタンスが保持し、このクラス内からの記述でのみアクセスできる変数。staticで呼び出されたときにこれらに格納されている値を返す。(frameが不要なものは初期値をここで定義)
+    private let horizonLength: CGFloat              // 水平線の長さ
+    private let horizonY: CGFloat                   // 水平線のy座標
+    private let laneWidth: CGFloat                  // 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
+    private let laneLength: CGFloat                 // 3D上でのレーン長
+    private let judgeLineY: CGFloat                 // 判定線のy座標
+    private let buttonUpperHeight: CGFloat          // ボタンの高さ(上の境界のy座標)
+    private var buttonX: [CGFloat] = []             // 各レーンの中心のx座標
+    private var judgeXRanges: [Range<CGFloat>] = [] // 各レーンの判定をするx座標についての範囲
     // 立体感を出すための定数
     private let horizontalDistance: CGFloat = 250   // 画面から目までの水平距離a（約5000で10cmほど）
-    let verticalDistance: CGFloat           // 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
-    let R: CGFloat                          // 視点から判定線までの距離(射影する球の半径)
+    private let verticalDistance: CGFloat           // 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
+    private let R: CGFloat                          // 視点から判定線までの距離(射影する球の半径)
    
-    private static var instance: Dimensions?    // 唯一のインスタンス
+    private static var instance: Dimensions?        // 唯一のインスタンス
     
-    private init(frame: CGRect) {
+    private init(frame: CGRect) {   // インスタンスの作成をこのクラス内のみに限定する
         let halfBound = frame.width / 10   // 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
         self.laneWidth = frame.width / 9
         // モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
@@ -566,7 +567,7 @@ class Dimensions {
     static var laneWidth:          CGFloat         { return Dimensions.instance?.laneWidth          ??  CGFloat(0)        }
     static var laneLength:         CGFloat         { return Dimensions.instance?.laneLength         ??  CGFloat(0)        }
     static var judgeLineY:         CGFloat         { return Dimensions.instance?.judgeLineY         ??  CGFloat(0)        }
-    static var buttonHeight:  CGFloat         { return Dimensions.instance?.buttonUpperHeight  ??  CGFloat(0)        }
+    static var buttonHeight:       CGFloat         { return Dimensions.instance?.buttonUpperHeight  ??  CGFloat(0)        }
     static var horizontalDistance: CGFloat         { return Dimensions.instance?.horizontalDistance ??  CGFloat(0)        }
     static var verticalDistance:   CGFloat         { return Dimensions.instance?.verticalDistance   ??  CGFloat(0)        }
     static var R:                  CGFloat         { return Dimensions.instance?.R                  ??  CGFloat(0)        }
