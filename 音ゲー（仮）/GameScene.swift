@@ -311,7 +311,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.passedTime = CACurrentMediaTime() - startTime
             }
         } else {
-            if isReadyPlayerView  { //currentTime>0は最初から成り立つ？
+            if isReadyPlayerView  { // currentTime>0は最初から成り立つ？
                 self.passedTime = TimeInterval(playerView.currentTime()) + BGMOffsetTime
             } else {
                 self.passedTime = CACurrentMediaTime() - startTime
@@ -342,24 +342,23 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         judgeQueue.sync {
             
             
-            for (index,value) in self.allTouches.enumerated() {
+            for (touchIndex,value) in self.allTouches.enumerated() {
                 
                 var pos = value.touch.location(in: self.view?.superview)
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
                 
-                guard pos.y < self.frame.width/3 else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
+                guard pos.y < Dimensions.buttonHeight else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
                     continue
                 }
                 
-                for i in 0...6 {
+                for (laneIndex,judgeXRange) in Dimensions.judgeXRanges.enumerated() {
                     
-                    if pos.x > Dimensions.buttonX[i] - Dimensions.halfBound &&
-                        pos.x < Dimensions.buttonX[i] + Dimensions.halfBound {   // ボタンの範囲
+                    if judgeXRange.contains(pos.x) {   // ボタンの範囲
                         
-                        if self.parfectMiddleJudge(lane: self.lanes[i]) { // middleの判定
+                        if self.parfectMiddleJudge(lane: self.lanes[laneIndex]) { // middleの判定
                             
                             self.actionSoundSet.play(type: .middle)
-                            self.allTouches[index].isJudgeableFlickEnd = true
+                            self.allTouches[touchIndex].isJudgeableFlickEnd = true
                             break
                         }
                     }
@@ -424,7 +423,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
         case .ended:
             playerView.removeFromSuperview()
-//            self.playerView = nil
             let scene = ResultScene(size: (view?.bounds.size)!)
             let skView = view as SKView?
             skView?.showsFPS = true
@@ -530,21 +528,23 @@ class Dimensions {
     let laneWidth: CGFloat      // 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
     let laneLength: CGFloat     // 3D上でのレーン長
     let judgeLineY: CGFloat     // 判定線のy座標
-    let halfBound: CGFloat      // 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
+    let buttonUpperHeight: CGFloat  //ボタンの高さ(上の境界のy座標)
     var buttonX: [CGFloat] = [] // 各レーンの中心のx座標
+    var judgeXRanges: [Range<CGFloat>] = [] //各レーンの判定をするx座標についての範囲
     // 立体感を出すための定数
-    let horizontalDistance: CGFloat = 250   // 画面から目までの水平距離a（約5000で10cmほど）
+    private let horizontalDistance: CGFloat = 250   // 画面から目までの水平距離a（約5000で10cmほど）
     let verticalDistance: CGFloat           // 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
     let R: CGFloat                          // 視点から判定線までの距離(射影する球の半径)
    
     private static var instance: Dimensions?    // 唯一のインスタンス
     
     private init(frame: CGRect) {
-        self.halfBound = frame.width / 10   // 1/18~1/9の値にすること
+        let halfBound = frame.width / 10   // 判定を汲み取る、ボタン中心からの距離。1/18~1/9の値にすること
         self.laneWidth = frame.width / 9
         // モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
         self.horizonY = frame.height * 15 / 16  // モデル値
         self.judgeLineY = frame.width / 9
+        self.buttonUpperHeight = frame.height / 3
         self.verticalDistance = horizonY - frame.width / 14
         self.R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
         
@@ -556,20 +556,22 @@ class Dimensions {
         for i in 0...6 {
             buttonX.append(frame.width/6 + CGFloat(i)*laneWidth)
         }
+        
+        self.judgeXRanges = buttonX.map({ $0 - halfBound ..< $0 + halfBound })
     }
     
     // これらクラスプロパティから、定数にアクセスする(createInstanceされてなければ全て0)
-    static var horizonLength:      CGFloat  { return Dimensions.instance?.horizonLength      ??  CGFloat(0) }
-    static var horizonY:           CGFloat  { return Dimensions.instance?.horizonY           ??  CGFloat(0) }
-    static var laneWidth:          CGFloat  { return Dimensions.instance?.laneWidth          ??  CGFloat(0) }
-    static var laneLength:         CGFloat  { return Dimensions.instance?.laneLength         ??  CGFloat(0) }
-    static var judgeLineY:         CGFloat  { return Dimensions.instance?.judgeLineY         ??  CGFloat(0) }
-    static var halfBound:          CGFloat  { return Dimensions.instance?.halfBound          ??  CGFloat(0) }
-    static var horizontalDistance: CGFloat  { return Dimensions.instance?.horizontalDistance ??  CGFloat(0) }
-    static var verticalDistance:   CGFloat  { return Dimensions.instance?.verticalDistance   ??  CGFloat(0) }
-    static var R:                  CGFloat  { return Dimensions.instance?.R                  ??  CGFloat(0) }
-    static var buttonX:           [CGFloat] { return Dimensions.instance?.buttonX            ?? [CGFloat]() }
-
+    static var horizonLength:      CGFloat         { return Dimensions.instance?.horizonLength      ??  CGFloat(0)        }
+    static var horizonY:           CGFloat         { return Dimensions.instance?.horizonY           ??  CGFloat(0)        }
+    static var laneWidth:          CGFloat         { return Dimensions.instance?.laneWidth          ??  CGFloat(0)        }
+    static var laneLength:         CGFloat         { return Dimensions.instance?.laneLength         ??  CGFloat(0)        }
+    static var judgeLineY:         CGFloat         { return Dimensions.instance?.judgeLineY         ??  CGFloat(0)        }
+    static var buttonHeight:  CGFloat         { return Dimensions.instance?.buttonUpperHeight  ??  CGFloat(0)        }
+    static var horizontalDistance: CGFloat         { return Dimensions.instance?.horizontalDistance ??  CGFloat(0)        }
+    static var verticalDistance:   CGFloat         { return Dimensions.instance?.verticalDistance   ??  CGFloat(0)        }
+    static var R:                  CGFloat         { return Dimensions.instance?.R                  ??  CGFloat(0)        }
+    static var buttonX:           [CGFloat]        { return Dimensions.instance?.buttonX            ?? [CGFloat]()        }
+    static var judgeXRanges:      [Range<CGFloat>] { return Dimensions.instance?.judgeXRanges       ?? [Range<CGFloat>]() }
     // この関数のみが唯一Dimensionsクラスをインスタンス化できる
     static func createInstance(frame: CGRect) {
         // 初回のみ有効
