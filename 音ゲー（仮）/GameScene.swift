@@ -296,7 +296,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         for i in lanes { // レーンの設定
             i.isSetLaneNotes = true
-            i.fjDelegate = self
         }
     }
     
@@ -323,6 +322,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         // 各ノーツの位置や大きさを更新
         for note in notes {
             note.update(passedTime)
+        }
+        
+        //レーンの更新
+        for lane in lanes {
+             lane.update(passedTime, self.BPMs)
         }
         
         // 同時押しラインの更新
@@ -367,16 +371,20 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             
             
-            // レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
+            // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
             for lane in self.lanes {
-                lane.update(passedTime, self.BPMs)          // TODO: parfectMiddleJudgeとか他のところでも呼ばれてるから統一した方がいい？
                 if lane.timeState == .passed && !(lane.laneNotes.isEmpty) {
                     
                     self.missJudge(lane: lane)
+                    
+                }else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
+                    if lane.timeLag < -storedFlickJudgeInformation.timeLag {
+                        
+                        self.storedFlickJudge(lane: lane)
+                    }
                 }
             }
         }
-        
     }
     
     
@@ -545,7 +553,7 @@ class Dimensions {
         // モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
         self.horizonY = frame.height * 15 / 16  // モデル値
         self.judgeLineY = frame.width / 9
-        self.buttonHeight = frame.height / 3
+        self.buttonHeight = self.judgeLineY * 2
         self.verticalDistance = horizonY - frame.width / 14
         self.R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
         

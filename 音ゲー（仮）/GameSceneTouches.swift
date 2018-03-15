@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-extension GameScene: FlickJudgeDelegate {
+extension GameScene {
     
     // タッチ関係
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -16,7 +16,7 @@ extension GameScene: FlickJudgeDelegate {
         
         judgeQueue.sync {
             
-            for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
+            uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 
                 var pos = uiTouch.location(in: self.view?.superview)
                 
@@ -26,7 +26,7 @@ extension GameScene: FlickJudgeDelegate {
                 self.allGSTouches.append(GSTouch(touch: uiTouch, isJudgeableFlick: true, isJudgeableFlickEnd: false, storedFlickJudgeLaneIndex: nil))
                 
                 for i in self.lanes {
-                    guard i.isTimeLagSet else { continue }
+                    guard i.isTimeLagSet else { continue uiTouchLoop }
                 }
                 
                 guard pos.y < Dimensions.buttonHeight else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
@@ -43,7 +43,7 @@ extension GameScene: FlickJudgeDelegate {
                         if (self.lanes[index].timeState == .still) ||
                             (self.lanes[index].timeState == .passed) { continue }
                         
-                        if self.lanes[index].laneNotes.count == 0 { continue }
+                        if self.lanes[index].laneNotes.isEmpty { continue }
                         
                         let note = self.lanes[index].laneNotes[0]
                         let distanceToButton = sqrt(pow(pos.x - Dimensions.buttonX[index], 2) + pow(pos.y - Dimensions.judgeLineY, 2))
@@ -109,7 +109,7 @@ extension GameScene: FlickJudgeDelegate {
                 // pposループ
                 for (index, judgeXRange) in Dimensions.judgeXRanges.enumerated() {
                     
-                    guard ppos.y < Dimensions.buttonHeight else { continue } // 以下、移動直前の位置がボタンの判定圏内にあるtouchのみを処理する
+                    guard ppos.y < Dimensions.buttonHeight else { break } // このループでは、移動直前の位置がボタンの判定圏内にあるtouchのみを処理する
                     
                     if judgeXRange.contains(ppos.x) {
                         if !(judgeXRange.contains(pos.x)) || pos.y >= Dimensions.buttonHeight { // 移動後にレーンから外れていた場合は、外れる直前にいた時間で判定
@@ -249,7 +249,7 @@ extension GameScene: FlickJudgeDelegate {
                                 }
                             }
                             
-                            if self.lanes[index].laneNotes.count == 0 { continue }
+                            if self.lanes[index].laneNotes.isEmpty { continue }
                             let note = self.lanes[index].laneNotes[0]
                             if note is TapEnd {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {    // 離しの判定
@@ -282,7 +282,7 @@ extension GameScene: FlickJudgeDelegate {
     
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("cancelされました")
+        print("タッチがcancelされました")
     }
     
     override func touchesEstimatedPropertiesUpdated(_ touches: Set<UITouch>) {
@@ -397,7 +397,7 @@ extension GameScene: FlickJudgeDelegate {
         guard lane.storedFlickJudgeInformation != nil else { return }
         
        
-        if judge(lane: lane, timeLag: lane.storedFlickJudgeInformation!.time,
+        if judge(lane: lane, timeLag: lane.storedFlickJudgeInformation!.timeLag,
                  touch: self.allGSTouches.first(where: { $0.touch == lane.storedFlickJudgeInformation!.touch })) { //（laneから呼び出され、すでに指が離れている場合はtouchはnilになる）
             
             self.actionSoundSet.play(type: .flick)
@@ -414,7 +414,7 @@ extension GameScene: FlickJudgeDelegate {
               lane.laneNotes[0] is Middle,
               lane.laneNotes[0].isJudgeable else { return false }
         
-        lane.update(passedTime, BPMs)
+//        lane.update(passedTime, BPMs)
         
         switch lane.timeState {
         case .parfect:
