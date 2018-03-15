@@ -10,7 +10,7 @@ import SpriteKit
 
 
 
-enum TimeState {
+enum TimeState {    //enumはRange型をサポートしていないのでrawValueにRange型のものを代入することはできない
     case miss, bad, good, great, parfect, still, passed
 }
 
