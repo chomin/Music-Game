@@ -414,7 +414,7 @@ extension GameScene {
               lane.laneNotes[0] is Middle,
               lane.laneNotes[0].isJudgeable else { return false }
         
-        lane.update(passedTime, BPMs)
+//        lane.update(passedTime, BPMs)
         
         switch lane.timeState {
         case .parfect:

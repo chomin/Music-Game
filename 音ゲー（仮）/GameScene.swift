@@ -324,6 +324,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             note.update(passedTime)
         }
         
+        //レーンの更新
+        for lane in lanes {
+             lane.update(passedTime, self.BPMs)
+        }
+        
         // 同時押しラインの更新
         for sameLine in sameLines {
             let (note1, note2, line) = (sameLine.note1, sameLine.note2, sameLine.line)
@@ -366,9 +371,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             
             
-            // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)とlaneのtimeLag更新
+            // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
             for lane in self.lanes {
-                lane.update(passedTime, self.BPMs)          // TODO: parfectMiddleJudgeとか他のところでも呼ばれてるから統一した方がいい？
                 if lane.timeState == .passed && !(lane.laneNotes.isEmpty) {
                     
                     self.missJudge(lane: lane)
