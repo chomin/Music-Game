@@ -139,6 +139,12 @@ extension GameScene {   // bmsファイルを読み込む
             case middle2   = "08"
             case end2      = "09"
             case flickEnd2 = "0A"
+            case tapL      = "0B"
+            case start1L   = "0C"
+            case end1L     = "0D"
+            case start2L   = "0E"
+            case end2L     = "0F"
+            case tapLL     = "0G"
         }
         
         // メインデータ1行を小節番号・チャンネル・データのタプルに分解
@@ -190,15 +196,15 @@ extension GameScene {   // bmsファイルを読み込む
                             break
                         case .tap:
                             notes.append(
-                                Tap     (beatPos: beat, laneIndex: lane, appearTime: getAppearTime(beat))
+                                Tap     (beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat))
                             )
                         case .flick:
                             notes.append(
-                                Flick   (beatPos: beat, laneIndex: lane, appearTime: getAppearTime(beat))
+                                Flick   (beatPos: beat, laneIndex: lane,                 appearTime: getAppearTime(beat))
                             )
                         case .start1:
                             longNotes1.append(
-                                TapStart(beatPos: beat, laneIndex: lane, appearTime: getAppearTime(beat))
+                                TapStart(beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat))
                             )
                         case .middle1:
                             longNotes1.append(
@@ -206,7 +212,7 @@ extension GameScene {   // bmsファイルを読み込む
                             )
                         case .end1:
                             longNotes1.append(
-                                TapEnd  (beatPos: beat, laneIndex: lane)
+                                TapEnd  (beatPos: beat, laneIndex: lane, isLarge: false)
                             )
                         case .flickEnd1:
                             longNotes1.append(
@@ -214,7 +220,7 @@ extension GameScene {   // bmsファイルを読み込む
                             )
                         case .start2:
                             longNotes2.append(
-                                TapStart(beatPos: beat, laneIndex: lane, appearTime: getAppearTime(beat))
+                                TapStart(beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat))
                             )
                         case .middle2:
                             longNotes2.append(
@@ -222,11 +228,35 @@ extension GameScene {   // bmsファイルを読み込む
                             )
                         case .end2:
                             longNotes2.append(
-                                TapEnd  (beatPos: beat, laneIndex: lane)
+                                TapEnd  (beatPos: beat, laneIndex: lane, isLarge: false)
                             )
                         case .flickEnd2:
                             longNotes2.append(
                                 FlickEnd(beatPos: beat, laneIndex: lane)
+                            )
+                        case .tapL:
+                            notes.append(
+                                Tap     (beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat))
+                            )
+                        case .start1L:
+                            longNotes1.append(
+                                TapStart(beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat))
+                            )
+                        case .end1L:
+                            longNotes1.append(
+                                TapEnd  (beatPos: beat, laneIndex: lane, isLarge: true)
+                            )
+                        case .start2L:
+                            longNotes2.append(
+                                TapStart(beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat))
+                            )
+                        case .end2L:
+                            longNotes2.append(
+                                TapEnd  (beatPos: beat, laneIndex: lane, isLarge: true)
+                            )
+                        case .tapLL:
+                            notes.append(
+                                Tap     (beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat))
                             )
                         }
                     }

@@ -95,7 +95,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     private var startTime: TimeInterval = 0.0       // シーン移動した時の時間
     var passedTime: TimeInterval = 0.0              // 経過時間
-    private var BGMOffsetTime: TimeInterval = 0.0   // 経過時間とBGM.currentTimeのずれ。一定
+    private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     let lanes = [Lane(laneIndex: 0), Lane(laneIndex: 1), Lane(laneIndex: 2), Lane(laneIndex: 3), Lane(laneIndex: 4), Lane(laneIndex: 5), Lane(laneIndex: 6)]     // レーン
     
     private let speedRatio: CGFloat
@@ -251,16 +251,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         setImages()
         
         
-        BGMOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
+        mediaOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
 
-        if self.playMode == .BGM {
-            startTime = CACurrentMediaTime()
+        if playMode == .BGM {
+            self.startTime = CACurrentMediaTime()
             // BGMの再生(時間指定)
-            BGM.play(atTime: CACurrentMediaTime() + BGMOffsetTime)  // 建築予定地
+            BGM.play(atTime: startTime + mediaOffsetTime)  // 建築予定地
             BGM.delegate = self
             self.backgroundColor = .black
         } else {
-            startTime = TimeInterval(pow(10.0, 308.0))  // Doubleのほぼ最大値。ロードが終わるまで。
+            self.startTime = TimeInterval(pow(10.0, 308.0))  // Doubleのほぼ最大値。ロードが終わるまで。
             
             playerView.delegate = self
             view.superview!.addSubview(playerView)
@@ -305,15 +305,20 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         // 経過時間の更新
         if self.playMode == .BGM {
             if BGM.currentTime > 0 {
-                self.passedTime = BGM.currentTime + BGMOffsetTime
+                self.passedTime = BGM.currentTime + mediaOffsetTime
             } else {
                 self.passedTime = CACurrentMediaTime() - startTime
             }
         } else {
             if isReadyPlayerView  { // currentTime>0は最初から成り立つ？
-                self.passedTime = TimeInterval(playerView.currentTime()) + BGMOffsetTime
+                if playerView.currentTime() > 0 {
+                    print(playerView.currentTime())
+                    self.passedTime = TimeInterval(playerView.currentTime()) + mediaOffsetTime
+                } else {
+                    self.passedTime = 0
+                }
             } else {
-                self.passedTime = CACurrentMediaTime() - startTime
+                self.passedTime = 0
             }
         }
         // ラベルの更新
@@ -428,7 +433,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
         switch (state) {
-            
+        case .playing:
+            isReadyPlayerView = true
         case .ended:
             playerView.removeFromSuperview()
             let scene = ResultScene(size: (view?.bounds.size)!)
@@ -446,13 +452,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
     }
     
-    func playerViewDidBecomeReady(_ playerView: YTPlayerView) { //読み込み完了後に呼び出される
+    func playerViewDidBecomeReady(_ playerView: YTPlayerView) { // 読み込み完了後に呼び出される
         
-        self.isReadyPlayerView = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + BGMOffsetTime) {
+//        self.isReadyPlayerView = true
+//        startTime = CACurrentMediaTime()
+//        DispatchQueue.main.asyncAfter(deadline: .now() + mediaOffsetTime) {
             playerView.playVideo()
-        }
-        startTime = CACurrentMediaTime()
+//        }
     }
     
     func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {   //エラー処理
