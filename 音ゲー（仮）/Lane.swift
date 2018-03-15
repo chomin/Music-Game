@@ -106,7 +106,7 @@ class Lane {
                 
                 for (index,i) in BPMs.enumerated(){
                     if BPMs.count > index+1 &&
-                        laneNotes[0].beat > BPMs[index+1].startPos{
+                        laneNotes[0].beat > BPMs[index+1].startPos{ // indexが最後でない場合
                         
                         timeLag += (BPMs[index+1].startPos - i.startPos)*60/i.bpm
                         
