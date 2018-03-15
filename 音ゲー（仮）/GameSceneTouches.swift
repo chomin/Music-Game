@@ -16,7 +16,7 @@ extension GameScene: FlickJudgeDelegate {
         
         judgeQueue.sync {
             
-            for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
+            uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 
                 var pos = uiTouch.location(in: self.view?.superview)
                 
@@ -26,7 +26,7 @@ extension GameScene: FlickJudgeDelegate {
                 self.allGSTouches.append(GSTouch(touch: uiTouch, isJudgeableFlick: true, isJudgeableFlickEnd: false, storedFlickJudgeLaneIndex: nil))
                 
                 for i in self.lanes {
-                    guard i.isTimeLagSet else { continue }
+                    guard i.isTimeLagSet else { continue uiTouchLoop }
                 }
                 
                 guard pos.y < Dimensions.buttonHeight else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
@@ -43,7 +43,7 @@ extension GameScene: FlickJudgeDelegate {
                         if (self.lanes[index].timeState == .still) ||
                             (self.lanes[index].timeState == .passed) { continue }
                         
-                        if self.lanes[index].laneNotes.count == 0 { continue }
+                        if self.lanes[index].laneNotes.isEmpty { continue }
                         
                         let note = self.lanes[index].laneNotes[0]
                         let distanceToButton = sqrt(pow(pos.x - Dimensions.buttonX[index], 2) + pow(pos.y - Dimensions.judgeLineY, 2))
@@ -249,7 +249,7 @@ extension GameScene: FlickJudgeDelegate {
                                 }
                             }
                             
-                            if self.lanes[index].laneNotes.count == 0 { continue }
+                            if self.lanes[index].laneNotes.isEmpty { continue }
                             let note = self.lanes[index].laneNotes[0]
                             if note is TapEnd {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {    // 離しの判定
@@ -282,7 +282,7 @@ extension GameScene: FlickJudgeDelegate {
     
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("cancelされました")
+        print("タッチがcancelされました")
     }
     
     override func touchesEstimatedPropertiesUpdated(_ touches: Set<UITouch>) {

@@ -545,7 +545,7 @@ class Dimensions {
         // モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
         self.horizonY = frame.height * 15 / 16  // モデル値
         self.judgeLineY = frame.width / 9
-        self.buttonHeight = frame.height / 3
+        self.buttonHeight = self.judgeLineY * 2
         self.verticalDistance = horizonY - frame.width / 14
         self.R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
         
