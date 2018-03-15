@@ -296,7 +296,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         for i in lanes { // レーンの設定
             i.isSetLaneNotes = true
-            i.fjDelegate = self
         }
     }
     
@@ -367,16 +366,21 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             
             
-            // レーンの監視(過ぎて行ってないか)とlaneのtimeLag更新
+            // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)とlaneのtimeLag更新
             for lane in self.lanes {
                 lane.update(passedTime, self.BPMs)          // TODO: parfectMiddleJudgeとか他のところでも呼ばれてるから統一した方がいい？
                 if lane.timeState == .passed && !(lane.laneNotes.isEmpty) {
                     
                     self.missJudge(lane: lane)
+                    
+                }else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
+                    if lane.timeLag < -storedFlickJudgeInformation.timeLag {
+                        
+                        self.storedFlickJudge(lane: lane)
+                    }
                 }
             }
         }
-        
     }
     
     

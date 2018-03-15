@@ -8,9 +8,7 @@
 
 import SpriteKit
 
-protocol FlickJudgeDelegate {   // parfect終了時に保存されているflickJudgeを行う
-    func storedFlickJudge(lane: Lane)
-}
+
 
 enum TimeState {
     case miss, bad, good, great, parfect, still, passed
@@ -34,8 +32,17 @@ class Lane {
     var laneNotes: [Note] = []   // 最初に全部格納する！
     var isSetLaneNotes = false
     let laneIndex: Int!
-    var fjDelegate: FlickJudgeDelegate!
-    var storedFlickJudgeInformation: (time: TimeInterval, touch: UITouch)? // (判定予定時間(movedが呼ばれた時間), タッチ情報)
+    var storedFlickJudgeInformation: (timeLag: TimeInterval, touch: UITouch)? {// (判定予定時間(movedが呼ばれた時間), タッチ情報)
+        didSet {
+            if let newTimeLag = storedFlickJudgeInformation?.timeLag {
+                if newTimeLag < 0 {
+                    print("storedFlickJudgeのtimeLag < 0 は不正です")
+                    storedFlickJudgeInformation = nil
+                }
+            }
+        }
+    }
+    
 
     var isJudgeRange: Bool {
         get {
@@ -45,7 +52,6 @@ class Lane {
             case .parfect, .great, .good, .bad, .miss : return true
             default                                   : return false
             }
-            
         }
     }
     
@@ -117,11 +123,7 @@ class Lane {
                     }
                 }
                 
-                //storedFlickJudgeの判定
-                if timeLag < -parfectUpperBorder &&
-                    self.storedFlickJudgeInformation != nil {
-                    self.fjDelegate?.storedFlickJudge(lane: self)
-                }
+                
             }
             
             self.isTimeLagSet = true    // パース前はtimeLagは更新されないので(このレーンが使われない場合でも)通知する必要あり.
@@ -136,7 +138,7 @@ class Lane {
         }
         
         switch abs(timeLag) {
-        case 0                ..< parfectUpperBorder  : return .parfect
+        case 0                  ..< parfectUpperBorder  : return .parfect
         case parfectUpperBorder ..< greatUpperBorder    : return .great
         case greatUpperBorder   ..< goodUpperBorder     : return .good
         case goodUpperBorder    ..< badUpperBorder      : return .bad

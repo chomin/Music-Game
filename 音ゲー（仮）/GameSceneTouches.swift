@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-extension GameScene: FlickJudgeDelegate {
+extension GameScene {
     
     // タッチ関係
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -109,7 +109,7 @@ extension GameScene: FlickJudgeDelegate {
                 // pposループ
                 for (index, judgeXRange) in Dimensions.judgeXRanges.enumerated() {
                     
-                    guard ppos.y < Dimensions.buttonHeight else { continue } // 以下、移動直前の位置がボタンの判定圏内にあるtouchのみを処理する
+                    guard ppos.y < Dimensions.buttonHeight else { break } // このループでは、移動直前の位置がボタンの判定圏内にあるtouchのみを処理する
                     
                     if judgeXRange.contains(ppos.x) {
                         if !(judgeXRange.contains(pos.x)) || pos.y >= Dimensions.buttonHeight { // 移動後にレーンから外れていた場合は、外れる直前にいた時間で判定
@@ -397,7 +397,7 @@ extension GameScene: FlickJudgeDelegate {
         guard lane.storedFlickJudgeInformation != nil else { return }
         
        
-        if judge(lane: lane, timeLag: lane.storedFlickJudgeInformation!.time,
+        if judge(lane: lane, timeLag: lane.storedFlickJudgeInformation!.timeLag,
                  touch: self.allGSTouches.first(where: { $0.touch == lane.storedFlickJudgeInformation!.touch })) { //（laneから呼び出され、すでに指が離れている場合はtouchはnilになる）
             
             self.actionSoundSet.play(type: .flick)
