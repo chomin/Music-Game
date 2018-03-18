@@ -44,6 +44,7 @@ class Lane {
     }
     
 
+    /// 判定時間範囲(前miss~後miss)かどうかを返す
     var isJudgeRange: Bool {
         get {
             guard isTimeLagSet else { return false }
@@ -143,8 +144,8 @@ class Lane {
         case greatUpperBorder   ..< goodUpperBorder     : return .good
         case goodUpperBorder    ..< badUpperBorder      : return .bad
         case badUpperBorder     ..< missUpperBorder     : return .miss
-        default                                     : if timeLag > 0 { return .still  }
-                                                      else           { return .passed }
+        default                                         : if timeLag > 0 { return .still  }
+                                                          else           { return .passed }
         }
     }
 }
