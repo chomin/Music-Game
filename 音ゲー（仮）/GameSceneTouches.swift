@@ -10,7 +10,7 @@ import SpriteKit
 
 extension GameScene {
     
-    // タッチ関係
+    // タッチ関係(恐らく、同フレーム内でupdate()等の後に呼び出されている)
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         
@@ -161,7 +161,6 @@ extension GameScene {
                             
                             self.actionSoundSet.play(type: .flick)
                             tmpCounter += 1
-                            print("\(tmpCounter)回目のフリック")
                             
                         } else {
                             print("判定失敗: flick")     // 二重判定防止に成功した時とか
