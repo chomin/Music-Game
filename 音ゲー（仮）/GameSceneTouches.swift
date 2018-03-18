@@ -10,7 +10,7 @@ import SpriteKit
 
 extension GameScene {
     
-    // タッチ関係
+    // タッチ関係(恐らく、同フレーム内でupdate()等の後に呼び出されている)
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         
@@ -160,7 +160,7 @@ extension GameScene {
                         } else if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag, touch: self.allGSTouches[touchIndex]) {
                             
                             self.actionSoundSet.play(type: .flick)
-                            
+                            tmpCounter += 1
                             
                         } else {
                             print("判定失敗: flick")     // 二重判定防止に成功した時とか
@@ -306,11 +306,15 @@ extension GameScene {
     /// - Returns: 成否をBoolで返す
     func judge(lane: Lane, timeLag: TimeInterval, touch: GSTouch?) -> Bool {
         
-        guard !(lane.laneNotes.isEmpty) else { return false }
+        guard !(lane.laneNotes.isEmpty),
+                lane.isJudgeRange else { return false }
         
         let judgeNote = lane.laneNotes.first!
         
         guard judgeNote.isJudgeable else { return false }
+        
+        
+        // 以下は判定が確定しているものとする
         
         
         switch judgeNote {
@@ -383,7 +387,8 @@ extension GameScene {
             setNextIsJudgeable(judgeNote: judgeNote)
             releaseNote(lane: lane)
             return true
-        default:
+        default:    //still,passedなら判定しない(guardで弾いてるはず。)
+            print("judge error")
             return false
             
         }

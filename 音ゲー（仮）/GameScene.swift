@@ -54,6 +54,8 @@ class SameLine {
 
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {    // 音ゲーをするシーン
     
+    var tmpCounter = 0  //デバッグ用
+    
     var playMode: PlayMode
     
     //
@@ -389,6 +391,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     }
                 }
             }
+        }
+        
+        //レーンの更新(再)(判定後、laneNotes[0]が入れ替わるので、それを反映させる)
+        for lane in lanes {
+            lane.update(passedTime, self.BPMs)
         }
     }
     
