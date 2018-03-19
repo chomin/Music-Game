@@ -19,7 +19,6 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
         let scene = ChooseMusicScene(size: view.bounds.size)
         let skView2 = SKView(frame: view.frame)
-//        let skView = view as! SKView
         skView2.showsFPS = true
         skView2.showsNodeCount = true
         skView2.showsDrawCount = true
@@ -28,7 +27,6 @@ class GameViewController: UIViewController {
         scene.scaleMode = .resizeFill
         
         view.addSubview(skView2)
-//        print("skView2:\(skView2)")
         
         skView2.presentScene(scene)  // ChooseMusicSceneに移動
         
