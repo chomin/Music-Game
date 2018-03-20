@@ -53,8 +53,8 @@ class SameLine {
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {    // 音ゲーをするシーン
     
     
+//    var tmpCounter = 0  //デバッグ用
     
-    var tmpCounter = 0  //デバッグ用
     
     var playMode: PlayMode
     
@@ -73,6 +73,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     // ボタン
     var pauseButton: UIButton!
+    var returnButton: UIButton!
+    var continueButton: UIButton!
+    
+    //ポーズ時のview
+    var pauseView: UIView?
     
     // 音楽プレイヤー
     var BGM: AVAudioPlayer!
@@ -157,17 +162,17 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     override func didMove(to view: SKView) {
         
         // ボタンの設定
-//        pauseButton = {() -> UIButton in
-//            let Button = UIButton()
-//
-//            Button.setImage(settingImage, for: .normal)
-//            Button.setImage(settingImageSelected, for: .highlighted)
-//            Button.addTarget(self, action: #selector(onClickSettingButton(_:)), for: .touchUpInside)
-//            Button.frame = CGRect(x: self.frame.width - iconButtonSize, y: 0, width:iconButtonSize, height: iconButtonSize)//yは上からの座標
-//            self.view?.addSubview(Button)
-//
-//            return Button
-//        }()
+        pauseButton = {() -> UIButton in
+            let Button = UIButton()
+
+            Button.setImage(UIImage(named: ImageName.pause.rawValue), for: .normal)
+            Button.setImage(UIImage(named: ImageName.pauseSelected.rawValue), for: .highlighted)
+            Button.addTarget(self, action: #selector(onClickPauseButton(_:)), for: .touchUpInside)
+            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(Button)
+
+            return Button
+        }()
         
         appDelegate = UIApplication.shared.delegate as! AppDelegate // AppDelegateのインスタンスを取得
         appDelegate.gsDelegate = self   // 子(AppDelegate)の設定しているdelegateに自身をセット
@@ -175,8 +180,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.view?.isMultipleTouchEnabled = true    // 恐らくデフォルトではfalseになってる
         self.view?.superview?.isMultipleTouchEnabled = true
         
-        // 寸法に関する定数をセット
-        Dimensions.createInstance(frame: self.frame)
+        
         
         // notesにノーツの"　始　点　"を入れる(必ずcreateInstanceの後に実行)
         do {
@@ -449,19 +453,65 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
     }
     
+    func moveToResultScene() {
+        pauseButton.removeFromSuperview()
+        let scene = ResultScene(size: (view?.bounds.size)!)
+        let skView = view as SKView?
+        skView?.showsFPS = true
+        skView?.showsNodeCount = true
+        skView?.ignoresSiblingOrder = true
+        scene.scaleMode = .resizeFill
+        skView?.presentScene(scene)     // ResultSceneに移動
+    }
     
+    @objc func onClickPauseButton(_ sender : UIButton){
+        applicationWillResignActive()
+    }
     
+    @objc func onClickReturnButton(_ sender : UIButton){
+        pauseButton.removeFromSuperview()
+        pauseView?.removeFromSuperview()
+        let scene = ChooseMusicScene(size: (view?.bounds.size)!)
+        let skView = view as SKView?
+        skView?.showsFPS = true
+        skView?.showsNodeCount = true
+        skView?.ignoresSiblingOrder = true
+        scene.scaleMode = .resizeFill
+        skView?.presentScene(scene)     // ChooseMusicSceneに移動
+    }
+    
+    @objc func onClickContinueButton(_ sender : UIButton){
+        pauseView?.removeFromSuperview()
+        self.isUserInteractionEnabled = true
+        actionSoundSet.stopAll()
+        if self.playMode == .BGM{
+            BGM?.currentTime -= 3   // 3秒巻き戻し
+            BGM?.play()
+        }else{
+            playerView.seek(toSeconds: playerView.currentTime()-3, allowSeekAhead: true)
+            playerView.playVideo()
+        }
+    }
+    
+    //同時押し対策
+    @objc func onReturnButton(_ sender : UIButton){
+        self.continueButton.isEnabled = false
+    }
+    @objc func onContinueButton(_ sender : UIButton){
+        self.returnButton.isEnabled = false
+    }
+    @objc func touchUpOutsideButton(_ sender : UIButton){
+        enableAllButtonsOnPauseView()
+    }
+    func enableAllButtonsOnPauseView() {
+        self.returnButton.isEnabled = true
+        self.continueButton.isEnabled = true
+    }
     // 再生終了時の呼び出しメソッド
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {    // playしたクラスと同じクラスに入れる必要あり？
         if player as AVAudioPlayer? == BGM {
             BGM = nil   // 別のシーンでアプリを再開したときに鳴るのを防止
-            let scene = ResultScene(size: (view?.bounds.size)!)
-            let skView = view as SKView?
-            skView?.showsFPS = true
-            skView?.showsNodeCount = true
-            skView?.ignoresSiblingOrder = true
-            scene.scaleMode = .resizeFill
-            skView?.presentScene(scene)     // ResultSceneに移動
+            moveToResultScene()
         }
     }
     
@@ -475,14 +525,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             isReadyPlayerView = true
         case .ended:
             playerView.removeFromSuperview()
-            let scene = ResultScene(size: (view?.bounds.size)!)
-            let skView = view as SKView?
-            skView?.showsFPS = true
-            skView?.showsNodeCount = true
-            skView?.ignoresSiblingOrder = true
-            scene.scaleMode = .resizeFill
-            skView?.presentScene(scene)     // ResultSceneに移動
-            
+            moveToResultScene()
         case .unknown:
             print("unknown")
         default:
@@ -556,19 +599,64 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 following.isJudged = true
             }
         }
+        
+        // 選択画面を出す
+        if self.pauseView == nil {
+            self.pauseView = { () -> UIView in
+                let view = UIView(frame: self.frame)
+                view.backgroundColor = UIColor(white: 0, alpha: 0.5)
+                return view
+            }()
+            self.returnButton = {() -> UIButton in
+                let Button = UIButton()
+                
+                Button.addTarget(self, action: #selector(onClickReturnButton(_:)), for: .touchUpInside)
+                Button.addTarget(self, action: #selector(onReturnButton(_:)), for: .touchDown)
+                Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+                Button.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
+                Button.backgroundColor = .red
+                Button.layer.masksToBounds = true
+                Button.setTitle("中断する", for: UIControlState())
+                Button.setTitleColor(UIColor.white, for: UIControlState())
+                Button.setTitle("中断する", for: UIControlState.highlighted)
+                Button.setTitleColor(UIColor.black, for: UIControlState.highlighted)
+                Button.isHidden = false
+                Button.layer.cornerRadius = 20.0
+                Button.layer.position = CGPoint(x: self.frame.midX + Button.frame.width*2/3, y: self.frame.midY)
+                self.pauseView?.addSubview(Button)
+                
+                return Button
+                }()
+            self.continueButton = {() -> UIButton in
+                let Button = UIButton()
+                
+                Button.addTarget(self, action: #selector(onClickContinueButton(_:)), for: .touchUpInside)
+                Button.addTarget(self, action: #selector(onContinueButton(_:)), for: .touchDown)
+                Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+                Button.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
+                Button.backgroundColor = .green
+                Button.layer.masksToBounds = true
+                Button.setTitle("続ける", for: UIControlState())
+                Button.setTitleColor(UIColor.white, for: UIControlState())
+                Button.setTitle("続ける", for: UIControlState.highlighted)
+                Button.setTitleColor(UIColor.black, for: UIControlState.highlighted)
+                Button.isHidden = false
+                Button.layer.cornerRadius = 20.0
+                Button.layer.position = CGPoint(x: self.frame.midX - Button.frame.width*2/3, y: self.frame.midY)
+                self.pauseView?.addSubview(Button)
+                
+                return Button
+            }()
+        }
+        self.view?.superview?.addSubview(pauseView!)
+        self.view?.superview?.bringSubview(toFront: pauseView!)
+        
+        self.isUserInteractionEnabled = false
+        
+        enableAllButtonsOnPauseView()
     }
     
-    //アプリを再開したときに呼ばれる
-    func applicationDidBecomeActive() {
-        actionSoundSet.stopAll()
-        if self.playMode == .BGM{
-            BGM?.currentTime -= 3   // 3秒巻き戻し
-            BGM?.play()
-        }else{
-            playerView.seek(toSeconds: playerView.currentTime()-3, allowSeekAhead: true)
-            playerView.playVideo()
-        }
-    }
+   
     
 }
 

@@ -10,7 +10,6 @@ import UIKit
 
 protocol GSAppDelegate {//子（呼び出し元)がAppDelegateクラス、親がGameSceneクラス
     func applicationWillResignActive()
-    func applicationDidBecomeActive()
 }
 
 @UIApplicationMain
@@ -53,7 +52,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         print("DidBecomeActive")
         
-        self.gsDelegate?.applicationDidBecomeActive()
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
