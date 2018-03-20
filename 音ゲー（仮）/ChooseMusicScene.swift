@@ -11,21 +11,11 @@
 import SpriteKit
 import GameplayKit
 
-enum Keys:String {
-    case speedRatioInt = "SpeedRatioInt"
-}
-
-
-
-
 class ChooseMusicScene: SKScene {
     
-    //VideoIDの辞書(https://www.youtube.com/watch?v=************の***********部分)
-    let videoIDDictionary = ["LEVEL5-Judgelight-":"1NYUKIZCV5k", "ぼなぺてぃーとS":"LOajYHKEHG8", "SAKURAスキップ":"dBwwipunJcw", "オラシオン":"6kQzRm21N_g", "ウラシオン":"fF6c1gqutjs", "にめんせい☆ウラオモテライフ！":"TyMx4pu7kA0", "ようこそジャパリパークへ":"xkMdLcB_vNU"]
-    /*
-     "ぼなぺてぃーとS": 埋め込み許可されているアニメ版が見つからず
-     
-    */
+    enum Keys: String {
+        case speedRatioInt = "SpeedRatioInt"
+    }
     
     var picker:PickerKeyboard!
     
@@ -37,18 +27,18 @@ class ChooseMusicScene: SKScene {
     var minus10Button = UIButton()
     var saveAndBackButton = UIButton()
     
-    let settingImage = UIImage(named: "SettingIcon")
-    let settingImageSelected = UIImage(named: "SettingIconSelected")
-    let plusImage = UIImage(named: "PlusIcon")
-    let plusImageSelected = UIImage(named: "PlusIconSelected")
-    let minusImage = UIImage(named: "MinusIcon")
-    let minusImageSelected = UIImage(named: "MinusIconSelected")
-    let plus10Image = UIImage(named: "Plus10Icon")
-    let plus10ImageSelected = UIImage(named: "Plus10IconSelected")
-    let minus10Image = UIImage(named: "Minus10Icon")
-    let minus10ImageSelected = UIImage(named: "Minus10IconSelected")
-    let saveAndBackImage = UIImage(named: "SaveAndBackIcon")
-    let saveAndBackImageSelected = UIImage(named: "SaveAndBackIconSelected")
+    let settingImage = UIImage(named: ImageName.setting.rawValue)
+    let settingImageSelected = UIImage(named: ImageName.settingSelected.rawValue)
+    let plusImage = UIImage(named: ImageName.plus.rawValue)
+    let plusImageSelected = UIImage(named: ImageName.plusSelected.rawValue)
+    let minusImage = UIImage(named: ImageName.minus.rawValue)
+    let minusImageSelected = UIImage(named: ImageName.minusSelected.rawValue)
+    let plus10Image = UIImage(named: ImageName.plus10.rawValue)
+    let plus10ImageSelected = UIImage(named: ImageName.plus10Selected.rawValue)
+    let minus10Image = UIImage(named: ImageName.minus10.rawValue)
+    let minus10ImageSelected = UIImage(named: ImageName.minus10Selected.rawValue)
+    let saveAndBackImage = UIImage(named: ImageName.saveAndBack.rawValue)
+    let saveAndBackImageSelected = UIImage(named: ImageName.saveAndBackSelected.rawValue)
     
     var settingLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")    // "設定画面"
     var speedLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")      // スピードの値（％）
@@ -222,32 +212,33 @@ class ChooseMusicScene: SKScene {
         speedLabel.text = String(speedRatioInt) + "%"
     }
     
-    @objc func onClickPlayButton(_ sender : UIButton){
-        //消す
+    @objc func onClickPlayButton(_ sender : UIButton) {
+        // 消す
         hideMainContents()
         
-        picker.resignFirstResponder()   //FirstResponderを放棄
+        picker.resignFirstResponder()   // FirstResponderを放棄
         
-        //移動
+        // 移動
         let scene: GameScene
-        if picker.textStore.suffix(9) == "(YouTube)"{
-            var musicName = picker.textStore
-            musicName.removeLast(9)
+        if picker.textStore.suffix(9) == "(YouTube)" {
+            var playMode = PlayMode.YouTube
+            var pickerTextStore = picker.textStore
+            pickerTextStore.removeLast(9)
             
             //ネタバレ注意！
-            if musicName == "オラシオン" &&
+            if pickerTextStore == "オラシオン" &&
                 (defaults.integer(forKey: Keys.speedRatioInt.rawValue) <= 21 ||
-                defaults.integer(forKey: Keys.speedRatioInt.rawValue) >= 201) { musicName = "ウラシオン" }
+                defaults.integer(forKey: Keys.speedRatioInt.rawValue) >= 201) { playMode = .YouTube2 /* 裏シオン */ }
             
-            scene = GameScene(musicName:musicName, videoID: videoIDDictionary[musicName]!, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
+            scene = GameScene(musicName: MusicName(rawValue: pickerTextStore)!, playMode: playMode, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
         }else{
-            scene = GameScene(musicName:picker.textStore ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
+            scene = GameScene(musicName: MusicName(rawValue: picker.textStore)! ,playMode: .BGM ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
         }
         
        
         
         
-        let skView = view as SKView?    //このviewはGameViewControllerのskView2
+        let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true
         skView?.ignoresSiblingOrder = true

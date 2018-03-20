@@ -40,8 +40,8 @@ extension GameScene {
                     
                     if judgeXRange.contains(pos.x) {    // ボタンの範囲
                         
-                        if (self.lanes[index].timeState == .still) ||
-                            (self.lanes[index].timeState == .passed) { continue }
+                        if (self.lanes[index].judgeTimeState == .still) ||
+                            (self.lanes[index].judgeTimeState == .passed) { continue }
                         
                         if self.lanes[index].laneNotes.isEmpty { continue }
                         
@@ -127,8 +127,8 @@ extension GameScene {
                     guard !(self.lanes[index].laneNotes.isEmpty) else { continue }
                     
                     let judgeNote = self.lanes[index].laneNotes[0]
-                    if moveDistance > 10 && self.lanes[index].timeState != .still &&
-                        self.lanes[index].timeState != .passed {
+                    if moveDistance > 10 && self.lanes[index].judgeTimeState != .still &&
+                        self.lanes[index].judgeTimeState != .passed {
                         
                         let gsTouch = self.allGSTouches[touchIndex] // エイリアス
                         
@@ -340,7 +340,7 @@ extension GameScene {
        
         
         
-        switch lane.getTimeState(timeLag: timeLag) {
+        switch lane.getJudgeTimeState(timeLag: timeLag) {
         case .parfect:
             setJudgeLabelText(text: "parfect!!")
             ResultScene.parfect += 1
@@ -421,7 +421,7 @@ extension GameScene {
         
 //        lane.update(passedTime, BPMs)
         
-        switch lane.timeState {
+        switch lane.judgeTimeState {
         case .parfect:
             setJudgeLabelText(text: "parfect!!")
             ResultScene.parfect += 1

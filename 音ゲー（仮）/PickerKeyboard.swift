@@ -10,31 +10,11 @@ import UIKit
 
 class PickerKeyboard: UIControl {
     
-    // ピッカーに表示させるデータ
-    var data = [
-        "シュガーソングとビターステップ",
-        "ようこそジャパリパークへ",
-        "ようこそジャパリパークへ(YouTube)",
-        "オラシオン",
-        "オラシオン(YouTube)",
-        "This game",
-        "SAKURAスキップ",
-        "SAKURAスキップ(YouTube)",
-        "残酷な天使のテーゼ",
-        "にめんせい☆ウラオモテライフ！",
-        "にめんせい☆ウラオモテライフ！(YouTube)",
-        "READY!!",
-        "自分REST@RT",
-        "Thank You!",
-        "Welcome!!",
-        "Brand New Theater!",
-        "ぼなぺてぃーとS",
-//        "ぼなぺてぃーとS(YouTube)",
-        "LEVEL5-Judgelight-",
-        "LEVEL5-Judgelight-(YouTube)"
-    ]
+    // ピッカーに表示させるデータ(DimentionsファイルのMusicNameから自動生成)
+    var data: [String] = []
     
     var textStore: String = "シュガーソングとビターステップ"   // 入力文字列を保存するためのプロパティ
+    
     
     // PickerViewで選択されたデータを表示する
     override func draw(_ rect: CGRect) {
@@ -48,6 +28,10 @@ class PickerKeyboard: UIControl {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        // ピッカーに初期値をセット
+        self.data = MusicName.getPickerArray()
+        
         // viewのタッチジェスチャーを取る
         addTarget(self, action: #selector(PickerKeyboard.didTap(sender: )), for: .touchUpInside)
     }
