@@ -106,13 +106,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     
     init(musicName: MusicName, playMode: PlayMode, size: CGSize, speedRatioInt: UInt) {   // YouTube用
-//        if musicName == "ウラシオン" {
-//            self.musicName = "オラシオン"
-//            self.playMode = .YouTube2
-//        } else {
-//            self.musicName =  musicName
-//            self.playMode = .YouTube
-//        }
+
         self.musicName = musicName
         self.playMode = playMode
         self.speedRatio = CGFloat(speedRatioInt) / 100
@@ -154,19 +148,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             }
         }
     }
-    
-//    init(musicName: MusicName, size: CGSize, speedRatioInt: UInt) {    // BGM用
-//        self.musicName = musicName
-//        self.speedRatio = CGFloat(speedRatioInt) / 100
-//        self.playMode = .BGM
-//
-//
-//        super.init(size: size)
-//
-//
-//
-//
-//    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

@@ -17,9 +17,6 @@ class ChooseMusicScene: SKScene {
         case speedRatioInt = "SpeedRatioInt"
     }
     
-//    // VideoIDの辞書(https://www.youtube.com/watch?v=************の***********部分)
-//    let videoIDDictionary = ["LEVEL5-Judgelight-":"1NYUKIZCV5k", "ぼなぺてぃーとS":"LOajYHKEHG8", "SAKURAスキップ":"dBwwipunJcw", "オラシオン":"6kQzRm21N_g", "ウラシオン":"fF6c1gqutjs", "にめんせい☆ウラオモテライフ！":"TyMx4pu7kA0", "ようこそジャパリパークへ":"xkMdLcB_vNU"]
-   
     var picker:PickerKeyboard!
     
     var playButton = UIButton()
