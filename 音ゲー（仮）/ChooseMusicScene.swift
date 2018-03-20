@@ -44,7 +44,7 @@ class ChooseMusicScene: SKScene {
     var speedLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")      // スピードの値（％）
     var speedTitleLabel = SKLabelNode(fontNamed: "HiraginoSans-W6") // "速さ"
     
-    var iconButtonSize:CGFloat!
+//    var iconButtonSize:CGFloat!
     var speedsPosY:CGFloat!
     
     let defaults = UserDefaults.standard
@@ -58,8 +58,7 @@ class ChooseMusicScene: SKScene {
         
         defaults.register(defaults: [Keys.speedRatioInt.rawValue : 100])    // 初期値を設定(値がすでに入ってる場合は無視される)
         
-        iconButtonSize = self.frame.width/16
-        speedsPosY = iconButtonSize*3
+        speedsPosY = Dimensions.iconButtonSize*3
         
         backgroundColor = .white
         
@@ -76,6 +75,8 @@ class ChooseMusicScene: SKScene {
             let Button = UIButton()
             
             Button.addTarget(self, action: #selector(onClickPlayButton(_:)), for: .touchUpInside)
+            Button.addTarget(self, action: #selector(onPlayButton(_:)), for: .touchDown)
+            Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
             Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/5, height: 50)
             Button.backgroundColor = UIColor.red
             Button.layer.masksToBounds = true
@@ -97,7 +98,10 @@ class ChooseMusicScene: SKScene {
             Button.setImage(settingImage, for: .normal)
             Button.setImage(settingImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickSettingButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.width - iconButtonSize, y: 0, width:iconButtonSize, height: iconButtonSize)//yは上からの座標
+            Button.addTarget(self, action: #selector(onSettingButton(_:)), for: .touchDown)
+            Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+
+            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(Button)
             return Button
         }()
@@ -108,7 +112,7 @@ class ChooseMusicScene: SKScene {
             Button.setImage(plusImage, for: .normal)
             Button.setImage(plusImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickPlusButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX + iconButtonSize*1.5, y: speedsPosY, width:iconButtonSize, height: iconButtonSize)//yは上からの座標
+            Button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(Button)
             Button.isHidden = true
             return Button
@@ -120,7 +124,7 @@ class ChooseMusicScene: SKScene {
             Button.setImage(plus10Image, for: .normal)
             Button.setImage(plus10ImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickPlus10Button(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX + iconButtonSize*2.5, y: speedsPosY, width:iconButtonSize, height: iconButtonSize)//yは上からの座標
+            Button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(Button)
             Button.isHidden = true
             return Button
@@ -132,7 +136,7 @@ class ChooseMusicScene: SKScene {
             Button.setImage(minusImage, for: .normal)
             Button.setImage(minusImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickMinusButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX - iconButtonSize*2.5, y: speedsPosY, width:iconButtonSize, height: iconButtonSize)//yは上からの座標
+            Button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(Button)
             Button.isHidden = true
             return Button
@@ -144,7 +148,7 @@ class ChooseMusicScene: SKScene {
             Button.setImage(minus10Image, for: .normal)
             Button.setImage(minus10ImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickMinus10Button(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX - iconButtonSize*3.5, y: speedsPosY, width:iconButtonSize, height: iconButtonSize)//yは上からの座標
+            Button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(Button)
             Button.isHidden = true
             return Button
@@ -156,7 +160,7 @@ class ChooseMusicScene: SKScene {
             Button.setImage(saveAndBackImage, for: .normal)
             Button.setImage(saveAndBackImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickSaveAndBackButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.width*9.4/10, y: self.frame.height - iconButtonSize, width:iconButtonSize, height: iconButtonSize)//yは上からの座標
+            Button.frame = CGRect(x: self.frame.width*9.4/10, y: self.frame.height - Dimensions.iconButtonSize, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(Button)
             Button.isHidden = true
             return Button
@@ -181,12 +185,11 @@ class ChooseMusicScene: SKScene {
         speedLabel = {() -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = iconButtonSize * 0.8
+            Label.fontSize = Dimensions.iconButtonSize * 0.8
             Label.horizontalAlignmentMode = .center//中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY - iconButtonSize*0.8)
+            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY - Dimensions.iconButtonSize*0.8)
             Label.fontColor = SKColor.black
             Label.isHidden = true
-            //          Label.text = "設定画面"
             
             self.addChild(Label)
             return Label
@@ -195,7 +198,7 @@ class ChooseMusicScene: SKScene {
         speedTitleLabel = {() -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = iconButtonSize * 0.6
+            Label.fontSize = Dimensions.iconButtonSize * 0.6
             Label.horizontalAlignmentMode = .center //中央寄せ
             Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY)
             Label.fontColor = SKColor.black
@@ -282,10 +285,25 @@ class ChooseMusicScene: SKScene {
         showMainContents()
     }
     
+    // 同時押し対策
+    @objc func onSettingButton(_ sender : UIButton){
+        playButton.isEnabled = false
+    }
+    @objc func onPlayButton(_ sender : UIButton){
+        settingButton.isEnabled = false
+    }
+    @objc func touchUpOutsideButton(_ sender : UIButton){
+        playButton.isEnabled = true
+        settingButton.isEnabled = true
+    }
+    
     func showMainContents(){
         picker.isHidden = false
         playButton.isHidden = false
         settingButton.isHidden = false
+        
+        playButton.isEnabled = true
+        settingButton.isEnabled = true
     }
     
     func hideMainContents(){

@@ -103,6 +103,7 @@ class Dimensions {
     private let laneLength: CGFloat                 // 3D上でのレーン長
     private let judgeLineY: CGFloat                 // 判定線のy座標
     private let buttonHeight: CGFloat               // ボタンの高さ(上の境界のy座標)
+    private let iconButtonSize: CGFloat             // アイコンの大きさ
     private var buttonX: [CGFloat] = []             // 各レーンの中心のx座標
     private var judgeXRanges: [Range<CGFloat>] = [] // 各レーンの判定をするx座標についての範囲
     // 立体感を出すための定数
@@ -119,6 +120,7 @@ class Dimensions {
         self.horizonY = frame.height * 15 / 16  // モデル値
         self.judgeLineY = frame.width / 9
         self.buttonHeight = self.judgeLineY * 2
+        self.iconButtonSize = frame.width/16
         self.verticalDistance = horizonY - frame.width / 14
         self.R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
         
@@ -141,6 +143,7 @@ class Dimensions {
     static var laneLength:         CGFloat         { return Dimensions.instance?.laneLength         ??  CGFloat(0)        }
     static var judgeLineY:         CGFloat         { return Dimensions.instance?.judgeLineY         ??  CGFloat(0)        }
     static var buttonHeight:       CGFloat         { return Dimensions.instance?.buttonHeight       ??  CGFloat(0)        }
+    static var iconButtonSize:     CGFloat         { return Dimensions.instance?.iconButtonSize     ??  CGFloat(0)        }
     static var horizontalDistance: CGFloat         { return Dimensions.instance?.horizontalDistance ??  CGFloat(0)        }
     static var verticalDistance:   CGFloat         { return Dimensions.instance?.verticalDistance   ??  CGFloat(0)        }
     static var R:                  CGFloat         { return Dimensions.instance?.R                  ??  CGFloat(0)        }

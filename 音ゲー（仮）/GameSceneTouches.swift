@@ -160,7 +160,6 @@ extension GameScene {
                         } else if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag, touch: self.allGSTouches[touchIndex]) {
                             
                             self.actionSoundSet.play(type: .flick)
-                            tmpCounter += 1
                             
                         } else {
                             print("判定失敗: flick")     // 二重判定防止に成功した時とか

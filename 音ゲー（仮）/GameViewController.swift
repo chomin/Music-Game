@@ -15,6 +15,8 @@ import GameplayKit
 class GameViewController: UIViewController {
     
     override func viewDidLoad() {
+        // 寸法に関する定数をセット
+        Dimensions.createInstance(frame: view.frame)
         
         super.viewDidLoad()
         let scene = ChooseMusicScene(size: view.bounds.size)
