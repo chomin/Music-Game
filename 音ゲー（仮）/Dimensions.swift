@@ -15,7 +15,7 @@ enum MusicName: String, EnumCollection {
     
     case shugabita              = "シュガーソングとビターステップ"
     case yo_kosoJapariParkHe    = "ようこそジャパリパークへ"
-    case orashion               = "オラシオン"
+    case oracion                = "オラシオン"
     case thisGame               = "This game"
     case sakuraSkip             = "SAKURAスキップ"
     case zankokuNaTenshiNoThese = "残酷な天使のテーゼ"
@@ -37,7 +37,7 @@ enum MusicName: String, EnumCollection {
             
             // YouTubeを実装しているものについてはYouTubeモードをピッカーに追加
             if musicName == .yo_kosoJapariParkHe ||
-                musicName == .orashion ||
+                musicName == .oracion ||
                 musicName == .sakuraSkip ||
                 musicName == .nimenseiUraomoteLife ||
                 musicName == .level5 {
@@ -54,8 +54,8 @@ enum MusicName: String, EnumCollection {
 enum VideoID: String {  // VideoIDの列挙型(https://www.youtube.com/watch?v=************の***********部分)
     
     case yo_kosoJapariParkHe  = "xkMdLcB_vNU"
-    case orashion             = "6kQzRm21N_g"
-    case urashion             = "fF6c1gqutjs"
+    case oracion              = "6kQzRm21N_g"
+    case uracion              = "fF6c1gqutjs"
     case sakuraSkip           = "dBwwipunJcw"
     case nimenseiUraomoteLife = "TyMx4pu7kA0"
     case buonAppetitoS        = "LOajYHKEHG8"

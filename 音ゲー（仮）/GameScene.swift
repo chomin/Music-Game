@@ -437,8 +437,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         switch musicName {
         case .yo_kosoJapariParkHe  : return .yo_kosoJapariParkHe
-        case .orashion             : if playMode == .YouTube { return .orashion }
-                                     else                    { return .urashion }
+        case .oracion             : if playMode == .YouTube { return .oracion }
+                                     else                    { return .uracion }
         case .sakuraSkip           : return .sakuraSkip
         case .nimenseiUraomoteLife : return .nimenseiUraomoteLife
         case .buonAppetitoS        : return .buonAppetitoS
