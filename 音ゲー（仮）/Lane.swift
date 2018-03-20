@@ -9,16 +9,15 @@
 import SpriteKit
 
 
-
-enum TimeState {    //enumはRange型をサポートしていないのでrawValueにRange型のものを代入することはできない
-    case miss, bad, good, great, parfect, still, passed
-}
-
-enum ObsevationTimeState {
-    case before, after, otherwise
-}
-
 class Lane {
+    
+    enum JudgeTimeState {    //enumはRange型をサポートしていないのでrawValueにRange型のものを代入することはできない
+        case miss, bad, good, great, parfect, still, passed
+    }
+    
+    enum ObsevationTimeState {
+        case before, after, otherwise
+    }
     
     //判定時間に関する定数群
     private let parfectUpperBorder = 0.05
@@ -36,7 +35,7 @@ class Lane {
         didSet {
             if let newTimeLag = storedFlickJudgeInformation?.timeLag {
                 if newTimeLag < 0 {
-                    print("storedFlickJudgeのtimeLag < 0 は不正です")
+                    print("storedFlickJudgeの timeLag < 0 は不正です")
                     storedFlickJudgeInformation = nil
                 }
             }
@@ -49,7 +48,7 @@ class Lane {
         get {
             guard isTimeLagSet else { return false }
             
-            switch self.getTimeState(timeLag: timeLag) {
+            switch self.getJudgeTimeState(timeLag: timeLag) {
             case .parfect, .great, .good, .bad, .miss : return true
             default                                   : return false
             }
@@ -84,11 +83,11 @@ class Lane {
         }
     }
     
-    var timeState:TimeState{    //このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
+    var judgeTimeState:JudgeTimeState{    //このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
         get{
             guard self.isTimeLagSet else { return .still }
             
-            return self.getTimeState(timeLag: timeLag)
+            return self.getJudgeTimeState(timeLag: timeLag)
         }
     }
     
@@ -132,7 +131,7 @@ class Lane {
     }
     
     // timeLagに対応する判定を返す
-    func getTimeState(timeLag: TimeInterval) -> TimeState {
+    func getJudgeTimeState(timeLag: TimeInterval) -> JudgeTimeState {
         guard self.isTimeLagSet else {
             print("timeLagが不正です")
             return .still
