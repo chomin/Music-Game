@@ -86,6 +86,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     // YouTubeプレイヤー
     var playerView : YTPlayerView!
     var isReadyPlayerView = false
+    var isSupposedToPausePlayerView = false
     
     // 画像(ノーツ以外)
     var judgeLine: SKShapeNode!
@@ -471,6 +472,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     @objc func onClickReturnButton(_ sender : UIButton){
         pauseButton.removeFromSuperview()
         pauseView?.removeFromSuperview()
+        playerView.removeFromSuperview()
         let scene = ChooseMusicScene(size: (view?.bounds.size)!)
         let skView = view as SKView?
         skView?.showsFPS = true
@@ -483,6 +485,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     @objc func onClickContinueButton(_ sender : UIButton){
         pauseView?.removeFromSuperview()
         self.isUserInteractionEnabled = true
+        self.isSupposedToPausePlayerView = false
         actionSoundSet.stopAll()
         if self.playMode == .BGM{
             BGM?.currentTime -= 3   // 3秒巻き戻し
@@ -535,11 +538,17 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     func playerViewDidBecomeReady(_ playerView: YTPlayerView) { // 読み込み完了後に呼び出される
         
+        
 //        self.isReadyPlayerView = true
 //        startTime = CACurrentMediaTime()
 //        DispatchQueue.main.asyncAfter(deadline: .now() + mediaOffsetTime) {
             playerView.playVideo()
 //        }
+        if self.isSupposedToPausePlayerView {
+            applicationWillResignActive()
+            self.isSupposedToPausePlayerView = false
+        }
+        
     }
     
     func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {   //エラー処理
@@ -561,6 +570,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     // アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
+        if !self.isReadyPlayerView {
+            self.isSupposedToPausePlayerView = true
+        }
+        
         if self.playMode == .BGM{
             BGM?.pause()
         }else{
