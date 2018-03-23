@@ -121,7 +121,7 @@ extension GameScene {   // bmsファイルを読み込む
         /*--- メインデータをパース ---*/
         
         // 利用可能なチャンネル番号
-        let availableChannels = [1, 3, 8, 11, 12, 13, 14, 15, 18, 19]
+        let availableChannels = [1, 2, 3, 8, 11, 12, 13, 14, 15, 18, 19]
         
         // チャンネルとレーンの対応付け
         let laneMap = [11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6]
@@ -169,11 +169,17 @@ extension GameScene {   // bmsファイルを読み込む
             } else {
                 throw ParseError.invalidValue("チャンネル指定が不正です: #\(str)")
             }
-            // オブジェクト配列を2文字ずつに分けてdataに格納
-            for i in stride(from: 0, to: components[1].count, by: 2) {
-                let headIndex = str.index(str.startIndex, offsetBy: i)
-                let tailIndex = str.index(str.startIndex, offsetBy: i + 2)
-                ret.body.append(String(components[1][headIndex..<tailIndex]))
+            
+            if ret.channel == 2 {   // 小節を指定数倍する
+                ret.body.append(components[1])
+
+            } else {
+                // オブジェクト配列を2文字ずつに分けてdataに格納
+                for i in stride(from: 0, to: components[1].count, by: 2) {
+                    let headIndex = str.index(str.startIndex, offsetBy: i)
+                    let tailIndex = str.index(str.startIndex, offsetBy: i + 2)
+                    ret.body.append(String(components[1][headIndex..<tailIndex]))
+                }
             }
             return ret
             }.filter {
@@ -183,14 +189,63 @@ extension GameScene {   // bmsファイルを読み込む
         // ロングノーツは一時配列に、その他はnotesに格納。その他命令も実行
         var longNotes1: [Note] = []         // ロングノーツ1を一時的に格納
         var longNotes2: [Note] = []	        // ロングノーツ2を一時的に格納
-        var musicStartPosSet: [Double] = [] //musicStartPosを一時的に格納
-        for (bar, channel, body) in processedMainData {
-            let unitBeat = 4.0 / Double(body.count) // 1オブジェクトの長さ(拍単位)
+        var musicStartPosSet: [Double] = [] // musicStartPosを一時的に格納
+        
+        
+        /// 小節の長さ
+        enum BarLength: String {
+            case threeFourths = "0.75"
+            case twoFourths   = "0.5"
+            case aFourth      = "0.25"
+            
+//            func getBeatOffsetAfterTheBar(barLength: BarLength) -> Double {
+//
+//            }
+        }
+        
+        var barLengthInformation: [(type: BarLength, barNumber: Int, offsetAfterTheBar: Double)] = []   //　小節の長さ変更分の情報
+        
+        for (bar, channel, body) in processedMainData { // 先に小節長を調整
+            if channel == 2 {
+                // 小節長命令の処理
+                switch body[0] {
+                case BarLength.threeFourths.rawValue : barLengthInformation.append((type: .threeFourths, barNumber: bar, offsetAfterTheBar: -1))
+                case BarLength.twoFourths.rawValue   : barLengthInformation.append((type: .twoFourths  , barNumber: bar, offsetAfterTheBar: -2))
+                case BarLength.aFourth.rawValue      : barLengthInformation.append((type: .aFourth     , barNumber: bar, offsetAfterTheBar: -3))
+                default                              : print("1,2,3/4拍子への変更にしか対応していません。")
+                    break
+                }
+            }
+        }
+        
+        for (bar, channel, body) in processedMainData { // 行ごとに処理
+            
+            var unitBeat = 4.0 / Double(body.count) // その小節における1オブジェクトの長さ(拍単位)
+            for info in barLengthInformation {
+                if info.barNumber == bar {
+                    switch info.type {
+                    case .aFourth     : unitBeat = 1.0 / Double(body.count)
+                    case .twoFourths  : unitBeat = 2.0 / Double(body.count)
+                    case .threeFourths: unitBeat = 3.0 / Double(body.count)
+                    }
+                    break
+                }
+            }
+            
+            
             if let lane = laneMap[channel] {
                 // ノーツ指定チャンネルだったとき
                 for (index, ob) in body.enumerated() {
                     autoreleasepool{
-                        let beat = Double(bar) * 4.0 + unitBeat * Double(index)
+                        var beatOffset: Double = 0.0
+                        for info in barLengthInformation {
+                            if bar > info.barNumber {
+                                beatOffset += info.offsetAfterTheBar
+                            }else{
+                                break
+                            }
+                        }
+                        let beat = Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset
                         switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
                         case .rest:
                             break
@@ -265,7 +320,15 @@ extension GameScene {   // bmsファイルを読み込む
                 // 楽曲開始命令の処理
                 for (index, ob) in body.enumerated() {
                     if ob == "10" {
-                        musicStartPosSet.append(Double(bar) * 4.0 + unitBeat * Double(index))
+                        var beatOffset: Double = 0.0
+                        for info in barLengthInformation {
+                            if bar > info.barNumber {
+                                beatOffset += info.offsetAfterTheBar
+                            }else{
+                                break
+                            }
+                        }
+                        musicStartPosSet.append(Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset)
                         break
                     }
                 }
@@ -276,14 +339,30 @@ extension GameScene {   // bmsファイルを読み込む
                         continue
                     }
                     if let newBPM = Int(ob, radix: 16) {
-                        BPMs.append((bpm: Double(newBPM), startPos: Double(bar) * 4.0 + unitBeat * Double(index)))
+                        var beatOffset: Double = 0.0
+                        for info in barLengthInformation {
+                            if bar > info.barNumber {
+                                beatOffset += info.offsetAfterTheBar
+                            }else{
+                                break
+                            }
+                        }
+                        BPMs.append((bpm: Double(newBPM), startPos: Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset))
                     }
                 }
             } else if channel == 8 {
                 // BPM変更命令の処理(インデックス型テンポ変更)
                 for (index, ob) in body.enumerated() {
                     if let newBPM = BPMTable[ob] {
-                        BPMs.append((bpm: Double(newBPM), startPos: Double(bar) * 4.0 + unitBeat * Double(index)))
+                        var beatOffset: Double = 0.0
+                        for info in barLengthInformation {
+                            if bar > info.barNumber {
+                                beatOffset += info.offsetAfterTheBar
+                            }else{
+                                break
+                            }
+                        }
+                        BPMs.append((bpm: Double(newBPM), startPos: Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset))
                     }
                 }
             }
@@ -423,7 +502,7 @@ extension GameScene {   // bmsファイルを読み込む
     }
     
     
-    // ノーツが画面上に現れる時刻を返す(updateするかの判定に使用)
+    /// ノーツが画面上に現れる時刻を返す(updateするかの判定に使用)
     private func getAppearTime(_ beat: Double) -> TimeInterval {
         var appearTime = TimeInterval(-Dimensions.laneLength / self.speed)   // レーン端から端までかかる時間
         
