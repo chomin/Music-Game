@@ -11,7 +11,7 @@ import SpriteKit
 
 class Lane {
     
-    enum JudgeTimeState {    //enumはRange型をサポートしていないのでrawValueにRange型のものを代入することはできない
+    enum JudgeTimeState {    // enumはRange型をサポートしていないのでrawValueにRange型のものを代入することはできない
         case miss, bad, good, great, parfect, still, passed
     }
     
@@ -26,11 +26,16 @@ class Lane {
     private let badUpperBorder = 0.09
     private let missUpperBorder = 0.1
     
+    let laneIndex: Int!                 // どのレーンか
     var timeLag: TimeInterval = 0.0
     var isTimeLagSet = false
-    var laneNotes: [Note] = []   // 最初に全部格納する！
+    private var laneNotes: [Note] = []   // 最初に全部格納する！
     var isSetLaneNotes = false
-    let laneIndex: Int!
+    var isEmpty: Bool { return laneNotes.isEmpty }
+    var headNote: Note? { return laneNotes.first }
+    func append(_ note: Note) { laneNotes.append(note) }
+    func removeHeadNote() { laneNotes.removeFirst() }
+    
     var storedFlickJudgeInformation: (timeLag: TimeInterval, touch: UITouch)? {// (判定予定時間(movedが呼ばれた時間), タッチ情報)
         didSet {
             if let newTimeLag = storedFlickJudgeInformation?.timeLag {
@@ -55,8 +60,8 @@ class Lane {
         }
     }
     
-    // 次の判定ノーツがmiddleで、判定圏内にあり、perfectでなければ、その前後で.beforeか.afterを返す
-    // それ以外の場合は.otherwiseを返す
+    /// 次の判定ノーツがmiddleで、判定圏内にあり、perfectでなければ、その前後で.beforeか.afterを返す
+    /// それ以外の場合は.otherwiseを返す
     var middleObservationTimeState: ObsevationTimeState {
         get {
             guard self.isTimeLagSet,
@@ -71,7 +76,7 @@ class Lane {
         }
     }
     
-    //  次の判定ノーツがフリックで、前半判定圏内にあり、perfectでなければtrue。その他の場合falseを返す
+    ///  次の判定ノーツがフリックで、前半判定圏内にあり、perfectでなければtrue。その他の場合falseを返す
     var isFlickAndBefore: Bool {
         get {
             guard self.isTimeLagSet,
@@ -83,7 +88,7 @@ class Lane {
         }
     }
     
-    var judgeTimeState:JudgeTimeState{    //このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
+    var judgeTimeState: JudgeTimeState {    // このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
         get{
             guard self.isTimeLagSet else { return .still }
             
@@ -104,21 +109,21 @@ class Lane {
     func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]){
         
         // timeLagの更新
-        if isSetLaneNotes{
+        if isSetLaneNotes {
             
             if !(laneNotes.isEmpty) {
                 
                 timeLag = -passedTime
                 
-                for (index,i) in BPMs.enumerated(){
+                for (index, BPM) in BPMs.enumerated(){
                     if BPMs.count > index+1 &&
-                        laneNotes[0].beat > BPMs[index+1].startPos{ // indexが最後でない場合
+                        laneNotes[0].beat > BPMs[index+1].startPos { // indexが最後でない場合
                         
-                        timeLag += (BPMs[index+1].startPos - i.startPos)*60/i.bpm
+                        timeLag += (BPMs[index+1].startPos - BPM.startPos) * 60 / BPM.bpm
                         
-                    }else{
+                    } else {
                         
-                        timeLag += (laneNotes[0].beat - i.startPos)*60/i.bpm
+                        timeLag += (laneNotes[0].beat - BPM.startPos) * 60 / BPM.bpm
                         break
                     }
                 }
@@ -147,4 +152,5 @@ class Lane {
                                                           else           { return .passed }
         }
     }
+    
 }
