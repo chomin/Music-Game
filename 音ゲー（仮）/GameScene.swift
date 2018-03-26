@@ -363,10 +363,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             for gsTouch in self.allGSTouches {
                 
-                var pos = gsTouch.touch.location(in: self.view?.superview)
-                pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
+                let pos = gsTouch.touch.location(in: self.view?.superview)
                 
-                guard pos.y < Dimensions.buttonHeight else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
+                guard Dimensions.judgeYRange.contains(pos.y) else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
                     continue
                 }
                 
