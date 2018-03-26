@@ -33,9 +33,9 @@ class GSTouch { // 参照型として扱いたい
 
 // 同時押し線の画像情報
 class SameLine {
-    unowned var note1:Note
-    unowned var note2:Note
-    var line:SKShapeNode
+    unowned var note1: Note
+    unowned var note2: Note
+    var line: SKShapeNode
     
     init(note1: Note, note2: Note, line: SKShapeNode) {
         self.note1 = note1
@@ -76,7 +76,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var returnButton: UIButton!
     var continueButton: UIButton!
     
-    //ポーズ時のview
+    // ポーズ時のview
     var pauseView: UIView?
     
     // 音楽プレイヤー
@@ -92,7 +92,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var sameLines: [SameLine] = []  // 連動する始点側のノーツと同時押しライン
     
     // 楽曲データ
-    var musicName: MusicName       // 曲名
+    var musicName: MusicName    // 曲名
     var notes: [Note] = []      // ノーツの" 始 点 "の集合。
     var musicStartPos = 1.0     // BGM開始の"拍"！
     var genre = ""              // ジャンル
@@ -339,7 +339,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             note.update(passedTime)
         }
         
-        //レーンの更新
+        // レーンの更新
         for lane in lanes {
              lane.update(passedTime, self.BPMs)
         }
@@ -349,8 +349,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             let (note1, note2, line) = (sameLine.note1, sameLine.note2, sameLine.line)
             // 同時押しラインを移動
             line.position = note1.position
+            // 表示状態の更新
             line.isHidden = note1.image.isHidden || note2.image.isHidden
-            
             // 大きさも変更
             line.setScale(note1.image.xScale / Note.scale)
         }
@@ -361,23 +361,23 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         judgeQueue.sync {
             
             
-            for (touchIndex,value) in self.allGSTouches.enumerated() {
+            for gsTouch in self.allGSTouches {
                 
-                var pos = value.touch.location(in: self.view?.superview)
+                var pos = gsTouch.touch.location(in: self.view?.superview)
                 pos.y = self.frame.height - pos.y   // 上下逆転(画面下からのy座標に変換)
                 
                 guard pos.y < Dimensions.buttonHeight else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
                     continue
                 }
                 
-                for (laneIndex,judgeXRange) in Dimensions.judgeXRanges.enumerated() {
+                for (laneIndex, judgeXRange) in Dimensions.judgeXRanges.enumerated() {
                     
                     if judgeXRange.contains(pos.x) {   // ボタンの範囲
                         
                         if self.parfectMiddleJudge(lane: self.lanes[laneIndex]) { // middleの判定
                             
                             self.actionSoundSet.play(type: .middle)
-                            self.allGSTouches[touchIndex].isJudgeableFlickEnd = true
+                            gsTouch.isJudgeableFlickEnd = true
                             break
                         }
                     }
@@ -392,7 +392,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     
                     self.missJudge(lane: lane)
                     
-                }else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
+                } else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
                     if lane.timeLag < -storedFlickJudgeInformation.timeLag {
                         
                         self.storedFlickJudge(lane: lane)
@@ -401,7 +401,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             }
         }
         
-        //レーンの更新(再)(判定後、laneNotes[0]が入れ替わるので、それを反映させる)
+        // レーンの更新(再)(判定後、laneNotes[0]が入れ替わるので、それを反映させる)
         for lane in lanes {
             lane.update(passedTime, self.BPMs)
         }
@@ -431,7 +431,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     ///   - musicName: MusicName型で指定
     ///   - playMode: PlayMode型で指定（.YouTube　または　.YouTube2）
     /// - Returns: VideoID型
-    func getVideoID(musicName: MusicName, playMode: PlayMode) -> VideoID? {
+    private func getVideoID(musicName: MusicName, playMode: PlayMode) -> VideoID? {
         
         guard playMode != .BGM else {
             print("playModeは .YouTube か .YouTube2 のみ指定可能です")
