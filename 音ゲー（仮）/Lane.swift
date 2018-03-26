@@ -26,11 +26,16 @@ class Lane {
     private let badUpperBorder = 0.09
     private let missUpperBorder = 0.1
     
+    let laneIndex: Int!                 // どのレーンか
     var timeLag: TimeInterval = 0.0
     var isTimeLagSet = false
-    var laneNotes: [Note] = []   // 最初に全部格納する！
+    private var laneNotes: [Note] = []   // 最初に全部格納する！
     var isSetLaneNotes = false
-    let laneIndex: Int!
+    var isEmpty: Bool { return laneNotes.isEmpty }
+    var headNote: Note? { return laneNotes.first }
+    func append(_ note: Note) { laneNotes.append(note) }
+    func removeHeadNote() { laneNotes.removeFirst() }
+    
     var storedFlickJudgeInformation: (timeLag: TimeInterval, touch: UITouch)? {// (判定予定時間(movedが呼ばれた時間), タッチ情報)
         didSet {
             if let newTimeLag = storedFlickJudgeInformation?.timeLag {
@@ -71,7 +76,7 @@ class Lane {
         }
     }
     
-    //  次の判定ノーツがフリックで、前半判定圏内にあり、perfectでなければtrue。その他の場合falseを返す
+    ///  次の判定ノーツがフリックで、前半判定圏内にあり、perfectでなければtrue。その他の場合falseを返す
     var isFlickAndBefore: Bool {
         get {
             guard self.isTimeLagSet,
@@ -147,4 +152,5 @@ class Lane {
                                                           else           { return .passed }
         }
     }
+    
 }

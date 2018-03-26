@@ -290,12 +290,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // 各レーンにノーツをセット
         for note in notes {
-            lanes[note.laneIndex].laneNotes.append(note)
+            lanes[note.laneIndex].append(note)
             
             if let start = note as? TapStart {
                 var following = start.next
                 while(true) {
-                    lanes[following.laneIndex].laneNotes.append(following)
+                    lanes[following.laneIndex].append(following)
                     if let middle = following as? Middle {
                         following = middle.next
                     } else {
@@ -304,8 +304,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 }
             }
         }
-        for i in lanes { // レーンの設定
-            i.isSetLaneNotes = true
+        for lane in lanes { // レーンの設定
+            lane.isSetLaneNotes = true
         }
     }
     
@@ -387,7 +387,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
             for lane in self.lanes {
-                if lane.judgeTimeState == .passed && !(lane.laneNotes.isEmpty) {
+                if lane.judgeTimeState == .passed && !(lane.isEmpty) {
                     
                     self.missJudge(lane: lane)
                     

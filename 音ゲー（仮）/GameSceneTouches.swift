@@ -41,9 +41,9 @@ extension GameScene {
                         if (self.lanes[index].judgeTimeState == .still) ||
                             (self.lanes[index].judgeTimeState == .passed) { continue }
                         
-                        if self.lanes[index].laneNotes.isEmpty { continue }
+                        if self.lanes[index].isEmpty { continue }
                         
-                        let note = self.lanes[index].laneNotes[0]
+                        let note = self.lanes[index].headNote!
                         let distanceXToButton = abs(pos.x - Dimensions.buttonX[index])
                         
                         if self.lanes[index].middleObservationTimeState == .after {    // middleの判定圏内（後）
@@ -119,9 +119,9 @@ extension GameScene {
                     }
                     
                     // フリックの判定
-                    guard !(self.lanes[index].laneNotes.isEmpty) else { continue }
+                    guard !(self.lanes[index].isEmpty) else { continue }
                     
-                    let judgeNote = self.lanes[index].laneNotes[0]
+                    let judgeNote = self.lanes[index].headNote!
                     if moveDistance > 10 && self.lanes[index].judgeTimeState != .still &&
                                             self.lanes[index].judgeTimeState != .passed {
                         
@@ -239,8 +239,8 @@ extension GameScene {
                                 }
                             }
                             
-                            if self.lanes[index].laneNotes.isEmpty { continue }
-                            let note = self.lanes[index].laneNotes[0]
+                            if self.lanes[index].isEmpty { continue }
+                            let note = self.lanes[index].headNote
                             if note is TapEnd {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {    // 離しの判定
                                     
@@ -296,10 +296,10 @@ extension GameScene {
     /// - Returns: 成否をBoolで返す
     func judge(lane: Lane, timeLag: TimeInterval, touch: GSTouch?) -> Bool {
         
-        guard !(lane.laneNotes.isEmpty),
+        guard !(lane.isEmpty),
                 lane.isJudgeRange else { return false }
         
-        let judgeNote = lane.laneNotes.first!
+        let judgeNote = lane.headNote!
         
         guard judgeNote.isJudgeable else { return false }
         
@@ -404,9 +404,9 @@ extension GameScene {
     // 受け取ったLaneの先頭ノーツを判定する。失敗したらfalseを返す。middleのperfect専用
     func parfectMiddleJudge(lane: Lane) -> Bool {
         
-        guard !(lane.laneNotes.isEmpty),
-              lane.laneNotes[0] is Middle,
-              lane.laneNotes[0].isJudgeable else { return false }
+        guard !(lane.isEmpty),
+              lane.headNote is Middle,
+              lane.headNote!.isJudgeable else { return false }
         
 //        lane.update(passedTime, BPMs)
         
@@ -418,8 +418,8 @@ extension GameScene {
             if ResultScene.combo > ResultScene.maxCombo {
                 ResultScene.maxCombo += 1
             }
-            lane.laneNotes[0].isJudged = true
-            setNextIsJudgeable(judgeNote: lane.laneNotes[0])
+            lane.headNote!.isJudged = true
+            setNextIsJudgeable(judgeNote: lane.headNote!)
             releaseNote(lane: lane)
             return true
         default:
@@ -431,13 +431,13 @@ extension GameScene {
     
     @discardableResult
     func missJudge(lane: Lane) -> Bool {
-        guard lane.laneNotes[0].isJudgeable else { return false }
+        guard !(lane.isEmpty), lane.headNote!.isJudgeable else { return false }
         
         setJudgeLabelText(text: "miss!")
         ResultScene.miss += 1
         ResultScene.combo = 0
-        lane.laneNotes[0].isJudged = true
-        setNextIsJudgeable(judgeNote: lane.laneNotes[0])
+        lane.headNote!.isJudged = true
+        setNextIsJudgeable(judgeNote: lane.headNote!)
         releaseNote(lane: lane)
         return true
     }
@@ -454,24 +454,24 @@ extension GameScene {
     
     func releaseNote(lane: Lane) {  // ノーツや同時押し線、関連ノードを開放する
         
-        if let i = sameLines.index(where: { $0.note1 === lane.laneNotes.first! } ) {    //同時押し線を解放
+        if let i = sameLines.index(where: { $0.note1 === lane.headNote! } ) {    //同時押し線を解放
             
             sameLines.remove(at: i)
-        } else if let i = sameLines.index(where: { $0.note2 === lane.laneNotes.first! } ) { //同時押し線を解放
+        } else if let i = sameLines.index(where: { $0.note2 === lane.headNote! } ) { //同時押し線を解放
             
             sameLines.remove(at: i)
         }
-        if let note = lane.laneNotes.first! as? TapEnd {        //始点から終点まで、連鎖的に参照を削除
+        if let note = lane.headNote! as? TapEnd {        //始点から終点まで、連鎖的に参照を削除
             let index = notes.index(where: { $0 === note.start } )
             notes.remove(at: index!)
-        } else if let note = lane.laneNotes.first! as? FlickEnd {
+        } else if let note = lane.headNote! as? FlickEnd {
             let index = notes.index(where: { $0 === note.start } )
             notes.remove(at: index!)
-        } else if lane.laneNotes.first! is Tap || lane.laneNotes.first! is Flick {
-            let index = notes.index(where: { $0 === lane.laneNotes.first! } )
+        } else if lane.headNote! is Tap || lane.headNote! is Flick {
+            let index = notes.index(where: { $0 === lane.headNote! } )
             notes.remove(at: index!)
         }
-        lane.laneNotes.removeFirst()                // レーンからの参照を削除
+        lane.removeHeadNote()                // レーンからの参照を削除
         
     }
 }
