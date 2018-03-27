@@ -366,10 +366,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 
                 let pos = gsTouch.touch.location(in: self.view?.superview)
                 
-//                guard Dimensions.judgeYRange.contains(pos.y) else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
-//                    continue
-//                }
-                
                 for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
                     
                     if judgeRect.contains(pos) {   // ボタンの範囲
