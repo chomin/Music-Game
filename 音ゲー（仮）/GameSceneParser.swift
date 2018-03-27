@@ -198,9 +198,6 @@ extension GameScene {   // bmsファイルを読み込む
             case twoFourths   = "0.5"
             case aFourth      = "0.25"
             
-//            func getBeatOffsetAfterTheBar(barLength: BarLength) -> Double {
-//
-//            }
         }
         
         var barLengthInformation: [(type: BarLength, barNumber: Int, offsetAfterTheBar: Double)] = []   //　小節の長さ変更分の情報
@@ -218,9 +215,9 @@ extension GameScene {   // bmsファイルを読み込む
             }
         }
         
-        for (bar, channel, body) in processedMainData { // 行ごとに処理
+        for (bar, channel, body) in processedMainData { // 行ごとに処理。bmsには1行あたり1小節分の情報がある
             
-            var unitBeat = 4.0 / Double(body.count) // その小節における1オブジェクトの長さ(拍単位)
+            var unitBeat = 4.0 / Double(body.count) // その小節における1オブジェクトの長さ(拍単位。行内のオブジェクトで共通。)
             for info in barLengthInformation {
                 if info.barNumber == bar {
                     switch info.type {
@@ -232,19 +229,20 @@ extension GameScene {   // bmsファイルを読み込む
                 }
             }
             
+            var beatOffset: Double = 0.0    // その小節の全オブジェクトに対する泊数の調整
+            for info in barLengthInformation {
+                if bar > info.barNumber {
+                    beatOffset += info.offsetAfterTheBar
+                }else{
+                    break
+                }
+            }
             
             if let lane = laneMap[channel] {
                 // ノーツ指定チャンネルだったとき
-                for (index, ob) in body.enumerated() {
+                for (index, ob) in body.enumerated() {  // オブジェクト単位での処理。
                     autoreleasepool{
-                        var beatOffset: Double = 0.0
-                        for info in barLengthInformation {
-                            if bar > info.barNumber {
-                                beatOffset += info.offsetAfterTheBar
-                            }else{
-                                break
-                            }
-                        }
+
                         let beat = Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset
                         switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
                         case .rest:
@@ -320,14 +318,7 @@ extension GameScene {   // bmsファイルを読み込む
                 // 楽曲開始命令の処理
                 for (index, ob) in body.enumerated() {
                     if ob == "10" {
-                        var beatOffset: Double = 0.0
-                        for info in barLengthInformation {
-                            if bar > info.barNumber {
-                                beatOffset += info.offsetAfterTheBar
-                            }else{
-                                break
-                            }
-                        }
+                        
                         musicStartPosSet.append(Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset)
                         break
                     }
@@ -339,14 +330,7 @@ extension GameScene {   // bmsファイルを読み込む
                         continue
                     }
                     if let newBPM = Int(ob, radix: 16) {
-                        var beatOffset: Double = 0.0
-                        for info in barLengthInformation {
-                            if bar > info.barNumber {
-                                beatOffset += info.offsetAfterTheBar
-                            }else{
-                                break
-                            }
-                        }
+                        
                         BPMs.append((bpm: Double(newBPM), startPos: Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset))
                     }
                 }
@@ -354,14 +338,7 @@ extension GameScene {   // bmsファイルを読み込む
                 // BPM変更命令の処理(インデックス型テンポ変更)
                 for (index, ob) in body.enumerated() {
                     if let newBPM = BPMTable[ob] {
-                        var beatOffset: Double = 0.0
-                        for info in barLengthInformation {
-                            if bar > info.barNumber {
-                                beatOffset += info.offsetAfterTheBar
-                            }else{
-                                break
-                            }
-                        }
+            
                         BPMs.append((bpm: Double(newBPM), startPos: Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset))
                     }
                 }
@@ -518,3 +495,5 @@ extension GameScene {   // bmsファイルを読み込む
         return appearTime
     }
 }
+    
+
