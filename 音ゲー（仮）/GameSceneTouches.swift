@@ -221,6 +221,7 @@ extension GameScene {
                         }
                     }
                     
+                    
                     // posループ
                     for (index, judgeXRange) in Dimensions.judgeXRanges.enumerated()  {
                         

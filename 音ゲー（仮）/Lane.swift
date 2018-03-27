@@ -26,7 +26,7 @@ class Lane {
     private let badUpperBorder = 0.09
     private let missUpperBorder = 0.1
     
-    let laneIndex: Int!                 // どのレーンか
+    let laneIndex: Int                // どのレーンか
     var timeLag: TimeInterval = 0.0
     var isTimeLagSet = false
     private var laneNotes: [Note] = []   // 最初に全部格納する！
