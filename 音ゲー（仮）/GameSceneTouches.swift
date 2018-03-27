@@ -27,16 +27,24 @@ extension GameScene {
                     guard lane.isTimeLagSet else { continue uiTouchLoop }
                 }
                 
-                guard Dimensions.judgeYRange.contains(pos.y) else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
+                
+                var isJudgeRangePos = false // いずれかの判定圏内に入っているか
+                for rect in Dimensions.judgeRects {
+                    if rect.contains(pos) {
+                        isJudgeRangePos = true
+                        break
+                    }
+                }
+                guard isJudgeRangePos else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する(kara用)
                     continue
                 }
 
                 
                 // 判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
                 var nearbyNotes: [(laneIndex: Int, timelag: TimeInterval, note: Note, distanceXToButton: CGFloat)] = []
-                for (index, judgeXRange) in Dimensions.judgeXRanges.enumerated() {
+                for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
                     
-                    if judgeXRange.contains(pos.x) {    // ボタンの範囲
+                    if judgeRect.contains(pos) {    // ボタンの範囲
                         
                         if (self.lanes[index].judgeTimeState == .still) ||
                             (self.lanes[index].judgeTimeState == .passed) { continue }
@@ -102,12 +110,12 @@ extension GameScene {
                 var nearbyNotes: [(laneIndex: Int, timelag: TimeInterval, note: Note, distanceXToButton: CGFloat)] = []
                 
                 // pposループ
-                for (index, judgeXRange) in Dimensions.judgeXRanges.enumerated() {
+                for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
                     
-                    guard Dimensions.judgeYRange.contains(ppos.y) else { break } // このループでは、移動直前の位置がボタンの判定圏内にあるtouchのみを処理する
-                    
-                    if judgeXRange.contains(ppos.x) {
-                        if !(judgeXRange.contains(pos.x)) || !(Dimensions.judgeYRange.contains(pos.y)) { // 移動後にレーンから外れていた場合は、外れる直前にいた時間で判定
+//                    guard Dimensions.judgeYRange.contains(ppos.y) else { break } // このループでは、移動直前の位置がボタンの判定圏内にあるtouchのみを処理する
+//                    
+                    if judgeRect.contains(ppos) {
+                        if !(judgeRect.contains(pos)) { // 移動後にレーンから外れていた場合は、外れる直前にいた時間で判定
                             
                             if self.lanes[index].middleObservationTimeState == .before {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
@@ -116,26 +124,28 @@ extension GameScene {
                                 }
                             }
                         }
-                    }
-                    
-                    // フリックの判定
-                    guard !(self.lanes[index].isEmpty) else { continue }
-                    
-                    let judgeNote = self.lanes[index].headNote!
-                    if moveDistance > 10 && self.lanes[index].judgeTimeState != .still &&
-                                            self.lanes[index].judgeTimeState != .passed {
                         
-                        let gsTouch = self.allGSTouches[touchIndex] // エイリアス
+                        // フリックの判定
+                        guard !(self.lanes[index].isEmpty) else { continue }
                         
-                        if ((judgeNote is Flick) && gsTouch.isJudgeableFlick) ||
-                            ((judgeNote is FlickEnd) && gsTouch.isJudgeableFlickEnd) {
-                            // ソート開始!
-                            let distanceXToButton = abs(ppos.x - Dimensions.buttonX[index])
+                        let judgeNote = self.lanes[index].headNote!
+                        if moveDistance > 10 && self.lanes[index].judgeTimeState != .still &&
+                            self.lanes[index].judgeTimeState != .passed {
                             
-                            nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: judgeNote, distanceXToButton: distanceXToButton))
-                            continue
+                            let gsTouch = self.allGSTouches[touchIndex] // エイリアス
+                            
+                            if ((judgeNote is Flick) && gsTouch.isJudgeableFlick) ||
+                                ((judgeNote is FlickEnd) && gsTouch.isJudgeableFlickEnd) {
+                                // ソート開始!
+                                let distanceXToButton = abs(ppos.x - Dimensions.buttonX[index])
+                                
+                                nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: judgeNote, distanceXToButton: distanceXToButton))
+                                continue
+                            }
                         }
                     }
+                    
+                   
                 }
                 
                 if !(nearbyNotes.isEmpty) {
@@ -164,8 +174,8 @@ extension GameScene {
                 
                 
                 // middleの話。afterで、外から中に入ってきた時は、その時判定する
-               for (index, judgeXRange) in Dimensions.judgeXRanges.enumerated() {
-                    if judgeXRange.contains(pos.x) && Dimensions.judgeYRange.contains(pos.y) {
+               for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
+                    if !(judgeRect.contains(ppos)) && judgeRect.contains(pos) {
                         
                         if self.lanes[index].middleObservationTimeState == .after {    // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
                             if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
@@ -178,7 +188,7 @@ extension GameScene {
                 
                 // storedFlickについて、指がレーンから外れていた場合、これ以上待っても決してperfectにはならないので、即判定してしまう。
                 if let buttonXAndLaneIndex = self.allGSTouches[touchIndex].storedFlickJudgeLaneIndex {
-                    if !(Dimensions.judgeXRanges[buttonXAndLaneIndex].contains(pos.x)) || !(Dimensions.judgeYRange.contains(pos.y)) {
+                    if !(Dimensions.judgeRects[buttonXAndLaneIndex].contains(pos)) {
                         
                         storedFlickJudge(lane: lanes[buttonXAndLaneIndex])
                     }
@@ -207,26 +217,25 @@ extension GameScene {
                     
                     
                     // pposループ
-                    for (index, judgeXRange) in Dimensions.judgeXRanges.enumerated() {
-                        if  judgeXRange.contains(ppos.x) && Dimensions.judgeYRange.contains(ppos.y) {
-                            if !(judgeXRange.contains(pos.x)) || !(Dimensions.judgeYRange.contains(pos.y)) {   // 移動後にレーンから外れていた場合
-                                if self.lanes[index].middleObservationTimeState == .before {
-                                    if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                        self.actionSoundSet.play(type: .middle)
-                                        
-                                        break
-                                    }
+                    for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
+                        if  judgeRect.contains(ppos) && !(judgeRect.contains(pos)) { // 移動後にレーンから外れていた場合
+                            
+                            if self.lanes[index].middleObservationTimeState == .before {
+                                if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
+                                    self.actionSoundSet.play(type: .middle)
+                                    
+                                    break
                                 }
                             }
+                            
                         }
                     }
                     
+                    
                     // posループ
-                    for (index, judgeXRange) in Dimensions.judgeXRanges.enumerated()  {
+                    for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
                         
-                        guard Dimensions.judgeYRange.contains(pos.y) else { continue }   // 以下、移動後の座標がボタン内である場合のみ処理を行う
-                        
-                        if judgeXRange.contains(pos.x) {  // ボタンの範囲
+                        if judgeRect.contains(pos) {  // ボタンの範囲
                             if self.lanes[index].middleObservationTimeState == .before { // 早めに指を離した場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
                                     self.actionSoundSet.play(type: .middle)
