@@ -104,8 +104,6 @@ class Dimensions {
     private let judgeLineY: CGFloat                 // 判定線のy座標
     private let iconButtonSize: CGFloat             // アイコンの大きさ
     private var buttonX: [CGFloat] = []             // 各レーンの中心のx座標
-//    private var judgeXRanges: [Range<CGFloat>] = [] // 各レーンの判定をするx座標についての範囲
-//    private let judgeYRange:   Range<CGFloat>       // 判定をするy座標についての範囲
     private var judgeRects: [CGRect] = []           // 各レーンの判定をする範囲(長方形)
     // 立体感を出すための定数
     private let horizontalDistance: CGFloat = 250   // 画面から目までの水平距離a（約5000で10cmほど）
@@ -133,9 +131,8 @@ class Dimensions {
             buttonX.append(frame.width/6 + CGFloat(i)*laneWidth)
         }
         
-//        self.judgeXRanges = buttonX.map({ $0 - halfBound ..< $0 + halfBound })
-//        self.judgeYRange = (frame.height - judgeLineY * 2) ..< frame.height
-        self.judgeRects = buttonX.map({ CGRect(x: $0-halfBound, y: frame.height - judgeLineY*2, width: halfBound*2 , height: judgeLineY*2) })
+
+        self.judgeRects = buttonX.map({ CGRect(x: $0-halfBound, y: frame.height/2, width: halfBound*2 , height: frame.height/2) })
     }
     
     // これらクラスプロパティから、定数にアクセスする(createInstanceされてなければ全て0)
@@ -149,8 +146,6 @@ class Dimensions {
     static var verticalDistance:   CGFloat         { return Dimensions.instance?.verticalDistance   ??  CGFloat(0)        }
     static var R:                  CGFloat         { return Dimensions.instance?.R                  ??  CGFloat(0)        }
     static var buttonX:           [CGFloat]        { return Dimensions.instance?.buttonX            ?? [CGFloat]()        }
-//    static var judgeXRanges:      [Range<CGFloat>] { return Dimensions.instance?.judgeXRanges       ?? [Range<CGFloat>]() }
-//    static var judgeYRange:        Range<CGFloat>  { return Dimensions.instance?.judgeYRange        ??  0..<0             }
     static var judgeRects:        [CGRect]         { return Dimensions.instance?.judgeRects         ?? [CGRect]()         }
     // この関数のみが唯一Dimensionsクラスをインスタンス化できる
     static func createInstance(frame: CGRect) {

@@ -27,9 +27,17 @@ extension GameScene {
                     guard lane.isTimeLagSet else { continue uiTouchLoop }
                 }
                 
-//                guard Dimensions.judgeYRange.contains(pos.y) else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する
-//                    continue
-//                }
+                
+                var isJudgeRangePos = false // いずれかの判定圏内に入っているか
+                for rect in Dimensions.judgeRects {
+                    if rect.contains(pos) {
+                        isJudgeRangePos = true
+                        break
+                    }
+                }
+                guard isJudgeRangePos else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する(kara用)
+                    continue
+                }
 
                 
                 // 判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
