@@ -108,14 +108,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     let lanes = [Lane(laneIndex: 0), Lane(laneIndex: 1), Lane(laneIndex: 2), Lane(laneIndex: 3), Lane(laneIndex: 4), Lane(laneIndex: 5), Lane(laneIndex: 6)]     // レーン
     
-    private let speedRatio: CGFloat
+    private let userSpeedRatio: CGFloat
     
     
     init(musicName: MusicName, playMode: PlayMode, size: CGSize, speedRatioInt: UInt) {   // YouTube用
 
         self.musicName = musicName
         self.playMode = playMode
-        self.speedRatio = CGFloat(speedRatioInt) / 100
+        self.userSpeedRatio = CGFloat(speedRatioInt) / 100
         
         
         super.init(size: size)
@@ -144,7 +144,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 print("ロードに失敗")
                 
                 // BGMモードへ移行
-                let scene = GameScene(musicName: self.musicName, playMode: .BGM, size: (view?.bounds.size)!, speedRatioInt: UInt(self.speedRatio*100))
+                let scene = GameScene(musicName: self.musicName, playMode: .BGM, size: (view?.bounds.size)!, speedRatioInt: UInt(self.userSpeedRatio*100))
                 let skView = view as SKView?    // このviewはGameViewControllerのskView2
                 skView?.showsFPS = true
                 skView?.showsNodeCount = true
@@ -199,7 +199,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // Noteクラスのクラスプロパティを設定
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration()    // BGMまたは映像の長さ
-        Note.setConstants(BPMs, speedRatio, duration)
+        Note.setConstants(BPMs, userSpeedRatio, duration)
         
         //リザルトの初期化
         ResultScene.parfect = 0
@@ -547,7 +547,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         print(error)
         
         //BGMモードへ移行
-        let scene = GameScene(musicName:self.musicName, playMode: .BGM ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.speedRatio*100))
+        let scene = GameScene(musicName:self.musicName, playMode: .BGM ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.userSpeedRatio*100))
         let skView = view as SKView?    //このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true

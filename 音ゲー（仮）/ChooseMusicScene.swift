@@ -14,7 +14,7 @@ import GameplayKit
 class ChooseMusicScene: SKScene {
     
     enum Keys: String {
-        case speedRatioInt = "SpeedRatioInt"
+        case userSpeedRatioInt = "userSpeedRatioInt"
     }
     
     var picker:PickerKeyboard!
@@ -49,14 +49,14 @@ class ChooseMusicScene: SKScene {
     
     let defaults = UserDefaults.standard
     
-    var speedRatioInt:UInt = 0
+    var userSpeedRatioInt:UInt = 0
     
     
     
     
     override func didMove(to view: SKView) {
         
-        defaults.register(defaults: [Keys.speedRatioInt.rawValue : 100])    // 初期値を設定(値がすでに入ってる場合は無視される)
+        defaults.register(defaults: [Keys.userSpeedRatioInt.rawValue : 100])    // 初期値を設定(値がすでに入ってる場合は無視される)
         
         speedsPosY = Dimensions.iconButtonSize*3
         
@@ -212,7 +212,7 @@ class ChooseMusicScene: SKScene {
     }
     
     override func update(_ currentTime: TimeInterval) {
-        speedLabel.text = String(speedRatioInt) + "%"
+        speedLabel.text = String(userSpeedRatioInt) + "%"
     }
     
     @objc func onClickPlayButton(_ sender : UIButton) {
@@ -230,12 +230,12 @@ class ChooseMusicScene: SKScene {
             
             //ネタバレ注意！
             if pickerTextStore == "オラシオン" &&
-                (defaults.integer(forKey: Keys.speedRatioInt.rawValue) <= 21 ||
-                defaults.integer(forKey: Keys.speedRatioInt.rawValue) >= 201) { playMode = .YouTube2 /* 裏シオン */ }
+                (defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue) <= 21 ||
+                defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue) >= 201) { playMode = .YouTube2 /* 裏シオン */ }
             
-            scene = GameScene(musicName: MusicName(rawValue: pickerTextStore)!, playMode: playMode, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
+            scene = GameScene(musicName: MusicName(rawValue: pickerTextStore)!, playMode: playMode, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
         }else{
-            scene = GameScene(musicName: MusicName(rawValue: picker.textStore)! ,playMode: .BGM ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)))
+            scene = GameScene(musicName: MusicName(rawValue: picker.textStore)! ,playMode: .BGM ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
         }
         
        
@@ -260,25 +260,25 @@ class ChooseMusicScene: SKScene {
     }
     
     @objc func onClickPlusButton(_ sender : UIButton){
-        speedRatioInt += 1
+        userSpeedRatioInt += 1
     }
     
     @objc func onClickPlus10Button(_ sender : UIButton){
-        speedRatioInt += 10
+        userSpeedRatioInt += 10
     }
     
     @objc func onClickMinusButton(_ sender : UIButton){
-        if speedRatioInt > 0 { speedRatioInt -= 1 }
+        if userSpeedRatioInt > 0 { userSpeedRatioInt -= 1 }
     }
     
     @objc func onClickMinus10Button(_ sender : UIButton){
-        if speedRatioInt > 10 { speedRatioInt -= 10 }
-        else 			    { speedRatioInt =  0  }
+        if userSpeedRatioInt > 10 { userSpeedRatioInt -= 10 }
+        else 			    { userSpeedRatioInt =  0  }
     }
     
     @objc func onClickSaveAndBackButton(_ sender : UIButton){
         //保存
-        defaults.set(speedRatioInt, forKey: Keys.speedRatioInt.rawValue)
+        defaults.set(userSpeedRatioInt, forKey: Keys.userSpeedRatioInt.rawValue)
         
         //消して表示
         hideSettingContents()
@@ -323,7 +323,7 @@ class ChooseMusicScene: SKScene {
         minusButton.isHidden = false
         minus10Button.isHidden = false
         
-        speedRatioInt = UInt(defaults.integer(forKey: Keys.speedRatioInt.rawValue)) //読み出し
+        userSpeedRatioInt = UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)) //読み出し
     }
     
     func hideSettingContents() {
