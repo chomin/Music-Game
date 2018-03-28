@@ -30,7 +30,6 @@ class Lane {
     var timeLag: TimeInterval = 0.0
     var isTimeLagSet = false
     private var laneNotes: [Note] = []   // 最初に全部格納する！
-    var isSetLaneNotes = false
     var isEmpty: Bool { return laneNotes.isEmpty }
     var headNote: Note? { return laneNotes.first }
     func append(_ note: Note) { laneNotes.append(note) }
@@ -109,28 +108,23 @@ class Lane {
     func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]){
         
         // timeLagの更新
-        if isSetLaneNotes {
+        
+        if !(laneNotes.isEmpty) {
             
-            if !(laneNotes.isEmpty) {
-                
-                timeLag = -passedTime
-                
-                for (index, BPM) in BPMs.enumerated(){
-                    if BPMs.count > index+1 &&
-                        laneNotes[0].beat > BPMs[index+1].startPos { // indexが最後でない場合
-                        
-                        timeLag += (BPMs[index+1].startPos - BPM.startPos) * 60 / BPM.bpm
-                        
-                    } else {
-                        
-                        timeLag += (laneNotes[0].beat - BPM.startPos) * 60 / BPM.bpm
-                        break
-                    }
+            timeLag = -passedTime
+            
+            for (index, BPM) in BPMs.enumerated(){
+                if BPMs.count > index+1 &&
+                    laneNotes[0].beat > BPMs[index+1].startPos { // indexが最後でない場合
+                    
+                    timeLag += (BPMs[index+1].startPos - BPM.startPos) * 60 / BPM.bpm
+                    
+                } else {
+                    
+                    timeLag += (laneNotes[0].beat - BPM.startPos) * 60 / BPM.bpm
+                    break
                 }
-                
-                
             }
-            
             self.isTimeLagSet = true    // パース前はtimeLagは更新されないので(このレーンが使われない場合でも)通知する必要あり.
         }
     }

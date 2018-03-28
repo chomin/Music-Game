@@ -305,14 +305,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 }
             }
         }
-        for lane in lanes { // レーンの設定
-            lane.isSetLaneNotes = true
-        }
     }
     
     
     override func update(_ currentTime: TimeInterval) {
-        
+       
         // 経過時間の更新
         if self.playMode == .BGM {
             if BGM.currentTime > 0 {
