@@ -94,6 +94,11 @@ enum PlayMode {
     case BGM, YouTube, YouTube2
 }
 
+extension CGRect {
+    var XRange: Range<CGFloat> { return self.minX ..< self.maxX }
+    var YRange: Range<CGFloat> { return self.minY ..< self.maxY }
+}
+
 /// 寸法に関する定数を提供(シングルトン)。GameSceneのframeをもとに決定される。
 class Dimensions {
     //インスタンスが保持し、このクラス内からの記述でのみアクセスできる変数。staticで呼び出されたときにこれらに格納されている値を返す。(frameが不要なものは初期値をここで定義)
