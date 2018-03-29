@@ -92,9 +92,12 @@ extension GameScene {   // bmsファイルを読み込む
             "GENRE":     { value in self.genre     = value },
             "TITLE":     { value in self.title     = value },
             "ARTIST":    { value in self.artist    = value },
+            "VIDEOID":   { value in if self.playMode == .YouTube  { self.videoID = value } },
+            "VIDEOID2":  { value in if self.playMode == .YouTube2 { self.videoID = value } },
             "BPM":       { value in if let num = Double(value) { self.BPMs = [(num, 0.0)] } },
             "PLAYLEVEL": { value in if let num = Int(value) { self.playLevel = num } },
             "VOLWAV":    { value in if let num = Int(value) { self.volWav = num } }
+            
         ]
         
         // 1行ずつ処理

@@ -215,11 +215,15 @@ class ChooseMusicScene: SKScene {
         speedLabel.text = String(userSpeedRatioInt) + "%"
     }
     
-    @objc func onClickPlayButton(_ sender : UIButton) {
+    override func willMove(from view: SKView) {
         // 消す
         hideMainContents()
         
         picker.resignFirstResponder()   // FirstResponderを放棄
+    }
+    
+    @objc func onClickPlayButton(_ sender : UIButton) {
+        
         
         // 移動
         let scene: GameScene

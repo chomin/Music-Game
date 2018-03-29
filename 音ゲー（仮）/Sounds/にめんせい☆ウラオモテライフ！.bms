@@ -2,13 +2,14 @@
 *---------------------- HEADER FIELD
 
 #PLAYER 1
-#GENRE 
+#GENRE
 #TITLE にめんせい☆ウラオモテライフ！
 #ARTIST 土間　埋（CV:田中あいみ）
 #BPM 170
 #PLAYLEVEL 28
 #RANK 3
-#STAGEFILE 
+#STAGEFILE
+#VIDEOID TyMx4pu7kA0
 
 #WAV01 タップ.wav
 #WAV02 フリック.wav
@@ -437,4 +438,3 @@
 
 
 #06801:11
-
