@@ -124,7 +124,7 @@ extension GameScene {   // bmsファイルを読み込む
         /*--- メインデータをパース ---*/
         
         // 利用可能なチャンネル番号
-        let availableChannels = [1, 2, 3, 8, 11, 12, 13, 14, 15, 18, 19, 20]
+        let availableChannels = [1, 2, 3, 8, 11, 12, 13, 14, 15, 18, 19, 21]
         
         // チャンネルとレーンの対応付け(辞書)
         let laneMap = [11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6]
@@ -221,8 +221,8 @@ extension GameScene {   // bmsファイルを読み込む
         }
         
         // 次にノーツスピード倍率命令を処理
-        for (bar, channel, body) in processedMainData {     // TODO: 該当Noteインスタンスをうまく探せるならばインスタンス化時にはデフォルトのままで、後で変更するようにし、このループを下のメインループ内で行っても良い
-            if channel == 20 {
+        for (bar, channel, body) in processedMainData {
+            if channel == 21 {
                 // ノーツのスピード倍率変更命令の処理
                 var unitBeat = 4.0 / Double(body.count) // その小節における1オブジェクトの長さ(拍単位。行内のオブジェクトで共通。)
                 for info in barLengthInformation {
@@ -246,7 +246,7 @@ extension GameScene {   // bmsファイルを読み込む
                 }
                 
                 for (index, ob) in body.enumerated() {  // オブジェクト単位での処理。
-                    if ob != "10" { // 1倍は無視する
+                    if ob != "10" && ob != "00" { // 1倍は無視する
                         noteSpeedRatioInformation.append((beat: Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset, noteSpeedRatio: CGFloat(atof(ob)) / CGFloat(16)))
                     }
                 }
