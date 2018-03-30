@@ -28,14 +28,7 @@ extension GameScene {
                 }
                 
                 
-                var isJudgeRangePos = false // いずれかの判定圏内に入っているか
-                for rect in Dimensions.judgeRects {
-                    if rect.contains(pos) {
-                        isJudgeRangePos = true
-                        break
-                    }
-                }
-                guard isJudgeRangePos else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する(kara用)
+                guard Dimensions.judgeRects[0].YRange.contains(pos.y) else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する(kara用)。judgeRect.YRangeは共通のはずなので、とりあえず先頭のものを使用。
                     continue
                 }
 

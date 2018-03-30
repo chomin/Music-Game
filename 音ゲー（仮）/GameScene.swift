@@ -99,6 +99,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var genre = ""              // ジャンル
     var title = ""              // タイトル
     var artist = ""             // アーティスト
+    var videoID = ""            // YouTubeのvideoID
     var playLevel = 0           // 難易度
     var volWav = 100            // 音量を現段階のn%として出力するか(TODO: 未実装)
     var BPMs: [(bpm: Double, startPos: Double)] = []        // 可変BPM情報
@@ -108,51 +109,19 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     let lanes = [Lane(laneIndex: 0), Lane(laneIndex: 1), Lane(laneIndex: 2), Lane(laneIndex: 3), Lane(laneIndex: 4), Lane(laneIndex: 5), Lane(laneIndex: 6)]     // レーン
     
-    private let speedRatio: CGFloat
+    private let userSpeedRatio: CGFloat
     
     
     init(musicName: MusicName, playMode: PlayMode, size: CGSize, speedRatioInt: UInt) {   // YouTube用
 
         self.musicName = musicName
         self.playMode = playMode
-        self.speedRatio = CGFloat(speedRatioInt) / 100
+        self.userSpeedRatio = CGFloat(speedRatioInt) / 100
         
         
         super.init(size: size)
         
-        switch playMode {
-        case .BGM:
-            // サウンドファイルのパスを生成
-            let Path = Bundle.main.path(forResource: "Sounds/" + musicName.rawValue, ofType: "mp3")!     // m4a,oggは不可
-            let soundURL = URL(fileURLWithPath: Path)
-            // AVAudioPlayerのインスタンスを作成
-            do {
-                BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
-            } catch {
-                print("AVAudioPlayerインスタンス作成失敗")
-                exit(1)
-            }
-            // バッファに保持していつでも再生できるようにする
-            BGM.prepareToPlay()
-            
-        case .YouTube, .YouTube2:
-            let videoID = getVideoID(musicName: musicName, playMode: playMode)!
-            
-            self.playerView = YTPlayerView(frame: self.frame)
-            // 詳しい使い方はJump to Definitionへ
-            if !(self.playerView.load(withVideoId: videoID.rawValue, playerVars: ["autoplay": 1, "controls": 0, "playsinline": 1, "rel": 0, "showinfo": 0])) {
-                print("ロードに失敗")
-                
-                // BGMモードへ移行
-                let scene = GameScene(musicName: self.musicName, playMode: .BGM, size: (view?.bounds.size)!, speedRatioInt: UInt(self.speedRatio*100))
-                let skView = view as SKView?    // このviewはGameViewControllerのskView2
-                skView?.showsFPS = true
-                skView?.showsNodeCount = true
-                skView?.ignoresSiblingOrder = true
-                scene.scaleMode = .resizeFill
-                skView?.presentScene(scene)  // GameSceneに移動
-            }
-        }
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -162,6 +131,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     override func didMove(to view: SKView) {
         
+      
+        
         // ボタンの設定
         pauseButton = {() -> UIButton in
             let Button = UIButton()
@@ -169,7 +140,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             Button.setImage(UIImage(named: ImageName.pause.rawValue), for: .normal)
             Button.setImage(UIImage(named: ImageName.pauseSelected.rawValue), for: .highlighted)
             Button.addTarget(self, action: #selector(onClickPauseButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize) // yは上からの座標
             self.view?.addSubview(Button)
 
             return Button
@@ -197,9 +168,47 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         catch ParseError.unexpected     (let msg) { print(msg) }
         catch                                     { print("未知のエラー") }
         
+        
+        // BGMまたはYouTubeのプレイヤーを作成(必ずパース後に実行する。(videoIDを読み込むため))
+        switch playMode {
+        case .BGM:
+            // サウンドファイルのパスを生成
+            let Path = Bundle.main.path(forResource: "Sounds/" + musicName.rawValue, ofType: "mp3")!     // m4a,oggは不可
+            let soundURL = URL(fileURLWithPath: Path)
+            // AVAudioPlayerのインスタンスを作成
+            do {
+                BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
+            } catch {
+                print("AVAudioPlayerインスタンス作成失敗")
+                exit(1)
+            }
+            // バッファに保持していつでも再生できるようにする
+            BGM.prepareToPlay()
+            
+        case .YouTube, .YouTube2:
+            
+            self.playerView = YTPlayerView(frame: self.frame)
+            // 詳しい使い方はJump to Definitionへ
+            if !(self.playerView.load(withVideoId: videoID, playerVars: ["autoplay": 1, "controls": 0, "playsinline": 1, "rel": 0, "showinfo": 0])) {
+                print("ロードに失敗")
+                
+                // BGMモードへ移行
+                let scene = GameScene(musicName: self.musicName, playMode: .BGM, size: view.bounds.size, speedRatioInt: UInt(self.userSpeedRatio*100))
+                let skView = view as SKView?    // このviewはGameViewControllerのskView2
+                skView?.showsFPS = true
+                skView?.showsNodeCount = true
+                skView?.ignoresSiblingOrder = true
+                scene.scaleMode = .resizeFill
+                skView?.presentScene(scene)  // GameSceneに移動
+            }
+        }
+        
+        
         // Noteクラスのクラスプロパティを設定
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration()    // BGMまたは映像の長さ
-        Note.setConstants(BPMs, speedRatio, duration)
+        Note.setConstants(BPMs, userSpeedRatio, duration)
+        
+        
         
         //リザルトの初期化
         ResultScene.parfect = 0
@@ -400,6 +409,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
     }
     
+    override func willMove(from view: SKView) {
+        pauseButton.removeFromSuperview()
+        pauseView?.removeFromSuperview()
+        playerView?.removeFromSuperview()
+    }
     
     // 判定ラベルのテキストを更新（アニメーション付き）
     func setJudgeLabelText(text:String) {
@@ -424,30 +438,29 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     ///   - musicName: MusicName型で指定
     ///   - playMode: PlayMode型で指定（.YouTube　または　.YouTube2）
     /// - Returns: VideoID型
-    private func getVideoID(musicName: MusicName, playMode: PlayMode) -> VideoID? {
-        
-        guard playMode != .BGM else {
-            print("playModeは .YouTube か .YouTube2 のみ指定可能です")
-            return nil
-        }
-        
-        
-        switch musicName {
-        case .yo_kosoJapariParkHe  : return .yo_kosoJapariParkHe
-        case .oracion             : if playMode == .YouTube { return .oracion }
-                                     else                    { return .uracion }
-        case .sakuraSkip           : return .sakuraSkip
-        case .nimenseiUraomoteLife : return .nimenseiUraomoteLife
-        case .buonAppetitoS        : return .buonAppetitoS
-        case .level5               : return .level5
-        default:
-            print("videoIDが存在しません")
-            return nil
-        }
-    }
+//    private func getVideoID(musicName: MusicName, playMode: PlayMode) -> VideoID? {
+//
+//        guard playMode != .BGM else {
+//            print("playModeは .YouTube か .YouTube2 のみ指定可能です")
+//            return nil
+//        }
+//
+//
+//        switch musicName {
+//        case .yo_kosoJapariParkHe  : return .yo_kosoJapariParkHe
+//        case .oracion             : if playMode == .YouTube { return .oracion }
+//                                     else                    { return .uracion }
+//        case .sakuraSkip           : return .sakuraSkip
+//        case .nimenseiUraomoteLife : return .nimenseiUraomoteLife
+//        case .buonAppetitoS        : return .buonAppetitoS
+//        case .level5               : return .level5
+//        default:
+//            print("videoIDが存在しません")
+//            return nil
+//        }
+//    }
     
     func moveToResultScene() {
-        pauseButton.removeFromSuperview()
         let scene = ResultScene(size: (view?.bounds.size)!)
         let skView = view as SKView?
         skView?.showsFPS = true
@@ -462,9 +475,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     @objc func onClickReturnButton(_ sender : UIButton){
-        pauseButton.removeFromSuperview()
-        pauseView?.removeFromSuperview()
-        playerView.removeFromSuperview()
+        
         let scene = ChooseMusicScene(size: (view?.bounds.size)!)
         let skView = view as SKView?
         skView?.showsFPS = true
@@ -547,7 +558,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         print(error)
         
         //BGMモードへ移行
-        let scene = GameScene(musicName:self.musicName, playMode: .BGM ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.speedRatio*100))
+        let scene = GameScene(musicName:self.musicName, playMode: .BGM ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.userSpeedRatio*100))
         let skView = view as SKView?    //このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true

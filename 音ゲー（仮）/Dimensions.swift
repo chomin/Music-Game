@@ -51,23 +51,23 @@ enum MusicName: String, EnumCollection {
 
 /// rawvalueがYouTubeのvideoIDに対応する列挙型
 /// YouTubeを追加する際は MusicName.getPickerArray()のif分岐 への追加も忘れないように
-enum VideoID: String {  // VideoIDの列挙型(https://www.youtube.com/watch?v=************の***********部分)
-    
-    case yo_kosoJapariParkHe  = "xkMdLcB_vNU"
-    case oracion              = "6kQzRm21N_g"
-    case uracion              = "fF6c1gqutjs"
-    case sakuraSkip           = "dBwwipunJcw"
-    case nimenseiUraomoteLife = "TyMx4pu7kA0"
-    case buonAppetitoS        = "LOajYHKEHG8"
-    case level5               = "1NYUKIZCV5k"
-    
-    /*
-     "ぼなぺてぃーとS": 埋め込み許可されているアニメ版が見つからず
-     
-     */
-    
-    
-}
+//enum VideoID: String {  // VideoIDの列挙型(https://www.youtube.com/watch?v=************の***********部分)
+//    
+//    case yo_kosoJapariParkHe  = "xkMdLcB_vNU"
+//    case oracion              = "6kQzRm21N_g"
+//    case uracion              = "fF6c1gqutjs"
+//    case sakuraSkip           = "dBwwipunJcw"
+//    case nimenseiUraomoteLife = "TyMx4pu7kA0"
+//    case buonAppetitoS        = "LOajYHKEHG8"
+//    case level5               = "1NYUKIZCV5k"
+//    
+//    /*
+//     "ぼなぺてぃーとS": 埋め込み許可されているアニメ版が見つからず
+//     
+//     */
+//    
+//    
+//}
 
 /// rawvalueが画像ファイル名に対応する列挙型
 enum ImageName: String {
@@ -92,6 +92,11 @@ enum ImageName: String {
 
 enum PlayMode {
     case BGM, YouTube, YouTube2
+}
+
+extension CGRect {
+    var XRange: Range<CGFloat> { return self.minX ..< self.maxX }
+    var YRange: Range<CGFloat> { return self.minY ..< self.maxY }
 }
 
 /// 寸法に関する定数を提供(シングルトン)。GameSceneのframeをもとに決定される。
