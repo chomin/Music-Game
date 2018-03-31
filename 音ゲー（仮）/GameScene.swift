@@ -54,7 +54,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     
 //    var tmpCounter = 0  //デバッグ用
-    
+    static var ultiateSuperGod = true
     
     var playMode: PlayMode
     
@@ -273,6 +273,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         mediaOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
 
+        // 再生時間や背景、ビューの前後関係などを指定
         if playMode == .BGM {
             self.startTime = CACurrentMediaTime()
             // BGMの再生(時間指定)
@@ -294,6 +295,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             self.view?.isUserInteractionEnabled = true
             self.view?.superview?.isUserInteractionEnabled = true
             playerView.isUserInteractionEnabled = false
+            
+            if GameScene.ultiateSuperGod { view.superview!.bringSubview(toFront: playerView) }
             
             
         }
