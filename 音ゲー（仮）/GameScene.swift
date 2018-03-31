@@ -253,7 +253,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.addChild(start.longImages.long)
                 
                 var following = start.next
-                while(true) {
+                while true {
                     self.addChild(following.image)
                     if let middle = following as? Middle {  // ダウンキャスト
                         // middleに付随する緑太線と緑円をaddChild
@@ -623,7 +623,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 view.backgroundColor = UIColor(white: 0, alpha: 0.5)
                 return view
             }()
-            self.returnButton = {() -> UIButton in
+            self.returnButton = { () -> UIButton in
                 let Button = UIButton()
                 
                 Button.addTarget(self, action: #selector(onClickReturnButton(_:)), for: .touchUpInside)
@@ -643,7 +643,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 
                 return Button
                 }()
-            self.continueButton = {() -> UIButton in
+            self.continueButton = { () -> UIButton in
                 let Button = UIButton()
                 
                 Button.addTarget(self, action: #selector(onClickContinueButton(_:)), for: .touchUpInside)

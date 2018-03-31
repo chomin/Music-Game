@@ -268,7 +268,7 @@ extension GameScene {   // bmsファイルを読み込む
                 }
             }
             
-            var beatOffset: Double = 0.0    // その小節の全オブジェクトに対する泊数の調整
+            var beatOffset: Double = 0.0    // その小節の全オブジェクトに対する拍数の調整
             for info in barLengthInformation {
                 if bar > info.barNumber {
                     beatOffset += info.offsetAfterTheBar
@@ -407,7 +407,7 @@ extension GameScene {   // bmsファイルを読み込む
             self.musicStartPos = musicStartPosSet[2]
         }
         
-        // ロングノーツを時間順にソート(同じ場合は.tapEnd or .flickEnd < .tapStart)
+        // ロングノーツを時間順にソート(同じ場合は TapEnd or FlickEnd < TapStart)
         longNotes1.sort(by: {
             if $0.beat == $1.beat { return $1 is TapStart }
             else { return $0.beat < $1.beat }
@@ -516,7 +516,7 @@ extension GameScene {   // bmsファイルを読み込む
         let dataFileType = splittedName[1]
         
         // 譜面データファイルのパスを取得
-        if let path = Bundle.main.path(forResource: "Sounds/"+dataFileName, ofType: dataFileType) {
+        if let path = Bundle.main.path(forResource: "Sounds/" + dataFileName, ofType: dataFileType) {
             do {
                 // ファイルの内容を取得する
                 let content = try String(contentsOfFile: path, encoding: String.Encoding.shiftJIS)

@@ -501,7 +501,7 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
     var size: CGFloat = 0       // ノーツの横幅
     var isJudged = false        // 判定済みかどうか
     var isJudgeable = true      // 判定可能かどうか。初期状態では始点系のみtrue
-    var noteSpeedRatio: CGFloat    // 各ノーツが持つスピード倍率。bmsの20チャンネルで指定する。
+    let noteSpeedRatio: CGFloat // 各ノーツが持つスピード倍率。bmsの21チャンネルで指定する。
     var position: CGPoint {     // ノーツの画面上の座標
         get {
             return image.position
@@ -581,7 +581,7 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         }
         let currentBeat = Note.BPMs[i].startPos + (passedTime - timeSum) * Note.BPMs[i].bpm / 60    // 判定線上における現在の経過beat
         
-        self.positionOnLane = CGFloat(beat - currentBeat) * Note.beatSpeed * self.noteSpeedRatio     // beat差に応じて位置を設定。（BPMが大きいところではbeat差が早く縮む）
+        self.positionOnLane = CGFloat(beat - currentBeat) * Note.beatSpeed * noteSpeedRatio         // beat差に応じて位置を設定。（BPMが大きいところではbeat差が早く縮む）
     }
     
     // ノーツの座標を設定
