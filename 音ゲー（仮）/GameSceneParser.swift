@@ -64,7 +64,7 @@ extension GameScene {   // bmsファイルを読み込む
         var rawMainData: [String] = []
         
         // インデックス型テンポ変更用テーブル
-        var BPMTable: [String: Double] = [:]
+        var BPMTable: [String : Double] = [:]
         
         // ファイルの内容をbmsDataに格納
         bmsData = try readFile(fileName: fileName)
@@ -185,219 +185,179 @@ extension GameScene {   // bmsファイルを読み込む
                 }
             }
             return ret
-            }.filter {
-                availableChannels.index(of: $0.channel) != nil      // サポート外のチャンネルを利用する命令を除去
+            
+        }.filter {
+            availableChannels.index(of: $0.channel) != nil      // サポート外のチャンネルを利用する命令を除去
         }
         
-        // ロングノーツは一時配列に、その他はnotesに格納。その他命令も実行
+        
         var longNotes1: [Note] = []         // ロングノーツ1を一時的に格納
-        var longNotes2: [Note] = []	        // ロングノーツ2を一時的に格納
+        var longNotes2: [Note] = []         // ロングノーツ2を一時的に格納
         var musicStartPosSet: [Double] = [] // musicStartPosを一時的に格納
-        
-        
-        /// 小節の長さ
-        enum BarLength: String {
-            case threeFourths = "0.75"
-            case twoFourths   = "0.5"
-            case aFourth      = "0.25"
-            
+        var beatOffset = 0  // その小節の全オブジェクトに対する拍数の調整。4/4以外の拍子があった場合に上下する
+
+        // processedMainDataを小節毎に分ける
+        var barGroup: [Int : [(channel: Int, body: [String])]] = [:]   // 小節と、対応するprocessedMainDataの辞書
+        for (bar, channel, body) in processedMainData {
+            if barGroup[bar]?.append((channel, body)) == nil {
+                barGroup[bar] = [(channel, body)]
+            }
         }
         
-        var barLengthInformation: [(type: BarLength, barNumber: Int, offsetAfterTheBar: Double)] = []   // 小節の長さ変更分の情報
-        var noteSpeedRatioInformation: [(beat: Double, noteSpeedRatio: CGFloat)] = []                   // ノーツのスピード変更情報
-        
-        // 先に小節長を調整
-        for (bar, channel, body) in processedMainData {
-            if channel == 2 {
+        // 小節毎に処理
+        for (bar, data) in barGroup.sorted(by: { $0.0 < $1.0 } ) {
+            
+            var barLength = 4       // この小節に含まれる拍数
+            var speedRatioTable: [Double : Double] = [:]    // スピード倍率変更命令用テーブル
+            // 先に小節全体に影響する命令を処理
+            for (channel, body) in data {
                 // 小節長命令の処理
-                switch body[0] {
-                case BarLength.threeFourths.rawValue : barLengthInformation.append((type: .threeFourths, barNumber: bar, offsetAfterTheBar: -1))
-                case BarLength.twoFourths.rawValue   : barLengthInformation.append((type: .twoFourths  , barNumber: bar, offsetAfterTheBar: -2))
-                case BarLength.aFourth.rawValue      : barLengthInformation.append((type: .aFourth     , barNumber: bar, offsetAfterTheBar: -3))
-                default                              : print("1,2,3/4拍子への変更にしか対応していません。")
-                    break
-                }
-            }
-        }
-        
-        // 次にノーツスピード倍率命令を処理
-        for (bar, channel, body) in processedMainData {
-            if channel == 21 {
-                // ノーツのスピード倍率変更命令の処理
-                var unitBeat = 4.0 / Double(body.count) // その小節における1オブジェクトの長さ(拍単位。行内のオブジェクトで共通。)
-                for info in barLengthInformation {
-                    if info.barNumber == bar {
-                        switch info.type {
-                        case .aFourth     : unitBeat = 1.0 / Double(body.count)
-                        case .twoFourths  : unitBeat = 2.0 / Double(body.count)
-                        case .threeFourths: unitBeat = 3.0 / Double(body.count)
+                if channel == 2 {
+                    guard !(body.isEmpty) else {
+                        throw ParseError.lackOfData("変更する小節長が指定されていません: \(bar)小節目")
+                    }
+                    if let ratio = Double(body.first!) {
+                        barLength = Int(ratio * 4)
+                    } else {
+                        throw ParseError.invalidValue("拍子指定が不正です: \(bar)小節目")
+                    }
+                } else if channel == 21 {
+                    // ノーツスピード倍率命令の処理
+                    let unitBeat = Double(barLength) / Double(body.count)   // その小節における1オブジェクトの長さ(拍単位。行内のオブジェクトで共通。)
+                    for (index, ob) in body.enumerated() {
+                        guard ob != "00" else {
+                            continue
                         }
-                        break
-                    }
-                }
-                
-                var beatOffset: Double = 0.0    // その小節の全オブジェクトに対する泊数の調整
-                for info in barLengthInformation {
-                    if bar > info.barNumber {
-                        beatOffset += info.offsetAfterTheBar
-                    }else{
-                        break
-                    }
-                }
-                
-                for (index, ob) in body.enumerated() {  // オブジェクト単位での処理。
-                    if ob != "10" && ob != "00" { // 1倍は無視する
-                        noteSpeedRatioInformation.append((beat: Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset, noteSpeedRatio: CGFloat(atof(ob)) / CGFloat(16)))
-                    }
-                }
-            }
-        }
-        
-        // メインループ。行ごとに処理。bmsには1行あたり1小節分の情報がある
-        for (bar, channel, body) in processedMainData {
-            
-            var unitBeat = 4.0 / Double(body.count) // その小節における1オブジェクトの長さ(拍単位。行内のオブジェクトで共通。)
-            for info in barLengthInformation {
-                if info.barNumber == bar {
-                    switch info.type {
-                    case .aFourth     : unitBeat = 1.0 / Double(body.count)
-                    case .twoFourths  : unitBeat = 2.0 / Double(body.count)
-                    case .threeFourths: unitBeat = 3.0 / Double(body.count)
-                    }
-                    break
-                }
-            }
-            
-            var beatOffset: Double = 0.0    // その小節の全オブジェクトに対する拍数の調整
-            for info in barLengthInformation {
-                if bar > info.barNumber {
-                    beatOffset += info.offsetAfterTheBar
-                }else{
-                    break
-                }
-            }
-            
-            if let lane = laneMap[channel] {
-                // ノーツ指定チャンネルだったとき
-                for (index, ob) in body.enumerated() {  // オブジェクト単位での処理。
-                    autoreleasepool{
-                        
-                        let beat = Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset
-                        
-                        let info = noteSpeedRatioInformation.filter({$0.beat == beat})
-                        
-                        guard info.count < 2 else {
-                            print("同じノーツに対するスピード倍率変更指定が複数あります")
-                            return
+                        if let num = Int(ob, radix: 16) {
+                            let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
+                            speedRatioTable[beat] = Double(num) / 16
+                        } else {
+                            throw ParseError.invalidValue("拍子指定が不正です: \(bar)小節目")
                         }
-                        
-                        let noteSpeedRatio: CGFloat = info.first?.noteSpeedRatio ?? 1.0
-                        
-                        
-                        switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
-                        case .rest:
+                    }
+                }
+            }
+            
+            // 行ごとに処理。bmsには1行あたり1小節分の情報がある
+            // ロングノーツは一時配列に、その他はnotesに格納。その他命令も実行
+            for (channel, body) in data {
+                
+                let unitBeat = Double(barLength) / Double(body.count)   // その小節における1オブジェクトの長さ(拍単位。行内のオブジェクトで共通。)
+                
+                if let lane = laneMap[channel] {
+                    // ノーツ指定チャンネルだったとき
+                    for (index, ob) in body.enumerated() {  // オブジェクト単位での処理。
+                        autoreleasepool {
+                            
+                            let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
+                            let noteSpeedRatio = speedRatioTable[beat] ?? 1.0
+                            
+                            switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
+                            case .rest:
+                                break
+                            case .tap:
+                                notes.append(
+                                    Tap     (beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .flick:
+                                notes.append(
+                                    Flick   (beatPos: beat, laneIndex: lane,                 appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .start1:
+                                longNotes1.append(
+                                    TapStart(beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .middle1:
+                                longNotes1.append(
+                                    Middle  (beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .end1:
+                                longNotes1.append(
+                                    TapEnd  (beatPos: beat, laneIndex: lane, isLarge: false,                                  noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .flickEnd1:
+                                longNotes1.append(
+                                    FlickEnd(beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .start2:
+                                longNotes2.append(
+                                    TapStart(beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .middle2:
+                                longNotes2.append(
+                                    Middle  (beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .end2:
+                                longNotes2.append(
+                                    TapEnd  (beatPos: beat, laneIndex: lane, isLarge: false,                                  noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .flickEnd2:
+                                longNotes2.append(
+                                    FlickEnd(beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .tapL:
+                                notes.append(
+                                    Tap     (beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .start1L:
+                                longNotes1.append(
+                                    TapStart(beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .end1L:
+                                longNotes1.append(
+                                    TapEnd  (beatPos: beat, laneIndex: lane, isLarge: true,                                   noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .start2L:
+                                longNotes2.append(
+                                    TapStart(beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .end2L:
+                                longNotes2.append(
+                                    TapEnd  (beatPos: beat, laneIndex: lane, isLarge: true,                                   noteSpeedRatio: noteSpeedRatio)
+                                )
+                            case .tapLL:
+                                notes.append(
+                                    Tap     (beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
+                                )
+                            }
+                        }
+                    }
+                } else if channel == 1 {
+                    // 楽曲開始命令の処理
+                    for (index, ob) in body.enumerated() {
+                        if ob == "10" {
+                            let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
+                            musicStartPosSet.append(beat)
                             break
-                        case .tap:
-                            notes.append(
-                                Tap     (beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .flick:
-                            notes.append(
-                                Flick   (beatPos: beat, laneIndex: lane,                 appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .start1:
-                            longNotes1.append(
-                                TapStart(beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .middle1:
-                            longNotes1.append(
-                                Middle  (beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .end1:
-                            longNotes1.append(
-                                TapEnd  (beatPos: beat, laneIndex: lane, isLarge: false,                                  noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .flickEnd1:
-                            longNotes1.append(
-                                FlickEnd(beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .start2:
-                            longNotes2.append(
-                                TapStart(beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .middle2:
-                            longNotes2.append(
-                                Middle  (beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .end2:
-                            longNotes2.append(
-                                TapEnd  (beatPos: beat, laneIndex: lane, isLarge: false,                                  noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .flickEnd2:
-                            longNotes2.append(
-                                FlickEnd(beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .tapL:
-                            notes.append(
-                                Tap     (beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .start1L:
-                            longNotes1.append(
-                                TapStart(beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .end1L:
-                            longNotes1.append(
-                                TapEnd  (beatPos: beat, laneIndex: lane, isLarge: true,                                   noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .start2L:
-                            longNotes2.append(
-                                TapStart(beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .end2L:
-                            longNotes2.append(
-                                TapEnd  (beatPos: beat, laneIndex: lane, isLarge: true,                                   noteSpeedRatio: noteSpeedRatio)
-                            )
-                        case .tapLL:
-                            notes.append(
-                                Tap     (beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
-                            )
+                        }
+                    }
+                } else if channel == 3 {
+                    // BPM変更命令の処理
+                    for (index, ob) in body.enumerated() {
+                        guard ob != "00" else {
+                            continue
+                        }
+                        if let newBPM = Int(ob, radix: 16) {
+                            let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
+                            BPMs.append((bpm: Double(newBPM), startPos: beat))
+                        }
+                    }
+                } else if channel == 8 {
+                    // BPM変更命令の処理(インデックス型テンポ変更)
+                    for (index, ob) in body.enumerated() {
+                        if let newBPM = BPMTable[ob] {
+                            let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
+                            BPMs.append((bpm: Double(newBPM), startPos: beat))
                         }
                     }
                 }
-            } else if channel == 1 {
-                // 楽曲開始命令の処理
-                for (index, ob) in body.enumerated() {
-                    if ob == "10" {
-                        
-                        musicStartPosSet.append(Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset)
-                        break
-                    }
-                }
-            } else if channel == 3 {
-                // BPM変更命令の処理
-                for (index, ob) in body.enumerated() {
-                    guard ob != "00" else {
-                        continue
-                    }
-                    if let newBPM = Int(ob, radix: 16) {
-                        
-                        BPMs.append((bpm: Double(newBPM), startPos: Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset))
-                    }
-                }
-            } else if channel == 8 {
-                // BPM変更命令の処理(インデックス型テンポ変更)
-                for (index, ob) in body.enumerated() {
-                    if let newBPM = BPMTable[ob] {
-            
-                        BPMs.append((bpm: Double(newBPM), startPos: Double(bar) * 4.0 + unitBeat * Double(index) + beatOffset))
-                    }
-                }
-            } else if channel == 20 {
-                // ノーツのスピード倍率変更命令
             }
+            
+            // 小節長の変更があった場合にbeatOffsetを調整
+            beatOffset += 4 - barLength
         }
         
-        //musicStartPosを格納
+        // musicStartPosを格納
         switch self.playMode {
         case .BGM:
             self.musicStartPos = musicStartPosSet[0]
@@ -447,10 +407,10 @@ extension GameScene {   // bmsファイルを読み込む
                 if let temp = longNotes1[i] as? TapEnd {
                     temp.start = start
                     //					temp.before = longNotes1[i - 1]
-                }else if let temp = longNotes1[i] as? FlickEnd {
+                } else if let temp = longNotes1[i] as? FlickEnd {
                     temp.start = start
                     //					temp.before = longNotes1[i - 1]
-                }else{
+                } else {
                     throw ParseError.unexpected("予期せぬエラー")
                 }
                 i += 1
@@ -487,10 +447,10 @@ extension GameScene {   // bmsファイルを読み込む
                 if let temp = longNotes2[i] as? TapEnd {
                     temp.start = start
                     //					temp.before = longNotes2[i - 1]
-                }else if let temp = longNotes2[i] as? FlickEnd {
+                } else if let temp = longNotes2[i] as? FlickEnd {
                     temp.start = start
                     //					temp.before = longNotes2[i - 1]
-                }else{
+                } else {
                     throw ParseError.unexpected("予期せぬエラー")
                 }
                 i += 1

@@ -109,14 +109,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     let lanes = [Lane(laneIndex: 0), Lane(laneIndex: 1), Lane(laneIndex: 2), Lane(laneIndex: 3), Lane(laneIndex: 4), Lane(laneIndex: 5), Lane(laneIndex: 6)]     // レーン
     
-    private let userSpeedRatio: CGFloat
+    private let userSpeedRatio: Double
     
     
     init(musicName: MusicName, playMode: PlayMode, size: CGSize, speedRatioInt: UInt) {   // YouTube用
 
         self.musicName = musicName
         self.playMode = playMode
-        self.userSpeedRatio = CGFloat(speedRatioInt) / 100
+        self.userSpeedRatio = Double(speedRatioInt) / 100
         
         
         super.init(size: size)
