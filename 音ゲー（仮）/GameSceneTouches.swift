@@ -10,8 +10,12 @@ import SpriteKit
 
 extension GameScene {
     
+    
+    
     // タッチ関係(恐らく、同フレーム内でupdate()等の後に呼び出されている)
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        
         
         
         judgeQueue.sync {
