@@ -109,14 +109,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     let lanes = [Lane(laneIndex: 0), Lane(laneIndex: 1), Lane(laneIndex: 2), Lane(laneIndex: 3), Lane(laneIndex: 4), Lane(laneIndex: 5), Lane(laneIndex: 6)]     // レーン
     
-    private let userSpeedRatio: CGFloat
+    private let userSpeedRatio: Double
     
     
     init(musicName: MusicName, playMode: PlayMode, size: CGSize, speedRatioInt: UInt) {   // YouTube用
 
         self.musicName = musicName
         self.playMode = playMode
-        self.userSpeedRatio = CGFloat(speedRatioInt) / 100
+        self.userSpeedRatio = Double(speedRatioInt) / 100
         
         
         super.init(size: size)
@@ -253,7 +253,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.addChild(start.longImages.long)
                 
                 var following = start.next
-                while(true) {
+                while true {
                     self.addChild(following.image)
                     if let middle = following as? Middle {  // ダウンキャスト
                         // middleに付随する緑太線と緑円をaddChild
@@ -626,7 +626,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 view.backgroundColor = UIColor(white: 0, alpha: 0.5)
                 return view
             }()
-            self.returnButton = {() -> UIButton in
+            self.returnButton = { () -> UIButton in
                 let Button = UIButton()
                 
                 Button.addTarget(self, action: #selector(onClickReturnButton(_:)), for: .touchUpInside)
@@ -646,7 +646,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 
                 return Button
                 }()
-            self.continueButton = {() -> UIButton in
+            self.continueButton = { () -> UIButton in
                 let Button = UIButton()
                 
                 Button.addTarget(self, action: #selector(onClickContinueButton(_:)), for: .touchUpInside)
