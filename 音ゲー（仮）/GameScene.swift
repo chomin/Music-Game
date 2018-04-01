@@ -54,7 +54,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     
 //    var tmpCounter = 0  //デバッグ用
-    static var ultiateSuperGod = true
+//    static var ultiateSuperGod = true 4月1日は終わりました
     
     var playMode: PlayMode
     
@@ -296,7 +296,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             self.view?.superview?.isUserInteractionEnabled = true
             playerView.isUserInteractionEnabled = false
             
-            if GameScene.ultiateSuperGod { view.superview!.bringSubview(toFront: playerView) }
             
             
         }

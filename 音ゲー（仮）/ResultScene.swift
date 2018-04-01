@@ -34,31 +34,18 @@ class ResultScene: SKScene {
             Label.fontColor = SKColor.white
             Label.numberOfLines = 7
             
-            if GameScene.ultiateSuperGod {
-                Label.text =    // swift4からの書き方(改行入りのString)
-                """
-                parfect:9999
-                great:0
-                good:0
-                bad:0
-                miss:0
-                
-                combo:9999
-                
-                All Parfect!!!!!!
-                """
-            } else {
-                Label.text =    // swift4からの書き方(改行入りのString)
-                """
-                parfect:\(ResultScene.parfect)
-                great:\(ResultScene.great)
-                good:\(ResultScene.good)
-                bad:\(ResultScene.bad)
-                miss:\(ResultScene.miss)
-                
-                combo:\(ResultScene.maxCombo)
-                """
-            }
+            
+            Label.text =    // swift4からの書き方(改行入りのString)
+            """
+            parfect:\(ResultScene.parfect)
+            great:\(ResultScene.great)
+            good:\(ResultScene.good)
+            bad:\(ResultScene.bad)
+            miss:\(ResultScene.miss)
+            
+            combo:\(ResultScene.maxCombo)
+            """
+            
             
             self.addChild(Label)
             return Label
