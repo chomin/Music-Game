@@ -560,7 +560,10 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         Note.beatSpeed = 1350 * 60 / CGFloat(majorBPM * userSpeedRatio)
     }
     
-    // ノーツの座標等の更新、毎フレーム呼ばれる
+    /// ノーツの表示状態の更新、毎フレーム呼ばれる
+    /// 格派生クラスでオーバーライドされる
+    ///
+    /// - Parameter passedTime: プレイ開始からの経過時間(BGMの経過時間とは異なる)
     func update(_ passedTime: TimeInterval) {
         setPositionOnLane(passedTime)
     }

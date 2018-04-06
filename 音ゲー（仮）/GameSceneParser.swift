@@ -8,34 +8,18 @@
 //（9/11の成果が残っている？）
 
 
-// parse 関数はいろいろエラー投げるので
-// こんな感じで使ってね
-/*
- do {
- try parse(fileName: "シュガーソングとビターステップ.bms")
- }
- catch FileError.invalidName     (let msg) { print(msg) }
- catch FileError.notFound        (let msg) { print(msg) }
- catch FileError.readFailed      (let msg) { print(msg) }
- catch ParseError.lackOfData     (let msg) { print(msg) }
- catch ParseError.invalidValue   (let msg) { print(msg) }
- catch ParseError.noLongNoteStart(let msg) { print(msg) }
- catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
- catch ParseError.unexpected     (let msg) { print(msg) }
- */
-
 import SpriteKit
 
 extension GameScene {   // bmsファイルを読み込む
     
-    // ファイルエラー定義列挙体
+    // ファイルエラー定義列挙型
     enum FileError: Error {
         case invalidName(String)
         case notFound(String)
         case readFailed(String)
     }
     
-    // パースエラー定義列挙体
+    // パースエラー定義列挙型
     enum ParseError: Error {
         case lackOfData(String)
         case invalidValue(String)
@@ -43,7 +27,7 @@ extension GameScene {   // bmsファイルを読み込む
         case noLongNoteEnd(String)
         case unexpected(String)
         
-        // 渡されたnoteのbeatが何小節目何拍目かを返す
+        /// 渡されたnoteのbeatが何小節目何拍目かを返す
         static func getBeat(of note: Note) -> String {
             let bar = Int(note.beat / 4.0)
             let restBeat = note.beat - Double(bar * 4)
@@ -52,7 +36,11 @@ extension GameScene {   // bmsファイルを読み込む
     }
     
     
-    // 渡されたファイルを読んでnotes配列を作成
+    /// 渡されたファイルを読んでnotes配列を作成
+    /// 投げるエラーはFileError列挙型とParseError列挙型に定義されている
+    ///
+    /// - Parameter fileName: 譜面データファイルの名前
+    /// - Throws: パース時に発生したエラー
     func parse(fileName: String) throws {
         
         // 譜面データファイルを一行ごとに配列で保持
