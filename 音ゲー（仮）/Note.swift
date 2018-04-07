@@ -21,7 +21,7 @@ class Tap: Note {
         super.init(beatPos: beat, laneIndex: laneIndex, noteSpeedRatio: noteSpeedRatio)
         
         // imageのインスタンス(白円or黄円)を作成
-        self.image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
+        self.image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
         image.fillColor = isLarge ? UIColor.yellow : UIColor.white
         image.isHidden = true   // 初期状態では隠しておく
     }
@@ -44,7 +44,8 @@ class Tap: Note {
         setScale()
         
         // ノーツが視点を向くように
-        image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (positionOnLane + Dimensions.horizontalDistance * 8))
+        let d = Dimensions.frameMidX - CGFloat(1.5 + Double(laneIndex)) * Dimensions.laneWidth  // 判定線中央から測ったx座標
+        image.zRotation = atan(d / (positionOnLane + Dimensions.horizontalDistance * 8))
         
         // image.isHiddenを更新
         if position.y > Dimensions.horizonY || isJudged {       // 水平線より上、判定済みのものは隠す
@@ -67,7 +68,7 @@ class Flick: Note {
         super.init(beatPos: beat, laneIndex: laneIndex, noteSpeedRatio: noteSpeedRatio)
         
         // imageのインスタンス(マゼンタ三角形)を作成
-        let length = Dimensions.laneWidth / 2   // 三角形一辺の長さの半分
+        let length = Note.initialSize / 2   // 三角形一辺の長さの半分
         // 始点から終点までの４点を指定(2点を一致させ三角形に).
         var points = [
             CGPoint(x: length,  y: 0.0),
@@ -123,12 +124,12 @@ class TapStart: Note {
         super.init(beatPos: beat, laneIndex: laneIndex, noteSpeedRatio: noteSpeedRatio)
         
         // imageのインスタンス(緑円or黄円)を作成
-        image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
+        image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
         image.fillColor = isLarge ? UIColor.yellow : UIColor.green
         image.isHidden = true	// 初期状態では隠しておく
         
         // longImagesのインスタンスを作成
-        self.longImages = (SKShapeNode(path: CGMutablePath()), SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2))
+        self.longImages = (SKShapeNode(path: CGMutablePath()), SKShapeNode(circleOfRadius: Note.initialSize / 2))
         longImages.long.fillColor = UIColor.green
         longImages.long.alpha = 0.8
         longImages.long.zPosition = -1
@@ -172,8 +173,9 @@ class TapStart: Note {
         
         
         // ノーツが視点を向くように
-        image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (positionOnLane + Dimensions.horizontalDistance * 8))
-        
+        let d = Dimensions.frameMidX - CGFloat(1.5 + Double(laneIndex)) * Dimensions.laneWidth  // 判定線中央から測ったx座標
+        image.zRotation = atan(d / (positionOnLane + Dimensions.horizontalDistance * 8))
+
         
         /* longImage.longを更新 */
         let long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)  // 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
@@ -188,7 +190,7 @@ class TapStart: Note {
                 / (next.position.y - position.y)        // 始点と終点のx座標を内分
             
             long.endPos = CGPoint(x: posX, y: posY)
-            long.endWidth = Dimensions.horizonLength / 7
+            long.endWidth = Dimensions.laneWidthOnHorizon
         }
         // 始点の情報を代入
         if position.y > Dimensions.judgeLineY && !isJudged {        // 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
@@ -216,17 +218,18 @@ class TapStart: Note {
         if position.y <= Dimensions.judgeLineY || isJudged {        // 始点ノーツが判定線を通過した後か、判定された後
             // 理想軌道の判定線上に緑円を描く
             // 楕円の縦幅を計算
-            let lSquare = pow(Dimensions.horizontalDistance, 2) + pow(Dimensions.laneWidth * 9/2 - long.startPos.x, 2)
+            let lSquare = pow(Dimensions.horizontalDistance, 2) + pow(Dimensions.frameMidX - long.startPos.x, 2)
             let denomOfAtan = lSquare + pow(Dimensions.verticalDistance, 2) - pow(Note.scale * Dimensions.laneWidth / 2, 2)
             guard 0 < denomOfAtan else {
                 return
             }
             let deltaY = Dimensions.R * atan(Note.scale * Dimensions.laneWidth * Dimensions.verticalDistance / denomOfAtan)
             
-            longImages.circle.yScale = deltaY / Dimensions.laneWidth
+            longImages.circle.yScale = deltaY / Note.initialSize
             longImages.circle.xScale = Note.scale
             longImages.circle.position = long.startPos
-            longImages.circle.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (Dimensions.horizontalDistance * 8))
+            let d = Dimensions.frameMidX - CGFloat(1.5 + Double(laneIndex)) * Dimensions.laneWidth  // 判定線中央から測ったx座標
+            longImages.circle.zRotation = atan(d / (Dimensions.horizontalDistance * 8))
         }
         
         
@@ -275,7 +278,7 @@ class Middle: Note {
         // imageのインスタンス(緑線分)を作成
         var points = [
             CGPoint(x: 0.0, y: 0.0),
-            CGPoint(x: Dimensions.laneWidth, y: 0.0)
+            CGPoint(x: Note.initialSize, y: 0.0)
         ]
         self.image = SKShapeNode(points: &points, count: points.count)
         image.lineWidth = 5.0
@@ -283,7 +286,7 @@ class Middle: Note {
         image.isHidden = true   // 初期状態では隠しておく
         
         // longImagesのインスタンスを作成
-        self.longImages = (SKShapeNode(path: CGMutablePath()), SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2))
+        self.longImages = (SKShapeNode(path: CGMutablePath()), SKShapeNode(circleOfRadius: Note.initialSize / 2))
         longImages.long.fillColor = UIColor.green
         longImages.long.alpha = 0.8
         longImages.long.zPosition = -1
@@ -333,7 +336,7 @@ class Middle: Note {
                 / (next.position.y - position.y)        // 始点と終点のx座標を内分
             
             long.endPos = CGPoint(x: posX, y: posY)
-            long.endWidth = Dimensions.horizonLength / 7
+            long.endWidth = Dimensions.laneWidthOnHorizon
         }
         // 始点の情報を代入
         if position.y > Dimensions.judgeLineY && !isJudged {        // 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
@@ -361,17 +364,18 @@ class Middle: Note {
         if position.y <= Dimensions.judgeLineY || isJudged {        // 始点ノーツが判定線を通過した後か、判定された後
             // 理想軌道の判定線上に緑円を描く
             // 楕円の縦幅を計算
-            let lSquare = pow(Dimensions.horizontalDistance, 2) + pow(Dimensions.laneWidth * 9/2 - long.startPos.x, 2)
+            let lSquare = pow(Dimensions.horizontalDistance, 2) + pow(Dimensions.frameMidX - long.startPos.x, 2)
             let denomOfAtan = lSquare + pow(Dimensions.verticalDistance, 2) - pow(Note.scale * Dimensions.laneWidth / 2, 2)
             guard 0 < denomOfAtan else {
                 return
             }
             let deltaY = Dimensions.R * atan(Note.scale * Dimensions.laneWidth * Dimensions.verticalDistance / denomOfAtan)
             
-            longImages.circle.yScale = deltaY / Dimensions.laneWidth
+            longImages.circle.yScale = deltaY / Note.initialSize
             longImages.circle.xScale = Note.scale
             longImages.circle.position = long.startPos
-            longImages.circle.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (Dimensions.horizontalDistance * 8))
+            let d = Dimensions.frameMidX - CGFloat(1.5 + Double(laneIndex)) * Dimensions.laneWidth  // 判定線中央から測ったx座標
+            longImages.circle.zRotation = atan(d / (Dimensions.horizontalDistance * 8))
         }
         
         
@@ -409,7 +413,7 @@ class TapEnd: Note {
         self.isJudgeable = false
         
         // imageのインスタンス(緑円or黄円)を作成
-        image = SKShapeNode(circleOfRadius: Dimensions.laneWidth / 2)
+        image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
         image.fillColor = isLarge ? UIColor.yellow : UIColor.green
         image.isHidden = true   // 初期状態では隠しておく
     }
@@ -429,8 +433,9 @@ class TapEnd: Note {
         setScale()
         
         // ノーツが視点を向くように
-        image.zRotation = atan(Dimensions.laneWidth * CGFloat(3 - laneIndex) / (positionOnLane + Dimensions.horizontalDistance * 8))
-        
+        let d = Dimensions.frameMidX - CGFloat(1.5 + Double(laneIndex)) * Dimensions.laneWidth  // 判定線中央から測ったx座標
+        image.zRotation = atan(d / (positionOnLane + Dimensions.horizontalDistance * 8))
+
         // image.isHiddenを更新
         if position.y > Dimensions.horizonY || isJudged {       // 水平線より上、判定済みのものは隠す
             image.isHidden = true
@@ -454,7 +459,7 @@ class FlickEnd: Note {
         self.isJudgeable = false
         
         // imageのインスタンス(マゼンタ三角形)を作成
-        let length = Dimensions.laneWidth / 2   // 三角形一辺の長さの半分
+        let length = Note.initialSize / 2   // 三角形一辺の長さの半分
         // 始点から終点までの４点を指定(2点を一致させ三角形に).
         var points = [
             CGPoint(x: length,  y: 0.0),
@@ -510,10 +515,11 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
             image.position = newValue
         }
     }
-    fileprivate var positionOnLane: CGFloat	= 0.0   // ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
-    static let scale: CGFloat = 1.3                 // レーン幅に対するノーツの幅の倍率
+    fileprivate var positionOnLane: CGFloat	= 0.0           // ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
+    static let scale: CGFloat = 1.3                         // レーン幅に対するノーツの幅の倍率
     private static var BPMs: [(bpm: Double, startPos: Double)] = []
-    private static var beatSpeed: CGFloat = 0.0     // beatに対してノーツがどれだけ進むか
+    private static var beatSpeed: CGFloat = 0.0             // beatに対してノーツがどれだけ進むか
+    fileprivate static let initialSize = CGFloat(100)       // ノーツの初期サイズ。ノーツ大きさはscaleで調節するのでどんな値でもよい
     
     
     init(beatPos beat: Double, laneIndex: Int, noteSpeedRatio: Double) {
@@ -602,11 +608,9 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         
         /* x座標の計算 */
         
-        var posX: CGFloat
-        
         let b = Dimensions.horizonY - Dimensions.judgeLineY                                     // 水平線から判定線までの2D上の距離
-        let c = CGFloat(3 - laneIndex) * (Dimensions.laneWidth - Dimensions.horizonLength/7)    // 水平線上と判定線上でのx座標のずれ
-        posX = Dimensions.laneWidth * 3/2 + CGFloat(laneIndex) * Dimensions.laneWidth           // 判定線上でのx座標
+        let c = Dimensions.horizonLeftX - Dimensions.laneWidth - (Dimensions.laneWidth - Dimensions.laneWidthOnHorizon) * CGFloat(0.5 + Double(laneIndex)) // 水平線上と判定線上でのx座標のずれ
+        var posX = Dimensions.laneWidth * 3/2 + CGFloat(laneIndex) * Dimensions.laneWidth       // 判定線上でのx座標
         posX += (posY - Dimensions.judgeLineY) * (c/b)                                          // 判定線から離れている分補正
         
         
@@ -618,22 +622,23 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
     fileprivate func setScale() {
         
         // ノーツの横幅を計算
-        let grad = (Dimensions.horizonLength/7 - Dimensions.laneWidth) / (Dimensions.horizonY - Dimensions.judgeLineY)  // 傾き
-        self.size = Note.scale * (grad * (position.y - Dimensions.horizonY) + Dimensions.horizonLength/7)
+        let grad = (Dimensions.laneWidthOnHorizon - Dimensions.laneWidth) / (Dimensions.horizonY - Dimensions.judgeLineY)  // 傾き
+        self.size = Note.scale * (grad * (position.y - Dimensions.horizonY) + Dimensions.laneWidthOnHorizon)
         
         // ノーツの横幅と縦幅をscaleで設定
         if self is Tap || self is TapStart || self is TapEnd {      // 楕円
-            let lSquare = pow(Dimensions.horizontalDistance + positionOnLane, 2) + pow(Dimensions.laneWidth * CGFloat(3 - laneIndex), 2)
+            let d = Dimensions.frameMidX - CGFloat(1.5 + Double(laneIndex)) * Dimensions.laneWidth  // 判定線中央から測ったx座標
+            let lSquare = pow(Dimensions.horizontalDistance + positionOnLane, 2) + pow(d, 2)
             let denomOfAtan = lSquare + pow(Dimensions.verticalDistance, 2) - pow(Note.scale * Dimensions.laneWidth / 2, 2)         // atan内の分母
             guard 0 < denomOfAtan else {    // atan内の分母が0になるのを防止
                 return
             }
             let deltaY = Dimensions.R * atan(Note.scale * Dimensions.laneWidth * Dimensions.verticalDistance / denomOfAtan)
             
-            image.xScale = size / Dimensions.laneWidth
-            image.yScale = deltaY / Dimensions.laneWidth
+            image.xScale = size / Note.initialSize
+            image.yScale = deltaY / Note.initialSize
         } else {        // 線と三角形
-            image.setScale(size / Dimensions.laneWidth)
+            image.setScale(size / Note.initialSize)
         }
     }
 }

@@ -84,8 +84,8 @@ extension GameScene {   // bmsファイルを読み込む
             "VIDEOID2":  { value in if self.playMode == .YouTube2 { self.videoID = value } },
             "BPM":       { value in if let num = Double(value) { self.BPMs = [(num, 0.0)] } },
             "PLAYLEVEL": { value in if let num = Int(value) { self.playLevel = num } },
-            "VOLWAV":    { value in if let num = Int(value) { self.volWav = num } }
-            
+            "VOLWAV":    { value in if let num = Int(value) { self.volWav = num } },
+            "LANE":      { value in if let num = Int(value) { self.laneNum = num } }
         ]
         
         // 1行ずつ処理
@@ -115,7 +115,19 @@ extension GameScene {   // bmsファイルを読み込む
         let availableChannels = [1, 2, 3, 8, 11, 12, 13, 14, 15, 18, 19, 21]
         
         // チャンネルとレーンの対応付け(辞書)
-        let laneMap = [11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6]
+        var laneMap: [Int : Int]
+        switch laneNum {
+        case 1: laneMap = [                      14: 0                      ]
+        case 2: laneMap = [               13: 0,        15: 1               ]
+        case 3: laneMap = [               13: 0, 14: 1, 15: 2               ]
+        case 4: laneMap = [        12: 0, 13: 1,        15: 2, 18: 3        ]
+        case 5: laneMap = [        12: 0, 13: 1, 14: 2, 15: 3, 18: 4        ]
+        case 6: laneMap = [ 11: 0, 12: 1, 13: 2,        15: 3, 18: 4, 19: 5 ]
+        case 7: laneMap = [ 11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6 ]
+        default:
+            laneNum = 7
+            laneMap = [11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6]
+        }
         
         // ファイル上のノーツ定義
         enum NoteExpression: String {
@@ -480,7 +492,7 @@ extension GameScene {   // bmsファイルを読み込む
     
     
     /// ノーツが画面上に現れる時刻を返す(updateするかの判定に使用)
-    private func getAppearTime(_ beat: Double) -> TimeInterval {
+    private func getAppearTime(_ beat: Double) -> TimeInterval {return 0
         var appearTime = TimeInterval(-Dimensions.laneLength / self.speed)   // レーン端から端までかかる時間
         
         for (index, bpm) in BPMs.enumerated() {
