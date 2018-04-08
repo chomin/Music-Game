@@ -110,7 +110,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     var lanes: [Lane] = []      // レーン
     
-    private let userSpeedRatio: Double
+    let userSpeedRatio: Double
     
     
     
@@ -202,7 +202,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // Noteクラスのクラスプロパティを設定
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration()    // BGMまたは映像の長さ
-        Note.setConstants(BPMs, userSpeedRatio, duration)
+        Note.initialize(BPMs, duration, notes)
         
         
         // ボタンの設定

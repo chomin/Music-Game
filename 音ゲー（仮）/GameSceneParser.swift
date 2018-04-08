@@ -250,74 +250,74 @@ extension GameScene {   // bmsファイルを読み込む
                         autoreleasepool {
                             
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
-                            let noteSpeedRatio = speedRatioTable[beat] ?? 1.0
+                            let ratio = (speedRatioTable[beat] ?? 1.0) * userSpeedRatio
                             
                             switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
                             case .rest:
                                 break
                             case .tap:
                                 notes.append(
-                                    Tap     (beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
+                                    Tap     (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false)
                                 )
                             case .flick:
                                 notes.append(
-                                    Flick   (beatPos: beat, laneIndex: lane,                 appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
+                                    Flick   (beatPos: beat, laneIndex: lane, speedRatio: ratio)
                                 )
                             case .start1:
                                 longNotes1.append(
-                                    TapStart(beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
+                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false)
                                 )
                             case .middle1:
                                 longNotes1.append(
-                                    Middle  (beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
+                                    Middle  (beatPos: beat, laneIndex: lane, speedRatio: ratio)
                                 )
                             case .end1:
                                 longNotes1.append(
-                                    TapEnd  (beatPos: beat, laneIndex: lane, isLarge: false,                                  noteSpeedRatio: noteSpeedRatio)
+                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false)
                                 )
                             case .flickEnd1:
                                 longNotes1.append(
-                                    FlickEnd(beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
+                                    FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: ratio)
                                 )
                             case .start2:
                                 longNotes2.append(
-                                    TapStart(beatPos: beat, laneIndex: lane, isLarge: false, appearTime: getAppearTime(beat), noteSpeedRatio: noteSpeedRatio)
+                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false)
                                 )
                             case .middle2:
                                 longNotes2.append(
-                                    Middle  (beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
+                                    Middle  (beatPos: beat, laneIndex: lane, speedRatio: ratio)
                                 )
                             case .end2:
                                 longNotes2.append(
-                                    TapEnd  (beatPos: beat, laneIndex: lane, isLarge: false,                                  noteSpeedRatio: noteSpeedRatio)
+                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false)
                                 )
                             case .flickEnd2:
                                 longNotes2.append(
-                                    FlickEnd(beatPos: beat, laneIndex: lane,                                                  noteSpeedRatio: noteSpeedRatio)
+                                    FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: ratio)
                                 )
                             case .tapL:
                                 notes.append(
-                                    Tap     (beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
+                                    Tap     (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             case .start1L:
                                 longNotes1.append(
-                                    TapStart(beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
+                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             case .end1L:
                                 longNotes1.append(
-                                    TapEnd  (beatPos: beat, laneIndex: lane, isLarge: true,                                   noteSpeedRatio: noteSpeedRatio)
+                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             case .start2L:
                                 longNotes2.append(
-                                    TapStart(beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
+                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             case .end2L:
                                 longNotes2.append(
-                                    TapEnd  (beatPos: beat, laneIndex: lane, isLarge: true,                                   noteSpeedRatio: noteSpeedRatio)
+                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             case .tapLL:
                                 notes.append(
-                                    Tap     (beatPos: beat, laneIndex: lane, isLarge: true, appearTime: getAppearTime(beat),  noteSpeedRatio: noteSpeedRatio)
+                                    Tap     (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             }
                         }
@@ -488,23 +488,6 @@ extension GameScene {   // bmsファイルを読み込む
         } else {
             throw FileError.notFound("指定されたファイルが見つかりません")
         }
-    }
-    
-    
-    /// ノーツが画面上に現れる時刻を返す(updateするかの判定に使用)
-    private func getAppearTime(_ beat: Double) -> TimeInterval {return 0
-        var appearTime = TimeInterval(-Dimensions.laneLength / self.speed)   // レーン端から端までかかる時間
-        
-        for (index, bpm) in BPMs.enumerated() {
-            if BPMs.count > index + 1 && beat > BPMs[index + 1].startPos {
-                appearTime += (BPMs[index + 1].startPos - bpm.startPos) * 60 / bpm.bpm
-            } else {
-                appearTime += (beat - bpm.startPos) * 60 / bpm.bpm
-                break
-            }
-        }
-        
-        return appearTime
     }
 }
     

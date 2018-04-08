@@ -13,12 +13,11 @@ import SpriteKit
 class Tap: Note {
     
     let isLarge: Bool               // 大ノーツかどうか
-    let appearTime: TimeInterval    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
+    fileprivate var appearTime: TimeInterval = 0    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(beatPos beat: Double, laneIndex: Int, isLarge: Bool, appearTime: TimeInterval, noteSpeedRatio: Double) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
         self.isLarge = isLarge
-        self.appearTime = appearTime
-        super.init(beatPos: beat, laneIndex: laneIndex, noteSpeedRatio: noteSpeedRatio)
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         // imageのインスタンス(白円or黄円)を作成
         self.image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
@@ -61,11 +60,10 @@ class Tap: Note {
 /// 呼び出し時にまだparfectの時間でない場合(before)について、後にparfect判定を行うかもしれないので、時間とUItouch情報を該当LaneインスタンスのstoredFlickJudgeに、レーン情報を該当GSTouchインスタンスのstoredFlickJudgeLaneIndexに格納し、後にこの情報をもとにGameSceneTouchesファイル内に記述されているGameScene.storedFlickJudge関数にて判定を行う。この呼出は情報が残っているときにのみ行われ、該当ノーツの判定後に各情報格納場所にnilが入る。storedFlickJudgeの呼び出しタイミングはtouchesMoved呼び出し時にレーンから指が外れた時、touchesEnded呼び出し時、これ以上待ってもより良い判定が来なくなる時（ノーツの正確なタイミングの時間についてtimeLag予定時間(>0)と対象な時間）である。
 class Flick: Note {
     
-    let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
+    fileprivate var appearTime: TimeInterval = 0    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
-    init(beatPos beat: Double, laneIndex: Int, appearTime: TimeInterval, noteSpeedRatio: Double) {
-        self.appearTime = appearTime
-        super.init(beatPos: beat, laneIndex: laneIndex, noteSpeedRatio: noteSpeedRatio)
+    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         // imageのインスタンス(マゼンタ三角形)を作成
         let length = Note.initialSize / 2   // 三角形一辺の長さの半分
@@ -116,12 +114,11 @@ class TapStart: Note {
     var next = Note()                                               // 次のノーツ（仮のインスタンス）
     var longImages = (long: SKShapeNode(), circle: SKShapeNode())   // このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
     let isLarge: Bool                                               // 大ノーツかどうか
-    let appearTime: TimeInterval                                    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
+    fileprivate var appearTime: TimeInterval = 0                    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
-    init(beatPos beat: Double, laneIndex: Int, isLarge: Bool, appearTime: TimeInterval, noteSpeedRatio: Double) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
         self.isLarge = isLarge
-        self.appearTime = appearTime
-        super.init(beatPos: beat, laneIndex: laneIndex, noteSpeedRatio: noteSpeedRatio)
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         // imageのインスタンス(緑円or黄円)を作成
         image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
@@ -226,7 +223,7 @@ class TapStart: Note {
             let deltaY = Dimensions.R * atan(Note.scale * Dimensions.laneWidth * Dimensions.verticalDistance / denomOfAtan)
             
             longImages.circle.yScale = deltaY / Note.initialSize
-            longImages.circle.xScale = Note.scale
+            longImages.circle.xScale = Note.scale           // TODO: 大きすぎ。初期値が違うから
             longImages.circle.position = long.startPos
             let d = Dimensions.frameMidX - CGFloat(1.5 + Double(laneIndex)) * Dimensions.laneWidth  // 判定線中央から測ったx座標
             longImages.circle.zRotation = atan(d / (Dimensions.horizontalDistance * 8))
@@ -270,8 +267,8 @@ class Middle: Note {
         }
     }
     
-    override init(beatPos beat: Double, laneIndex: Int, noteSpeedRatio: Double) {
-        super.init(beatPos: beat, laneIndex: laneIndex, noteSpeedRatio: noteSpeedRatio)
+    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         self.isJudgeable = false
         
@@ -406,9 +403,9 @@ class TapEnd: Note {
     unowned var start = Note()  // 循環参照防止の為unowned参照にする
     let isLarge: Bool           // 大ノーツかどうか
     
-    init(beatPos beat: Double, laneIndex: Int, isLarge: Bool, noteSpeedRatio: Double) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
         self.isLarge = isLarge
-        super.init(beatPos: beat, laneIndex: laneIndex, noteSpeedRatio: noteSpeedRatio)
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         self.isJudgeable = false
         
@@ -453,8 +450,8 @@ class FlickEnd: Note {
     
     unowned var start = Note()
     
-    override init(beatPos beat: Double, laneIndex: Int, noteSpeedRatio: Double) {
-        super.init(beatPos: beat, laneIndex: laneIndex, noteSpeedRatio: noteSpeedRatio)
+    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         self.isJudgeable = false
         
@@ -506,7 +503,6 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
     var size: CGFloat = 0       // ノーツの横幅
     var isJudged = false        // 判定済みかどうか
     var isJudgeable = true      // 判定可能かどうか。初期状態では始点系のみtrue
-    let noteSpeedRatio: Double  // 各ノーツが持つスピード倍率。bmsの21チャンネルで指定する。
     var position: CGPoint {     // ノーツの画面上の座標
         get {
             return image.position
@@ -515,30 +511,32 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
             image.position = newValue
         }
     }
-    fileprivate var positionOnLane: CGFloat	= 0.0           // ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
+    fileprivate var positionOnLane: CGFloat = 0.0           // ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
+    private let baseSpeed: CGFloat                          // ノーツスピード。実際のスピードはこの値とBPMによって決定される
+    
     static let scale: CGFloat = 1.3                         // レーン幅に対するノーツの幅の倍率
-    private static var BPMs: [(bpm: Double, startPos: Double)] = []
-    private static var beatSpeed: CGFloat = 0.0             // beatに対してノーツがどれだけ進むか
     fileprivate static let initialSize = CGFloat(100)       // ノーツの初期サイズ。ノーツ大きさはscaleで調節するのでどんな値でもよい
+    private static var majorBPM: Double = 0.0               // 楽曲の基本BPM。BPM配列の中から最も持続時間が長いもの。
+    private static var BPMs: [(bpm: Double, startPos: Double)] = []
     
     
-    init(beatPos beat: Double, laneIndex: Int, noteSpeedRatio: Double) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
         self.beat = beat
         self.laneIndex = laneIndex
-        self.noteSpeedRatio = noteSpeedRatio
+        self.baseSpeed = 1350 * CGFloat(speedRatio)
     }
     init() {
         self.beat = 0
         self.laneIndex = 0
-        self.noteSpeedRatio = 0
+        self.baseSpeed = 1350
     }
     
     deinit {
         self.image.removeFromParent()
     }
     
-    // クラスプロパティを設定
-    static func setConstants(_ BPMs: [(bpm: Double, startPos: Double)], _ userSpeedRatio: Double, _ duration: TimeInterval) {
+    // クラスプロパティとappearTimeを設定
+    static func initialize(_ BPMs: [(bpm: Double, startPos: Double)], _ duration: TimeInterval, _ notes: [Note]) {
         
         guard !BPMs.isEmpty else {
             print("空のBPM配列")
@@ -560,37 +558,68 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
             }
             i += 1
         }
-        let majorBPM = BPMIntervals.max { $0.interval < $1.interval }!.bpm  // 楽曲の基本BPM。BPM配列の中から最も持続時間が長いもの。
-        
+        Note.majorBPM = BPMIntervals.max { $0.interval < $1.interval }!.bpm
         Note.BPMs = BPMs
-        Note.beatSpeed = 1350 * 60 / CGFloat(majorBPM * userSpeedRatio)
+        
+        /* appearTimeの設定 */
+        
+        for note in notes {
+            switch note {
+            case is Tap:
+                let tap = note as! Tap
+                tap.appearTime = getAppearTime(note)
+            case is Flick:
+                let flick = note as! Flick
+                flick.appearTime = getAppearTime(note)
+            case is TapStart:
+                let tapStart = note as! TapStart
+                tapStart.appearTime = getAppearTime(note)
+            default:
+                break
+            }
+        }
+    }
+    
+    /// ノーツが画面上に現れる時刻を返す(updateするかの判定に使用)
+    private static func getAppearTime(_ note: Note) -> TimeInterval {
+        
+        var judgeTime: TimeInterval = 0.0   // 判定線所雨に乗る時刻
+        var i = 0
+        while i + 1 < Note.BPMs.count && Note.BPMs[i + 1].startPos < note.beat {
+            judgeTime += (Note.BPMs[i + 1].startPos - Note.BPMs[i].startPos) / (Note.BPMs[i].bpm/60)
+            
+            i += 1
+        }
+        judgeTime += (note.beat - Note.BPMs[i].startPos) / (Note.BPMs[i].bpm/60)
+        
+        let speed = note.baseSpeed * CGFloat(Note.BPMs[i].bpm / Note.majorBPM)
+        let appearTime = judgeTime - TimeInterval(Dimensions.laneLength / speed)   // judgeTime - レーン端から端までかかる時間
+        
+        return appearTime
     }
     
     /// ノーツの表示状態の更新、毎フレーム呼ばれる
-    /// 格派生クラスでオーバーライドされる
+    /// 各派生クラスでオーバーライドされる
     ///
     /// - Parameter passedTime: プレイ開始からの経過時間(BGMの経過時間とは異なる)
     func update(_ passedTime: TimeInterval) {
         setPositionOnLane(passedTime)
     }
     
-    // 時刻から3D空間レーン上のノーツ座標を得る
+    /// 経過時間から3D空間レーン上のノーツ座標を得る
     private func setPositionOnLane(_ passedTime: TimeInterval) {
         
-        // passedTimeを現在のbeatに変換する
-        var timeSum: TimeInterval = 0
+        var remainingTime: TimeInterval = 0.0   // 判定線所雨に乗る時刻 - 現在時刻
         var i = 0
-        while i + 1 < Note.BPMs.count {
-            let timeInterval = TimeInterval((Note.BPMs[i + 1].startPos - Note.BPMs[i].startPos) / (Note.BPMs[i].bpm/60))
-            if timeSum + timeInterval > passedTime {
-                break
-            }
-            timeSum += timeInterval
+        while i + 1 < Note.BPMs.count && Note.BPMs[i + 1].startPos < beat {
+            remainingTime += (Note.BPMs[i + 1].startPos - Note.BPMs[i].startPos) / (Note.BPMs[i].bpm/60)
+            
             i += 1
         }
-        let currentBeat = Note.BPMs[i].startPos + (passedTime - timeSum) * Note.BPMs[i].bpm / 60        // 判定線上における現在の経過beat
+        remainingTime += (beat - Note.BPMs[i].startPos) / (Note.BPMs[i].bpm/60)
+        remainingTime -= passedTime
         
-        self.positionOnLane = CGFloat(beat - currentBeat) * Note.beatSpeed * CGFloat(noteSpeedRatio)    // beat差に応じて位置を設定。（BPMが大きいところではbeat差が早く縮む）
+        self.positionOnLane = CGFloat(remainingTime) * baseSpeed * CGFloat(Note.BPMs[i].bpm / Note.majorBPM)    // 判定線からの水平距離x
     }
     
     // ノーツの座標を設定
