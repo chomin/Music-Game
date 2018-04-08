@@ -175,6 +175,7 @@ class TapStart: Note {
 
         
         /* longImage.longを更新 */
+        
         let long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)  // 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
         
         // 終点の情報を代入
@@ -223,10 +224,9 @@ class TapStart: Note {
             let deltaY = Dimensions.R * atan(Note.scale * Dimensions.laneWidth * Dimensions.verticalDistance / denomOfAtan)
             
             longImages.circle.yScale = deltaY / Note.initialSize
-            longImages.circle.xScale = Note.scale           // TODO: 大きすぎ。初期値が違うから
+            longImages.circle.xScale = Dimensions.laneWidth * Note.scale / Note.initialSize     // 横幅は不変。できれば初期値で指定したい。レーン幅に対しノーツサイズを一定にすれば可能
             longImages.circle.position = long.startPos
-            let d = Dimensions.frameMidX - CGFloat(1.5 + Double(laneIndex)) * Dimensions.laneWidth  // 判定線中央から測ったx座標
-            longImages.circle.zRotation = atan(d / (Dimensions.horizontalDistance * 8))
+            longImages.circle.zRotation = atan((Dimensions.frameMidX - long.startPos.x) / (Dimensions.horizontalDistance * 8))
         }
         
         
@@ -320,7 +320,9 @@ class Middle: Note {
         // スケールを変更
         setScale()
         
+        
         /* longImage.longを更新 */
+        
         let long: (startPos: CGPoint, endPos: CGPoint, startWidth: CGFloat, endWidth: CGFloat)  // 部分ロングノーツの(始点中心座標, 終点中心座標, 始点幅, 終点幅)
         
         // 終点の情報を代入
@@ -369,11 +371,10 @@ class Middle: Note {
             let deltaY = Dimensions.R * atan(Note.scale * Dimensions.laneWidth * Dimensions.verticalDistance / denomOfAtan)
             
             longImages.circle.yScale = deltaY / Note.initialSize
-            longImages.circle.xScale = Note.scale
+            longImages.circle.xScale = Dimensions.laneWidth * Note.scale / Note.initialSize     // 横幅は不変。できれば初期値で指定したい。レーン幅に対しノーツサイズを一定にすれば可能
             longImages.circle.position = long.startPos
-            let d = Dimensions.frameMidX - CGFloat(1.5 + Double(laneIndex)) * Dimensions.laneWidth  // 判定線中央から測ったx座標
-            longImages.circle.zRotation = atan(d / (Dimensions.horizontalDistance * 8))
-        }
+            longImages.circle.zRotation = atan((Dimensions.frameMidX - long.startPos.x) / (Dimensions.horizontalDistance * 8))
+       }
         
         
         // isHiddenを更新
@@ -535,7 +536,7 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         self.image.removeFromParent()
     }
     
-    // クラスプロパティとappearTimeを設定
+    /// クラスプロパティとappearTimeを設定
     static func initialize(_ BPMs: [(bpm: Double, startPos: Double)], _ duration: TimeInterval, _ notes: [Note]) {
         
         guard !BPMs.isEmpty else {
@@ -561,8 +562,7 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         Note.majorBPM = BPMIntervals.max { $0.interval < $1.interval }!.bpm
         Note.BPMs = BPMs
         
-        /* appearTimeの設定 */
-        
+        // appearTimeの設定
         for note in notes {
             switch note {
             case is Tap:
@@ -622,7 +622,7 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         self.positionOnLane = CGFloat(remainingTime) * baseSpeed * CGFloat(Note.BPMs[i].bpm / Note.majorBPM)    // 判定線からの水平距離x
     }
     
-    // ノーツの座標を設定
+    /// ノーツの座標を設定
     fileprivate func setPos() {
         
         /* y座標の計算 */
@@ -647,7 +647,7 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         self.position = CGPoint(x: posX, y: posY)
     }
     
-    // ノーツのスケールを設定
+    /// ノーツのスケールを設定
     fileprivate func setScale() {
         
         // ノーツの横幅を計算

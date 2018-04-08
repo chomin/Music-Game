@@ -314,7 +314,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             if let start = note as? TapStart {
                 var following = start.next
-                while(true) {
+                while true {
                     lanes[following.laneIndex].append(following)
                     if let middle = following as? Middle {
                         following = middle.next
@@ -358,7 +358,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // レーンの更新(ノーツ更新後に実行)
         for lane in lanes {
-             lane.update(passedTime, self.BPMs)
+             lane.update(passedTime, BPMs)
         }
         
         // 同時押しラインの更新
