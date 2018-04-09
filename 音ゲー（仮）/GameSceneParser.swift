@@ -350,6 +350,16 @@ extension GameScene {   // bmsファイルを読み込む
                             BPMs.append((bpm: Double(newBPM), startPos: beat))
                         }
                     }
+                } else if channel == 14 && laneNum == 6 {
+                    // ミリシタ譜面の特大ノーツを処理
+                    for (index, ob) in body.enumerated() {
+                        if NoteExpression(rawValue: ob) == .tapLL {
+                            let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
+                            let ratio = (speedRatioTable[beat] ?? 1.0) * userSpeedRatio
+                            notes.append(Tap(beatPos: beat, laneIndex: 2, speedRatio: ratio, isLarge: true))
+                            notes.append(Tap(beatPos: beat, laneIndex: 3, speedRatio: ratio, isLarge: true))
+                        }
+                    }
                 }
             }
             
