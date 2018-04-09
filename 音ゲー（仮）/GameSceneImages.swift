@@ -14,8 +14,8 @@ extension GameScene {
     func setImages() {
         
         // レーンの境目の線の描写
-        for i in 0...7 {
-            var points = [CGPoint(x: self.frame.width*CGFloat(i+1)/9 ,y: self.frame.width/9) ,CGPoint(x: self.frame.width/2 - Dimensions.horizonLength/2 + CGFloat(i)*Dimensions.horizonLength/7 ,y: Dimensions.horizonY)]
+        for i in 0...laneNum {
+            var points = [CGPoint(x: Dimensions.laneWidth * CGFloat(i+1), y: Dimensions.judgeLineY), CGPoint(x: Dimensions.horizonLeftX + Dimensions.laneWidthOnHorizon*CGFloat(i), y: Dimensions.horizonY)]
             let line = SKShapeNode(points: &points, count: points.count)
             
             line.lineWidth = 1.0
@@ -26,11 +26,11 @@ extension GameScene {
         }
         
         // 判定ラインの描写
-        var jlPoint = [CGPoint(x: 0.0, y: 0.0), CGPoint(x: self.frame.width/9*7, y: 0.0)]
+        var jlPoint = [CGPoint(x: 0.0, y: 0.0), CGPoint(x: Dimensions.laneWidth * CGFloat(laneNum), y: 0.0)]
         judgeLine = SKShapeNode(points: &jlPoint, count: jlPoint.count)
         judgeLine.lineWidth = 3.0
         judgeLine.strokeColor = UIColor.white
-        judgeLine.position = CGPoint(x: self.frame.width/9, y: self.frame.width/9)
+        judgeLine.position = CGPoint(x: Dimensions.laneWidth, y: Dimensions.judgeLineY)
         self.addChild(judgeLine)
         
         
@@ -104,7 +104,7 @@ extension GameScene {
     
     func paintSameLine(i: Note, j: Note) {
         // 同時押しラインの描写
-        var lPoint = [CGPoint(x: 0,y: 0), CGPoint(x: CGFloat(j.laneIndex - i.laneIndex) * Dimensions.laneWidth, y: 0)]
+        var lPoint = [CGPoint(x: 0, y: 0), CGPoint(x: CGFloat(j.laneIndex - i.laneIndex) * Dimensions.laneWidth, y: 0)]
         let line = SKShapeNode(points: &lPoint, count: lPoint.count)
         line.lineWidth = 3.0
         line.strokeColor = UIColor.white

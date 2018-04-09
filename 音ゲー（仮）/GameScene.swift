@@ -103,16 +103,19 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var playLevel = 0           // 難易度
     var volWav = 100            // 音量を現段階のn%として出力するか(TODO: 未実装)
     var BPMs: [(bpm: Double, startPos: Double)] = []        // 可変BPM情報
+    var laneNum = 7             // レーン数(指定されなければデフォルトで7)
     
     private var startTime: TimeInterval = 0.0       // シーン移動した時の時間
     var passedTime: TimeInterval = 0.0              // 経過時間
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
-    let lanes = [Lane(laneIndex: 0), Lane(laneIndex: 1), Lane(laneIndex: 2), Lane(laneIndex: 3), Lane(laneIndex: 4), Lane(laneIndex: 5), Lane(laneIndex: 6)]     // レーン
+    var lanes: [Lane] = []      // レーン
     
-    private let userSpeedRatio: Double
+    let userSpeedRatio: Double
     
     
-    init(musicName: MusicName, playMode: PlayMode, size: CGSize, speedRatioInt: UInt) {   // YouTube用
+    
+    
+    init(musicName: MusicName, playMode: PlayMode, size: CGSize, speedRatioInt: UInt) {
 
         self.musicName = musicName
         self.playMode = playMode
@@ -129,22 +132,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     
+    
     override func didMove(to view: SKView) {
         
-      
-        
-        // ボタンの設定
-        pauseButton = {() -> UIButton in
-            let Button = UIButton()
-
-            Button.setImage(UIImage(named: ImageName.pause.rawValue), for: .normal)
-            Button.setImage(UIImage(named: ImageName.pauseSelected.rawValue), for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickPauseButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize) // yは上からの座標
-            self.view?.addSubview(Button)
-
-            return Button
-        }()
         
         appDelegate = UIApplication.shared.delegate as! AppDelegate // AppDelegateのインスタンスを取得
         appDelegate.gsDelegate = self   // 子(AppDelegate)の設定しているdelegateに自身をセット
@@ -153,8 +143,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.view?.superview?.isMultipleTouchEnabled = true
         
         
-        
-        // notesにノーツの"　始　点　"を入れる(必ずcreateInstanceの後に実行)
+        // notesにノーツの"　始　点　"を入れる
         do {
             try parse(fileName: musicName.rawValue + ".bms")
         }
@@ -168,6 +157,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         catch ParseError.unexpected     (let msg) { print(msg) }
         catch                                     { print("未知のエラー") }
         
+        // 寸法に関する定数をセット(必ずパース後に実行(laneNumを読み込むため))
+        Dimensions.createInstance(frame: view.frame, laneNum: laneNum)
+        
+        // Laneインスタンスを作成
+        for i in 0..<self.laneNum {
+            self.lanes.append(Lane(laneIndex: i))
+        }
         
         // BGMまたはYouTubeのプレイヤーを作成(必ずパース後に実行する。(videoIDを読み込むため))
         switch playMode {
@@ -206,9 +202,21 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // Noteクラスのクラスプロパティを設定
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration()    // BGMまたは映像の長さ
-        Note.setConstants(BPMs, userSpeedRatio, duration)
+        Note.initialize(BPMs, duration, notes)
         
         
+        // ボタンの設定
+        pauseButton = { () -> UIButton in
+            let Button = UIButton()
+            
+            Button.setImage(UIImage(named: ImageName.pause.rawValue), for: .normal)
+            Button.setImage(UIImage(named: ImageName.pauseSelected.rawValue), for: .highlighted)
+            Button.addTarget(self, action: #selector(onClickPauseButton(_:)), for: .touchUpInside)
+            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize) // yは上からの座標
+            self.view?.addSubview(Button)
+            
+            return Button
+        }()
         
         //リザルトの初期化
         ResultScene.parfect = 0
@@ -225,7 +233,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             Label.fontSize = self.frame.width / 36
             Label.horizontalAlignmentMode = .center // 中央寄せ
-            Label.position = CGPoint(x: self.frame.midX, y: self.frame.width/9*2)
+            Label.position = CGPoint(x: self.frame.midX, y: Dimensions.judgeLineY * 2)
             Label.fontColor = SKColor.yellow
             
             self.addChild(Label)
@@ -306,7 +314,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             if let start = note as? TapStart {
                 var following = start.next
-                while(true) {
+                while true {
                     lanes[following.laneIndex].append(following)
                     if let middle = following as? Middle {
                         following = middle.next
@@ -348,9 +356,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             note.update(passedTime)
         }
         
-        // レーンの更新
+        // レーンの更新(ノーツ更新後に実行)
         for lane in lanes {
-             lane.update(passedTime, self.BPMs)
+             lane.update(passedTime, BPMs)
         }
         
         // 同時押しラインの更新
@@ -361,7 +369,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             // 表示状態の更新
             line.isHidden = note1.image.isHidden || note2.image.isHidden
             // 大きさも変更
-            line.setScale(note1.image.xScale / Note.scale)
+            line.setScale(note1.size / Note.scale / Dimensions.laneWidth)
         }
         
         
