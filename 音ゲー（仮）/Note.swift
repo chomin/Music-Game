@@ -131,7 +131,7 @@ class TapStart: Note {
         longImages.long.alpha = 0.8
         longImages.long.zPosition = -1
         longImages.long.isHidden = true
-        longImages.circle.fillColor = UIColor.green
+        longImages.circle.fillColor = isLarge ? UIColor.yellow : UIColor.green
         longImages.circle.isHidden = true
     }
     
@@ -288,7 +288,7 @@ class Middle: Note {
         longImages.long.alpha = 0.8
         longImages.long.zPosition = -1
         longImages.long.isHidden = true
-        longImages.circle.fillColor = UIColor.green
+//        longImages.circle.fillColor = UIColor.green
         longImages.circle.isHidden = true
     }
     
