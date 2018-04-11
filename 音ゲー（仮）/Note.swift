@@ -184,8 +184,10 @@ class TapStart: Note {
             long.endWidth = next.size / Note.scale
         } else {                                        // 終点ノーツが描画域より奥にあるとき
             let posY = Dimensions.horizonY
-            let posX = ((next.position.y - Dimensions.horizonY) * position.x + (Dimensions.horizonY - position.y) * next.position.x)
-                / (next.position.y - position.y)        // 始点と終点のx座標を内分
+            let posXOnHorizon     = Dimensions.horizonLeftX + Dimensions.laneWidthOnHorizon * CGFloat(Double(laneIndex) + 1/2)
+            let posXOnHorizonNext = Dimensions.horizonLeftX + Dimensions.laneWidthOnHorizon * CGFloat(Double(next.laneIndex) + 1/2)
+            let posX = ((Dimensions.laneLength - positionOnLane) * posXOnHorizonNext + (next.positionOnLane - Dimensions.laneLength) * posXOnHorizon)
+                / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.endPos = CGPoint(x: posX, y: posY)
             long.endWidth = Dimensions.laneWidthOnHorizon
@@ -196,8 +198,8 @@ class TapStart: Note {
             long.startWidth = size / Note.scale
         } else {
             let posY = Dimensions.judgeLineY
-            let posX = ((next.position.y - Dimensions.judgeLineY) * position.x + (Dimensions.judgeLineY - position.y) * next.position.x)
-                / (next.position.y - position.y)            // 始点と終点のx座標を内分
+            let posX = (-positionOnLane * Dimensions.buttonX[next.laneIndex] + next.positionOnLane * Dimensions.buttonX[laneIndex])
+                / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.startPos = CGPoint(x: posX, y: posY)
             long.startWidth = Dimensions.laneWidth
@@ -331,8 +333,10 @@ class Middle: Note {
             long.endWidth = next.size / Note.scale
         } else {                                        // 終点ノーツが描画域より奥にあるとき
             let posY = Dimensions.horizonY
-            let posX = ((next.position.y - Dimensions.horizonY) * position.x + (Dimensions.horizonY - position.y) * next.position.x)
-                / (next.position.y - position.y)        // 始点と終点のx座標を内分
+            let posXOnHorizon     = Dimensions.horizonLeftX + Dimensions.laneWidthOnHorizon * CGFloat(Double(laneIndex) + 1/2)
+            let posXOnHorizonNext = Dimensions.horizonLeftX + Dimensions.laneWidthOnHorizon * CGFloat(Double(next.laneIndex) + 1/2)
+            let posX = ((Dimensions.laneLength - positionOnLane) * posXOnHorizonNext + (next.positionOnLane - Dimensions.laneLength) * posXOnHorizon)
+                / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.endPos = CGPoint(x: posX, y: posY)
             long.endWidth = Dimensions.laneWidthOnHorizon
@@ -343,9 +347,9 @@ class Middle: Note {
             long.startWidth = size / Note.scale
         } else {
             let posY = Dimensions.judgeLineY
-            let posX = ((next.position.y - Dimensions.judgeLineY) * position.x + (Dimensions.judgeLineY - position.y) * next.position.x)
-                / (next.position.y - position.y)            // 始点と終点のx座標を内分
-            
+            let posX = (-positionOnLane * Dimensions.buttonX[next.laneIndex] + next.positionOnLane * Dimensions.buttonX[laneIndex])
+                / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
+
             long.startPos = CGPoint(x: posX, y: posY)
             long.startWidth = Dimensions.laneWidth
         }
