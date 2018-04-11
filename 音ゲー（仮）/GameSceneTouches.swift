@@ -15,7 +15,7 @@ extension GameScene {
     // タッチ関係(恐らく、同フレーム内でupdate()等の後に呼び出されている)
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        
+        guard !isAutoPlay else { return }
         
         
         judgeQueue.sync {
@@ -89,6 +89,9 @@ extension GameScene {
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        guard !isAutoPlay else { return }
+        
         judgeQueue.sync {
             for i in self.lanes {
                 guard i.isTimeLagSet else { return }
@@ -196,6 +199,9 @@ extension GameScene {
     
     // touchMovedと似てる。TapEndの判定をするかだけが違う
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        guard !isAutoPlay else { return }
+
         judgeQueue.sync {
             
             for touch in touches {
