@@ -27,6 +27,12 @@ enum MusicName: String, EnumCollection {
     case brandNewTheater        = "Brand New Theater!"
     case buonAppetitoS          = "ぼなぺてぃーとS"
     case level5                 = "LEVEL5-Judgelight-"
+    case shootingStars          = "Shooting Stars"
+    case twinkleRhythm          = "ZETTAI × BREAK!! トゥインクルリズム"
+    case growingStorm           = "Growing Storm!"
+    case utaMas                 = "THE IDOLM@STER"
+    case marionettesNeverSleep  = "Marionetteは眠らない"
+    case machiukePrince         = "待ち受けプリンス"
     
     static func getPickerArray() -> [String] {
         
