@@ -16,7 +16,7 @@ import youtube_ios_player_helper    // 今後、これを利用するために.x
 
 
 
-// 判定関係のフラグ付きタッチ情報
+/// 判定関係のフラグ付きタッチ情報
 class GSTouch { // 参照型として扱いたい
     let touch: UITouch
     var isJudgeableFlick: Bool      // このタッチでのフリック判定を許すor許さない
@@ -31,7 +31,7 @@ class GSTouch { // 参照型として扱いたい
     }
 }
 
-// 同時押し線の画像情報
+/// 同時押し線の画像情報
 class SameLine {
     unowned var note1: Note
     unowned var note2: Note
@@ -49,14 +49,15 @@ class SameLine {
 }
 
 
-
-class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {    // 音ゲーをするシーン
+/// 音ゲーをするシーン
+class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {
     
     
 //    var tmpCounter = 0  //デバッグ用
 //    static var ultiateSuperGod = true 4月1日は終わりました
     
     var playMode: PlayMode
+    var isAutoPlay: Bool
     
     let judgeQueue = DispatchQueue(label: "judge_queue")    // キューに入れた処理内容を順番に実行(FPS落ち対策)
     
@@ -115,16 +116,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     
     
-    init(musicName: MusicName, playMode: PlayMode, size: CGSize, speedRatioInt: UInt) {
+    init(musicName: MusicName, playMode: PlayMode, isAutoPlay: Bool,  size: CGSize, speedRatioInt: UInt) {
 
         self.musicName = musicName
         self.playMode = playMode
+        self.isAutoPlay = isAutoPlay
         self.userSpeedRatio = Double(speedRatioInt) / 100
         
-        
         super.init(size: size)
-        
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -189,7 +188,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 print("ロードに失敗")
                 
                 // BGMモードへ移行
-                let scene = GameScene(musicName: self.musicName, playMode: .BGM, size: view.bounds.size, speedRatioInt: UInt(self.userSpeedRatio*100))
+                let scene = GameScene(musicName: self.musicName, playMode: .BGM, isAutoPlay: self.isAutoPlay, size: view.bounds.size, speedRatioInt: UInt(self.userSpeedRatio*100))
                 let skView = view as SKView?    // このviewはGameViewControllerのskView2
                 skView?.showsFPS = true
                 skView?.showsNodeCount = true
@@ -200,7 +199,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         
-        // Noteクラスのクラスプロパティを設定
+        // Noteクラスのクラスプロパティを設定(必ずパース後にすること)
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration()    // BGMまたは映像の長さ
         Note.initialize(BPMs, duration, notes)
         
@@ -373,50 +372,69 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         
-        // 判定関係
-        // middleの判定（同じところで長押しのやつ）
-        judgeQueue.sync {
-            
-            
-            for gsTouch in self.allGSTouches {
-                
-                let pos = gsTouch.touch.location(in: self.view?.superview)
-                
-                for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
+        if isAutoPlay {
+            for lane in lanes {
+                if lane.timeLag <= 0 && !(lane.isEmpty) {
+                    switch lane.headNote! {
+                    case is Flick, is FlickEnd          : self.actionSoundSet.play(type: .flick)
+                    case is Middle                      : self.actionSoundSet.play(type: .middle)
+                    case is Tap, is TapStart, is TapEnd : self.actionSoundSet.play(type: .tap)
+                    default:
+                        print("ノーツの型の見落とし")
+                    }
                     
-                    if judgeRect.contains(pos) {   // ボタンの範囲
+                    _ = judge(lane: lane, timeLag: 0, touch: nil)
+                    
+                }
+            }
+        } else {
+            // 判定関係
+            // middleの判定（同じところで長押しのやつ）
+            judgeQueue.sync {
+                
+                
+                for gsTouch in self.allGSTouches {
+                    
+                    let pos = gsTouch.touch.location(in: self.view?.superview)
+                    
+                    for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
                         
-                        if self.parfectMiddleJudge(lane: self.lanes[laneIndex]) { // middleの判定
+                        if judgeRect.contains(pos) {   // ボタンの範囲
                             
-                            self.actionSoundSet.play(type: .middle)
-                            gsTouch.isJudgeableFlickEnd = true
-                            break
+                            if self.parfectMiddleJudge(lane: self.lanes[laneIndex]) { // middleの判定
+                                
+                                self.actionSoundSet.play(type: .middle)
+                                gsTouch.isJudgeableFlickEnd = true
+                                break
+                            }
+                        }
+                    }
+                }
+                
+                
+                
+                // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
+                for lane in self.lanes {
+                    if lane.judgeTimeState == .passed && !(lane.isEmpty) {
+                        
+                        self.missJudge(lane: lane)
+                        
+                    } else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
+                        if lane.timeLag < -storedFlickJudgeInformation.timeLag {
+                            
+                            self.storedFlickJudge(lane: lane)
                         }
                     }
                 }
             }
             
-            
-            
-            // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
-            for lane in self.lanes {
-                if lane.judgeTimeState == .passed && !(lane.isEmpty) {
-                    
-                    self.missJudge(lane: lane)
-                    
-                } else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
-                    if lane.timeLag < -storedFlickJudgeInformation.timeLag {
-                        
-                        self.storedFlickJudge(lane: lane)
-                    }
-                }
+            // レーンの更新(再)(判定後、laneNotes[0]が入れ替わるので、それを反映させる)
+            for lane in lanes {
+                lane.update(passedTime, self.BPMs)
             }
         }
         
-        // レーンの更新(再)(判定後、laneNotes[0]が入れ替わるので、それを反映させる)
-        for lane in lanes {
-            lane.update(passedTime, self.BPMs)
-        }
+        
     }
     
     override func willMove(from view: SKView) {
@@ -568,7 +586,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         print(error)
         
         //BGMモードへ移行
-        let scene = GameScene(musicName:self.musicName, playMode: .BGM ,size: (view?.bounds.size)!, speedRatioInt:UInt(self.userSpeedRatio*100))
+        let scene = GameScene(musicName:self.musicName, playMode: .BGM , isAutoPlay: self.isAutoPlay, size: (view?.bounds.size)!, speedRatioInt:UInt(self.userSpeedRatio*100))
         let skView = view as SKView?    //このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true

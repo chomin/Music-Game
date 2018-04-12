@@ -17,15 +17,44 @@ class ChooseMusicScene: SKScene {
         case userSpeedRatioInt = "userSpeedRatioInt"
     }
     
-    var picker:PickerKeyboard!
-    
+    // 初期画面のボタンなど
+    var picker: PickerKeyboard!
     var playButton = UIButton()
     var settingButton = UIButton()
+    var autoPlaySwitch = UISwitch()
+    var YouTubeSwitch = UISwitch()
+    var mainContents: [UIControl] {
+        get{
+            var contents: [UIControl] = []
+            contents.append(picker)
+            contents.append(playButton)
+            contents.append(settingButton)
+            contents.append(autoPlaySwitch)
+            contents.append(YouTubeSwitch)
+            return contents
+        }
+    }
+    
+    // 設定画面のボタン
     var plusButton = UIButton()
     var plus10Button = UIButton()
     var minusButton = UIButton()
     var minus10Button = UIButton()
     var saveAndBackButton = UIButton()
+    var settingLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")    // "設定画面"
+    var speedLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")      // スピードの値（％）
+    var speedTitleLabel = SKLabelNode(fontNamed: "HiraginoSans-W6") // "速さ"
+    var settingContents: [UIControl] {
+        get{
+            var contents: [UIControl] = []
+            contents.append(plusButton)
+            contents.append(plus10Button)
+            contents.append(minusButton)
+            contents.append(minus10Button)
+            contents.append(saveAndBackButton)
+            return contents
+        }
+    }
     
     let settingImage = UIImage(named: ImageName.setting.rawValue)
     let settingImageSelected = UIImage(named: ImageName.settingSelected.rawValue)
@@ -40,9 +69,7 @@ class ChooseMusicScene: SKScene {
     let saveAndBackImage = UIImage(named: ImageName.saveAndBack.rawValue)
     let saveAndBackImageSelected = UIImage(named: ImageName.saveAndBackSelected.rawValue)
     
-    var settingLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")    // "設定画面"
-    var speedLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")      // スピードの値（％）
-    var speedTitleLabel = SKLabelNode(fontNamed: "HiraginoSans-W6") // "速さ"
+   
     
 //    var iconButtonSize:CGFloat!
     var speedsPosY:CGFloat!
@@ -62,7 +89,7 @@ class ChooseMusicScene: SKScene {
         
         backgroundColor = .white
         
-        //ピッカーキーボードの設置
+        // ピッカーキーボードの設置
         let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
         picker = PickerKeyboard(frame:rect)
         picker.backgroundColor = .gray
@@ -70,7 +97,8 @@ class ChooseMusicScene: SKScene {
         self.view?.addSubview(picker!)
         
         
-        //ボタンの設定
+        // ボタンなどの設定
+        // 初期画面のボタン
         playButton = {() -> UIButton in
             let Button = UIButton()
             
@@ -101,11 +129,33 @@ class ChooseMusicScene: SKScene {
             Button.addTarget(self, action: #selector(onSettingButton(_:)), for: .touchDown)
             Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
 
-            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)// yは上からの座標
+            Button.isHidden = false
             self.view?.addSubview(Button)
             return Button
         }()
         
+        YouTubeSwitch = {() -> UISwitch in
+            let swicth: UISwitch = UISwitch()
+            swicth.layer.position = CGPoint(x: self.frame.width/4, y: self.frame.height/3)
+            swicth.tintColor = .black   // Swicthの枠線を表示する.
+            
+            self.view?.addSubview(swicth)
+            
+            return swicth
+        }()
+        
+        autoPlaySwitch = {() -> UISwitch in
+            let swicth: UISwitch = UISwitch()
+            swicth.layer.position = CGPoint(x: self.frame.width/4, y: self.frame.height/3 + swicth.bounds.height*1.5)
+            swicth.tintColor = .black   // Swicthの枠線を表示する.
+            
+            self.view?.addSubview(swicth)
+            
+            return swicth
+        }()
+        
+        // 設定画面のボタン
         plusButton = {() -> UIButton in
             let Button = UIButton()
             
@@ -237,9 +287,9 @@ class ChooseMusicScene: SKScene {
                 (defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue) <= 21 ||
                 defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue) >= 201) { playMode = .YouTube2 /* 裏シオン */ }
             
-            scene = GameScene(musicName: MusicName(rawValue: pickerTextStore)!, playMode: playMode, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
+            scene = GameScene(musicName: MusicName(rawValue: pickerTextStore)!, playMode: playMode, isAutoPlay: autoPlaySwitch.isOn, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
         }else{
-            scene = GameScene(musicName: MusicName(rawValue: picker.textStore)! ,playMode: .BGM ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
+            scene = GameScene(musicName: MusicName(rawValue: picker.textStore)! , playMode: .BGM , isAutoPlay: autoPlaySwitch.isOn, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
         }
         
        
@@ -277,7 +327,7 @@ class ChooseMusicScene: SKScene {
     
     @objc func onClickMinus10Button(_ sender : UIButton){
         if userSpeedRatioInt > 10 { userSpeedRatioInt -= 10 }
-        else 			    { userSpeedRatioInt =  0  }
+        else 			          { userSpeedRatioInt  =  0 }
     }
     
     @objc func onClickSaveAndBackButton(_ sender : UIButton){
@@ -302,21 +352,31 @@ class ChooseMusicScene: SKScene {
     }
     
     func showMainContents(){
-        picker.isHidden = false
-        playButton.isHidden = false
-        settingButton.isHidden = false
+        for contents in mainContents {
+            contents.isHidden = false
+            contents.isEnabled = true
+        }
         
-        playButton.isEnabled = true
-        settingButton.isEnabled = true
+//        picker.isHidden = false
+//        playButton.isHidden = false
+//        settingButton.isHidden = false
+//
+//        playButton.isEnabled = true
+//        settingButton.isEnabled = true
     }
     
     func hideMainContents(){
-        picker.isHidden = true
-        playButton.isHidden = true
-        settingButton.isHidden = true
+        for contents in mainContents {
+            contents.isHidden = true
+        }
+//        picker.isHidden = true
+//        playButton.isHidden = true
+//        settingButton.isHidden = true
     }
     
     func showSettingContents(){
+        
+        
         settingLabel.isHidden = false
         speedLabel.isHidden = false
         speedTitleLabel.isHidden = false
