@@ -17,19 +17,44 @@ class ChooseMusicScene: SKScene {
         case userSpeedRatioInt = "userSpeedRatioInt"
     }
     
-    var picker:PickerKeyboard!
-    
-    // 初期画面のボタン
+    // 初期画面のボタンなど
+    var picker: PickerKeyboard!
     var playButton = UIButton()
     var settingButton = UIButton()
     var autoPlaySwitch = UISwitch()
     var YouTubeSwitch = UISwitch()
+    var mainContents: [UIControl] {
+        get{
+            var contents: [UIControl] = []
+            contents.append(picker)
+            contents.append(playButton)
+            contents.append(settingButton)
+            contents.append(autoPlaySwitch)
+            contents.append(YouTubeSwitch)
+            return contents
+        }
+    }
+    
     // 設定画面のボタン
     var plusButton = UIButton()
     var plus10Button = UIButton()
     var minusButton = UIButton()
     var minus10Button = UIButton()
     var saveAndBackButton = UIButton()
+    var settingLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")    // "設定画面"
+    var speedLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")      // スピードの値（％）
+    var speedTitleLabel = SKLabelNode(fontNamed: "HiraginoSans-W6") // "速さ"
+    var settingContents: [UIControl] {
+        get{
+            var contents: [UIControl] = []
+            contents.append(plusButton)
+            contents.append(plus10Button)
+            contents.append(minusButton)
+            contents.append(minus10Button)
+            contents.append(saveAndBackButton)
+            return contents
+        }
+    }
     
     let settingImage = UIImage(named: ImageName.setting.rawValue)
     let settingImageSelected = UIImage(named: ImageName.settingSelected.rawValue)
@@ -44,9 +69,7 @@ class ChooseMusicScene: SKScene {
     let saveAndBackImage = UIImage(named: ImageName.saveAndBack.rawValue)
     let saveAndBackImageSelected = UIImage(named: ImageName.saveAndBackSelected.rawValue)
     
-    var settingLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")    // "設定画面"
-    var speedLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")      // スピードの値（％）
-    var speedTitleLabel = SKLabelNode(fontNamed: "HiraginoSans-W6") // "速さ"
+   
     
 //    var iconButtonSize:CGFloat!
     var speedsPosY:CGFloat!
@@ -329,21 +352,31 @@ class ChooseMusicScene: SKScene {
     }
     
     func showMainContents(){
-        picker.isHidden = false
-        playButton.isHidden = false
-        settingButton.isHidden = false
+        for contents in mainContents {
+            contents.isHidden = false
+            contents.isEnabled = true
+        }
         
-        playButton.isEnabled = true
-        settingButton.isEnabled = true
+//        picker.isHidden = false
+//        playButton.isHidden = false
+//        settingButton.isHidden = false
+//
+//        playButton.isEnabled = true
+//        settingButton.isEnabled = true
     }
     
     func hideMainContents(){
-        picker.isHidden = true
-        playButton.isHidden = true
-        settingButton.isHidden = true
+        for contents in mainContents {
+            contents.isHidden = true
+        }
+//        picker.isHidden = true
+//        playButton.isHidden = true
+//        settingButton.isHidden = true
     }
     
     func showSettingContents(){
+        
+        
         settingLabel.isHidden = false
         speedLabel.isHidden = false
         speedTitleLabel.isHidden = false
