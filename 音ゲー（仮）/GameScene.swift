@@ -323,6 +323,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 }
             }
         }
+        for lane in lanes {
+            lane.sort()
+        }
     }
     
     
