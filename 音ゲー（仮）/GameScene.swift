@@ -154,6 +154,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         catch ParseError.noLongNoteStart(let msg) { print(msg) }
         catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
         catch ParseError.unexpected     (let msg) { print(msg) }
+        catch ParseError.lackOfVideoID  (let msg) {
+            print(msg)
+            reloadSceneAsBGMMode()
+            return
+        }
         catch                                     { print("未知のエラー") }
         
         // 寸法に関する定数をセット(必ずパース後に実行(laneNumを読み込むため))
@@ -187,14 +192,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             if !(self.playerView.load(withVideoId: videoID, playerVars: ["autoplay": 1, "controls": 0, "playsinline": 1, "rel": 0, "showinfo": 0])) {
                 print("ロードに失敗")
                 
-                // BGMモードへ移行
-                let scene = GameScene(musicName: self.musicName, playMode: .BGM, isAutoPlay: self.isAutoPlay, size: view.bounds.size, speedRatioInt: UInt(self.userSpeedRatio*100))
-                let skView = view as SKView?    // このviewはGameViewControllerのskView2
-                skView?.showsFPS = true
-                skView?.showsNodeCount = true
-                skView?.ignoresSiblingOrder = true
-                scene.scaleMode = .resizeFill
-                skView?.presentScene(scene)  // GameSceneに移動
+                reloadSceneAsBGMMode()
+                return
             }
         }
         
@@ -438,7 +437,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     override func willMove(from view: SKView) {
-        pauseButton.removeFromSuperview()
+        pauseButton?.removeFromSuperview()
         pauseView?.removeFromSuperview()
         playerView?.removeFromSuperview()
     }
@@ -496,6 +495,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         skView?.ignoresSiblingOrder = true
         scene.scaleMode = .resizeFill
         skView?.presentScene(scene)     // ResultSceneに移動
+    }
+    
+    /// BGMモードへ移行
+    func reloadSceneAsBGMMode() {
+        
+        let scene = GameScene(musicName: self.musicName, playMode: .BGM, isAutoPlay: self.isAutoPlay, size: (self.view?.bounds.size)!, speedRatioInt: UInt(self.userSpeedRatio*100))
+        let skView = view as SKView?    // このviewはGameViewControllerのskView2
+        skView?.showsFPS = true
+        skView?.showsNodeCount = true
+        skView?.ignoresSiblingOrder = true
+        scene.scaleMode = .resizeFill
+        skView?.presentScene(scene)  // GameSceneに移動
     }
     
     @objc func onClickPauseButton(_ sender : UIButton){
@@ -582,18 +593,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
     }
     
-    func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {   //エラー処理
+    /// エラー処理
+    func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {
         print(error)
-        
-        //BGMモードへ移行
-        let scene = GameScene(musicName:self.musicName, playMode: .BGM , isAutoPlay: self.isAutoPlay, size: (view?.bounds.size)!, speedRatioInt:UInt(self.userSpeedRatio*100))
-        let skView = view as SKView?    //このviewはGameViewControllerのskView2
-        skView?.showsFPS = true
-        skView?.showsNodeCount = true
-        skView?.ignoresSiblingOrder = true
-        scene.scaleMode = .resizeFill
-        skView?.presentScene(scene)  // GameSceneに移動
-        
+        reloadSceneAsBGMMode()
     }
     
     

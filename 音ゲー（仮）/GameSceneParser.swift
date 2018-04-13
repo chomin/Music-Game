@@ -22,6 +22,7 @@ extension GameScene {   // bmsファイルを読み込む
     // パースエラー定義列挙型
     enum ParseError: Error {
         case lackOfData(String)
+        case lackOfVideoID(String)
         case invalidValue(String)
         case noLongNoteStart(String)
         case noLongNoteEnd(String)
@@ -108,6 +109,10 @@ extension GameScene {   // bmsファイルを読み込む
             }
         }
         
+        if (playMode == .YouTube || playMode == .YouTube2) &&
+            videoID == "" {
+            throw ParseError.lackOfVideoID("ファイル内にvideoIDが見つかりませんでした。BGMモードで実行します。")
+        }
         
         /*--- メインデータをパース ---*/
         

@@ -42,14 +42,14 @@ enum MusicName: String, EnumCollection {
             pickerArray.append(musicName.rawValue)
             
             // YouTubeを実装しているものについてはYouTubeモードをピッカーに追加
-            if musicName == .yo_kosoJapariParkHe ||
-                musicName == .oracion ||
-                musicName == .sakuraSkip ||
-                musicName == .nimenseiUraomoteLife ||
-                musicName == .level5 {
-                
-                pickerArray.append(musicName.rawValue + "(YouTube)")
-            }
+//            if musicName == .yo_kosoJapariParkHe ||
+//                musicName == .oracion ||
+//                musicName == .sakuraSkip ||
+//                musicName == .nimenseiUraomoteLife ||
+//                musicName == .level5 {
+//                
+//                pickerArray.append(musicName.rawValue + "(YouTube)")
+//            }
         }
         return pickerArray
     }
