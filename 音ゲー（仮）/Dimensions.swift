@@ -10,7 +10,6 @@ import UIKit
 
 /// rawvalueが音楽ファイル名に対応する列挙型
 /// 新曲を追加する際はここに曲名を追加する。
-/// YouTube付きのものを追加する際は、getPickerArray()内のif分岐　及び　VideoID列挙型　への追加を忘れずに
 enum MusicName: String, EnumCollection {
     
     case shugabita              = "シュガーソングとビターステップ"
@@ -42,14 +41,14 @@ enum MusicName: String, EnumCollection {
             pickerArray.append(musicName.rawValue)
             
             // YouTubeを実装しているものについてはYouTubeモードをピッカーに追加
-            if musicName == .yo_kosoJapariParkHe ||
-                musicName == .oracion ||
-                musicName == .sakuraSkip ||
-                musicName == .nimenseiUraomoteLife ||
-                musicName == .level5 {
-                
-                pickerArray.append(musicName.rawValue + "(YouTube)")
-            }
+//            if musicName == .yo_kosoJapariParkHe ||
+//                musicName == .oracion ||
+//                musicName == .sakuraSkip ||
+//                musicName == .nimenseiUraomoteLife ||
+//                musicName == .level5 {
+//
+//                pickerArray.append(musicName.rawValue + "(YouTube)")
+//            }
         }
         return pickerArray
     }

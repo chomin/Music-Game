@@ -17,15 +17,53 @@ class ChooseMusicScene: SKScene {
         case userSpeedRatioInt = "userSpeedRatioInt"
     }
     
-    var picker:PickerKeyboard!
-    
+    // 初期画面のボタンなど
+    var picker: PickerKeyboard!
     var playButton = UIButton()
     var settingButton = UIButton()
+    var autoPlaySwitch = UISwitch()
+    var YouTubeSwitch = UISwitch()
+    var autoPlayLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")      // "自動演奏"
+    var YouTubeLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")       // "YouTube"
+    
+    var mainContents: [UIResponder] {
+        get{
+            var contents: [UIResponder] = []
+            contents.append(picker)
+            contents.append(playButton)
+            contents.append(settingButton)
+            contents.append(autoPlaySwitch)
+            contents.append(YouTubeSwitch)
+            contents.append(autoPlayLabel)
+            contents.append(YouTubeLabel)
+            return contents
+        }
+    }
+    
+    // 設定画面のボタンなど
     var plusButton = UIButton()
     var plus10Button = UIButton()
     var minusButton = UIButton()
     var minus10Button = UIButton()
     var saveAndBackButton = UIButton()
+    var settingLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")    // "設定画面"
+    var speedLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")      // スピードの値（％）
+    var speedTitleLabel = SKLabelNode(fontNamed: "HiraginoSans-W6") // "速さ"
+    var settingContents: [UIResponder] {
+        get{
+            var contents: [UIResponder] = []
+            contents.append(plusButton)
+            contents.append(plus10Button)
+            contents.append(minusButton)
+            contents.append(minus10Button)
+            contents.append(saveAndBackButton)
+            contents.append(settingLabel)
+            contents.append(speedLabel)
+            contents.append(speedTitleLabel)
+            
+            return contents
+        }
+    }
     
     let settingImage = UIImage(named: ImageName.setting.rawValue)
     let settingImageSelected = UIImage(named: ImageName.settingSelected.rawValue)
@@ -40,9 +78,7 @@ class ChooseMusicScene: SKScene {
     let saveAndBackImage = UIImage(named: ImageName.saveAndBack.rawValue)
     let saveAndBackImageSelected = UIImage(named: ImageName.saveAndBackSelected.rawValue)
     
-    var settingLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")    // "設定画面"
-    var speedLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")      // スピードの値（％）
-    var speedTitleLabel = SKLabelNode(fontNamed: "HiraginoSans-W6") // "速さ"
+   
     
 //    var iconButtonSize:CGFloat!
     var speedsPosY:CGFloat!
@@ -62,7 +98,7 @@ class ChooseMusicScene: SKScene {
         
         backgroundColor = .white
         
-        //ピッカーキーボードの設置
+        // ピッカーキーボードの設置
         let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
         picker = PickerKeyboard(frame:rect)
         picker.backgroundColor = .gray
@@ -70,7 +106,8 @@ class ChooseMusicScene: SKScene {
         self.view?.addSubview(picker!)
         
         
-        //ボタンの設定
+        // ボタンなどの設定
+        // 初期画面のボタン
         playButton = {() -> UIButton in
             let Button = UIButton()
             
@@ -101,11 +138,64 @@ class ChooseMusicScene: SKScene {
             Button.addTarget(self, action: #selector(onSettingButton(_:)), for: .touchDown)
             Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
 
-            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)// yは上からの座標
+            Button.isHidden = false
             self.view?.addSubview(Button)
             return Button
         }()
         
+        YouTubeSwitch = {() -> UISwitch in
+            let swicth: UISwitch = UISwitch()
+            swicth.layer.position = CGPoint(x: self.frame.width/4, y: self.frame.height/3)
+            swicth.tintColor = .black   // Swicthの枠線を表示する.
+            swicth.isOn = true
+            self.view?.addSubview(swicth)
+            
+            return swicth
+        }()
+        
+        autoPlaySwitch = {() -> UISwitch in
+            let swicth: UISwitch = UISwitch()
+            swicth.layer.position = CGPoint(x: self.frame.width/4, y: self.frame.height/3 + swicth.bounds.height*1.5)
+            swicth.tintColor = .black   // Swicthの枠線を表示する.
+            
+            self.view?.addSubview(swicth)
+            
+            return swicth
+        }()
+        
+        // スイッチの種類を示すラベル(スイッチに連動させるため、スイッチの設定後に行うこと)
+        YouTubeLabel = {() -> SKLabelNode in
+            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            
+            Label.fontSize = YouTubeSwitch.bounds.height*2/3
+            Label.horizontalAlignmentMode = .right // 右寄せ
+            Label.position = convertPoint(fromView: YouTubeSwitch.layer.position)   // view形式の座標をscene形式に変換
+            Label.position.x -= YouTubeSwitch.bounds.width/2
+            Label.position.y -= YouTubeSwitch.bounds.height/5
+            Label.fontColor = SKColor.black
+            Label.text = "YouTube:"
+            
+            self.addChild(Label)
+            return Label
+        }()
+        
+        autoPlayLabel = {() -> SKLabelNode in
+            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            
+            Label.fontSize = autoPlaySwitch.bounds.height*2/3
+            Label.horizontalAlignmentMode = .right // 右寄せ
+            Label.position = convertPoint(fromView: autoPlaySwitch.layer.position)
+            Label.position.x -= autoPlaySwitch.bounds.width/2
+            Label.position.y -= autoPlaySwitch.bounds.height/5
+            Label.fontColor = SKColor.black
+            Label.text = "自動演奏:"
+            
+            self.addChild(Label)
+            return Label
+        }()
+        
+        // 設定画面のボタン
         plusButton = {() -> UIButton in
             let Button = UIButton()
             
@@ -167,7 +257,7 @@ class ChooseMusicScene: SKScene {
         }()
         
         
-        //ラベルの設定
+        // ラベルの設定
         settingLabel = {() -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
@@ -213,6 +303,12 @@ class ChooseMusicScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         speedLabel.text = String(userSpeedRatioInt) + "%"
+//        settingButton.isHidden = false
+//        self.view?.bringSubview(toFront: settingButton)
+        self.view?.addSubview(settingButton)
+        
+        
+        
     }
     
     override func willMove(from view: SKView) {
@@ -227,19 +323,19 @@ class ChooseMusicScene: SKScene {
         
         // 移動
         let scene: GameScene
-        if picker.textStore.suffix(9) == "(YouTube)" {
+        if YouTubeSwitch.isOn {
             var playMode = PlayMode.YouTube
-            var pickerTextStore = picker.textStore
-            pickerTextStore.removeLast(9)
+//            let pickerTextStore = picker.textStore
+//            pickerTextStore.removeLast(9)
             
             //ネタバレ注意！
-            if pickerTextStore == "オラシオン" &&
+            if picker.textStore == "オラシオン" &&
                 (defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue) <= 21 ||
                 defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue) >= 201) { playMode = .YouTube2 /* 裏シオン */ }
             
-            scene = GameScene(musicName: MusicName(rawValue: pickerTextStore)!, playMode: playMode, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
+            scene = GameScene(musicName: MusicName(rawValue: picker.textStore)!, playMode: playMode, isAutoPlay: autoPlaySwitch.isOn, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
         }else{
-            scene = GameScene(musicName: MusicName(rawValue: picker.textStore)! ,playMode: .BGM ,size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
+            scene = GameScene(musicName: MusicName(rawValue: picker.textStore)! , playMode: .BGM , isAutoPlay: autoPlaySwitch.isOn, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
         }
         
        
@@ -277,7 +373,7 @@ class ChooseMusicScene: SKScene {
     
     @objc func onClickMinus10Button(_ sender : UIButton){
         if userSpeedRatioInt > 10 { userSpeedRatioInt -= 10 }
-        else 			    { userSpeedRatioInt =  0  }
+        else 			          { userSpeedRatioInt  =  0 }
     }
     
     @objc func onClickSaveAndBackButton(_ sender : UIButton){
@@ -302,43 +398,89 @@ class ChooseMusicScene: SKScene {
     }
     
     func showMainContents(){
-        picker.isHidden = false
-        playButton.isHidden = false
-        settingButton.isHidden = false
+        for content in mainContents {
+            if let view = content as? UIControl {
+                view.isHidden = false
+                view.isEnabled = true
+            } else if let node = content as? SKNode {
+                node.isHidden = false
+            } else if let uiswitch = content as? UISwitch {
+                uiswitch.isHidden = true
+            } else {
+                print("mainContentsの振り分け漏れ: \(content)")
+            }
+        }
         
-        playButton.isEnabled = true
-        settingButton.isEnabled = true
+//        picker.isHidden = false
+//        playButton.isHidden = false
+//        settingButton.isHidden = false
+//
+//        playButton.isEnabled = true
+//        settingButton.isEnabled = true
     }
     
     func hideMainContents(){
-        picker.isHidden = true
-        playButton.isHidden = true
-        settingButton.isHidden = true
+        for content in mainContents {
+            if let view = content as? UIView {
+                view.isHidden = true
+            } else if let node = content as? SKNode {
+                node.isHidden = true
+            } else if let uiswitch = content as? UISwitch {
+                uiswitch.isHidden = true
+            } else {
+                print("mainContentsの振り分け漏れ: \(content)")
+            }
+        }
+//        picker.isHidden = true
+//        playButton.isHidden = true
+//        settingButton.isHidden = true
     }
     
     func showSettingContents(){
-        settingLabel.isHidden = false
-        speedLabel.isHidden = false
-        speedTitleLabel.isHidden = false
         
-        saveAndBackButton.isHidden = false
-        plusButton.isHidden = false
-        plus10Button.isHidden = false
-        minusButton.isHidden = false
-        minus10Button.isHidden = false
+        for content in settingContents {
+            if let view = content as? UIView {
+                view.isHidden = false
+            } else if let node = content as? SKNode {
+                node.isHidden = false
+            } else {
+                print("settingContentsの振り分け漏れ: \(content)")
+            }
+        }
+        
+//        settingLabel.isHidden = false
+//        speedLabel.isHidden = false
+//        speedTitleLabel.isHidden = false
+//
+//        saveAndBackButton.isHidden = false
+//        plusButton.isHidden = false
+//        plus10Button.isHidden = false
+//        minusButton.isHidden = false
+//        minus10Button.isHidden = false
         
         userSpeedRatioInt = UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)) //読み出し
     }
     
     func hideSettingContents() {
-        settingLabel.isHidden = true
-        speedLabel.isHidden = true
-        speedTitleLabel.isHidden = true
         
-        saveAndBackButton.isHidden = true
-        plusButton.isHidden = true
-        plus10Button.isHidden = true
-        minusButton.isHidden = true
-        minus10Button.isHidden = true
+        for content in settingContents {
+            if let view = content as? UIView {
+                view.isHidden = true
+            } else if let node = content as? SKNode {
+                node.isHidden = true
+            } else {
+                print("settingContentsの振り分け漏れ: \(content)")
+            }
+        }
+        
+//        settingLabel.isHidden = true
+//        speedLabel.isHidden = true
+//        speedTitleLabel.isHidden = true
+//
+//        saveAndBackButton.isHidden = true
+//        plusButton.isHidden = true
+//        plus10Button.isHidden = true
+//        minusButton.isHidden = true
+//        minus10Button.isHidden = true
     }
 }

@@ -540,7 +540,7 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         self.image.removeFromParent()
     }
     
-    /// クラスプロパティとappearTimeを設定
+    /// クラスプロパティとappearTimeを設定.必ずパース後に実行すること.
     static func initialize(_ BPMs: [(bpm: Double, startPos: Double)], _ duration: TimeInterval, _ notes: [Note]) {
         
         guard !BPMs.isEmpty else {

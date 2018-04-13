@@ -15,7 +15,7 @@ extension GameScene {
     // タッチ関係(恐らく、同フレーム内でupdate()等の後に呼び出されている)
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        
+        guard !isAutoPlay else { return }
         
         
         judgeQueue.sync {
@@ -78,7 +78,7 @@ extension GameScene {
                        (nearbyNotes[0].note is Middle) {
                         
                         if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag, touch: self.allGSTouches[self.allGSTouches.count-1]) {
-                            self.actionSoundSet.play(type: .tap)
+//                            self.actionSoundSet.play(type: .tap)
                         } else {
                             print("判定失敗:tap")
                         }
@@ -89,6 +89,9 @@ extension GameScene {
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        guard !isAutoPlay else { return }
+        
         judgeQueue.sync {
             for i in self.lanes {
                 guard i.isTimeLagSet else { return }
@@ -116,7 +119,7 @@ extension GameScene {
                             
                             if self.lanes[index].middleObservationTimeState == .before {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                    self.actionSoundSet.play(type: .middle)
+//                                    self.actionSoundSet.play(type: .middle)
                                     break
                                 }
                             }
@@ -161,7 +164,7 @@ extension GameScene {
                             
                         } else if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag, touch: self.allGSTouches[touchIndex]) {
                             
-                            self.actionSoundSet.play(type: .flick)
+//                            self.actionSoundSet.play(type: .flick)
                             
                         } else {
                             print("判定失敗: flick")     // 二重判定防止に成功した時とか
@@ -176,7 +179,7 @@ extension GameScene {
                         
                         if self.lanes[index].middleObservationTimeState == .after {    // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
                             if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                self.actionSoundSet.play(type: .middle)
+//                                self.actionSoundSet.play(type: .middle)
                                 break
                             }
                         }
@@ -196,6 +199,9 @@ extension GameScene {
     
     // touchMovedと似てる。TapEndの判定をするかだけが違う
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        guard !isAutoPlay else { return }
+
         judgeQueue.sync {
             
             for touch in touches {
@@ -219,7 +225,7 @@ extension GameScene {
                             
                             if self.lanes[index].middleObservationTimeState == .before {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                    self.actionSoundSet.play(type: .middle)
+//                                    self.actionSoundSet.play(type: .middle)
                                     
                                     break
                                 }
@@ -235,12 +241,12 @@ extension GameScene {
                         if judgeRect.contains(pos) {  // ボタンの範囲
                             if self.lanes[index].middleObservationTimeState == .before { // 早めに指を離した場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                    self.actionSoundSet.play(type: .middle)
+//                                    self.actionSoundSet.play(type: .middle)
                                     break
                                 }
                             } else if self.lanes[index].middleObservationTimeState == .after { // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                    self.actionSoundSet.play(type: .middle)
+//                                    self.actionSoundSet.play(type: .middle)
                                     break
                                 }
                             }
@@ -250,7 +256,7 @@ extension GameScene {
                             if note is TapEnd {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {    // 離しの判定
                                     
-                                    self.actionSoundSet.play(type: .tap)
+//                                    self.actionSoundSet.play(type: .tap)
                                     break
                                 }
                             } else if ((note is Flick    && self.allGSTouches[touchIndex].isJudgeableFlick) ||
@@ -303,11 +309,18 @@ extension GameScene {
     func judge(lane: Lane, timeLag: TimeInterval, touch: GSTouch?) -> Bool {
         
         guard !(lane.isEmpty),
-                lane.isJudgeRange else { return false }
+                lane.isJudgeRange else {
+                    print("laneが空、あるいは判定時間圏内にノーツがありません. laneIndex: \(lane.laneIndex)")
+                    return false
+                    
+        }
         
         let judgeNote = lane.headNote!
         
-        guard judgeNote.isJudgeable else { return false }
+        guard judgeNote.isJudgeable else {
+            print("判定対象ノーツ.isJudgeableがfalseです. laneIndex: \(lane.laneIndex)")
+            return false
+        }
         
         
         // 以下は判定が確定しているものとする
@@ -321,6 +334,7 @@ extension GameScene {
             // storedFlickJudgeに関する処理
             touch?.storedFlickJudgeLaneIndex = nil
             lane.storedFlickJudgeInformation = nil
+            
         case is Tap:
             touch?.isJudgeableFlick = false
             touch?.isJudgeableFlickEnd = false
@@ -333,7 +347,13 @@ extension GameScene {
             
         }
        
-       
+       // 音を鳴らす
+        switch lane.headNote! {
+        case is Flick, is FlickEnd          : self.actionSoundSet.play(type: .flick)
+        case is Middle                      : self.actionSoundSet.play(type: .middle)
+        case is Tap, is TapStart, is TapEnd : self.actionSoundSet.play(type: .tap)
+        default                             : print("ノーツの型の見落とし")
+        }
         
         
         switch lane.getJudgeTimeState(timeLag: timeLag) {
@@ -384,7 +404,7 @@ extension GameScene {
             releaseNote(lane: lane)
             return true
         default:    // still,passedなら判定しない(guardで弾いてるはず。)
-            print("judge error")
+            print("judge error. laneIndex: \(lane.laneIndex)")
             return false
         }
         
@@ -400,7 +420,7 @@ extension GameScene {
         if judge(lane: lane, timeLag: lane.storedFlickJudgeInformation!.timeLag,
                  touch: self.allGSTouches.first(where: { $0.touch == lane.storedFlickJudgeInformation!.touch })) { //（laneから呼び出され、すでに指が離れている場合はtouchはnilになる）
             
-            self.actionSoundSet.play(type: .flick)
+//            self.actionSoundSet.play(type: .flick)
         } else {
             
             print("storedFlickJudgeに失敗")
