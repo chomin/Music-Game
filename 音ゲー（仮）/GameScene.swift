@@ -161,8 +161,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         catch                                     { print("未知のエラー") }
         
-        // 寸法に関する定数をセット(必ずパース後に実行(laneNumを読み込むため))
-        Dimensions.createInstance(frame: view.frame, laneNum: laneNum)
+        // 寸法に関するレーン数依存の定数をセット(必ずパース後に実行(laneNumを読み込むため))
+        Dimensions.updateInstance(laneNum: laneNum)
         
         // Laneインスタンスを作成
         for i in 0..<self.laneNum {

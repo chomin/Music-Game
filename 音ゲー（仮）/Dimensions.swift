@@ -106,51 +106,54 @@ extension CGRect {
 
 /// 寸法に関する定数を提供(シングルトン)。GameSceneのframeをもとに決定される。
 class Dimensions {
-    //インスタンスが保持し、このクラス内からの記述でのみアクセスできる変数。staticで呼び出されたときにこれらに格納されている値を返す。(frameが不要なものは初期値をここで定義)
-    private let frameMidX: CGFloat                  // 画面中央x座標
-    private let horizonLeftX: CGFloat               // 水平線の左端x座標
+    // インスタンスが保持し、このクラス内からの記述でのみアクセスできる変数。staticで呼び出されたときにこれらに格納されている値を返す。(frameが不要なものは初期値をここで定義)
+    // オプショナルのものはレーン数依存定数
+    private let frame: CGRect                       // 画面の大きさ
+    private var horizonLeftX: CGFloat?              // 水平線の左端x座標
     private let horizonY: CGFloat                   // 水平線のy座標
-    private let laneWidth: CGFloat                  // 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
-    private let laneWidthOnHorizon: CGFloat         // 画面の水平線上でのレーン幅
+    private var laneWidth: CGFloat?                 // 3D上でのレーン幅(判定線における2D上のレーン幅と一致)
+    private var laneWidthOnHorizon: CGFloat?        // 画面の水平線上でのレーン幅
     private let laneLength: CGFloat                 // 3D上でのレーン長
     private let judgeLineY: CGFloat                 // 判定線のy座標
     private let iconButtonSize: CGFloat             // アイコンの大きさ
-    private var buttonX: [CGFloat] = []             // 各レーンの中心のx座標
-    private var judgeRects: [CGRect] = []           // 各レーンの判定をする範囲(長方形)
-    // 立体感を出すための定数
+    private var buttonX: [CGFloat]?                 // 各レーンの中心のx座標
+    private var judgeRects: [CGRect]?               // 各レーンの判定をする範囲(長方形)
     private let horizontalDistance: CGFloat = 250   // 画面から目までの水平距離a（約5000で10cmほど）
     private let verticalDistance: CGFloat           // 画面を垂直に見たとき、判定線から目までの高さh（実際の水平線の高さでもある）
     private let R: CGFloat                          // 視点から判定線までの距離(射影する球の半径)
     
     private static var instance: Dimensions?        // 唯一のインスタンス
     
-    private init(frame: CGRect, laneNum: Int) {     // インスタンスの作成をこのクラス内のみに限定する
-        self.frameMidX = frame.midX
-        self.laneWidth = frame.width / CGFloat(laneNum + 2) // レーン両サイドの空白はレーン幅と同じ
-        let halfBound = laneWidth * (9/10)          // 判定を汲み取る、ボタン中心からの距離。laneWidth/2 ~ laneWidth の値にすること
+    private init(frame: CGRect) {           // インスタンスの作成をこのクラス内のみに限定する
+        self.frame = frame
         // モデルに合わせるなら水平線は画面上端辺りが丁度いい？モデルに合わせるなら大きくは変えてはならない。
-        self.horizonY = frame.height * 15 / 16      // モデル値
+        self.horizonY = frame.height * 15 / 16              // モデル値
         self.judgeLineY = frame.width / 9
         self.iconButtonSize = frame.width / 16
         self.verticalDistance = horizonY - frame.width / 14
         self.R = sqrt(pow(horizontalDistance, 2) + pow(verticalDistance, 2))
-        
         let laneHeight = horizonY - judgeLineY      // レーンの高さ(画面上)
         self.laneLength = pow(R, 2) / (verticalDistance / tan(laneHeight/R) - horizontalDistance)   // レーン長(3D)
-        let horizonLength = 2 * horizontalDistance * atan(laneWidth * CGFloat(laneNum)/2 / (horizontalDistance + laneLength))
+    }
+    
+    private func update(laneNum: Int) {
+        self.laneWidth = frame.width / CGFloat(laneNum + 2) // レーン両サイドの空白はレーン幅と同じ
+        let horizonLength = 2 * horizontalDistance * atan(laneWidth! * CGFloat(laneNum)/2 / (horizontalDistance + laneLength))
         self.laneWidthOnHorizon = horizonLength / CGFloat(laneNum)
         self.horizonLeftX = frame.midX - horizonLength / 2
         
+        buttonX = []
         // ボタンの位置をセット
         for i in 0..<laneNum {
-            buttonX.append(laneWidth * (3/2) + CGFloat(i) * laneWidth)
+            buttonX!.append(laneWidth! * (3/2) + CGFloat(i) * laneWidth!)
         }
         
-        self.judgeRects = buttonX.map({ CGRect(x: $0-halfBound, y: frame.height/2, width: halfBound*2 , height: frame.height/2) })
+        let halfBound = laneWidth! * (9/10)                  // 判定を汲み取る、ボタン中心からの距離。laneWidth/2 ~ laneWidth の値にすること
+        self.judgeRects = buttonX!.map { CGRect(x: $0 - halfBound, y: frame.height / 2, width: halfBound * 2 , height: frame.height / 2) }
     }
     
     // これらクラスプロパティから、定数にアクセスする(createInstanceされてなければ全て0)
-    static var frameMidX:          CGFloat         { return Dimensions.instance?.frameMidX          ??  CGFloat(0) }
+    static var frameMidX:          CGFloat         { return Dimensions.instance?.frame.midX         ??  CGFloat(0) }
     static var horizonLeftX:       CGFloat         { return Dimensions.instance?.horizonLeftX       ??  CGFloat(0) }
     static var horizonY:           CGFloat         { return Dimensions.instance?.horizonY           ??  CGFloat(0) }
     static var laneWidth:          CGFloat         { return Dimensions.instance?.laneWidth          ??  CGFloat(0) }
@@ -165,8 +168,17 @@ class Dimensions {
     static var judgeRects:        [CGRect]         { return Dimensions.instance?.judgeRects         ?? [CGRect]()  }
     
     // この関数のみが唯一Dimensionsクラスをインスタンス化できる
-    static func createInstance(frame: CGRect, laneNum: Int) {
-        self.instance = Dimensions(frame: frame, laneNum: laneNum)
+    static func createInstance(frame: CGRect) {
+        // 初回のみ有効
+        if self.instance == nil {
+            self.instance = Dimensions(frame: frame)
+        }
+    }
+    
+    /// レーン数依存の定数を設定
+    static func updateInstance(laneNum: Int) {
+        self.instance?.update(laneNum: laneNum)
     }
 }
+
 
