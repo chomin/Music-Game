@@ -309,11 +309,18 @@ extension GameScene {
     func judge(lane: Lane, timeLag: TimeInterval, touch: GSTouch?) -> Bool {
         
         guard !(lane.isEmpty),
-                lane.isJudgeRange else { return false }
+                lane.isJudgeRange else {
+                    print("laneが空、あるいは判定時間圏内にノーツがありません. laneIndex: \(lane.laneIndex)")
+                    return false
+                    
+        }
         
         let judgeNote = lane.headNote!
         
-        guard judgeNote.isJudgeable else { return false }
+        guard judgeNote.isJudgeable else {
+            print("判定対象ノーツ.isJudgeableがfalseです. laneIndex: \(lane.laneIndex)")
+            return false
+        }
         
         
         // 以下は判定が確定しているものとする
@@ -327,6 +334,7 @@ extension GameScene {
             // storedFlickJudgeに関する処理
             touch?.storedFlickJudgeLaneIndex = nil
             lane.storedFlickJudgeInformation = nil
+            
         case is Tap:
             touch?.isJudgeableFlick = false
             touch?.isJudgeableFlickEnd = false
@@ -390,7 +398,7 @@ extension GameScene {
             releaseNote(lane: lane)
             return true
         default:    // still,passedなら判定しない(guardで弾いてるはず。)
-            print("judge error")
+            print("judge error. laneIndex: \(lane.laneIndex)")
             return false
         }
         

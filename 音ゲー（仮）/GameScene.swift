@@ -370,7 +370,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             line.setScale(note1.size / Note.scale / Dimensions.laneWidth)
         }
         
-        
+        // 自動演奏or判定
         if isAutoPlay {
             for lane in lanes {
                 if lane.timeLag <= 0 && !(lane.isEmpty) {
@@ -378,12 +378,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     case is Flick, is FlickEnd          : self.actionSoundSet.play(type: .flick)
                     case is Middle                      : self.actionSoundSet.play(type: .middle)
                     case is Tap, is TapStart, is TapEnd : self.actionSoundSet.play(type: .tap)
-                    default:
-                        print("ノーツの型の見落とし")
+                    default                             : print("ノーツの型の見落とし")
                     }
-                    
-                    _ = judge(lane: lane, timeLag: 0, touch: nil)
-                    
+                    if !(judge(lane: lane, timeLag: 0, touch: nil)) { print("判定失敗@自動演奏") }
                 }
             }
         } else {
