@@ -78,7 +78,7 @@ extension GameScene {
                        (nearbyNotes[0].note is Middle) {
                         
                         if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag, touch: self.allGSTouches[self.allGSTouches.count-1]) {
-                            self.actionSoundSet.play(type: .tap)
+//                            self.actionSoundSet.play(type: .tap)
                         } else {
                             print("判定失敗:tap")
                         }
@@ -119,7 +119,7 @@ extension GameScene {
                             
                             if self.lanes[index].middleObservationTimeState == .before {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                    self.actionSoundSet.play(type: .middle)
+//                                    self.actionSoundSet.play(type: .middle)
                                     break
                                 }
                             }
@@ -164,7 +164,7 @@ extension GameScene {
                             
                         } else if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag, touch: self.allGSTouches[touchIndex]) {
                             
-                            self.actionSoundSet.play(type: .flick)
+//                            self.actionSoundSet.play(type: .flick)
                             
                         } else {
                             print("判定失敗: flick")     // 二重判定防止に成功した時とか
@@ -179,7 +179,7 @@ extension GameScene {
                         
                         if self.lanes[index].middleObservationTimeState == .after {    // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
                             if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                self.actionSoundSet.play(type: .middle)
+//                                self.actionSoundSet.play(type: .middle)
                                 break
                             }
                         }
@@ -225,7 +225,7 @@ extension GameScene {
                             
                             if self.lanes[index].middleObservationTimeState == .before {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                    self.actionSoundSet.play(type: .middle)
+//                                    self.actionSoundSet.play(type: .middle)
                                     
                                     break
                                 }
@@ -241,12 +241,12 @@ extension GameScene {
                         if judgeRect.contains(pos) {  // ボタンの範囲
                             if self.lanes[index].middleObservationTimeState == .before { // 早めに指を離した場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                    self.actionSoundSet.play(type: .middle)
+//                                    self.actionSoundSet.play(type: .middle)
                                     break
                                 }
                             } else if self.lanes[index].middleObservationTimeState == .after { // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {
-                                    self.actionSoundSet.play(type: .middle)
+//                                    self.actionSoundSet.play(type: .middle)
                                     break
                                 }
                             }
@@ -256,7 +256,7 @@ extension GameScene {
                             if note is TapEnd {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, touch: self.allGSTouches[touchIndex]) {    // 離しの判定
                                     
-                                    self.actionSoundSet.play(type: .tap)
+//                                    self.actionSoundSet.play(type: .tap)
                                     break
                                 }
                             } else if ((note is Flick    && self.allGSTouches[touchIndex].isJudgeableFlick) ||
@@ -347,7 +347,13 @@ extension GameScene {
             
         }
        
-       
+       // 音を鳴らす
+        switch lane.headNote! {
+        case is Flick, is FlickEnd          : self.actionSoundSet.play(type: .flick)
+        case is Middle                      : self.actionSoundSet.play(type: .middle)
+        case is Tap, is TapStart, is TapEnd : self.actionSoundSet.play(type: .tap)
+        default                             : print("ノーツの型の見落とし")
+        }
         
         
         switch lane.getJudgeTimeState(timeLag: timeLag) {
@@ -414,7 +420,7 @@ extension GameScene {
         if judge(lane: lane, timeLag: lane.storedFlickJudgeInformation!.timeLag,
                  touch: self.allGSTouches.first(where: { $0.touch == lane.storedFlickJudgeInformation!.touch })) { //（laneから呼び出され、すでに指が離れている場合はtouchはnilになる）
             
-            self.actionSoundSet.play(type: .flick)
+//            self.actionSoundSet.play(type: .flick)
         } else {
             
             print("storedFlickJudgeに失敗")

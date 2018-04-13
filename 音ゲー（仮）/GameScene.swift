@@ -374,12 +374,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         if isAutoPlay {
             for lane in lanes {
                 if lane.timeLag <= 0 && !(lane.isEmpty) {
-                    switch lane.headNote! {
-                    case is Flick, is FlickEnd          : self.actionSoundSet.play(type: .flick)
-                    case is Middle                      : self.actionSoundSet.play(type: .middle)
-                    case is Tap, is TapStart, is TapEnd : self.actionSoundSet.play(type: .tap)
-                    default                             : print("ノーツの型の見落とし")
-                    }
+//                    switch lane.headNote! {
+//                    case is Flick, is FlickEnd          : self.actionSoundSet.play(type: .flick)
+//                    case is Middle                      : self.actionSoundSet.play(type: .middle)
+//                    case is Tap, is TapStart, is TapEnd : self.actionSoundSet.play(type: .tap)
+//                    default                             : print("ノーツの型の見落とし")
+//                    }
                     if !(judge(lane: lane, timeLag: 0, touch: nil)) { print("判定失敗@自動演奏") }
                 }
             }
@@ -399,7 +399,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                             
                             if self.parfectMiddleJudge(lane: self.lanes[laneIndex]) { // middleの判定
                                 
-                                self.actionSoundSet.play(type: .middle)
+//                                self.actionSoundSet.play(type: .middle)
                                 gsTouch.isJudgeableFlickEnd = true
                                 break
                             }
