@@ -406,13 +406,19 @@ extension GameScene {   // bmsファイルを読み込む
                     guard longNotes1[i + 1] is Middle || longNotes1[i + 1] is TapEnd || longNotes1[i + 1] is FlickEnd else {
                         throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません(\(ParseError.getBeat(of: longNotes1[i + 1])))")
                     }
-                    if let temp = longNotes1[i] as? TapStart {
-                        temp.next = longNotes1[i + 1]
-                        longNotes1[i] = temp
-                    } else if let temp = longNotes1[i] as? Middle {
-                        temp.next = longNotes1[i + 1]
+                    if let tapStart = longNotes1[i] as? TapStart {
+                        tapStart.next = longNotes1[i + 1]
+                        // ガイド円の色を設定
+                        if let middle = tapStart.next as? Middle {
+                            middle.longImages.circle.fillColor = tapStart.isLarge ? UIColor.yellow : UIColor.green
+                        }
+                    } else if let middle = longNotes1[i] as? Middle {
+                        middle.next = longNotes1[i + 1]
+                        // ガイド円の色を設定
+                        if let middle2 = middle.next as? Middle {
+                            middle2.longImages.circle.fillColor = middle.longImages.circle.fillColor
+                        }
                         //						temp.before = longNotes1[i - 1]
-                        longNotes1[i] = temp
                     } else {
                         throw ParseError.unexpected("予期せぬエラー")
                     }
@@ -446,13 +452,19 @@ extension GameScene {   // bmsファイルを読み込む
                     guard longNotes2[i + 1] is Middle || longNotes2[i + 1] is TapEnd || longNotes2[i + 1] is FlickEnd else {
                         throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません(\(ParseError.getBeat(of: longNotes2[i + 1])))")
                     }
-                    if let temp = longNotes2[i] as? TapStart {
-                        temp.next = longNotes2[i + 1]
-                        longNotes2[i] = temp
-                    } else if let temp = longNotes2[i] as? Middle {
-                        temp.next = longNotes2[i + 1]
-                        //						temp.before = longNotes2[i - 1]
-                        longNotes2[i] = temp
+                    if let tapStart = longNotes2[i] as? TapStart {
+                        tapStart.next = longNotes2[i + 1]
+                        // ガイド円の色を設定
+                        if let middle = tapStart.next as? Middle {
+                            middle.longImages.circle.fillColor = tapStart.isLarge ? UIColor.yellow : UIColor.green
+                        }
+                    } else if let middle = longNotes2[i] as? Middle {
+                        middle.next = longNotes2[i + 1]
+                        // ガイド円の色を設定
+                        if let middle2 = middle.next as? Middle {
+                            middle2.longImages.circle.fillColor = middle.longImages.circle.fillColor
+                        }
+                        //                        temp.before = longNotes1[i - 1]
                     } else {
                         throw ParseError.unexpected("予期せぬエラー")
                     }
