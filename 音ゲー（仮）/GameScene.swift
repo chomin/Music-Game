@@ -335,7 +335,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             if BGM.currentTime > 0 {
                 self.passedTime = BGM.currentTime + mediaOffsetTime
             } else {
-                self.passedTime = CACurrentMediaTime() - startTime
+                self.passedTime = CACurrentMediaTime() - startTime // シーン移動後からBGM再生開始までノーツを動かす(再生開始後に急にノーツが現れるのを防ぐため)。この時間差がmediaOffsetTimeになったときにBGMの再生が始まる
             }
         } else {
             if isReadyPlayerView  { // currentTime>0は最初から成り立つ？
@@ -608,7 +608,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             self.isSupposedToPausePlayerView = true
         }
         
-        if self.playMode == .BGM{
+        if self.playMode == .BGM {
             BGM?.pause()
         }else{
             playerView.pauseVideo()
