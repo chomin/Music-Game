@@ -383,7 +383,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
 //                    case is Tap, is TapStart, is TapEnd : self.actionSoundSet.play(type: .tap)
 //                    default                             : print("ノーツの型の見落とし")
 //                    }
-                    if !(judge(lane: lane, timeLag: 0, touch: nil)) { print("判定失敗@自動演奏") }
+                    if !(judge(lane: lane, timeLag: 0, gsTouch: nil)) { print("判定失敗@自動演奏") }
                 }
             }
         } else {
@@ -400,11 +400,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                         
                         if judgeRect.contains(pos) {   // ボタンの範囲
                             
-                            if self.parfectMiddleJudge(lane: self.lanes[laneIndex]) { // middleの判定
-                                
-//                                self.actionSoundSet.play(type: .middle)
-                                gsTouch.isJudgeableFlickEnd = true
-                                break
+                            if self.parfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
+                                break   // このタッチでこのフレームでの判定はもう行わない
                             }
                         }
                     }
