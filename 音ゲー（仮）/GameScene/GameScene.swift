@@ -279,15 +279,17 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         mediaOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
 
+        self.startTime = CACurrentMediaTime()
+        
         // 再生時間や背景、ビューの前後関係などを指定
         if playMode == .BGM {
-            self.startTime = CACurrentMediaTime()
+            
             // BGMの再生(時間指定)
             BGM.play(atTime: startTime + mediaOffsetTime)  // 建築予定地
             BGM.delegate = self
             self.backgroundColor = .black
         } else {
-            self.startTime = TimeInterval(pow(10.0, 308.0))  // Doubleのほぼ最大値。ロードが終わるまで。
+//            self.startTime = TimeInterval(pow(10.0, 308.0))  // Doubleのほぼ最大値。ロードが終わるまで。
             
             playerView.delegate = self
             view.superview!.addSubview(playerView.view)
@@ -339,7 +341,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             }
         } else {
             if isReadyPlayerView  {
-                if playerView.view.currentTime() > 0.3 {    // 右辺は適当.このくらいまで同期取れば以降はほぼずれない
+                if playerView.view.currentTime() > 1 {              // 独自タイマー同期後(右辺は適当.このくらいまで同期取れば以降はほぼずれない)
 //                    print(playerView.view.currentTime())
                     if !(playerView.isSetStartTime) {
                         playerView.startTime = CACurrentMediaTime() - TimeInterval(playerView.view.currentTime())
@@ -347,9 +349,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                         print("set startTime")
                     }
                     self.passedTime = playerView.currentTime + mediaOffsetTime
-                } else {
-                    self.passedTime = 0
+                } else if playerView.view.currentTime() > 0 {       // 再生開始から独自タイマー同期まで
+                    self.passedTime = TimeInterval(playerView.view.currentTime()) + mediaOffsetTime
                     
+                } else {                                            // シーン移動後から再生開始まで
+                    self.passedTime = 0
                 }
             } else {
                 self.passedTime = 0
