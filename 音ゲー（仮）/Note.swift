@@ -193,10 +193,18 @@ class TapStart: Note {
             long.endWidth = Dimensions.laneWidthOnHorizon
         }
         // 始点の情報を代入
-        if position.y > Dimensions.judgeLineY && !isJudged {        // 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
-            long.startPos = position
-            long.startWidth = size / Note.scale
+        if position.y > Dimensions.judgeLineY {
+            if !isJudged {
+                // ノーツがレーンの半ばにある時
+                long.startPos = position
+                long.startWidth = size / Note.scale
+            } else {
+                // レーン通過前に判定された時
+                long.startPos = CGPoint(x: Dimensions.buttonX[laneIndex], y: Dimensions.judgeLineY)
+                long.startWidth = Dimensions.laneWidth
+            }
         } else {
+            // ノーツがレーンを通過した時
             let posY = Dimensions.judgeLineY
             let posX = (-positionOnLane * Dimensions.buttonX[next.laneIndex] + next.positionOnLane * Dimensions.buttonX[laneIndex])
                 / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
@@ -342,14 +350,22 @@ class Middle: Note {
             long.endWidth = Dimensions.laneWidthOnHorizon
         }
         // 始点の情報を代入
-        if position.y > Dimensions.judgeLineY && !isJudged {        // 始点ノーツが判定線を通過する前で、判定する前(判定後は位置が更新されないので...)
-            long.startPos = position
-            long.startWidth = size / Note.scale
+        if position.y > Dimensions.judgeLineY {
+            if !isJudged {
+                // ノーツがレーンの半ばにある時
+                long.startPos = position
+                long.startWidth = size / Note.scale
+            } else {
+                // レーン通過前に判定された時
+                long.startPos = CGPoint(x: Dimensions.buttonX[laneIndex], y: Dimensions.judgeLineY)
+                long.startWidth = Dimensions.laneWidth
+            }
         } else {
+            // ノーツがレーンを通過した時
             let posY = Dimensions.judgeLineY
             let posX = (-positionOnLane * Dimensions.buttonX[next.laneIndex] + next.positionOnLane * Dimensions.buttonX[laneIndex])
                 / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
-
+            
             long.startPos = CGPoint(x: posX, y: posY)
             long.startWidth = Dimensions.laneWidth
         }

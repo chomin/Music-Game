@@ -384,7 +384,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         if isAutoPlay {
             for lane in lanes {
                 if lane.timeLag <= 0 && !(lane.isEmpty) {
-                    if !(judge(lane: lane, timeLag: 0, touch: nil)) { print("判定失敗@自動演奏") }
+
+
+                    if !(judge(lane: lane, timeLag: 0, gsTouch: nil)) { print("判定失敗@自動演奏") }
                 }
             }
         } else {
@@ -401,11 +403,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                         
                         if judgeRect.contains(pos) {   // ボタンの範囲
                             
-                            if self.parfectMiddleJudge(lane: self.lanes[laneIndex]) { // middleの判定
-                                
-//                                self.actionSoundSet.play(type: .middle)
-                                gsTouch.isJudgeableFlickEnd = true
-                                break
+                            if self.parfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
+                                break   // このタッチでこのフレームでの判定はもう行わない
                             }
                         }
                     }
@@ -496,7 +495,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         skView?.presentScene(scene)     // ChooseMusicSceneに移動
     }
     
-    @objc func onClickContinueButton(_ sender : UIButton){
+    @objc func onClickContinueButton(_ sender : UIButton) {     // 誤差軽減のため、実行順序注意！
         pauseView?.removeFromSuperview()
         self.isUserInteractionEnabled = true
         self.isSupposedToPausePlayerView = false
@@ -507,7 +506,42 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }else{
             playerView.timeOffset += CACurrentMediaTime() - playerView.pausedTime + 3
             playerView.seek(toSeconds: Float(playerView.currentTime), allowSeekAhead: true)
+
             playerView.playVideo()
+        }
+        
+        setJudgeLabelText(text: "")
+        
+        // 表示されているノーツを非表示に
+        for note in notes {
+            note.image.isHidden = true
+            if let start = note as? TapStart {
+                start.longImages.long.isHidden = true
+                start.longImages.circle.isHidden = true
+                var following = start.next
+                while true {
+                    if let middle = following as? Middle {
+                        middle.image.isHidden = true
+                        middle.longImages.long.isHidden = true
+                        middle.longImages.circle.isHidden = true
+                        following = middle.next
+                    } else {
+                        following.image.isHidden = true
+                        break
+                    }
+                }
+            }
+        }
+        // 途中まで判定したロングノーツがあれば最後まで判定済みに
+        for note in notes {
+            if let start = note as? TapStart, start.isJudged {
+                var following = start.next
+                while let middle = following as? Middle {
+                    middle.isJudged = true
+                    following = middle.next
+                }
+                following.isJudged = true
+            }
         }
     }
     
@@ -593,41 +627,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         if self.playMode == .BGM {
             BGM?.pause()
-        }else{
+        } else {
             playerView.pauseVideo()
-        }
-        setJudgeLabelText(text: "")
-        
-        // 表示されているノーツを非表示に
-        for note in notes {
-            note.image.isHidden = true
-            if let start = note as? TapStart {
-                start.longImages.long.isHidden = true
-                start.longImages.circle.isHidden = true
-                var following = start.next
-                while true {
-                    if let middle = following as? Middle {
-                        middle.image.isHidden = true
-                        middle.longImages.long.isHidden = true
-                        middle.longImages.circle.isHidden = true
-                        following = middle.next
-                    } else {
-                        following.image.isHidden = true
-                        break
-                    }
-                }
-            }
-        }
-        // 途中まで判定したロングノーツがあれば最後まで判定済みに
-        for note in notes {
-            if let start = note as? TapStart, start.isJudged {
-                var following = start.next
-                while let middle = following as? Middle {
-                    middle.isJudged = true
-                    following = middle.next
-                }
-                following.isJudged = true
-            }
         }
         
         // 選択画面を出す
