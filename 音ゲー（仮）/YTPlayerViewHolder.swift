@@ -27,12 +27,12 @@ class YTPlayerViewHolder {
     var duration: TimeInterval { return self.view.duration() }
     
     var delegate: YTPlayerViewDelegate? {
-        get{
+        get {
             return self.view.delegate
         }
         
-        set(tmp) {
-            self.view.delegate = tmp
+        set {
+            self.view.delegate = newValue
         }
     }
     
@@ -40,8 +40,8 @@ class YTPlayerViewHolder {
         get {
             return self.view.isUserInteractionEnabled
         }
-        set(tmp) {
-            self.view.isUserInteractionEnabled = tmp
+        set {
+            self.view.isUserInteractionEnabled = newValue
         }
     }
     
