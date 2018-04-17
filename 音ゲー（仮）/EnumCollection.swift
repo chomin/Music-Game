@@ -25,6 +25,8 @@ public extension EnumCollection {
     public static var allValues: [Self] {
         return Array(self.cases())  // Sequenceから配列を作る。(Array(1...4)で[1,2,3,4]を作るときも同じイニシャライザを使う)
     }
+    
+    public static var first: Self? { return Self.allValues.first }
 }
 
 /*

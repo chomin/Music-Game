@@ -325,7 +325,15 @@ extension GameScene {
         
         // 以下は判定が確定しているものとする
         
+        // 音を鳴らす
+        switch lane.headNote! {
+        case is Flick, is FlickEnd          : self.actionSoundSet.play(type: .flick)
+        case is Middle                      : self.actionSoundSet.play(type: .middle)
+        case is Tap, is TapStart, is TapEnd : self.actionSoundSet.play(type: .tap)
+        default                             : print("ノーツの型の見落とし")
+        }
         
+        // 必要ならgsTouch関係の処理
         switch judgeNote {
         case is Flick, is FlickEnd:
             touch?.isJudgeableFlick = false    // このタッチでのフリック判定を禁止
@@ -347,13 +355,7 @@ extension GameScene {
             
         }
        
-       // 音を鳴らす
-        switch lane.headNote! {
-        case is Flick, is FlickEnd          : self.actionSoundSet.play(type: .flick)
-        case is Middle                      : self.actionSoundSet.play(type: .middle)
-        case is Tap, is TapStart, is TapEnd : self.actionSoundSet.play(type: .tap)
-        default                             : print("ノーツの型の見落とし")
-        }
+       
         
         
         switch lane.getJudgeTimeState(timeLag: timeLag) {

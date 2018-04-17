@@ -13,7 +13,7 @@ class PickerKeyboard: UIControl {
     // ピッカーに表示させるデータ(DimentionsファイルのMusicNameから自動生成)
     var data: [String] = []
     
-    var textStore: String = "シュガーソングとビターステップ"   // 入力文字列を保存するためのプロパティ
+    var textStore: String = MusicName.first!.rawValue   // 入力文字列を保存するためのプロパティ
     
     
     // PickerViewで選択されたデータを表示する
