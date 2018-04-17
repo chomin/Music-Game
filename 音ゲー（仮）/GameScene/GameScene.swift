@@ -338,17 +338,24 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.passedTime = CACurrentMediaTime() - startTime // シーン移動後からBGM再生開始までノーツを動かす(再生開始後に急にノーツが現れるのを防ぐため)。この時間差がmediaOffsetTimeになったときにBGMの再生が始まる
             }
         } else {
-            if isReadyPlayerView  { // currentTime>0は最初から成り立つ？
-                if playerView.currentTime > 0 {
-//                    print(playerView.currentTime())
+            if isReadyPlayerView  {
+                if playerView.view.currentTime() > 0.3 {    // 右辺は適当.このくらいまで同期取れば以降はほぼずれない
+//                    print(playerView.view.currentTime())
+                    if !(playerView.isSetStartTime) {
+                        playerView.startTime = CACurrentMediaTime() - TimeInterval(playerView.view.currentTime())
+                        playerView.isSetStartTime = true
+                        print("set startTime")
+                    }
                     self.passedTime = playerView.currentTime + mediaOffsetTime
                 } else {
                     self.passedTime = 0
+                    
                 }
             } else {
                 self.passedTime = 0
             }
         }
+        
         // ラベルの更新
         comboLabel.text = String(ResultScene.combo)
         
@@ -432,7 +439,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         playerView?.view.removeFromSuperview()
     }
     
-    // 判定ラベルのテキストを更新（アニメーション付き）
+    /// 判定ラベルのテキストを更新（アニメーション付き）
     func setJudgeLabelText(text:String) {
         
         judgeLabel.text = text
@@ -471,7 +478,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         skView?.presentScene(scene)  // GameSceneに移動
     }
     
-    // ボタン関数
+    
+    /* -------- ボタン関数群 -------- */
+    
     @objc func onClickPauseButton(_ sender : UIButton){
         applicationWillResignActive()
     }
@@ -502,7 +511,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
     }
     
-    // 同時押し対策
+    
+    /* -------- 同時押し対策 -------- */
+    
     @objc func onReturnButton(_ sender : UIButton){
         self.continueButton.isEnabled = false
     }
@@ -554,10 +565,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         DispatchQueue.main.asyncAfter(deadline: .now()+3) {
             playerView.playVideo()
-            if self.playerView.view == playerView {
-                print("set startTime")
-                self.playerView.startTime = CACurrentMediaTime()
-            }
             
             if self.isSupposedToPausePlayerView {
                 self.applicationWillResignActive()

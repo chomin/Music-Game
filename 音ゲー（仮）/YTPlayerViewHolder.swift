@@ -12,7 +12,8 @@ class YTPlayerViewHolder {
     
     var view: YTPlayerView
     
-    var startTime: TimeInterval = TimeInterval(pow(10.0, 308.0))  // ロードが終わり、再生開始された時間を格納する(初期値はDoubleのほぼ最大値).ポーズするたびに差分を足す.
+    var startTime: TimeInterval = TimeInterval(pow(10.0, 308.0))  // ロードが終わり、再生開始された時間を格納する(初期値はDoubleのほぼ最大値).再生されてしばらくしてから同期をとる.
+    var isSetStartTime: Bool = false
     
     var timeOffset: TimeInterval = 0.0                            // ポーズするたびに差分を足す.
     
