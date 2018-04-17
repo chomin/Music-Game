@@ -12,7 +12,6 @@ import UIKit
 /// 新曲を追加する際はここに曲名を追加する。
 enum MusicName: String, EnumCollection {
     
-    case shugabita              = "シュガーソングとビターステップ"
     case yo_kosoJapariParkHe    = "ようこそジャパリパークへ"
     case oracion                = "オラシオン"
     case thisGame               = "This game"
@@ -52,6 +51,7 @@ enum MusicName: String, EnumCollection {
         }
         return pickerArray
     }
+    
 }
 
 /// rawvalueがYouTubeのvideoIDに対応する列挙型
