@@ -18,13 +18,16 @@ enum MusicName: String, EnumCollection {
     case sakuraSkip             = "SAKURAスキップ"
     case zankokuNaTenshiNoThese = "残酷な天使のテーゼ"
     case nimenseiUraomoteLife   = "にめんせい☆ウラオモテライフ！"
+    case buonAppetitoS          = "ぼなぺてぃーとS"
+    case level5                 = "LEVEL5-Judgelight-"
+    
+    /*--------ミリシタ楽曲---------*/
     case ready                  = "READY!!"
     case jibunRestart           = "自分REST@RT"
     case thankYou               = "Thank You!"
     case welcome                = "Welcome!!"
     case brandNewTheater        = "Brand New Theater!"
-    case buonAppetitoS          = "ぼなぺてぃーとS"
-    case level5                 = "LEVEL5-Judgelight-"
+    
     case shootingStars          = "Shooting Stars"
     case twinkleRhythm          = "ZETTAI × BREAK!! トゥインクルリズム"
     case growingStorm           = "Growing Storm!"

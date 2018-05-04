@@ -10,13 +10,13 @@ import UIKit
 
 class PickerKeyboard: UIControl {
     
-    // ピッカーに表示させるデータ(DimentionsファイルのMusicNameから自動生成)
-    var data: [String] = []
     
+    var musicNameArray: [String] = []                             // ピッカーに表示させるデータ(DimentionsファイルのMusicNameから自動生成)
     var textStore: String = MusicName.first!.rawValue   // 入力文字列を保存するためのプロパティ
+    var isFirstMovedFromTitleLabel = false                      // 一番最初に選択されたラベルを強調するためのもの
     
     
-    // PickerViewで選択されたデータを表示する
+    // PickerViewで'選択されたデータ'を表示する
     override func draw(_ rect: CGRect) {
         UIColor.black.set()
         UIRectFrame(rect)
@@ -30,7 +30,7 @@ class PickerKeyboard: UIControl {
         super.init(frame: frame)
         
         // ピッカーに初期値をセット
-        self.data = MusicName.getPickerArray()
+        self.musicNameArray = MusicName.getPickerArray()
         
         // viewのタッチジェスチャーを取る
         addTarget(self, action: #selector(PickerKeyboard.didTap(sender: )), for: .touchUpInside)
@@ -58,12 +58,15 @@ class PickerKeyboard: UIControl {
         return true
     }
     
-    // inputViewをオーバーライドさせてシステムキーボードの代わりにPickerViewを表示
+    // inputViewをオーバーライドさせてシステムキーボードの代わりにPickerViewを表示(初期配置)
     override var inputView: UIView? {
         let pickerView = UIPickerView()
         pickerView.delegate = self
-        let row = data.index(of: textStore) ?? -1
-        pickerView.selectRow(row, inComponent: 0, animated: false)
+        let row = musicNameArray.index(of: textStore) ?? -1
+        pickerView.selectRow(row, inComponent: 0, animated: true)
+        pickerView.showsSelectionIndicator = true
+        
+        
         return pickerView
     }
     
@@ -115,20 +118,99 @@ extension PickerKeyboard: UIKeyInput {
 
 // UIPickerViewDelegateとDataSourceを実装して、dataの内容をピッカーへ表示させる
 extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return data.count
-    }
     
+    /*---------- UIPickerViewDataSourceの関数 -----------*/
+    /// 列の数
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
+    /// 行の数
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return musicNameArray.count
+    }
+    
+    
+    
+    /*----------  UIPickerViewDelegateの関数 -----------*/
+    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return pickerView.frame.height/4
+    }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return data[row]
+        return musicNameArray[row]
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        textStore = data[row]       // ピッカーから選択されたらその値をtextStoreへ入れる
+        
+        isFirstMovedFromTitleLabel = true
+        
+        textStore = musicNameArray[row]       // ピッカーから選択されたらその値をtextStoreへ入れる
+        
+        for dataIndex in 0 ... musicNameArray.count-1 {
+            if let label = pickerView.view(forRow: dataIndex, forComponent: component) as? UILabel {
+                
+                if dataIndex == row    { setSelectedLabelColor   (label: label) }
+                else if dataIndex <= 7 { setBackLabelNormalColor (label: label) }
+                else                   { setBackLabelRedColor    (label: label) }
+                
+            }
+            
+        }
+        
+        
+        
         setNeedsDisplay()
     }
+    
+    /// 自分でカスタマイズしたビューをpickerに表示する.しょっちゅう呼び出されるが、対象のビューが曖昧なので全体のupdateの代わりとする.
+    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+        
+        if view != nil {    // ここには入らない
+            
+            return view!
+            
+        }
+        else {
+            
+            let fontSize: CGFloat = pickerView.frame.height/8 // この値は開いたり閉じたりするときに急激に変化する
+            
+            let label = UILabel()   // 前のラベルは(こちらで保持していても)逐一解放される？ので新たにインスタンス化する必要あり
+            label.text = self.musicNameArray[row]
+            label.textAlignment = .center
+            label.font = UIFont.systemFont(ofSize: fontSize)
+            label.frame = CGRect(x: label.frame.minX, y: label.frame.minY, width: label.frame.width, height: pickerView.frame.height/4)
+            if row > 7 {
+                label.textColor = UIColor.red
+            }
+            
+//            if pickerView.selectedRow(inComponent: component) == row {
+//                setSelectedLabelColor(label: label)
+//            } else {
+//                setBackLabelColor(label: label)
+            
+//            }
+            
+            if row == 0 && !isFirstMovedFromTitleLabel {
+                setSelectedLabelColor(label: label)
+            }
+            
+            return label
+        }
+    }
+    
+    
+    func setSelectedLabelColor(label: UILabel) {
+        label.textColor = UIColor.darkText
+        label.backgroundColor = UIColor.lightGray
+    }
+    func setBackLabelNormalColor(label: UILabel) {
+        label.textColor = UIColor.black
+        label.backgroundColor = UIColor.clear
+    }
+    func setBackLabelRedColor(label: UILabel) {
+        label.textColor = UIColor.red
+        label.backgroundColor = UIColor.clear
+    }
+    
+    
 }
