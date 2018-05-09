@@ -10,18 +10,36 @@ import youtube_ios_player_helper
 
 class YTPlayerViewHolder {
     
-    var view: YTPlayerView
+    let view: YTPlayerView
     
-    var startTime: TimeInterval = TimeInterval(pow(10.0, 308.0))  // ロードが終わり、再生開始された時間を格納する(初期値はDoubleのほぼ最大値).再生されてしばらくしてから同期をとる.
-    var isSetStartTime: Bool = false
+    private var offset: TimeInterval = 0
+    private var timeDiffSamples: [TimeInterval] = []    // 再生開始後3フレーム目までのシステム時刻とYouTubeのcurrentTimeの差を3つ保存。中央値を基準として使用するため
+    private var baseline: TimeInterval = 0              // currentTimeのずれを検出するための基準。timeDiffSamplesの中央値
     
-    var timeOffset: TimeInterval = 0.0                            // ポーズするたびに差分を足す.
+//    var startTime: TimeInterval = TimeInterval(pow(10.0, 308.0))  // ロードが終わり、再生開始された時間を格納する(初期値はDoubleのほぼ最大値).再生されてしばらくしてから同期をとる.
+//    var isSetStartTime: Bool = false
     
-    var pausedTime: TimeInterval = 0.0
+//    var timeOffset: TimeInterval = 0.0                            // ポーズするたびに差分を足す.
+    
+    var initialPausedTime: TimeInterval = 0     // 始めの同期待ちポーズの時にオーバーランした時間
     
     var currentTime: TimeInterval {
-        if self.view.playerState() == .paused { return self.pausedTime - self.startTime - self.timeOffset }
-        else { return CACurrentMediaTime() - self.startTime - self.timeOffset }
+//        if self.view.playerState() == .paused { return self.pausedTime - self.startTime - self.timeOffset }
+//        else { return CACurrentMediaTime() - self.startTime - self.timeOffset }
+        
+        let currentTime = TimeInterval(view.currentTime())
+        
+        // 再生開始から4フレーム以降
+        if timeDiffSamples.count == 3 {
+            let diff = CACurrentMediaTime() - (currentTime + offset)
+            // 誤差が大きければ補正
+            if abs(diff - baseline) > 1/150 {       // 閾値はiPhone8による測定値から決定。カクつきが目立たない値にする
+                offset += diff - baseline
+                print("adjusted")
+            }
+        }
+        
+        return currentTime + offset
     }
     
     var duration: TimeInterval { return self.view.duration() }
@@ -59,14 +77,31 @@ class YTPlayerViewHolder {
     
     func playVideo() {
         self.view.playVideo()
-        
     }
     
     func pauseVideo() {
+//        self.pausedTime = CACurrentMediaTime()
         self.view.pauseVideo()
-        self.pausedTime = CACurrentMediaTime()
+    }
+    
+    func playerState() -> YTPlayerState {
+        return self.view.playerState()
+    }
+    
+    func sample() {
+        if timeDiffSamples.count < 3 {
+            timeDiffSamples.append(CACurrentMediaTime() - TimeInterval(view.currentTime()))
+            print("sampled")
+            if timeDiffSamples.count == 3 {
+                baseline = timeDiffSamples.sorted()[1]  // 3つの値の中央値を基準に設定
+            }
+        }
     }
     
     
-        
 }
+
+
+
+
+

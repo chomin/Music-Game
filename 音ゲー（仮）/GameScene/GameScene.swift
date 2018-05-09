@@ -86,8 +86,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     // YouTubeプレイヤー
     var playerView : YTPlayerViewHolder!
-    var isReadyPlayerView = false
-    var isSupposedToPausePlayerView = false
+    enum YTLaunchState {
+        case loading, initialPaused, done
+    }
+    var ytLaunchState = YTLaunchState.loading
+    //    var isSupposedToPausePlayerView = false
     
     // 画像(ノーツ以外)
     var judgeLine: SKShapeNode!
@@ -106,7 +109,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var BPMs: [(bpm: Double, startPos: Double)] = []        // 可変BPM情報
     var laneNum = 7             // レーン数(指定されなければデフォルトで7)
     
-    private var startTime: TimeInterval = 0.0       // シーン移動した時の時間
+    private var startTime: TimeInterval = 0.0       // 譜面再生開始時刻
     var passedTime: TimeInterval = 0.0              // 経過時間
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     var lanes: [Lane] = []      // レーン
@@ -340,23 +343,69 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.passedTime = CACurrentMediaTime() - startTime // シーン移動後からBGM再生開始までノーツを動かす(再生開始後に急にノーツが現れるのを防ぐため)。この時間差がmediaOffsetTimeになったときにBGMの再生が始まる
             }
         } else {
-            if isReadyPlayerView  {
-                if playerView.view.currentTime() > 1 {              // 独自タイマー同期後(右辺は適当.このくらいまで同期取れば以降はほぼずれない)
-//                    print(playerView.view.currentTime())
-                    if !(playerView.isSetStartTime) {
-                        playerView.startTime = CACurrentMediaTime() - TimeInterval(playerView.view.currentTime())
-                        playerView.isSetStartTime = true
-                        print("set startTime")
+            if playerView.playerState() == .playing || playerView.playerState() == .paused {
+                
+                switch ytLaunchState {
+                case .loading:
+                    playerView.pauseVideo()         // ロードが終わった瞬間にポーズして、ノーツとの同期を待つ
+                    self.passedTime = 0
+                    self.startTime = CACurrentMediaTime()
+                    self.ytLaunchState = .initialPaused
+                case .initialPaused:                            // 0 < passedTime < mediaOffsetTime の時(厳密にはポーズへの移行中(再生中)も含む)
+                    self.passedTime = CACurrentMediaTime() - startTime
+                    if playerView.playerState() == .paused && passedTime > mediaOffsetTime + playerView.initialPausedTime {
+                        playerView.playVideo()
+                        self.ytLaunchState = .done
+                    }
+                case .done:                   // mediaOffsettime < passedTime の時(厳密には再生状態への移行中(ポーズ中)も含む)
+                    if playerView.playerState() == .playing {
+                        playerView.sample()
                     }
                     self.passedTime = playerView.currentTime + mediaOffsetTime
-                } else if playerView.view.currentTime() > 0 {       // 再生開始から独自タイマー同期まで
-                    self.passedTime = TimeInterval(playerView.view.currentTime()) + mediaOffsetTime
-                    
-                } else {                                            // シーン移動後から再生開始まで
-                    self.passedTime = 0
+                    print(CACurrentMediaTime() - playerView.currentTime)
                 }
-            } else {
-                self.passedTime = 0
+                
+                
+                
+                
+                
+                
+                /*
+                
+                if ytLaunchState == .loading {          // ロードが終わった瞬間にポーズして、ノーツとの同期を待つ
+                    playerView.pauseVideo()
+//                    playerView.seek(toSeconds: 0, allowSeekAhead: true) // 0秒にシークするとなぜか再生に時間がかかる
+                    self.passedTime = 0
+                    self.startTime = CACurrentMediaTime()
+                    self.ytLaunchState = .initialPaused
+                } else {
+                    let passedTime = CACurrentMediaTime() - startTime
+                    if self.passedTime > mediaOffsetTime + playerView.initialPausedTime {
+                        if playerView.playerState() == .paused {
+                            playerView.playVideo()
+                            self.passedTime = passedTime
+                        } else {
+                            playerView.sample()
+                            self.passedTime = playerView.currentTime + mediaOffsetTime      // mediaOffsettime < passedTime の時
+                            print(CACurrentMediaTime() - playerView.currentTime)
+                        }
+                    } else {
+                        self.passedTime = passedTime        // 0 < passedTime < mediaOffsetTime の時(再生開始前)
+                    }
+                }
+                
+//                print(CACurrentMediaTime() - TimeInterval(playerView.view.currentTime()))
+//                if !(playerView.isSetStartTime) {
+//                    playerView.startTime = CACurrentMediaTime() - TimeInterval(playerView.view.currentTime())
+//                    playerView.isSetStartTime = true
+//                    print("set startTime")
+//                }
+//                self.passedTime = playerView.currentTime + mediaOffsetTime
+            
+//            } else {
+//                self.passedTime = 0
+                 
+                 */
             }
         }
         
@@ -502,16 +551,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     @objc func onClickContinueButton(_ sender : UIButton) {     // 誤差軽減のため、実行順序注意！
         pauseView?.removeFromSuperview()
         self.isUserInteractionEnabled = true
-        self.isSupposedToPausePlayerView = false
+//        self.isSupposedToPausePlayerView = false
         actionSoundSet.stopAll()
-        if self.playMode == .BGM{
+        if self.playMode == .BGM {
             BGM?.currentTime -= 3   // 3秒巻き戻し
             BGM?.play()
-        }else{
-            playerView.timeOffset += CACurrentMediaTime() - playerView.pausedTime + 3
-            playerView.seek(toSeconds: Float(playerView.currentTime), allowSeekAhead: true)
-
+        } else {
+//            let passedTime = playerView.pausedTime - playerView.startTime - playerView.timeOffset - 3
+            playerView.seek(toSeconds: Float(playerView.currentTime - 3), allowSeekAhead: true)
             playerView.playVideo()
+//            playerView.timeOffset += CACurrentMediaTime() - playerView.pausedTime + 3
         }
         
         setJudgeLabelText(text: "")
@@ -580,8 +629,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
         switch (state) {
-        case .playing:
-            isReadyPlayerView = true
+//        case .playing:
+//            isReadyPlayerView = true
+        case .paused:
+            if ytLaunchState == .initialPaused {
+                self.playerView.initialPausedTime = self.playerView.currentTime
+            }
         case .ended:
             playerView.removeFromSuperview()
             moveToResultScene()
@@ -599,16 +652,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // play呼び出し→読み込み→再生開始となるが、通信環境によって読み込み時間がバラバラのため、最初だけは少し先読みしてから再生。
         playerView.playVideo()
-        playerView.pauseVideo()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now()+3) {
-            playerView.playVideo()
-            
-            if self.isSupposedToPausePlayerView {
-                self.applicationWillResignActive()
-                self.isSupposedToPausePlayerView = false
-            }
-        }
+//        playerView.pauseVideo()
+//
+//        DispatchQueue.main.asyncAfter(deadline: .now()+3) {
+//            playerView.playVideo()
+//
+//            if self.isSupposedToPausePlayerView {
+//                self.applicationWillResignActive()
+//                self.isSupposedToPausePlayerView = false
+//            }
+//        }
         
        
         
@@ -625,9 +678,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     /// アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
-        if !self.isReadyPlayerView {
-            self.isSupposedToPausePlayerView = true
-        }
+//        if !self.isReadyPlayerView {
+//            self.isSupposedToPausePlayerView = true
+//        }
         
         if self.playMode == .BGM {
             BGM?.pause()
