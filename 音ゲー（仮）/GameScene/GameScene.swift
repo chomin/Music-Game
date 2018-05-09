@@ -87,7 +87,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     // YouTubeプレイヤー
     var playerView : YTPlayerViewHolder!
     enum YTLaunchState {
-        case loading, initialPaused, done
+        case loading, initialPaused, tryingToPlay, done
     }
     var ytLaunchState = YTLaunchState.loading
     //    var isSupposedToPausePlayerView = false
@@ -355,14 +355,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     self.passedTime = CACurrentMediaTime() - startTime
                     if playerView.playerState() == .paused && passedTime > mediaOffsetTime + playerView.initialPausedTime {
                         playerView.playVideo()
-                        self.ytLaunchState = .done
+                        self.ytLaunchState = .tryingToPlay
                     }
-                case .done:                   // mediaOffsettime < passedTime の時(厳密には再生状態への移行中(ポーズ中)も含む)
-                    if playerView.playerState() == .playing {
-                        playerView.sample()
-                    }
+                case .tryingToPlay:     // 再生状態へ移行中(ポーズ中)
                     self.passedTime = playerView.currentTime + mediaOffsetTime
-                    print(CACurrentMediaTime() - playerView.currentTime)
+                case .done:                   // mediaOffsettime < passedTime の時
+                    playerView.sample()
+                    self.passedTime = playerView.currentTime + mediaOffsetTime
+//                    print(CACurrentMediaTime() - playerView.currentTime)
                 }
                 
                 
@@ -558,7 +558,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             BGM?.play()
         } else {
 //            let passedTime = playerView.pausedTime - playerView.startTime - playerView.timeOffset - 3
-            playerView.seek(toSeconds: Float(playerView.currentTime - 3), allowSeekAhead: true)
+//            playerView.seek(toSeconds: Float(playerView.currentTime - 3), allowSeekAhead: true)
             playerView.playVideo()
 //            playerView.timeOffset += CACurrentMediaTime() - playerView.pausedTime + 3
         }
@@ -629,7 +629,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
         switch (state) {
-//        case .playing:
+        case .playing:
+            if ytLaunchState == .tryingToPlay {     // プレイ開始時
+                ytLaunchState = .done
+            } else if ytLaunchState == .done {      // プレイ再開時
+                self.playerView.updateBaseline()
+            }
 //            isReadyPlayerView = true
         case .paused:
             if ytLaunchState == .initialPaused {
