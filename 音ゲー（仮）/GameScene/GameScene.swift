@@ -348,6 +348,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 switch ytLaunchState {
                 case .loading:
                     playerView.pauseVideo()         // ロードが終わった瞬間にポーズして、ノーツとの同期を待つ
+//                    playerView.seek(toSeconds: 0, allowSeekAhead: true) // 0秒にシークするとなぜか再生に時間がかかる
                     self.passedTime = 0
                     self.startTime = CACurrentMediaTime()
                     self.ytLaunchState = .initialPaused
@@ -360,39 +361,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 case .tryingToPlay:     // 再生状態へ移行中(ポーズ中)
                     self.passedTime = playerView.currentTime + mediaOffsetTime
                 case .done:                   // mediaOffsettime < passedTime の時
-                    playerView.sample()
                     self.passedTime = playerView.currentTime + mediaOffsetTime
 //                    print(CACurrentMediaTime() - playerView.currentTime)
                 }
                 
-                
-                
-                
-                
-                
-                /*
-                
-                if ytLaunchState == .loading {          // ロードが終わった瞬間にポーズして、ノーツとの同期を待つ
-                    playerView.pauseVideo()
-//                    playerView.seek(toSeconds: 0, allowSeekAhead: true) // 0秒にシークするとなぜか再生に時間がかかる
-                    self.passedTime = 0
-                    self.startTime = CACurrentMediaTime()
-                    self.ytLaunchState = .initialPaused
-                } else {
-                    let passedTime = CACurrentMediaTime() - startTime
-                    if self.passedTime > mediaOffsetTime + playerView.initialPausedTime {
-                        if playerView.playerState() == .paused {
-                            playerView.playVideo()
-                            self.passedTime = passedTime
-                        } else {
-                            playerView.sample()
-                            self.passedTime = playerView.currentTime + mediaOffsetTime      // mediaOffsettime < passedTime の時
-                            print(CACurrentMediaTime() - playerView.currentTime)
-                        }
-                    } else {
-                        self.passedTime = passedTime        // 0 < passedTime < mediaOffsetTime の時(再生開始前)
-                    }
-                }
+
                 
 //                print(CACurrentMediaTime() - TimeInterval(playerView.view.currentTime()))
 //                if !(playerView.isSetStartTime) {
@@ -404,8 +377,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
 //            } else {
 //                self.passedTime = 0
-                 
-                 */
+                
+                
             }
         }
         
@@ -632,11 +605,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         case .playing:
             if ytLaunchState == .tryingToPlay {     // プレイ開始時
                 ytLaunchState = .done
+                self.playerView.setBaseline()
             } else if ytLaunchState == .done {      // プレイ再開時
-                self.playerView.updateBaseline()
+                self.playerView.setBaseline()
             }
-//            isReadyPlayerView = true
-        case .paused:
+        case .paused:       // ここはポーズ時になぜか2回呼ばれる
             if ytLaunchState == .initialPaused {
                 self.playerView.initialPausedTime = self.playerView.currentTime
             }
