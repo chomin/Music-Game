@@ -13,7 +13,6 @@ class YTPlayerViewHolder {
     let view: YTPlayerView
     
     private var offset: TimeInterval = 0
-//    private var timeDiffSamples: [TimeInterval] = []    // 再生開始後3フレーム目までのシステム時刻とYouTubeのcurrentTimeの差を3つ保存。中央値を基準として使用するため
     private var baseline: TimeInterval!                 // currentTimeのずれを検出するための基準。timeDiffSamplesの中央値。ポーズ後に更新される
     
     var initialPausedTime: TimeInterval = 0     // 始めの同期待ちポーズの時にオーバーランした時間
@@ -28,7 +27,7 @@ class YTPlayerViewHolder {
             // 誤差が大きければ補正
             if abs(diff - baseline!) > 1/150 {      // 閾値はiPhone8による測定値から決定。カクつきが目立たない値にする
                 offset += diff - baseline
-                print("adjusted")
+//                print("adjusted")
             }
         }
         
@@ -74,6 +73,7 @@ class YTPlayerViewHolder {
     func pauseVideo() {
         self.view.pauseVideo()
         baseline = nil
+//        print("paused")
     }
     
     func playerState() -> YTPlayerState {
@@ -82,20 +82,24 @@ class YTPlayerViewHolder {
     
     // 再生開始時に呼ぶこと
     func setBaseline() {
+        offset = 0
         baseline = CACurrentMediaTime() - (TimeInterval(view.currentTime()) + offset)
+        print("baseline setted")
     }
 
-    /*
-    // 再生開始時に呼ぶこと
-    func sample() {
-        if timeDiffSamples.count < 3 {
-            timeDiffSamples.append(CACurrentMediaTime() - TimeInterval(view.currentTime()))
-            if timeDiffSamples.count == 3 {
-                baseline = timeDiffSamples.sorted()[1]  // 3つの値の中央値を基準に設定
+    private var cnt = 0
+    // 毎フレームに1度呼ぶこと
+    func countFrameForBaseline() {
+        if view.playerState() == .playing && baseline == nil {
+            cnt += 1
+            if cnt == 60 {
+                setBaseline()
             }
+        } else if view.playerState() == .paused {
+            cnt = 0
         }
     }
-    */
+    
     
 }
 

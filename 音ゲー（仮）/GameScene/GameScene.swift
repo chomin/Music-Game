@@ -362,6 +362,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     self.passedTime = playerView.currentTime + mediaOffsetTime
                 case .done:                   // mediaOffsettime < passedTime の時
                     self.passedTime = playerView.currentTime + mediaOffsetTime
+                    playerView.countFrameForBaseline()
 //                    print(CACurrentMediaTime() - playerView.currentTime)
                 }
                 
@@ -531,7 +532,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             BGM?.play()
         } else {
 //            let passedTime = playerView.pausedTime - playerView.startTime - playerView.timeOffset - 3
-//            playerView.seek(toSeconds: Float(playerView.currentTime - 3), allowSeekAhead: true)
             playerView.playVideo()
 //            playerView.timeOffset += CACurrentMediaTime() - playerView.pausedTime + 3
         }
@@ -607,7 +607,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 ytLaunchState = .done
                 self.playerView.setBaseline()
             } else if ytLaunchState == .done {      // プレイ再開時
-                self.playerView.setBaseline()
+//                self.playerView.setBaseline()
             }
         case .paused:       // ここはポーズ時になぜか2回呼ばれる
             if ytLaunchState == .initialPaused {
@@ -664,6 +664,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             BGM?.pause()
         } else {
             playerView.pauseVideo()
+            playerView.seek(toSeconds: Float(playerView.currentTime - 3), allowSeekAhead: true)
         }
         
         // 選択画面を出す
