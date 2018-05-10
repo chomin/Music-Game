@@ -84,7 +84,7 @@ class YTPlayerViewHolder {
     func setBaseline() {
         offset = 0
         baseline = CACurrentMediaTime() - (TimeInterval(view.currentTime()) + offset)
-        print("baseline setted")
+        print("baseline set")
     }
 
     private var cnt = 0
