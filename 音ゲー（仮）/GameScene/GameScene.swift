@@ -605,7 +605,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         case .playing:
             if ytLaunchState == .tryingToPlay {     // プレイ開始時
                 ytLaunchState = .done
-                self.playerView.setBaseline()
+                self.playerView.renewTimeParams()
             } else if ytLaunchState == .done {      // プレイ再開時
 //                self.playerView.setBaseline()
             }

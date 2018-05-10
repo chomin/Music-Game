@@ -79,27 +79,27 @@ class YTPlayerViewHolder {
     func playerState() -> YTPlayerState {
         return self.view.playerState()
     }
+
+    private var frame = 0
+    // 毎フレームに1度呼ぶこと
+    func countFrameForBaseline() {
+        if view.playerState() == .playing && baseline == nil {
+            frame += 1
+            if frame == 60 {
+                renewTimeParams()
+            }
+        } else if view.playerState() == .paused {
+            frame = 0
+        }
+    }
     
     // 再生開始時に呼ぶこと
-    func setBaseline() {
+    func renewTimeParams() {
         offset = 0
         baseline = CACurrentMediaTime() - (TimeInterval(view.currentTime()) + offset)
         print("baseline set")
     }
 
-    private var cnt = 0
-    // 毎フレームに1度呼ぶこと
-    func countFrameForBaseline() {
-        if view.playerState() == .playing && baseline == nil {
-            cnt += 1
-            if cnt == 60 {
-                setBaseline()
-            }
-        } else if view.playerState() == .paused {
-            cnt = 0
-        }
-    }
-    
     
 }
 
