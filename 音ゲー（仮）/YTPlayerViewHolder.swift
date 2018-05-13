@@ -10,18 +10,28 @@ import youtube_ios_player_helper
 
 class YTPlayerViewHolder {
     
-    var view: YTPlayerView
+    let view: YTPlayerView
     
-    var startTime: TimeInterval = TimeInterval(pow(10.0, 308.0))  // ロードが終わり、再生開始された時間を格納する(初期値はDoubleのほぼ最大値).再生されてしばらくしてから同期をとる.
-    var isSetStartTime: Bool = false
+    private var offset: TimeInterval = 0
+    private var baseline: TimeInterval!                 // currentTimeのずれを検出するための基準。timeDiffSamplesの中央値。ポーズ後に更新される
     
-    var timeOffset: TimeInterval = 0.0                            // ポーズするたびに差分を足す.
-    
-    var pausedTime: TimeInterval = 0.0
+    var initialPausedTime: TimeInterval = 0     // 始めの同期待ちポーズの時にオーバーランした時間
     
     var currentTime: TimeInterval {
-        if self.view.playerState() == .paused { return self.pausedTime - self.startTime - self.timeOffset }
-        else { return CACurrentMediaTime() - self.startTime - self.timeOffset }
+        
+        let currentTime = TimeInterval(view.currentTime())
+        
+        // 再生開始から4フレーム以降(ポーズ中は除く)
+        if baseline != nil {
+            let diff = CACurrentMediaTime() - (currentTime + offset)
+            // 誤差が大きければ補正
+            if abs(diff - baseline!) > 1/150 {      // 閾値はiPhone8による測定値から決定。カクつきが目立たない値にする
+                offset += diff - baseline
+//                print("adjusted")
+            }
+        }
+        
+        return currentTime + offset
     }
     
     var duration: TimeInterval { return self.view.duration() }
@@ -30,7 +40,6 @@ class YTPlayerViewHolder {
         get {
             return self.view.delegate
         }
-        
         set {
             self.view.delegate = newValue
         }
@@ -59,14 +68,42 @@ class YTPlayerViewHolder {
     
     func playVideo() {
         self.view.playVideo()
-        
     }
     
     func pauseVideo() {
         self.view.pauseVideo()
-        self.pausedTime = CACurrentMediaTime()
+        baseline = nil
+//        print("paused")
     }
     
+    func playerState() -> YTPlayerState {
+        return self.view.playerState()
+    }
+
+    private var frame = 0
+    // 毎フレームに1度呼ぶこと
+    func countFrameForBaseline() {
+        if view.playerState() == .playing && baseline == nil {
+            frame += 1
+            if frame == 60 {
+                renewTimeParams()
+            }
+        } else if view.playerState() == .paused {
+            frame = 0
+        }
+    }
     
-        
+    // 再生開始時に呼ぶこと
+    func renewTimeParams() {
+        offset = 0
+        baseline = CACurrentMediaTime() - (TimeInterval(view.currentTime()) + offset)
+        print("baseline set")
+    }
+
+    
 }
+
+
+
+
+
