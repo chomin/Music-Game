@@ -694,14 +694,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.isSupposedToPausePlayerView = true
             }
         } else {
-            if isPrecedingStartValid {
-                if ytLaunchState != .done {
-                    self.isSupposedToPausePlayerView = true
-                }
-            } else {
-                if playerView.playerState() != .playing {
-                    self.isSupposedToPausePlayerView = true
-                }
+            if (isPrecedingStartValid && ytLaunchState != .done) || (isPrecedingStartValid && playerView.playerState() != .playing) {
+                self.isSupposedToPausePlayerView = true
             }
         }
         
