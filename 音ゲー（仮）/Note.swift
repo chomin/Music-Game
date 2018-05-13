@@ -12,8 +12,8 @@ import SpriteKit
 /// touchesBeganか呼び出されたときに判定する。
 class Tap: Note {
     
-    let isLarge: Bool               // 大ノーツかどうか
-    fileprivate var appearTime: TimeInterval = 0    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
+    let isLarge: Bool                   // 大ノーツかどうか
+    var appearTime: TimeInterval = 0    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
     init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
         self.isLarge = isLarge
@@ -60,7 +60,7 @@ class Tap: Note {
 /// 呼び出し時にまだparfectの時間でない場合(before)について、後にparfect判定を行うかもしれないので、時間とUItouch情報を該当LaneインスタンスのstoredFlickJudgeに、レーン情報を該当GSTouchインスタンスのstoredFlickJudgeLaneIndexに格納し、後にこの情報をもとにGameSceneTouchesファイル内に記述されているGameScene.storedFlickJudge関数にて判定を行う。この呼出は情報が残っているときにのみ行われ、該当ノーツの判定後に各情報格納場所にnilが入る。storedFlickJudgeの呼び出しタイミングはtouchesMoved呼び出し時にレーンから指が外れた時、touchesEnded呼び出し時、これ以上待ってもより良い判定が来なくなる時（ノーツの正確なタイミングの時間についてtimeLag予定時間(>0)と対象な時間）である。
 class Flick: Note {
     
-    fileprivate var appearTime: TimeInterval = 0    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
+    var appearTime: TimeInterval = 0        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
     override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
         super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
@@ -114,7 +114,7 @@ class TapStart: Note {
     var next = Note()                                               // 次のノーツ（仮のインスタンス）
     var longImages = (long: SKShapeNode(), circle: SKShapeNode())   // このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
     let isLarge: Bool                                               // 大ノーツかどうか
-    fileprivate var appearTime: TimeInterval = 0                    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
+    var appearTime: TimeInterval = 0                                // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
     init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
         self.isLarge = isLarge
