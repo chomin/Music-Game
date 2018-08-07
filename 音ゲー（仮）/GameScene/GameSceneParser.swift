@@ -7,6 +7,14 @@
 //
 //（9/11の成果が残っている？）
 
+/* チャンネル番号定義
+ * 1: 楽曲開始命令
+ * 2: 小節長変更命令(bodyに倍率を小数で指定)
+ * 3: BPM変更命令
+ * 8: インデックス型BPM変更命令(256以上や小数のBPMに対応)
+ * 11-15, 18-19: レーン指定(レーン数によっては使わない場所あり)
+ * 21: ノーツスピード変更命令(倍率を16倍したものを16進数で記述)
+ */
 
 import SpriteKit
 
@@ -45,36 +53,14 @@ extension GameScene {   // bmsファイルを読み込む
     func parse(fileName: String) throws {
         
         // 譜面データファイルを一行ごとに配列で保持
-        var bmsData: [String] = []
-        
-        // 譜面データファイルのヘッダ
-        var header: [String] = []
+        let bmsData = try readFile(fileName: fileName)
+
         // 譜面データファイルのメインデータ
-        var rawMainData: [String] = []
+        var mainData: [(bar: Int, channel: Int, body: [String])] = []
         
         // インデックス型テンポ変更用テーブル
         var BPMTable: [String : Double] = [:]
-        
-        // ファイルの内容をbmsDataに格納
-        bmsData = try readFile(fileName: fileName)
-        
-        // 先頭が'#'であるものだけを抽出し、'#'を削除
-        bmsData = bmsData
-            .filter { $0.hasPrefix("#") }
-            .map { str in String(str.dropFirst()) }
-        
-        
-        // ヘッダとメインデータに分割
-        for bmsLine in bmsData {
-            if Int(bmsLine.prefix(1)) == nil {  // 1文字目が数字じゃないならヘッダ
-                header.append(bmsLine)
-            } else {
-                rawMainData.append(bmsLine)
-            }
-        }
-        
-        
-        /*--- ヘッダをパース ---*/
+
         
         // コマンド文字列を命令と結びつける辞書
         let headerInstructionTable: [String: (String) -> ()] = [
@@ -88,23 +74,49 @@ extension GameScene {   // bmsファイルを読み込む
             "VOLWAV":    { value in if let num = Int(value) { self.volWav = num } },
             "LANE":      { value in if let num = Int(value) { self.laneNum = num } }
         ]
-        
-        // 1行ずつ処理
-        for headerLine in header {
-            let components = headerLine.components(separatedBy: " ")
-            if components.count >= 2 {
-                if let headerInstruction = headerInstructionTable[components[0]] {  // 辞書に該当する命令がある場合
-                    var value = components[1]
-                    let splittedValue = components.dropFirst(2) // 3つ目以降(名前の中に半角スペースがある場合)
-                    for str in splittedValue {
-                        value += (" " + str)
-                    }
+
+        let headerEx = try! Regex("^#([A-Z][0-9A-Z]*) (.*)$")   // ヘッダの行にマッチ
+        let mainDataEx = try! Regex("^#([0-9]{3})([0-9]{2}):(([0-9A-Z]{2})+)$") // メインデータの小節長変更命令以外にマッチ
+        let barLengthEx = try! Regex("^#([0-9]{3})02:(([1-9]\\d*|0)(\\.\\d+)?)$") // メインデータの小節長変更命令にマッチ
+
+        // BMS形式のテキストを1行ずつパース
+        for bmsLine in bmsData {
+            if let match = headerEx.firstMatch(bmsLine) {
+                let item = match.groups[0]!
+                let value = match.groups[1]!
+                // ヘッダをパース
+                if let headerInstruction = headerInstructionTable[item] {   // 辞書に該当する命令がある場合
                     headerInstruction(value)
-                } else if components[0].hasPrefix("BPM") {
-                    // BPM指定コマンドのとき
-                    if let bpm = Double(components[1]) {
-                        BPMTable[String(components[0].dropFirst(3))] = bpm
+                } else if let bpmMatch = (try! Regex("^BPM([0-9A-F]{1,2})$")).firstMatch(item) {
+                    // BPM指定コマンドの時
+                    if let bpm = Double(value) {
+                       BPMTable[bpmMatch.groups[0]!] = bpm
                     }
+                } else {
+                    print("未定義のヘッダ命令: \(item)")
+                }
+                
+            } else if let match = mainDataEx.firstMatch(bmsLine) {
+                // メインデータ(小節長変更命令以外)をパース
+                let bar = Int(match.groups[0]!)!        // 正規表現でフィルタしてるので必ずパース成功
+                let channel = Int(match.groups[1]!)!    // 同上
+                var body = [String]()
+                // オブジェクト文字列を2文字ずつに分割
+                let obstr = match.groups[2]!
+                for i in stride(from: 0, to: obstr.count, by: 2) {
+                    let headIndex = obstr.index(obstr.startIndex, offsetBy: i)
+                    let tailIndex = obstr.index(obstr.startIndex, offsetBy: i + 2)
+                    body.append(String(obstr[headIndex..<tailIndex]))
+                }
+                mainData.append((bar, channel, body))
+                
+            } else if let match = barLengthEx.firstMatch(bmsLine) {
+                // メインデータの小節長変更命令をパース
+                let bar = Int(match.groups[0]!)!
+                mainData.append((bar, 2, [match.groups[1]!]))
+            } else {
+                if bmsLine.hasPrefix("#") {
+                    throw ParseError.invalidValue("命令が不正です: \(bmsLine)")
                 }
             }
         }
@@ -113,12 +125,10 @@ extension GameScene {   // bmsファイルを読み込む
             videoID == "" {
             throw ParseError.lackOfVideoID("ファイル内にvideoIDが見つかりませんでした。BGMモードで実行します。")
         }
-        
-        /*--- メインデータをパース ---*/
-        
-        // 利用可能なチャンネル番号
-        let availableChannels = [1, 2, 3, 8, 11, 12, 13, 14, 15, 18, 19, 21]
-        
+
+
+        /*--- メインデータからノーツを生成 ---*/
+
         // チャンネルとレーンの対応付け(辞書)
         var laneMap: [Int : Int]
         switch laneNum {
@@ -154,60 +164,19 @@ extension GameScene {   // bmsファイルを読み込む
             case end2L     = "0F"
             case tapLL     = "0G"
         }
-        
-        // メインデータ1行を小節番号・チャンネル・データのタプルに分解
-        let processedMainData = try rawMainData.map {
-            (str: String) throws -> (bar: Int, channel: Int, body: [String]) in
-            
-            var ret = (bar: 0, channel: 0, body: [String]())
-            
-            let components = str.components(separatedBy: ":")
-            
-            guard components.count >= 2 && components[0].count == 5 else {
-                throw ParseError.lackOfData("データが欠損しています: #\(str)")
-            }
-            
-            if let num = Int(components[0].prefix(3)) {
-                ret.bar = num
-            } else {
-                throw ParseError.invalidValue("小節番号指定が不正です: #\(str)")
-            }
-            if let num = Int(components[0].suffix(2)) {
-                ret.channel = num
-            } else {
-                throw ParseError.invalidValue("チャンネル指定が不正です: #\(str)")
-            }
-            
-            if ret.channel == 2 {   // 小節を指定数倍する
-                ret.body.append(components[1])
 
-            } else {
-                // オブジェクト配列を2文字ずつに分けてdataに格納
-                for i in stride(from: 0, to: components[1].count, by: 2) {
-                    let headIndex = str.index(str.startIndex, offsetBy: i)
-                    let tailIndex = str.index(str.startIndex, offsetBy: i + 2)
-                    ret.body.append(String(components[1][headIndex..<tailIndex]))
-                }
+        // mainDataを小節毎に分ける
+        var barGroup: [Int : [(channel: Int, body: [String])]] = [:]   // 小節と、対応するmainDataの辞書
+        for (bar, channel, body) in mainData {
+            if barGroup[bar]?.append((channel, body)) == nil {
+                barGroup[bar] = [(channel, body)]
             }
-            return ret
-            
-        }.filter {
-            availableChannels.index(of: $0.channel) != nil      // サポート外のチャンネルを利用する命令を除去
         }
-        
         
         var longNotes1: [Note] = []         // ロングノーツ1を一時的に格納
         var longNotes2: [Note] = []         // ロングノーツ2を一時的に格納
         var musicStartPosSet: [Double] = [] // musicStartPosを一時的に格納
         var beatOffset = 0  // その小節の全オブジェクトに対する拍数の調整。4/4以外の拍子があった場合に上下する
-
-        // processedMainDataを小節毎に分ける
-        var barGroup: [Int : [(channel: Int, body: [String])]] = [:]   // 小節と、対応するprocessedMainDataの辞書
-        for (bar, channel, body) in processedMainData {
-            if barGroup[bar]?.append((channel, body)) == nil {
-                barGroup[bar] = [(channel, body)]
-            }
-        }
         
         // 小節毎に処理
         for (bar, data) in barGroup.sorted(by: { $0.0 < $1.0 } ) {
