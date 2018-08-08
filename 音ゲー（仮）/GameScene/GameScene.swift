@@ -148,7 +148,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // notesにノーツの"　始　点　"を入れる
         do {
-            try parse(fileName: musicName.rawValue + ".bms")
+//            try parse(fileName: musicName.rawValue + ".bms")
+            try parse(fileName: "READY!!(小節長変更確認用).bms")
         }
         catch FileError.invalidName     (let msg) { print(msg) }
         catch FileError.notFound        (let msg) { print(msg) }

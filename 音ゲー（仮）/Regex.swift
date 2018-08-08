@@ -18,7 +18,7 @@ public struct Regex {
                 .map { i -> String? in
                     let range = res.range(at: i)
                     guard range.location != NSNotFound else {
-                        // ない可能性のある()だとnilのこともある ←どんなとき？？
+                        // ない可能性のある()だとnilのこともある ←"(hoge)?"とか
                         return nil
                     }
                     return text.substring(with: res.range(at: i))
