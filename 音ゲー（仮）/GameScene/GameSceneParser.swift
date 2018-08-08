@@ -75,7 +75,7 @@ extension GameScene {   // bmsファイルを読み込む
             "LANE":      { value in if let num = Int(value) { self.laneNum = num } }
         ]
 
-        let headerEx = try! Regex("^#([A-Z][0-9A-Z]*) (.*)$")   // ヘッダの行にマッチ
+        let headerEx = try! Regex("^#([A-Z][0-9A-Z]*)( .*)?$")   // ヘッダの行にマッチ
         let mainDataEx = try! Regex("^#([0-9]{3})([0-9]{2}):(([0-9A-Z]{2})+)$") // メインデータの小節長変更命令以外にマッチ
         let barLengthEx = try! Regex("^#([0-9]{3})02:(([1-9]\\d*|0)(\\.\\d+)?)$") // メインデータの小節長変更命令にマッチ
 
@@ -83,7 +83,7 @@ extension GameScene {   // bmsファイルを読み込む
         for bmsLine in bmsData {
             if let match = headerEx.firstMatch(bmsLine) {
                 let item = match.groups[0]!
-                let value = match.groups[1]!
+                let value = String(match.groups[1]?.dropFirst() ?? "")  // nilでなければ空白を取り除く
                 // ヘッダをパース
                 if let headerInstruction = headerInstructionTable[item] {   // 辞書に該当する命令がある場合
                     headerInstruction(value)
