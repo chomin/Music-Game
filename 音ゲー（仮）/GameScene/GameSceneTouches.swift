@@ -314,10 +314,8 @@ extension GameScene {
                     return false
                     
         }
-        
-        let judgeNote = lane.headNote!
-        
-        guard judgeNote.isJudgeable else {
+
+        guard lane.headNote!.isJudgeable else {
             print("判定対象ノーツ.isJudgeableがfalseです. laneIndex: \(lane.laneIndex)")
             return false
         }
@@ -334,7 +332,7 @@ extension GameScene {
         }
         
         // 必要ならgsTouch関係の処理
-        switch judgeNote {
+        switch lane.headNote! {
         case is Flick, is FlickEnd:
             gsTouch?.isJudgeableFlick = false    // このタッチでのフリック判定を禁止
             gsTouch?.isJudgeableFlickEnd = false
@@ -366,9 +364,7 @@ extension GameScene {
             if ResultScene.combo > ResultScene.maxCombo {
                 ResultScene.maxCombo += 1
             }
-            judgeNote.isJudged = true
-            setNextIsJudgeable(judgeNote: judgeNote)
-            releaseNote(lane: lane)
+            lane.setHeadNoteJudged()
             return true
         case .great:
             setJudgeLabelText(text: "great!")
@@ -377,40 +373,30 @@ extension GameScene {
             if ResultScene.combo > ResultScene.maxCombo {
                 ResultScene.maxCombo += 1
             }
-            judgeNote.isJudged = true
-            setNextIsJudgeable(judgeNote: judgeNote)
-            releaseNote(lane: lane)
+            lane.setHeadNoteJudged()
             return true
         case .good:
             setJudgeLabelText(text: "good")
             ResultScene.good += 1
             ResultScene.combo = 0
-            judgeNote.isJudged = true
-            setNextIsJudgeable(judgeNote: judgeNote)
-            releaseNote(lane: lane)
+            lane.setHeadNoteJudged()
             return true
         case .bad:
             setJudgeLabelText(text: "bad")
             ResultScene.bad += 1
             ResultScene.combo = 0
-            judgeNote.isJudged = true
-            setNextIsJudgeable(judgeNote: judgeNote)
-            releaseNote(lane: lane)
+            lane.setHeadNoteJudged()
             return true
         case .miss:
             setJudgeLabelText(text: "miss!")
             ResultScene.miss += 1
             ResultScene.combo = 0
-            judgeNote.isJudged = true
-            setNextIsJudgeable(judgeNote: judgeNote)
-            releaseNote(lane: lane)
+            lane.setHeadNoteJudged()
             return true
         default:    // still,passedなら判定しない(guardで弾いてるはず。)
             print("judge error. laneIndex: \(lane.laneIndex)")
             return false
         }
-        
-        
     }
     
     /// parfect終了時(laneからのdelegate)または指が外れた時に呼び出される。
@@ -472,42 +458,9 @@ extension GameScene {
         setJudgeLabelText(text: "miss!")
         ResultScene.miss += 1
         ResultScene.combo = 0
-        lane.headNote!.isJudged = true
-        setNextIsJudgeable(judgeNote: lane.headNote!)
-        releaseNote(lane: lane)
+        lane.setHeadNoteJudged()
         return true
     }
-    
-    func setNextIsJudgeable(judgeNote: Note)  {
-        if judgeNote is TapStart {
-            let note = judgeNote as! TapStart
-            note.next.isJudgeable = true
-        } else if judgeNote is Middle {
-            let note = judgeNote as! Middle
-            note.next.isJudgeable = true
-        }
-    }
-    
-    func releaseNote(lane: Lane) {  // ノーツや同時押し線、関連ノードを開放する
-        
-        if let i = sameLines.index(where: { $0.note1 === lane.headNote! } ) {    //同時押し線を解放
-            
-            sameLines.remove(at: i)
-        } else if let i = sameLines.index(where: { $0.note2 === lane.headNote! } ) { //同時押し線を解放
-            
-            sameLines.remove(at: i)
-        }
-        if let note = lane.headNote! as? TapEnd {        //始点から終点まで、連鎖的に参照を削除
-            let index = notes.index(where: { $0 === note.start } )
-            notes.remove(at: index!)
-        } else if let note = lane.headNote! as? FlickEnd {
-            let index = notes.index(where: { $0 === note.start } )
-            notes.remove(at: index!)
-        } else if lane.headNote! is Tap || lane.headNote! is Flick {
-            let index = notes.index(where: { $0 === lane.headNote! } )
-            notes.remove(at: index!)
-        }
-        lane.removeHeadNote()                // レーンからの参照を削除
-        
-    }
+
 }
+

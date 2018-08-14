@@ -143,15 +143,15 @@ class TapStart: Note {
     
     override func update(_ passedTime: TimeInterval) {
         // update不要なときはreturn
-        guard passedTime > appearTime else {            // 描画領域外のノーツはreturn
+        guard passedTime > appearTime else {            // 描画域より上のノーツはreturn
             return
         }
-        
-        super.update(passedTime)
-        
+
         // 後続ノーツを先にupdate
         next.update(passedTime)
-        
+
+        super.update(passedTime)
+
         // update不要なときはreturn
         guard !isJudged || positionOnLane > 0                           // 描画域内にあるか、過ぎていても判定前なら更新
             || (positionOnLane < 0 && 0 < next.positionOnLane)          // ロングノーツが描画域内にあれば更新
@@ -268,6 +268,7 @@ class Middle: Note {
     
     var next = Note()                                               // 次のノーツ（仮のインスタンス）
     var longImages = (long: SKShapeNode(), circle: SKShapeNode())   // このノーツを始点とする緑太線の画像と、判定線上に残る緑楕円(将来的にはimageに格納？)
+    var appearTime: TimeInterval = 0                                // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     override var position: CGPoint {                                // positionを左端ではなく線の中点にするためオーバーライド
         get {
             return CGPoint(x: image.position.x + size / 2, y: image.position.y)
@@ -309,19 +310,17 @@ class Middle: Note {
     
     
     override func update(_ passedTime: TimeInterval) {
-        
-        super.update(passedTime)
-        
-        // 後続ノーツを先にupdate
-        if positionOnLane <= Dimensions.laneLength {
-            next.update(passedTime)
+        // 水平線より下ならば
+        if passedTime > appearTime {
+            next.update(passedTime) // 後続ノーツを先にupdate
         }
         
         // update不要なときはreturn
         guard !(isJudged && image.isHidden && longImages.circle.isHidden && longImages.long.isHidden) else {        // 通過後のノーツはreturn
             return
         }
-        
+
+        super.update(passedTime)
         
         // x座標とy座標を計算しpositionを変更
         setPos()
@@ -582,7 +581,7 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         Note.majorBPM = BPMIntervals.max { $0.interval < $1.interval }!.bpm
         Note.BPMs = BPMs
         
-        // appearTimeの設定
+        // appearTimeの設定(end系以外)
         for note in notes {
             switch note {
             case is Tap:
@@ -594,6 +593,9 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
             case is TapStart:
                 let tapStart = note as! TapStart
                 tapStart.appearTime = getAppearTime(note)
+            case is Middle:
+                let middle = note as! Middle
+                middle.appearTime = getAppearTime(note)
             default:
                 break
             }
