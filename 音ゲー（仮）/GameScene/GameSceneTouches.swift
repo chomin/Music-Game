@@ -314,7 +314,7 @@ extension GameScene {
                     return false
                     
         }
-        
+
         guard lane.headNote!.isJudgeable else {
             print("判定対象ノーツ.isJudgeableがfalseです. laneIndex: \(lane.laneIndex)")
             return false
