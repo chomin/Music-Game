@@ -39,9 +39,12 @@ enum MusicName: String, EnumCollection {
         
         var pickerArray: [String] = []
         
+//        print(MusicName.allValues)
+        
+        
         for musicName in MusicName.allValues {
             pickerArray.append(musicName.rawValue)
-            
+//            print(musicName.rawValue)
             // YouTubeを実装しているものについてはYouTubeモードをピッカーに追加
 //            if musicName == .yo_kosoJapariParkHe ||
 //                musicName == .oracion ||

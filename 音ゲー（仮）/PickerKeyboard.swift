@@ -12,7 +12,7 @@ class PickerKeyboard: UIControl {
     
     
     var musicNameArray: [String] = []                             // ピッカーに表示させるデータ(DimentionsファイルのMusicNameから自動生成)
-    var textStore: String = MusicName.first!.rawValue   // 入力文字列を保存するためのプロパティ
+    var textStore: String = MusicName.first!.rawValue   // 入力文字列を保存するためのプロパティ(MusicName.first!.rawValueとするとfirstがnilになる)
     var isFirstMovedFromTitleLabel = false                      // 一番最初に選択されたラベルを強調するためのもの
     
     
