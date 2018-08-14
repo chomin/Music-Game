@@ -368,7 +368,6 @@ extension GameScene {
             }
             judgeNote.isJudged = true
             setNextIsJudgeable(judgeNote: judgeNote)
-            releaseNote(lane: lane)
             return true
         case .great:
             setJudgeLabelText(text: "great!")
@@ -379,7 +378,6 @@ extension GameScene {
             }
             judgeNote.isJudged = true
             setNextIsJudgeable(judgeNote: judgeNote)
-            releaseNote(lane: lane)
             return true
         case .good:
             setJudgeLabelText(text: "good")
@@ -387,7 +385,6 @@ extension GameScene {
             ResultScene.combo = 0
             judgeNote.isJudged = true
             setNextIsJudgeable(judgeNote: judgeNote)
-            releaseNote(lane: lane)
             return true
         case .bad:
             setJudgeLabelText(text: "bad")
@@ -395,7 +392,6 @@ extension GameScene {
             ResultScene.combo = 0
             judgeNote.isJudged = true
             setNextIsJudgeable(judgeNote: judgeNote)
-            releaseNote(lane: lane)
             return true
         case .miss:
             setJudgeLabelText(text: "miss!")
@@ -403,7 +399,6 @@ extension GameScene {
             ResultScene.combo = 0
             judgeNote.isJudged = true
             setNextIsJudgeable(judgeNote: judgeNote)
-            releaseNote(lane: lane)
             return true
         default:    // still,passedなら判定しない(guardで弾いてるはず。)
             print("judge error. laneIndex: \(lane.laneIndex)")
@@ -474,7 +469,6 @@ extension GameScene {
         ResultScene.combo = 0
         lane.headNote!.isJudged = true
         setNextIsJudgeable(judgeNote: lane.headNote!)
-        releaseNote(lane: lane)
         return true
     }
     
@@ -487,27 +481,5 @@ extension GameScene {
             note.next.isJudgeable = true
         }
     }
-    
-    func releaseNote(lane: Lane) {  // ノーツや同時押し線、関連ノードを開放する
-        
-        if let i = sameLines.index(where: { $0.note1 === lane.headNote! } ) {    //同時押し線を解放
-            
-            sameLines.remove(at: i)
-        } else if let i = sameLines.index(where: { $0.note2 === lane.headNote! } ) { //同時押し線を解放
-            
-            sameLines.remove(at: i)
-        }
-        if let note = lane.headNote! as? TapEnd {        //始点から終点まで、連鎖的に参照を削除
-            let index = notes.index(where: { $0 === note.start } )
-            notes.remove(at: index!)
-        } else if let note = lane.headNote! as? FlickEnd {
-            let index = notes.index(where: { $0 === note.start } )
-            notes.remove(at: index!)
-        } else if lane.headNote! is Tap || lane.headNote! is Flick {
-            let index = notes.index(where: { $0 === lane.headNote! } )
-            notes.remove(at: index!)
-        }
-        lane.removeHeadNote()                // レーンからの参照を削除
-        
-    }
 }
+
