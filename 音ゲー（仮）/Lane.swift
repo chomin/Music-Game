@@ -34,8 +34,24 @@ class Lane {
     var headNote: Note? { return laneNotes.first }
     func append(_ note: Note) { laneNotes.append(note) }
     func sort() { laneNotes.sort { $0.beat < $1.beat } }
-    func removeHeadNote() { laneNotes.removeFirst() }
-    
+    // 先頭ノーツを判定し終えた時の処理をまとめて行う
+    func setHeadNoteJudged() {
+        laneNotes.first?.isJudged = true
+        if !isEmpty {
+        setNextIsJudgeable(judgeNote: laneNotes.first!)
+        }
+        laneNotes.removeFirst()
+    }
+    private func setNextIsJudgeable(judgeNote: Note)  {
+        if judgeNote is TapStart {
+            let note = judgeNote as! TapStart
+            note.next.isJudgeable = true
+        } else if judgeNote is Middle {
+            let note = judgeNote as! Middle
+            note.next.isJudgeable = true
+        }
+    }
+
     var storedFlickJudgeInformation: (timeLag: TimeInterval, touch: UITouch)? {// (判定予定時間(movedが呼ばれた時間), タッチ情報)
         didSet {
             if let newTimeLag = storedFlickJudgeInformation?.timeLag {
