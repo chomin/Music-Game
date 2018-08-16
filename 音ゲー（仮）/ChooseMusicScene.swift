@@ -335,6 +335,7 @@ class ChooseMusicScene: SKScene {
             
             scene = GameScene(musicName: MusicName(rawValue: picker.textStore)!, playMode: playMode, isAutoPlay: autoPlaySwitch.isOn, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
         }else{
+            print(picker.textStore)
             scene = GameScene(musicName: MusicName(rawValue: picker.textStore)! , playMode: .BGM , isAutoPlay: autoPlaySwitch.isOn, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
         }
         

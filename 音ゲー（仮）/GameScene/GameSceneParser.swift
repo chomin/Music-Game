@@ -479,7 +479,14 @@ extension GameScene {   // bmsファイルを読み込む
                 
                 return content.components(separatedBy: .newlines)
             } catch {
-                throw FileError.readFailed("ファイルの内容取得に失敗")
+                do {
+                    // ファイルの内容を取得する
+                    let content = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
+                    
+                    return content.components(separatedBy: .newlines)
+                } catch {
+                    throw FileError.readFailed("ファイルの内容取得に失敗")
+                }
             }
         } else {
             throw FileError.notFound("指定されたファイルが見つかりません")
