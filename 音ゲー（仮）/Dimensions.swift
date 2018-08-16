@@ -39,6 +39,7 @@ enum MusicName: String, EnumCollection {
     case thisGameEx             = "This game(expert)"
     case dreamParade            = "ドリームパレード(expert)"
     case seikaihahitotujanai    = "正解はひとつ！じゃない！！(expert)"
+    case believeInMyExistence   = "Believe in my existence(expert)"
     
     static func getPickerArray() -> [String] {
         
