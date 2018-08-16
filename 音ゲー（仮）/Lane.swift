@@ -100,7 +100,7 @@ class Lane {
             guard laneNotes.first is Flick ||
                   laneNotes.first is FlickEnd else { return false }
             
-            return Range(parfectUpperBorder ..< missUpperBorder).contains(timeLag)
+            return (parfectUpperBorder ..< missUpperBorder).contains(timeLag)
         }
     }
     

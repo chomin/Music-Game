@@ -35,13 +35,24 @@ enum MusicName: String, EnumCollection {
     case marionettesNeverSleep  = "Marionetteは眠らない"
     case machiukePrince         = "待ち受けプリンス"
     
+    /*--------バンドリ楽曲---------*/
+    case thisGameEx             = "This game(expert)"
+    case dreamParade            = "ドリームパレード(expert)"
+    case seikaihahitotujanai    = "正解はひとつ！じゃない！！(expert)"
+    case believeInMyExistence   = "Believe in my existence(expert)"
+    case redo                   = "Redo(expert)"
+    case kimijanakyadamemitai   = "君じゃなきゃダメみたい(expert)"
+    
     static func getPickerArray() -> [String] {
         
         var pickerArray: [String] = []
         
+//        print(MusicName.allValues)
+        
+        
         for musicName in MusicName.allValues {
             pickerArray.append(musicName.rawValue)
-            
+//            print(musicName.rawValue)
             // YouTubeを実装しているものについてはYouTubeモードをピッカーに追加
 //            if musicName == .yo_kosoJapariParkHe ||
 //                musicName == .oracion ||
