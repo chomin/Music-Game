@@ -43,6 +43,7 @@ enum MusicName: String, EnumCollection {
     case redo                   = "Redo(expert)"
     case kimijanakyadamemitai   = "君じゃなきゃダメみたい(expert)"
     case rokuchonen             = "六兆年と一夜物語(expert)"
+    case heyDay                 = "Hey-day狂想曲(カプリチオ)(expert)"
     
     
     static func getPickerArray() -> [String] {
