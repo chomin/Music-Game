@@ -44,6 +44,7 @@ enum MusicName: String, EnumCollection {
     case kimijanakyadamemitai   = "君じゃなきゃダメみたい(expert)"
     case rokuchonen             = "六兆年と一夜物語(expert)"
     
+    
     static func getPickerArray() -> [String] {
         
         var pickerArray: [String] = []
