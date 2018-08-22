@@ -317,10 +317,7 @@ class Middle: Note {
         
         // 通過後のノーツはreturn
         guard !(isJudged &&
-            image.isHidden && longImages.circle.isHidden && longImages.long.isHidden
-            &&
-            position.y < Dimensions.judgeLineY
-            ) else {
+            image.isHidden && longImages.circle.isHidden && longImages.long.isHidden) else {
             return
         }
 
