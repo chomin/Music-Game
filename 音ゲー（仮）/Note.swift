@@ -251,7 +251,7 @@ class TapStart: Note {
         } else {
             longImages.long.isHidden = false
         }
-        if position.y >= Dimensions.judgeLineY || next.position.y < Dimensions.judgeLineY || next.isJudged {
+        if position.y >= Dimensions.judgeLineY || next.position.y < Dimensions.judgeLineY {
             longImages.circle.isHidden = true
         } else {
             longImages.circle.isHidden = false
@@ -315,8 +315,9 @@ class Middle: Note {
             next.update(passedTime) // 後続ノーツを先にupdate
         }
         
-        // update不要なときはreturn
-        guard !(isJudged && image.isHidden && longImages.circle.isHidden && longImages.long.isHidden) else {        // 通過後のノーツはreturn
+        // 通過後のノーツはreturn
+        guard !(isJudged &&
+            image.isHidden && longImages.circle.isHidden && longImages.long.isHidden) else {
             return
         }
 
@@ -407,7 +408,7 @@ class Middle: Note {
         } else {
             longImages.long.isHidden = false
         }
-        if position.y >= Dimensions.judgeLineY || next.position.y < Dimensions.judgeLineY || next.isJudged {
+        if position.y >= Dimensions.judgeLineY || next.position.y < Dimensions.judgeLineY {
             longImages.circle.isHidden = true
         } else {
             longImages.circle.isHidden = false
@@ -437,7 +438,7 @@ class TapEnd: Note {
     
     override func update(_ passedTime: TimeInterval) {
         // update不要なときはreturn
-        guard !(image.isHidden && isJudged) else {      // 通過後のノーツはreturn
+        guard !(image.isHidden && isJudged && positionOnLane < 0) else {      // 通過後のノーツはreturn
             return
         }
         
@@ -492,7 +493,7 @@ class FlickEnd: Note {
     
     override func update(_ passedTime: TimeInterval) {
         // update不要なときはreturn
-        guard !(image.isHidden && isJudged) else {      // 通過後のノーツはreturn
+        guard !(image.isHidden && isJudged && positionOnLane < 0) else {      // 通過後のノーツはreturn
             return
         }
         
