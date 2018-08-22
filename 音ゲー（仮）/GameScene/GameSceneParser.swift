@@ -8,10 +8,10 @@
 //（9/11の成果が残っている？）
 
 /* チャンネル番号定義
- * 1: 楽曲開始命令
- * 2: 小節長変更命令(bodyに倍率を小数で指定)
- * 3: BPM変更命令
- * 8: インデックス型BPM変更命令(256以上や小数のBPMに対応)
+ * 01: 楽曲開始命令(10,20,30)、及び楽曲終了命令(11)
+ * 02: 小節長変更命令(bodyに倍率を小数で指定)
+ * 03: BPM変更命令
+ * 08: インデックス型BPM変更命令(256以上や小数のBPMに対応)
  * 11-15, 18-19: レーン指定(レーン数によっては使わない場所あり)
  * 21: ノーツスピード変更命令(倍率を16倍したものを16進数で記述)
  */
@@ -175,7 +175,8 @@ extension GameScene {   // bmsファイルを読み込む
         
         var longNotes1: [Note] = []         // ロングノーツ1を一時的に格納
         var longNotes2: [Note] = []         // ロングノーツ2を一時的に格納
-        var musicStartPosSet: [Double] = [] // musicStartPosを一時的に格納
+        var musicStartPosSet: [PlayMode : Double] = [:] // 各モードのmusicStartPosを一時的に格納
+        var musicEndPos: Double?            // 楽曲終了タイミング(拍単位)
         var beatOffset = 0  // その小節の全オブジェクトに対する拍数の調整。4/4以外の拍子があった場合に上下する
         
         // 小節毎に処理
@@ -297,11 +298,16 @@ extension GameScene {   // bmsファイルを読み込む
                         }
                     }
                 } else if channel == 1 {
-                    // 楽曲開始命令の処理
+                    // 楽曲開始及び終了命令の処理
                     for (index, ob) in body.enumerated() {
-                        if ob == "10" {
-                            let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
-                            musicStartPosSet.append(beat)
+                        let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
+
+                        switch ob {
+                        case "10": musicStartPosSet[.BGM] = beat
+                        case "20": musicStartPosSet[.YouTube] = beat
+                        case "30": musicStartPosSet[.YouTube2] = beat
+                        case "11": musicEndPos = beat
+                        default:
                             break
                         }
                     }
@@ -342,14 +348,36 @@ extension GameScene {   // bmsファイルを読み込む
         }
         
         // musicStartPosを格納
-        switch self.playMode {
-        case .BGM:
-            self.musicStartPos = musicStartPosSet[0]
-        case .YouTube:
-            self.musicStartPos = musicStartPosSet[1]
-        case .YouTube2:
-            self.musicStartPos = musicStartPosSet[2]
+        guard musicStartPosSet[.BGM] != nil else {
+            throw ParseError.lackOfData("楽曲開始命令がありません")
         }
+        switch playMode {
+        case .BGM:
+            self.musicStartPos = musicStartPosSet[.BGM]!
+        case .YouTube:
+            self.musicStartPos = musicStartPosSet[.YouTube] ?? musicStartPosSet[.BGM]!
+        case .YouTube2:
+            self.musicStartPos = musicStartPosSet[.YouTube2] ?? musicStartPosSet[.YouTube] ?? musicStartPosSet[.BGM]!
+        }
+        // 楽曲継続時間を設定
+        self.duration = {
+            if let endPos = musicEndPos {
+                var i = 0
+                var timeInterval: TimeInterval = 0
+                while true {
+                    if i + 1 < BPMs.count {
+                        timeInterval += (BPMs[i + 1].startPos - BPMs[i].startPos) / (BPMs[i].bpm/60)
+                    } else {
+                        timeInterval += (endPos - BPMs[i].startPos) / (BPMs[i].bpm/60)
+                        break
+                    }
+                    i += 1
+                }
+                return timeInterval
+            } else {
+                return nil
+            }
+        }()
         
         // ロングノーツを時間順にソート(同じ場合は TapEnd or FlickEnd < TapStart)
         longNotes1.sort(by: {
