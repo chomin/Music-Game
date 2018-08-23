@@ -52,7 +52,7 @@ class SameLine {
 /// 音ゲーをするシーン
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {
     
-    
+    static var cnt = 0  // デバッグ用
 //    var tmpCounter = 0  //デバッグ用
 //    static var ultiateSuperGod = true 4月1日は終わりました
     
@@ -452,7 +452,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         } else {
             // 判定関係
             // middleの判定（同じところで長押しのやつ）
-            judgeQueue.sync {
+            judgeQueue.async {
                 
                 
                 for gsTouch in self.allGSTouches {
@@ -521,7 +521,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         judgeLabel.run(seq)
     }
     
-    func moveToResultScene() {
+    func moveToResultScene() { print(GameScene.cnt)
         let scene = ResultScene(size: (view?.bounds.size)!)
         let skView = view as SKView?
         skView?.showsFPS = true

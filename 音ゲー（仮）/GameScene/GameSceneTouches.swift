@@ -18,7 +18,7 @@ extension GameScene {
         guard !isAutoPlay else { return }
         
         
-        judgeQueue.sync {
+        judgeQueue.async {
             
             uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 
@@ -92,7 +92,7 @@ extension GameScene {
         
         guard !isAutoPlay else { return }
         
-        judgeQueue.sync {
+        judgeQueue.async {
             for i in self.lanes {
                 guard i.isTimeLagSet else { return }
             }
@@ -190,7 +190,7 @@ extension GameScene {
                 if let buttonXAndLaneIndex = self.allGSTouches[touchIndex].storedFlickJudgeLaneIndex {
                     if !(Dimensions.judgeRects[buttonXAndLaneIndex].contains(pos)) {
                         
-                        storedFlickJudge(lane: lanes[buttonXAndLaneIndex])
+                        self.storedFlickJudge(lane: self.lanes[buttonXAndLaneIndex])
                     }
                 }
             }
@@ -202,7 +202,7 @@ extension GameScene {
         
         guard !isAutoPlay else { return }
 
-        judgeQueue.sync {
+        judgeQueue.async {
             
             for touch in touches {
                 
@@ -271,7 +271,7 @@ extension GameScene {
                     
                     // storedFlickが残っていないか確認
                     if let laneIndex = self.allGSTouches[touchIndex].storedFlickJudgeLaneIndex {
-                        storedFlickJudge(lane: lanes[laneIndex])
+                        self.storedFlickJudge(lane: self.lanes[laneIndex])
                     }
                     
                     self.allGSTouches.remove(at: self.allGSTouches.index(where: { $0.touch == touch } )!)
@@ -319,7 +319,7 @@ extension GameScene {
             print("判定対象ノーツ.isJudgeableがfalseです. laneIndex: \(lane.laneIndex)")
             return false
         }
-        
+        GameScene.cnt += 1
         
         // 以下は判定が確定しているものとする
         
