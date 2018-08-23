@@ -57,8 +57,8 @@ class Setting {
         isAutoPlay = defaults.bool(forKey: Keys.userIsAutoPlay.rawValue)
         isFitSizeToLane = defaults.bool(forKey: Keys.userIsFitToLane.rawValue)
         
-        speedRatioP = Double(speedRatioIntP/100)
-        scaleRatioP = Double(scaleRatioIntP/100)
+        speedRatioP = Double(speedRatioIntP)/100
+        scaleRatioP = Double(scaleRatioIntP)/100
     }
     
     func save(){
@@ -68,7 +68,7 @@ class Setting {
         defaults.set(isAutoPlay, forKey: Keys.userIsAutoPlay.rawValue)
         defaults.set(isFitSizeToLane, forKey: Keys.userIsFitToLane.rawValue)
         
-        speedRatio = Double(speedRatioInt/100)
+        speedRatio = Double(speedRatioInt)/100
     }
     
     /* ----- getter, setter -----*/
@@ -78,7 +78,7 @@ class Setting {
         }
         set(value){
             speedRatioIntP = value
-            speedRatioP = Double(value/100)
+            speedRatioP = Double(value)/100
         }
     }
     var speedRatio: Double {
@@ -96,7 +96,7 @@ class Setting {
         }
         set(value){
             scaleRatioIntP = value
-            scaleRatioP = Double(value/100)
+            scaleRatioP = Double(value)/100
         }
     }
     var scaleRatio: Double {
