@@ -73,39 +73,39 @@ class Setting {
     
     /* ----- getter, setter -----*/
     var speedRatioInt: UInt {
-        get{
+        get {
             return speedRatioIntP
         }
-        set(value){
-            speedRatioIntP = value
-            speedRatioP = Double(value)/100
+        set {
+            speedRatioIntP = newValue
+            speedRatioP = Double(newValue)/100
         }
     }
     var speedRatio: Double {
-        get{
+        get {
             return speedRatioP
         }
-        set(value){
-            speedRatioP = value
-            speedRatioIntP = UInt(value*100)
+        set {
+            speedRatioP = newValue
+            speedRatioIntP = UInt(newValue*100)
         }
     }
     var scaleRatioInt: UInt {
-        get{
+        get {
             return scaleRatioIntP
         }
-        set(value){
-            scaleRatioIntP = value
-            scaleRatioP = Double(value)/100
+        set {
+            scaleRatioIntP = newValue
+            scaleRatioP = Double(newValue)/100
         }
     }
     var scaleRatio: Double {
-        get{
+        get {
             return scaleRatioP
         }
-        set(value){
-            scaleRatioP = value
-            scaleRatioIntP = UInt(value*100)
+        set {
+            scaleRatioP = newValue
+            scaleRatioIntP = UInt(newValue*100)
         }
     }
     
