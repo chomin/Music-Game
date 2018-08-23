@@ -190,7 +190,7 @@ class TapStart: Note {
                 / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.endPos = CGPoint(x: posX, y: posY)
-            long.endWidth = Dimensions.laneWidthOnHorizon * longScale
+            long.endWidth = Dimensions.laneWidthOnHorizon * Note.scale * longScale
         }
         // 始点の情報を代入
         if position.y > Dimensions.judgeLineY {
@@ -201,7 +201,7 @@ class TapStart: Note {
             } else {
                 // レーン通過前に判定された時
                 long.startPos = CGPoint(x: Dimensions.buttonX[laneIndex], y: Dimensions.judgeLineY)
-                long.startWidth = Dimensions.laneWidth * longScale
+                long.startWidth = Dimensions.laneWidth * Note.scale * longScale
             }
         } else {
             // ノーツがレーンを通過した時
@@ -210,7 +210,7 @@ class TapStart: Note {
                 / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.startPos = CGPoint(x: posX, y: posY)
-            long.startWidth = Dimensions.laneWidth * longScale
+            long.startWidth = Dimensions.laneWidth * Note.scale * longScale
         }
         
         let path = CGMutablePath()          // 台形の外周
@@ -346,7 +346,7 @@ class Middle: Note {
                 / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.endPos = CGPoint(x: posX, y: posY)
-            long.endWidth = Dimensions.laneWidthOnHorizon * longScale
+            long.endWidth = Dimensions.laneWidthOnHorizon * Note.scale * longScale
         }
         // 始点の情報を代入
         if position.y > Dimensions.judgeLineY {
@@ -357,7 +357,7 @@ class Middle: Note {
             } else {
                 // レーン通過前に判定された時
                 long.startPos = CGPoint(x: Dimensions.buttonX[laneIndex], y: Dimensions.judgeLineY)
-                long.startWidth = Dimensions.laneWidth * longScale
+                long.startWidth = Dimensions.laneWidth * Note.scale * longScale
             }
         } else {
             // ノーツがレーンを通過した時
@@ -366,7 +366,7 @@ class Middle: Note {
                 / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.startPos = CGPoint(x: posX, y: posY)
-            long.startWidth = Dimensions.laneWidth * longScale
+            long.startWidth = Dimensions.laneWidth * Note.scale * longScale
         }
         
         let path = CGMutablePath()      // 台形の外周
