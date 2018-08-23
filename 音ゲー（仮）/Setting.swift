@@ -12,11 +12,11 @@ import Foundation
 class Setting {
     
     enum Keys: String {
-        case userSpeedRatioInt    = "userSpeedRatioInt"
-        case userNoteSizeRatioInt = "userNoteSizeRatioInt"
-        case userIsYouTube        = "userIsYouTube"
-        case userIsAutoPlay       = "userIsAutoPlay"
-        case userIsFitToLane      = "userIsFitToLane"
+        case userSpeedRatioInt
+        case userNoteSizeRatioInt
+        case userIsYouTube
+        case userIsAutoPlay
+        case userIsFitToLane
     }
     
     private var speedRatioIntP:  UInt    // privateのP
