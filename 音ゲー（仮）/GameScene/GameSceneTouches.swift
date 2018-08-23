@@ -27,7 +27,7 @@ extension GameScene {
                 // フリック判定したかを示すBoolを加えてallTouchにタッチ情報を付加
                 self.allGSTouches.append(GSTouch(touch: uiTouch, isJudgeableFlick: true, isJudgeableFlickEnd: false, storedFlickJudgeLaneIndex: nil))
                 
-                for lane in self.lanes {
+                for lane in self.lanes {    // laneのTimeLagがまだ設定されていなければ以下の処理は行わない
                     guard lane.isTimeLagSet else { continue uiTouchLoop }
                 }
                 

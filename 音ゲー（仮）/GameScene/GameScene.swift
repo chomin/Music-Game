@@ -7,13 +7,10 @@
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
 //
 
-
-
 import SpriteKit
 import GameplayKit
 import AVFoundation
 import youtube_ios_player_helper    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
-
 
 
 /// 判定関係のフラグ付きタッチ情報
@@ -51,10 +48,6 @@ class SameLine {
 
 /// 音ゲーをするシーン
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {
-    
-    
-//    var tmpCounter = 0  //デバッグ用
-//    static var ultiateSuperGod = true 4月1日は終わりました
     
     var playMode: PlayMode
     var isAutoPlay: Bool
@@ -98,6 +91,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var sameLines: [SameLine] = []  // 連動する始点側のノーツと同時押しライン
     
     // 楽曲データ
+    var music: Music = Music(laneNum: 7)
     var musicName: MusicName    // 曲名
     var notes: [Note] = []      // ノーツの" 始 点 "の集合。
     var musicStartPos = 1.0     // BGM開始の"拍"！
@@ -108,7 +102,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var playLevel = 0           // 難易度
     var volWav = 100            // 音量を現段階のn%として出力するか(TODO: 未実装)
     var BPMs: [(bpm: Double, startPos: Double)] = []        // 可変BPM情報
-    var laneNum = 7             // レーン数(指定されなければデフォルトで7)
+//    var laneNum = 7             // レーン数(指定されなければデフォルトで7)
     
     private var startTime: TimeInterval = 0.0       // 譜面再生開始時刻
     var duration: TimeInterval?                     // 譜面再生時間
@@ -116,17 +110,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     var lanes: [Lane] = []      // レーン
     
-    let userSpeedRatio: Double
+//    let userSpeedRatio: Double
+    var setting: Setting
     
     
     
-    
-    init(musicName: MusicName, playMode: PlayMode, isAutoPlay: Bool,  size: CGSize, speedRatioInt: UInt) {
+    init(size: CGSize, setting: Setting) {
 
-        self.musicName = musicName
-        self.playMode = playMode
-        self.isAutoPlay = isAutoPlay
-        self.userSpeedRatio = Double(speedRatioInt) / 100
+        self.musicName = setting.musicName
+        self.playMode = setting.playMode
+        self.isAutoPlay = setting.isAutoPlay
+//        self.userSpeedRatio = Double(setting.speedRatioInt) / 100
+        self.setting = setting
         
         super.init(size: size)
     }
@@ -138,7 +133,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     
     override func didMove(to view: SKView) {
-        
         
         appDelegate = UIApplication.shared.delegate as! AppDelegate // AppDelegateのインスタンスを取得
         appDelegate.gsDelegate = self   // 子(AppDelegate)の設定しているdelegateに自身をセット
@@ -167,10 +161,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         catch                                     { print("未知のエラー") }
         
         // 寸法に関するレーン数依存の定数をセット(必ずパース後に実行(laneNumを読み込むため))
-        Dimensions.updateInstance(laneNum: laneNum)
+        Dimensions.updateInstance(laneNum: music.laneNum)
         
         // Laneインスタンスを作成
-        for i in 0..<self.laneNum {
+        for i in 0..<self.music.laneNum {
             self.lanes.append(Lane(laneIndex: i))
         }
         
@@ -202,11 +196,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             }
         }
         
-        
         // Noteクラスのクラスプロパティを設定(必ずパース後にすること)
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration    // BGMまたは映像の長さ
-        Note.initialize(BPMs, duration, notes)
-        
+        Note.initialize(BPMs, duration, notes, music, setting)   // 将来的にmusicに圧縮
         
         // ボタンの設定
         pauseButton = { () -> UIButton in
@@ -534,7 +526,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     /// BGMモードへ移行
     func reloadSceneAsBGMMode() {
         
-        let scene = GameScene(musicName: self.musicName, playMode: .BGM, isAutoPlay: self.isAutoPlay, size: (self.view?.bounds.size)!, speedRatioInt: UInt(self.userSpeedRatio*100))
+        let scene = GameScene(size: (self.view?.bounds.size)!, setting: setting)
         let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true

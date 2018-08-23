@@ -14,7 +14,7 @@ extension GameScene {
     func setImages() {
         
         // レーンの境目の線の描写
-        for i in 0...laneNum {
+        for i in 0...music.laneNum {
             var points = [CGPoint(x: Dimensions.laneWidth * CGFloat(i+1), y: Dimensions.judgeLineY), CGPoint(x: Dimensions.horizonLeftX + Dimensions.laneWidthOnHorizon*CGFloat(i), y: Dimensions.horizonY)]
             let line = SKShapeNode(points: &points, count: points.count)
             
@@ -26,7 +26,7 @@ extension GameScene {
         }
         
         // 判定ラインの描写
-        var jlPoint = [CGPoint(x: 0.0, y: 0.0), CGPoint(x: Dimensions.laneWidth * CGFloat(laneNum), y: 0.0)]
+        var jlPoint = [CGPoint(x: 0.0, y: 0.0), CGPoint(x: Dimensions.laneWidth * CGFloat(music.laneNum), y: 0.0)]
         judgeLine = SKShapeNode(points: &jlPoint, count: jlPoint.count)
         judgeLine.lineWidth = 3.0
         judgeLine.strokeColor = UIColor.white

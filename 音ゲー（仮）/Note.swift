@@ -181,7 +181,7 @@ class TapStart: Note {
         // 終点の情報を代入
         if next.position.y < Dimensions.horizonY {      // 終点ノーツが描画域内にあるとき
             long.endPos = next.position
-            long.endWidth = next.size / Note.scale
+            long.endWidth = next.size * Note.longScale
         } else {                                        // 終点ノーツが描画域より奥にあるとき
             let posY = Dimensions.horizonY
             let posXOnHorizon     = Dimensions.horizonLeftX + Dimensions.laneWidthOnHorizon * CGFloat(Double(laneIndex) + 1/2)
@@ -190,18 +190,18 @@ class TapStart: Note {
                 / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.endPos = CGPoint(x: posX, y: posY)
-            long.endWidth = Dimensions.laneWidthOnHorizon
+            long.endWidth = Dimensions.laneWidthOnHorizon * Note.scale * Note.longScale
         }
         // 始点の情報を代入
         if position.y > Dimensions.judgeLineY {
             if !isJudged {
                 // ノーツがレーンの半ばにある時
                 long.startPos = position
-                long.startWidth = size / Note.scale
+                long.startWidth = size * Note.longScale
             } else {
                 // レーン通過前に判定された時
                 long.startPos = CGPoint(x: Dimensions.buttonX[laneIndex], y: Dimensions.judgeLineY)
-                long.startWidth = Dimensions.laneWidth
+                long.startWidth = Dimensions.laneWidth * Note.scale * Note.longScale
             }
         } else {
             // ノーツがレーンを通過した時
@@ -210,7 +210,7 @@ class TapStart: Note {
                 / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.startPos = CGPoint(x: posX, y: posY)
-            long.startWidth = Dimensions.laneWidth
+            long.startWidth = Dimensions.laneWidth * Note.scale * Note.longScale
         }
         
         let path = CGMutablePath()          // 台形の外周
@@ -338,7 +338,7 @@ class Middle: Note {
         // 終点の情報を代入
         if next.position.y < Dimensions.horizonY {      // 終点ノーツが描画域内にあるとき
             long.endPos = next.position
-            long.endWidth = next.size / Note.scale
+            long.endWidth = next.size * Note.longScale
         } else {                                        // 終点ノーツが描画域より奥にあるとき
             let posY = Dimensions.horizonY
             let posXOnHorizon     = Dimensions.horizonLeftX + Dimensions.laneWidthOnHorizon * CGFloat(Double(laneIndex) + 1/2)
@@ -347,18 +347,18 @@ class Middle: Note {
                 / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.endPos = CGPoint(x: posX, y: posY)
-            long.endWidth = Dimensions.laneWidthOnHorizon
+            long.endWidth = Dimensions.laneWidthOnHorizon * Note.scale * Note.longScale
         }
         // 始点の情報を代入
         if position.y > Dimensions.judgeLineY {
             if !isJudged {
                 // ノーツがレーンの半ばにある時
                 long.startPos = position
-                long.startWidth = size / Note.scale
+                long.startWidth = size * Note.longScale
             } else {
                 // レーン通過前に判定された時
                 long.startPos = CGPoint(x: Dimensions.buttonX[laneIndex], y: Dimensions.judgeLineY)
-                long.startWidth = Dimensions.laneWidth
+                long.startWidth = Dimensions.laneWidth * Note.scale * Note.longScale
             }
         } else {
             // ノーツがレーンを通過した時
@@ -367,7 +367,7 @@ class Middle: Note {
                 / (next.positionOnLane - positionOnLane)            // 始点と終点のx座標を内分
             
             long.startPos = CGPoint(x: posX, y: posY)
-            long.startWidth = Dimensions.laneWidth
+            long.startWidth = Dimensions.laneWidth * Note.scale * Note.longScale
         }
         
         let path = CGMutablePath()      // 台形の外周
@@ -516,10 +516,12 @@ class FlickEnd: Note {
 
 
 // ノーツ基本クラス
-class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]のみにすること
+class Note {
     
     let beat: Double            // "拍"単位！小節ではない！！！
     let laneIndex: Int          // レーンのインデックス(0始まり)
+//    fileprivate static var setting: Setting = Setting()
+//    let music: Music
     var image = SKShapeNode()   // ノーツの画像
     var size: CGFloat = 0       // ノーツの横幅
     var isJudged = false        // 判定済みかどうか
@@ -534,22 +536,36 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
     }
     fileprivate var positionOnLane: CGFloat = 0.0           // ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
     private let baseSpeed: CGFloat                          // ノーツスピード。実際のスピードはこの値とBPMによって決定される
-    
-    static let scale: CGFloat = 1.3                         // レーン幅に対するノーツの幅の倍率
+    static var scale: CGFloat = 1.0                         // ノーツの幅の倍率(ノーツごとの差異はなく、メモリ領域削減のためstatic)。settingのほか、レーン数を踏まえて値を返す
+    fileprivate static let longScale: CGFloat = 0.8                // ノーツの幅に対するlongの幅の倍率
     fileprivate static let initialSize = CGFloat(100)       // ノーツの初期サイズ。ノーツ大きさはscaleで調節するのでどんな値でもよい
     private static var majorBPM: Double = 0.0               // 楽曲の基本BPM。BPM配列の中から最も持続時間が長いもの。
     private static var BPMs: [(bpm: Double, startPos: Double)] = []
     
     
+
+    /// Noteのイニシャライザ
+    ///
+    /// - Parameters:
+    ///   - beat: 拍
+    ///   - laneIndex: laneのindex
+    ///   - speedRatio: bmsの指定を反映した、各ノーツ固有のスピード倍率
+    ///   - setting: 設定
     init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
         self.beat = beat
         self.laneIndex = laneIndex
         self.baseSpeed = 1350 * CGFloat(speedRatio)
+//        self.setting = setting
+//        self.music = music
+        
+       
     }
     init() {
         self.beat = 0
         self.laneIndex = 0
         self.baseSpeed = 1350
+//        self.setting = Setting()
+//        self.music = Music(laneNum: 7)
     }
     
     deinit {
@@ -557,13 +573,13 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
     }
     
     /// クラスプロパティとappearTimeを設定.必ずパース後に実行すること.
-    static func initialize(_ BPMs: [(bpm: Double, startPos: Double)], _ duration: TimeInterval, _ notes: [Note]) {
+    static func initialize(_ BPMs: [(bpm: Double, startPos: Double)], _ duration: TimeInterval, _ notes: [Note], _ music: Music, _ setting: Setting) {
         
         guard !BPMs.isEmpty else {
             print("空のBPM配列")
             return
         }
-
+        
         var BPMIntervals: [(bpm: Double, interval: TimeInterval)] = []
         var timeSum: TimeInterval = 0
         var i = 0
@@ -581,6 +597,13 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
         }
         Note.majorBPM = BPMIntervals.max { $0.interval < $1.interval }!.bpm
         Note.BPMs = BPMs
+//        Note.setting = setting
+        
+        if !setting.isFitSizeToLane {
+            Note.scale = CGFloat(setting.scaleRatio/7*Double(music.laneNum))
+        } else {
+            Note.scale = CGFloat(setting.scaleRatio)
+        }
         
         // appearTimeの設定(end系以外)
         for note in notes {
@@ -672,7 +695,6 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
     
     /// ノーツのスケールを設定
     fileprivate func setScale() {
-        
         // ノーツの横幅を計算
         let grad = (Dimensions.laneWidthOnHorizon - Dimensions.laneWidth) / (Dimensions.horizonY - Dimensions.judgeLineY)  // 傾き
         self.size = Note.scale * (grad * (position.y - Dimensions.horizonY) + Dimensions.laneWidthOnHorizon)

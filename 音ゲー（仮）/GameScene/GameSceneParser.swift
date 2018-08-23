@@ -72,7 +72,7 @@ extension GameScene {   // bmsファイルを読み込む
             "BPM":       { value in if let num = Double(value) { self.BPMs = [(num, 0.0)] } },
             "PLAYLEVEL": { value in if let num = Int(value) { self.playLevel = num } },
             "VOLWAV":    { value in if let num = Int(value) { self.volWav = num } },
-            "LANE":      { value in if let num = Int(value) { self.laneNum = num } }
+            "LANE":      { value in if let num = Int(value) { self.music.laneNum = num } }
         ]
 
         let headerEx = try! Regex("^#([A-Z][0-9A-Z]*)( .*)?$")   // ヘッダの行にマッチ
@@ -131,7 +131,7 @@ extension GameScene {   // bmsファイルを読み込む
 
         // チャンネルとレーンの対応付け(辞書)
         var laneMap: [Int : Int]
-        switch laneNum {
+        switch music.laneNum {
         case 1: laneMap = [                      14: 0                      ]
         case 2: laneMap = [               13: 0,        15: 1               ]
         case 3: laneMap = [               13: 0, 14: 1, 15: 2               ]
@@ -140,7 +140,7 @@ extension GameScene {   // bmsファイルを読み込む
         case 6: laneMap = [ 11: 0, 12: 1, 13: 2,        15: 3, 18: 4, 19: 5 ]
         case 7: laneMap = [ 11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6 ]
         default:
-            laneNum = 7
+            music.laneNum = 7
             laneMap = [11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6]
         }
         
@@ -225,7 +225,7 @@ extension GameScene {   // bmsファイルを読み込む
                         autoreleasepool {
                             
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
-                            let ratio = (speedRatioTable[beat] ?? 1.0) * userSpeedRatio
+                            let ratio = (speedRatioTable[beat] ?? 1.0) * setting.speedRatio
                             
                             switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
                             case .rest:
@@ -330,12 +330,12 @@ extension GameScene {   // bmsファイルを読み込む
                             BPMs.append((bpm: Double(newBPM), startPos: beat))
                         }
                     }
-                } else if channel == 14 && laneNum == 6 {
+                } else if channel == 14 && music.laneNum == 6 {
                     // ミリシタ譜面の特大ノーツを処理
                     for (index, ob) in body.enumerated() {
                         if NoteExpression(rawValue: ob) == .tapLL {
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
-                            let ratio = (speedRatioTable[beat] ?? 1.0) * userSpeedRatio
+                            let ratio = (speedRatioTable[beat] ?? 1.0) * setting.speedRatio
                             notes.append(Tap(beatPos: beat, laneIndex: 2, speedRatio: ratio, isLarge: true))
                             notes.append(Tap(beatPos: beat, laneIndex: 3, speedRatio: ratio, isLarge: true))
                         }
