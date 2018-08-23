@@ -7,13 +7,10 @@
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
 //
 
-
-
 import SpriteKit
 import GameplayKit
 import AVFoundation
 import youtube_ios_player_helper    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
-
 
 
 /// 判定関係のフラグ付きタッチ情報
@@ -51,10 +48,6 @@ class SameLine {
 
 /// 音ゲーをするシーン
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {
-    
-    
-//    var tmpCounter = 0  //デバッグ用
-//    static var ultiateSuperGod = true 4月1日は終わりました
     
     var playMode: PlayMode
     var isAutoPlay: Bool
@@ -116,16 +109,17 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var lanes: [Lane] = []      // レーン
     
     let userSpeedRatio: Double
+    var setting: Setting
     
     
     
-    
-    init(musicName: MusicName, playMode: PlayMode, isAutoPlay: Bool,  size: CGSize, speedRatioInt: UInt) {
+    init(size: CGSize, setting: Setting) {
 
-        self.musicName = musicName
-        self.playMode = playMode
-        self.isAutoPlay = isAutoPlay
-        self.userSpeedRatio = Double(speedRatioInt) / 100
+        self.musicName = setting.musicName
+        self.playMode = setting.playMode
+        self.isAutoPlay = setting.isAutoPlay
+        self.userSpeedRatio = Double(setting.speedRatioInt) / 100
+        self.setting = setting
         
         super.init(size: size)
     }
@@ -137,7 +131,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     
     override func didMove(to view: SKView) {
-        
         
         appDelegate = UIApplication.shared.delegate as! AppDelegate // AppDelegateのインスタンスを取得
         appDelegate.gsDelegate = self   // 子(AppDelegate)の設定しているdelegateに自身をセット
@@ -201,11 +194,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             }
         }
         
-        
         // Noteクラスのクラスプロパティを設定(必ずパース後にすること)
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration    // BGMまたは映像の長さ
         Note.initialize(BPMs, duration, notes)
-        
         
         // ボタンの設定
         pauseButton = { () -> UIButton in
@@ -527,7 +518,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     /// BGMモードへ移行
     func reloadSceneAsBGMMode() {
         
-        let scene = GameScene(musicName: self.musicName, playMode: .BGM, isAutoPlay: self.isAutoPlay, size: (self.view?.bounds.size)!, speedRatioInt: UInt(self.userSpeedRatio*100))
+        let scene = GameScene(size: (self.view?.bounds.size)!, setting: setting)
         let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true

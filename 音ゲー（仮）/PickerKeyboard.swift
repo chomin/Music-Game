@@ -10,7 +10,6 @@ import UIKit
 
 class PickerKeyboard: UIControl {
     
-    
     var musicNameArray: [String] = []                             // ピッカーに表示させるデータ(DimentionsファイルのMusicNameから自動生成)
     var textStore: String = MusicName.first!.rawValue   // 入力文字列を保存するためのプロパティ(MusicName.first!.rawValueとするとfirstがnilになる)
     var isFirstMovedFromTitleLabel = false                      // 一番最初に選択されたラベルを強調するためのもの
@@ -145,6 +144,7 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
         isFirstMovedFromTitleLabel = true
         
         textStore = musicNameArray[row]       // ピッカーから選択されたらその値をtextStoreへ入れる
+//        Setting.musicName = MusicName(rawValue: textStore)!
         
         for dataIndex in 0 ... musicNameArray.count-1 {
             if let label = pickerView.view(forRow: dataIndex, forComponent: component) as? UILabel {
@@ -183,13 +183,6 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
                 label.textColor = UIColor.red
             }
             
-//            if pickerView.selectedRow(inComponent: component) == row {
-//                setSelectedLabelColor(label: label)
-//            } else {
-//                setBackLabelColor(label: label)
-            
-//            }
-            
             if row == 0 && !isFirstMovedFromTitleLabel {
                 setSelectedLabelColor(label: label)
             }
@@ -197,7 +190,6 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
             return label
         }
     }
-    
     
     func setSelectedLabelColor(label: UILabel) {
         label.textColor = UIColor.darkText

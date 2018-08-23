@@ -671,7 +671,6 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
     
     /// ノーツのスケールを設定
     fileprivate func setScale() {
-        
         // ノーツの横幅を計算
         let grad = (Dimensions.laneWidthOnHorizon - Dimensions.laneWidth) / (Dimensions.horizonY - Dimensions.judgeLineY)  // 傾き
         self.size = Note.scale * (grad * (position.y - Dimensions.horizonY) + Dimensions.laneWidthOnHorizon)
