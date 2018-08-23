@@ -15,9 +15,9 @@ class Tap: Note {
     let isLarge: Bool                   // 大ノーツかどうか
     var appearTime: TimeInterval = 0    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool, setting: Setting, music: Music) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
         self.isLarge = isLarge
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         // imageのインスタンス(白円or黄円)を作成
         self.image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
@@ -62,8 +62,8 @@ class Flick: Note {
     
     var appearTime: TimeInterval = 0        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
-    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, setting: Setting, music: Music) {
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
+    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         // imageのインスタンス(マゼンタ三角形)を作成
         let length = Note.initialSize / 2   // 三角形一辺の長さの半分
@@ -116,9 +116,9 @@ class TapStart: Note {
     let isLarge: Bool                                               // 大ノーツかどうか
     var appearTime: TimeInterval = 0                                // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
-    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool, setting: Setting, music: Music) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
         self.isLarge = isLarge
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         // imageのインスタンス(緑円or黄円)を作成
         image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
@@ -278,8 +278,8 @@ class Middle: Note {
         }
     }
     
-    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, setting: Setting, music: Music) {
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
+    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         self.isJudgeable = false
         
@@ -423,9 +423,9 @@ class TapEnd: Note {
     unowned var start = Note()  // 循環参照防止の為unowned参照にする
     let isLarge: Bool           // 大ノーツかどうか
     
-    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool, setting: Setting, music: Music) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
         self.isLarge = isLarge
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         self.isJudgeable = false
         
@@ -470,8 +470,8 @@ class FlickEnd: Note {
     
     unowned var start = Note()
     
-    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, setting: Setting, music: Music) {
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
+    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
         
         self.isJudgeable = false
         
@@ -519,8 +519,8 @@ class Note {
     
     let beat: Double            // "拍"単位！小節ではない！！！
     let laneIndex: Int          // レーンのインデックス(0始まり)
-    let setting: Setting
-    let music: Music
+//    fileprivate static var setting: Setting = Setting()
+//    let music: Music
     var image = SKShapeNode()   // ノーツの画像
     var size: CGFloat = 0       // ノーツの横幅
     var isJudged = false        // 判定済みかどうか
@@ -550,26 +550,21 @@ class Note {
     ///   - laneIndex: laneのindex
     ///   - speedRatio: bmsの指定を反映した、各ノーツ固有のスピード倍率
     ///   - setting: 設定
-    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, setting: Setting, music: Music) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
         self.beat = beat
         self.laneIndex = laneIndex
         self.baseSpeed = 1350 * CGFloat(speedRatio)
-        self.setting = setting
-        self.music = music
+//        self.setting = setting
+//        self.music = music
         
-        // Note.scaleを設定（initializeで行うのが望ましい）
-        if !setting.isFitSizeToLane {
-            Note.scale = CGFloat(setting.scaleRatio/7*Double(music.laneNum))
-        } else {
-            Note.scale = CGFloat(setting.scaleRatio)
-        }
+       
     }
     init() {
         self.beat = 0
         self.laneIndex = 0
         self.baseSpeed = 1350
-        self.setting = Setting()
-        self.music = Music(laneNum: 7)
+//        self.setting = Setting()
+//        self.music = Music(laneNum: 7)
     }
     
     deinit {
@@ -577,13 +572,13 @@ class Note {
     }
     
     /// クラスプロパティとappearTimeを設定.必ずパース後に実行すること.
-    static func initialize(_ BPMs: [(bpm: Double, startPos: Double)], _ duration: TimeInterval, _ notes: [Note]) {
+    static func initialize(_ BPMs: [(bpm: Double, startPos: Double)], _ duration: TimeInterval, _ notes: [Note], _ music: Music, _ setting: Setting) {
         
         guard !BPMs.isEmpty else {
             print("空のBPM配列")
             return
         }
-
+        
         var BPMIntervals: [(bpm: Double, interval: TimeInterval)] = []
         var timeSum: TimeInterval = 0
         var i = 0
@@ -601,6 +596,13 @@ class Note {
         }
         Note.majorBPM = BPMIntervals.max { $0.interval < $1.interval }!.bpm
         Note.BPMs = BPMs
+//        Note.setting = setting
+        
+        if !setting.isFitSizeToLane {
+            Note.scale = CGFloat(setting.scaleRatio/7*Double(music.laneNum))
+        } else {
+            Note.scale = CGFloat(setting.scaleRatio)
+        }
         
         // appearTimeの設定(end系以外)
         for note in notes {

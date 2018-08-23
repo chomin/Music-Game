@@ -231,67 +231,67 @@ extension GameScene {   // bmsファイルを読み込む
                                 break
                             case .tap:
                                 notes.append(
-                                    Tap     (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false, setting: setting, music: music)
+                                    Tap     (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false)
                                 )
                             case .flick:
                                 notes.append(
-                                    Flick   (beatPos: beat, laneIndex: lane, speedRatio: ratio, setting: setting, music: music)
+                                    Flick   (beatPos: beat, laneIndex: lane, speedRatio: ratio)
                                 )
                             case .start1:
                                 longNotes1.append(
-                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false, setting: setting, music: music)
+                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false)
                                 )
                             case .middle1:
                                 longNotes1.append(
-                                    Middle  (beatPos: beat, laneIndex: lane, speedRatio: ratio, setting: setting, music: music)
+                                    Middle  (beatPos: beat, laneIndex: lane, speedRatio: ratio)
                                 )
                             case .end1:
                                 longNotes1.append(
-                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false, setting: setting, music: music)
+                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false)
                                 )
                             case .flickEnd1:
                                 longNotes1.append(
-                                    FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: ratio, setting: setting, music: music)
+                                    FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: ratio)
                                 )
                             case .start2:
                                 longNotes2.append(
-                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false, setting: setting, music: music)
+                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false)
                                 )
                             case .middle2:
                                 longNotes2.append(
-                                    Middle  (beatPos: beat, laneIndex: lane, speedRatio: ratio, setting: setting, music: music)
+                                    Middle  (beatPos: beat, laneIndex: lane, speedRatio: ratio)
                                 )
                             case .end2:
                                 longNotes2.append(
-                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false, setting: setting, music: music)
+                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false)
                                 )
                             case .flickEnd2:
                                 longNotes2.append(
-                                    FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: ratio, setting: setting, music: music)
+                                    FlickEnd(beatPos: beat, laneIndex: lane, speedRatio: ratio)
                                 )
                             case .tapL:
                                 notes.append(
-                                    Tap     (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true, setting: setting, music: music)
+                                    Tap     (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             case .start1L:
                                 longNotes1.append(
-                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true, setting: setting, music: music)
+                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             case .end1L:
                                 longNotes1.append(
-                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true, setting: setting, music: music)
+                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             case .start2L:
                                 longNotes2.append(
-                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true, setting: setting, music: music)
+                                    TapStart(beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             case .end2L:
                                 longNotes2.append(
-                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true, setting: setting, music: music)
+                                    TapEnd  (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             case .tapLL:
                                 notes.append(
-                                    Tap     (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true, setting: setting, music: music)
+                                    Tap     (beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true)
                                 )
                             }
                         }
@@ -330,8 +330,8 @@ extension GameScene {   // bmsファイルを読み込む
                         if NoteExpression(rawValue: ob) == .tapLL {
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
                             let ratio = (speedRatioTable[beat] ?? 1.0) * setting.speedRatio
-                            notes.append(Tap(beatPos: beat, laneIndex: 2, speedRatio: ratio, isLarge: true, setting: setting, music: music))
-                            notes.append(Tap(beatPos: beat, laneIndex: 3, speedRatio: ratio, isLarge: true, setting: setting, music: music))
+                            notes.append(Tap(beatPos: beat, laneIndex: 2, speedRatio: ratio, isLarge: true))
+                            notes.append(Tap(beatPos: beat, laneIndex: 3, speedRatio: ratio, isLarge: true))
                         }
                     }
                 }

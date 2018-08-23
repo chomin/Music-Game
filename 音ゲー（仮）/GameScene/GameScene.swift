@@ -197,7 +197,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // Noteクラスのクラスプロパティを設定(必ずパース後にすること)
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration    // BGMまたは映像の長さ
-        Note.initialize(BPMs, duration, notes)
+        Note.initialize(BPMs, duration, notes, music, setting)   // 将来的にmusicに圧縮
         
         // ボタンの設定
         pauseButton = { () -> UIButton in
