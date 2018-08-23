@@ -15,9 +15,9 @@ class Tap: Note {
     let isLarge: Bool                   // 大ノーツかどうか
     var appearTime: TimeInterval = 0    // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool, setting: Setting, music: Music) {
         self.isLarge = isLarge
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
         
         // imageのインスタンス(白円or黄円)を作成
         self.image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
@@ -62,8 +62,8 @@ class Flick: Note {
     
     var appearTime: TimeInterval = 0        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
-    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
+    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, setting: Setting, music: Music) {
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
         
         // imageのインスタンス(マゼンタ三角形)を作成
         let length = Note.initialSize / 2   // 三角形一辺の長さの半分
@@ -116,9 +116,9 @@ class TapStart: Note {
     let isLarge: Bool                                               // 大ノーツかどうか
     var appearTime: TimeInterval = 0                                // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
 
-    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool, setting: Setting, music: Music) {
         self.isLarge = isLarge
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
         
         // imageのインスタンス(緑円or黄円)を作成
         image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
@@ -278,8 +278,8 @@ class Middle: Note {
         }
     }
     
-    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
+    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, setting: Setting, music: Music) {
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
         
         self.isJudgeable = false
         
@@ -423,9 +423,9 @@ class TapEnd: Note {
     unowned var start = Note()  // 循環参照防止の為unowned参照にする
     let isLarge: Bool           // 大ノーツかどうか
     
-    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool) {
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool, setting: Setting, music: Music) {
         self.isLarge = isLarge
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
         
         self.isJudgeable = false
         
@@ -470,8 +470,8 @@ class FlickEnd: Note {
     
     unowned var start = Note()
     
-    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
-        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio)
+    override init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, setting: Setting, music: Music) {
+        super.init(beatPos: beat, laneIndex: laneIndex, speedRatio: speedRatio, setting: setting, music: music)
         
         self.isJudgeable = false
         
@@ -519,6 +519,8 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
     
     let beat: Double            // "拍"単位！小節ではない！！！
     let laneIndex: Int          // レーンのインデックス(0始まり)
+    let setting: Setting
+    let music: Music
     var image = SKShapeNode()   // ノーツの画像
     var size: CGFloat = 0       // ノーツの横幅
     var isJudged = false        // 判定済みかどうか
@@ -533,22 +535,40 @@ class Note {	// 強参照はGameScene.notes[]とNote.next、Lane.laneNotes[]の�
     }
     fileprivate var positionOnLane: CGFloat = 0.0           // ノーツのレーン上の座標(判定線を0、奥を正の向きとする)
     private let baseSpeed: CGFloat                          // ノーツスピード。実際のスピードはこの値とBPMによって決定される
-    
-    static let scale: CGFloat = 1.3                         // レーン幅に対するノーツの幅の倍率
+    static var scale: CGFloat = 1.0                         // ノーツの幅の倍率(ノーツごとの差異はなく、GameSceneでも使うからstatic?)。settingのほか、レーン数を踏まえて値を返す
     fileprivate static let initialSize = CGFloat(100)       // ノーツの初期サイズ。ノーツ大きさはscaleで調節するのでどんな値でもよい
     private static var majorBPM: Double = 0.0               // 楽曲の基本BPM。BPM配列の中から最も持続時間が長いもの。
     private static var BPMs: [(bpm: Double, startPos: Double)] = []
     
     
-    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double) {
+
+    /// Noteのイニシャライザ
+    ///
+    /// - Parameters:
+    ///   - beat: 拍
+    ///   - laneIndex: laneのindex
+    ///   - speedRatio: bmsの指定を反映した、各ノーツ固有のスピード倍率
+    ///   - setting: 設定
+    init(beatPos beat: Double, laneIndex: Int, speedRatio: Double, setting: Setting, music: Music) {
         self.beat = beat
         self.laneIndex = laneIndex
         self.baseSpeed = 1350 * CGFloat(speedRatio)
+        self.setting = setting
+        self.music = music
+        
+        // Note.scaleを設定（initializeで行うのが望ましい）
+        if !setting.isFitSizeToLane {
+            Note.scale = CGFloat(setting.scaleRatio/7*Double(music.laneNum))
+        } else {
+            Note.scale = CGFloat(setting.scaleRatio)
+        }
     }
     init() {
         self.beat = 0
         self.laneIndex = 0
         self.baseSpeed = 1350
+        self.setting = Setting()
+        self.music = Music(laneNum: 7)
     }
     
     deinit {

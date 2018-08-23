@@ -91,6 +91,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var sameLines: [SameLine] = []  // 連動する始点側のノーツと同時押しライン
     
     // 楽曲データ
+    var music: Music = Music(laneNum: 7)
     var musicName: MusicName    // 曲名
     var notes: [Note] = []      // ノーツの" 始 点 "の集合。
     var musicStartPos = 1.0     // BGM開始の"拍"！
@@ -101,14 +102,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var playLevel = 0           // 難易度
     var volWav = 100            // 音量を現段階のn%として出力するか(TODO: 未実装)
     var BPMs: [(bpm: Double, startPos: Double)] = []        // 可変BPM情報
-    var laneNum = 7             // レーン数(指定されなければデフォルトで7)
+//    var laneNum = 7             // レーン数(指定されなければデフォルトで7)
     
     private var startTime: TimeInterval = 0.0       // 譜面再生開始時刻
     var passedTime: TimeInterval = 0.0              // 経過時間
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     var lanes: [Lane] = []      // レーン
     
-    let userSpeedRatio: Double
+//    let userSpeedRatio: Double
     var setting: Setting
     
     
@@ -118,7 +119,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.musicName = setting.musicName
         self.playMode = setting.playMode
         self.isAutoPlay = setting.isAutoPlay
-        self.userSpeedRatio = Double(setting.speedRatioInt) / 100
+//        self.userSpeedRatio = Double(setting.speedRatioInt) / 100
         self.setting = setting
         
         super.init(size: size)
@@ -159,10 +160,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         catch                                     { print("未知のエラー") }
         
         // 寸法に関するレーン数依存の定数をセット(必ずパース後に実行(laneNumを読み込むため))
-        Dimensions.updateInstance(laneNum: laneNum)
+        Dimensions.updateInstance(laneNum: music.laneNum)
         
         // Laneインスタンスを作成
-        for i in 0..<self.laneNum {
+        for i in 0..<self.music.laneNum {
             self.lanes.append(Lane(laneIndex: i))
         }
         

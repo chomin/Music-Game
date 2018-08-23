@@ -19,11 +19,13 @@ class Setting {
         case userIsFitToLane      = "userIsFitToLane"
     }
     
-    var speedRatioInt:    UInt
-    var noteSizeRatioInt: UInt
-    var isYouTube:        Bool
-    var isAutoPlay:       Bool
-    var isFitSizeToLane:  Bool
+    private var speedRatioIntP:  UInt    // privateのP
+    private var speedRatioP:     Double
+    private var scaleRatioIntP:  UInt
+    private var scaleRatioP:     Double
+            var isYouTube:       Bool
+            var isAutoPlay:      Bool
+            var isFitSizeToLane: Bool
     
     var musicName = MusicName.first!
     
@@ -36,6 +38,8 @@ class Setting {
         }
     }
     
+    
+    
     let defaults = UserDefaults.standard
     
     init() {
@@ -47,20 +51,62 @@ class Setting {
         defaults.register(defaults: [ Keys.userIsFitToLane.rawValue      : true  ])
         
         
-        speedRatioInt = UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)) //読み出し
-        noteSizeRatioInt = UInt(defaults.integer(forKey: Keys.userNoteSizeRatioInt.rawValue))
+        speedRatioIntP = UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)) //読み出し
+        scaleRatioIntP = UInt(defaults.integer(forKey: Keys.userNoteSizeRatioInt.rawValue))
         isYouTube = defaults.bool(forKey: Keys.userIsYouTube.rawValue)
         isAutoPlay = defaults.bool(forKey: Keys.userIsAutoPlay.rawValue)
         isFitSizeToLane = defaults.bool(forKey: Keys.userIsFitToLane.rawValue)
+        
+        speedRatioP = Double(speedRatioIntP/100)
+        scaleRatioP = Double(scaleRatioIntP/100)
     }
     
     func save(){
         defaults.set(speedRatioInt, forKey: Keys.userSpeedRatioInt.rawValue)
-        defaults.set(noteSizeRatioInt, forKey: Keys.userNoteSizeRatioInt.rawValue)
+        defaults.set(scaleRatioInt, forKey: Keys.userNoteSizeRatioInt.rawValue)
         defaults.set(isYouTube, forKey: Keys.userIsYouTube.rawValue)
         defaults.set(isAutoPlay, forKey: Keys.userIsAutoPlay.rawValue)
         defaults.set(isFitSizeToLane, forKey: Keys.userIsFitToLane.rawValue)
+        
+        speedRatio = Double(speedRatioInt/100)
     }
     
+    /* ----- getter, setter -----*/
+    var speedRatioInt: UInt {
+        get{
+            return speedRatioIntP
+        }
+        set(value){
+            speedRatioIntP = value
+            speedRatioP = Double(value/100)
+        }
+    }
+    var speedRatio: Double {
+        get{
+            return speedRatioP
+        }
+        set(value){
+            speedRatioP = value
+            speedRatioIntP = UInt(value*100)
+        }
+    }
+    var scaleRatioInt: UInt {
+        get{
+            return scaleRatioIntP
+        }
+        set(value){
+            scaleRatioIntP = value
+            scaleRatioP = Double(value/100)
+        }
+    }
+    var scaleRatio: Double {
+        get{
+            return scaleRatioP
+        }
+        set(value){
+            scaleRatioP = value
+            scaleRatioIntP = UInt(value*100)
+        }
+    }
     
 }

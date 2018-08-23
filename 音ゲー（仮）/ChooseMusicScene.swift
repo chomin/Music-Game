@@ -412,7 +412,7 @@ class ChooseMusicScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         
         speedLabel.text = String(setting.speedRatioInt) + "%"
-        noteSizeLabel.text = String(setting.noteSizeRatioInt) + "%"
+        noteSizeLabel.text = String(setting.scaleRatioInt) + "%"
         
 //        self.view?.addSubview(settingButton)
     }
@@ -533,20 +533,20 @@ class ChooseMusicScene: SKScene {
     }
     
     @objc func onClickSIPlusButton(_ sender : UIButton){
-        setting.noteSizeRatioInt += 1
+        setting.scaleRatioInt += 1
     }
     
     @objc func onClickSIPlus10Button(_ sender : UIButton){
-        setting.noteSizeRatioInt += 10
+        setting.scaleRatioInt += 10
     }
     
     @objc func onClickSIMinusButton(_ sender : UIButton){
-        if setting.noteSizeRatioInt > 0 { setting.noteSizeRatioInt -= 1 }
+        if setting.scaleRatioInt > 0 { setting.scaleRatioInt -= 1 }
     }
     
     @objc func onClickSIMinus10Button(_ sender : UIButton){
-        if setting.noteSizeRatioInt > 10 { setting.noteSizeRatioInt -= 10 }
-        else                             { setting.noteSizeRatioInt  =  0 }
+        if setting.scaleRatioInt > 10 { setting.scaleRatioInt -= 10 }
+        else                             { setting.scaleRatioInt  =  0 }
     }
     
     @objc func onClickSaveAndBackButton(_ sender : UIButton){
