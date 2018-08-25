@@ -17,9 +17,7 @@ extension GameScene {
         
         guard !isAutoPlay else { return }
         
-        
         judgeQueue.sync {
-            
             uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 
                 let pos = uiTouch.location(in: self.view?.superview)
@@ -77,9 +75,7 @@ extension GameScene {
                        (nearbyNotes[0].note is TapStart) ||
                        (nearbyNotes[0].note is Middle) {
                         
-                        if self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag, gsTouch: self.allGSTouches[self.allGSTouches.count-1]) {
-//                            self.actionSoundSet.play(type: .tap)
-                        } else {
+                        if !self.judge(lane: self.lanes[nearbyNotes[0].laneIndex], timeLag: nearbyNotes[0].timelag, gsTouch: self.allGSTouches[self.allGSTouches.count-1]) {
                             print("判定失敗:tap")
                         }
                     }
@@ -353,8 +349,6 @@ extension GameScene {
             
         }
        
-       
-        
         
         switch lane.getJudgeTimeState(timeLag: timeLag) {
         case .parfect:
