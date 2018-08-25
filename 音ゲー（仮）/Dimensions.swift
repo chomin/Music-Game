@@ -47,6 +47,10 @@ enum MusicName: String, EnumCollection {
     case gogoManiac             = "GO!GO!MANIAC(expert)"
     case dontSayLazy            = "Don't say \"lazy\"(expert)"
     case dontSayLazySp          = "Don't say \"lazy\"(special)"
+    case teardrops              = "ティアドロップス(expert)"
+    case kirakiraDatoka         = "キラキラだとか夢だとか~Sing Girls~(expert)"
+    case godKnows               = "God knows…(expert)"
+    
     
     
     static func getPickerArray() -> [String] {
