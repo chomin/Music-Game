@@ -50,6 +50,7 @@ enum MusicName: String, EnumCollection {
     case teardrops              = "ティアドロップス(expert)"
     case kirakiraDatoka         = "キラキラだとか夢だとか~Sing Girls~(expert)"
     case godKnows               = "God knows…(expert)"
+    case shugabita              = "シュガーソングとビターステップ(expert)"
     
     
     
