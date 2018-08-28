@@ -17,6 +17,7 @@ class Setting {
         case userIsYouTube
         case userIsAutoPlay
         case userIsFitToLane
+        case userLastChosenMusicStr
     }
     
     private var speedRatioIntP:  UInt    // privateのP
@@ -26,8 +27,8 @@ class Setting {
             var isYouTube:       Bool
             var isAutoPlay:      Bool
             var isFitSizeToLane: Bool
+    private var musicNameStr:    String
     
-    var musicName = MusicName.first!
     
     var playMode: PlayMode {
         get {
@@ -44,18 +45,19 @@ class Setting {
     
     init() {
         // 設定をロード
-        defaults.register(defaults: [ Keys.userSpeedRatioInt.rawValue    : 100   ])    // 初期値を設定(値がすでに入ってる場合は無視される)
-        defaults.register(defaults: [ Keys.userNoteSizeRatioInt.rawValue : 100   ])
-        defaults.register(defaults: [ Keys.userIsYouTube.rawValue        : true  ])
-        defaults.register(defaults: [ Keys.userIsAutoPlay.rawValue       : false ])
-        defaults.register(defaults: [ Keys.userIsFitToLane.rawValue      : true  ])
-        
+        defaults.register(defaults: [ Keys.userSpeedRatioInt.rawValue      : 100                       ])    // 初期値を設定(値がすでに入ってる場合は無視される)
+        defaults.register(defaults: [ Keys.userNoteSizeRatioInt.rawValue   : 100                       ])
+        defaults.register(defaults: [ Keys.userIsYouTube.rawValue          : true                      ])
+        defaults.register(defaults: [ Keys.userIsAutoPlay.rawValue         : false                     ])
+        defaults.register(defaults: [ Keys.userIsFitToLane.rawValue        : true                      ])
+        defaults.register(defaults: [ Keys.userLastChosenMusicStr.rawValue : MusicName.first!.rawValue ])
         
         speedRatioIntP = UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)) //読み出し
         scaleRatioIntP = UInt(defaults.integer(forKey: Keys.userNoteSizeRatioInt.rawValue))
         isYouTube = defaults.bool(forKey: Keys.userIsYouTube.rawValue)
         isAutoPlay = defaults.bool(forKey: Keys.userIsAutoPlay.rawValue)
         isFitSizeToLane = defaults.bool(forKey: Keys.userIsFitToLane.rawValue)
+        musicNameStr = defaults.string(forKey: Keys.userLastChosenMusicStr.rawValue)!
         
         speedRatioP = Double(speedRatioIntP)/100
         scaleRatioP = Double(scaleRatioIntP)/100
@@ -67,6 +69,7 @@ class Setting {
         defaults.set(isYouTube, forKey: Keys.userIsYouTube.rawValue)
         defaults.set(isAutoPlay, forKey: Keys.userIsAutoPlay.rawValue)
         defaults.set(isFitSizeToLane, forKey: Keys.userIsFitToLane.rawValue)
+        defaults.set(musicNameStr, forKey: Keys.userLastChosenMusicStr.rawValue)
         
         speedRatio = Double(speedRatioInt)/100
     }
@@ -106,6 +109,14 @@ class Setting {
         set {
             scaleRatioP = newValue
             scaleRatioIntP = UInt(newValue*100)
+        }
+    }
+    var musicName: MusicName {
+        get {
+            return MusicName(rawValue: musicNameStr)!
+        }
+        set {
+            musicNameStr = newValue.rawValue
         }
     }
     

@@ -11,7 +11,7 @@ import UIKit
 class PickerKeyboard: UIControl {
     
     var musicNameArray: [String] = []                             // ピッカーに表示させるデータ(DimentionsファイルのMusicNameから自動生成)
-    var textStore: String = MusicName.first!.rawValue   // 入力文字列を保存するためのプロパティ(MusicName.first!.rawValueとするとfirstがnilになる)
+    var textStore: String                                          // 入力文字列を保存するためのプロパティ(MusicName.first!.rawValueとするとfirstがnilになる)
     var isFirstMovedFromTitleLabel = false                      // 一番最初に選択されたラベルを強調するためのもの
     
     
@@ -25,9 +25,10 @@ class PickerKeyboard: UIControl {
         textStore.draw(in:rect, withAttributes: attrs)
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(frame: CGRect, firstText: String) {
         
+        textStore = firstText
+        super.init(frame: frame)
         // ピッカーに初期値をセット
         self.musicNameArray = MusicName.getPickerArray()
         
@@ -36,8 +37,9 @@ class PickerKeyboard: UIControl {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
         
+        textStore = MusicName.first!.rawValue
+        super.init(coder: aDecoder)
         // viewのタッチジェスチャーを取る
         addTarget(self, action: #selector(PickerKeyboard.didTap(sender: )), for: .touchUpInside)
     }
@@ -144,7 +146,6 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
         isFirstMovedFromTitleLabel = true
         
         textStore = musicNameArray[row]       // ピッカーから選択されたらその値をtextStoreへ入れる
-//        Setting.musicName = MusicName(rawValue: textStore)!
         
         for dataIndex in 0 ... musicNameArray.count-1 {
             if let label = pickerView.view(forRow: dataIndex, forComponent: component) as? UILabel {
@@ -156,9 +157,6 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
             }
             
         }
-        
-        
-        
         setNeedsDisplay()
     }
     
@@ -166,13 +164,11 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         
         if view != nil {    // ここには入らない
-            
+
             return view!
+        } else {
             
-        }
-        else {
-            
-            let fontSize: CGFloat = pickerView.frame.height/8 // この値は開いたり閉じたりするときに急激に変化する
+            let fontSize: CGFloat = pickerView.frame.height/8   // この値は開いたり閉じたりするときに急激に変化する
             
             let label = UILabel()   // 前のラベルは(こちらで保持していても)逐一解放される？ので新たにインスタンス化する必要あり
             label.text = self.musicNameArray[row]
