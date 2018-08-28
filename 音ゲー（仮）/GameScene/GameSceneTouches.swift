@@ -16,7 +16,6 @@ extension GameScene {
         guard !isAutoPlay else { return }
         
         judgeQueue.sync {
-            print(Thread.current)
             uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 
                 let pos = uiTouch.location(in: self.view?.superview)
