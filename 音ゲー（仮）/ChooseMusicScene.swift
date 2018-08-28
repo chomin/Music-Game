@@ -107,7 +107,6 @@ class ChooseMusicScene: SKScene {
         picker.backgroundColor = .gray
         picker.isHidden = false
         picker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)
-        print(picker.textStore)
         
         self.view?.addSubview(picker!)
         
