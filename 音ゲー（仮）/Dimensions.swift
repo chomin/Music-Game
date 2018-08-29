@@ -18,7 +18,7 @@ enum MusicName: String, EnumCollection {
     case sakuraSkip             = "SAKURAスキップ"
     case zankokuNaTenshiNoThese = "残酷な天使のテーゼ"
     case nimenseiUraomoteLife   = "にめんせい☆ウラオモテライフ！"
-    case buonAppetitoS          = "ぼなぺてぃーとS"
+    case buonAppetitoS          = "ぼなぺてぃーと♡S"
     case level5                 = "LEVEL5-Judgelight-"
     
     /*--------ミリシタ楽曲---------*/
@@ -34,6 +34,10 @@ enum MusicName: String, EnumCollection {
     case utaMas                 = "THE IDOLM@STER"
     case marionettesNeverSleep  = "Marionetteは眠らない"
     case machiukePrince         = "待ち受けプリンス"
+    case princessBeAmbitious    = "Princess Be Ambitious!!"
+    case angelicParade          = "Angelic Parade♪"
+    case fairyTaleJairarenai    = "FairyTaleじゃいられない"
+    case union                  = "UNION!!"
     
     /*--------バンドリ楽曲---------*/
     case thisGameEx             = "This game(expert)"
