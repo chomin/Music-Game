@@ -91,7 +91,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var sameLines: [SameLine] = []  // 連動する始点側のノーツと同時押しライン
     
     // 楽曲データ
-    var music: Music = Music()
+    var music: Music
     var notes: [Note] = []      // ノーツの" 始 点 "の集合。
     var musicStartPos = 1.0     // BGM開始の"拍"！
     var BPMs: [(bpm: Double, startPos: Double)] {
@@ -109,12 +109,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     
     
-    init(size: CGSize, setting: Setting) {
+    init(size: CGSize, setting: Setting, music: Music) {
 
-        self.music.musicName = setting.musicName
+//        self.music.musicName = setting.musicName
         self.playMode = setting.playMode
         self.isAutoPlay = setting.isAutoPlay
         self.setting = setting
+        self.music = music
         
         super.init(size: size)
     }
@@ -370,27 +371,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     case .done:                   // mediaOffsettime < passedTime の時
                         self.passedTime = playerView.currentTime + mediaOffsetTime
                         playerView.countFrameForBaseline()
-//                        print(CACurrentMediaTime() - playerView.currentTime)
                         if isSupposedToPausePlayerView {
                             playerView.pauseVideo()
                             self.isSupposedToPausePlayerView = false
                         }
                     }
-                    
-
-                
-//                print(CACurrentMediaTime() - TimeInterval(playerView.view.currentTime()))
-//                if !(playerView.isSetStartTime) {
-//                    playerView.startTime = CACurrentMediaTime() - TimeInterval(playerView.view.currentTime())
-//                    playerView.isSetStartTime = true
-//                    print("set startTime")
-//                }
-//                self.passedTime = playerView.currentTime + mediaOffsetTime
-            
-//            } else {
-//                self.passedTime = 0
-                
-                
                 }
             } else {
                 self.passedTime = playerView.currentTime + mediaOffsetTime
@@ -519,7 +504,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     /// BGMモードへ移行
     func reloadSceneAsBGMMode() {
         
-        let scene = GameScene(size: (self.view?.bounds.size)!, setting: setting)
+        let scene = GameScene(size: (self.view?.bounds.size)!, setting: setting, music: music)
         let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true

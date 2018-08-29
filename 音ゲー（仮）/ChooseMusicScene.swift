@@ -112,6 +112,7 @@ class ChooseMusicScene: SKScene {
         
         // 将来的にはファイル探索から
         for musicStr in picker.musicNameArray {
+//            print(musicStr)
             do {
                 try musics.append(Reader.readHeadContents(fileName: musicStr + ".bms"))
             } catch {
@@ -119,7 +120,9 @@ class ChooseMusicScene: SKScene {
             }
             
         }
-        
+        for i in musics{
+            print(i.musicName.rawValue)
+        }
         
         /*--------- ボタンなどの設定 ---------*/
         // 初期画面のボタン
@@ -424,8 +427,6 @@ class ChooseMusicScene: SKScene {
         
         speedLabel.text = String(setting.speedRatioInt) + "%"
         noteSizeLabel.text = String(setting.scaleRatioInt) + "%"
-        
-//        self.view?.addSubview(settingButton)
     }
     
     override func willMove(from view: SKView) {
@@ -439,19 +440,14 @@ class ChooseMusicScene: SKScene {
         setting.musicName = MusicName(rawValue: picker.textStore)!
         setting.save()
         
-        // 移動
-        let scene = GameScene(size: (view?.bounds.size)!, setting: setting)
-//        if YouTubeSwitch.isOn {
-        
-//            if picker.textStore == "オラシオン" &&
-//                (setting.speedRatioInt <= 21 || setting.speedRatioInt >= 201 ) { setting.playMode = .YouTube2 /* 裏シオン */ }
-            
-//            scene = GameScene(size: (view?.bounds.size)!)
-//        }else{
-//            print(picker.textStore)
-//            scene = GameScene(musicName: MusicName(rawValue: picker.textStore)! , playMode: .BGM , isAutoPlay: autoPlaySwitch.isOn, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
+//        print(setting.musicName)
+//        for i in musics {
+//            print(i.musicName)
 //        }
         
+        // 移動
+        let musicIndex = musics.index(where: {$0.musicName == setting.musicName})!
+        let scene = GameScene(size: (view?.bounds.size)!, setting: setting, music: musics[musicIndex])
         let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true
