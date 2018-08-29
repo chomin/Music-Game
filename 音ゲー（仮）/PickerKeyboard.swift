@@ -29,7 +29,7 @@ class PickerKeyboard: UIControl {
         
         textStore = firstText
         super.init(frame: frame)
-        // ピッカーに初期値をセット
+        // ピッカーに初期値をセット(将来的にはファイル探索から)
         self.musicNameArray = MusicName.getPickerArray()
         
         // viewのタッチジェスチャーを取る

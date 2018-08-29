@@ -92,7 +92,7 @@ class ChooseMusicScene: SKScene {
     var sizesPosY:CGFloat!
     
     var setting = Setting()
-    
+    var musics: [Music] = []
     
     override func didMove(to view: SKView) {
         
@@ -109,6 +109,16 @@ class ChooseMusicScene: SKScene {
         picker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)
         
         self.view?.addSubview(picker!)
+        
+        // 将来的にはファイル探索から
+        for musicStr in picker.musicNameArray {
+            do {
+                try musics.append(Reader.readHeadContents(fileName: musicStr + ".bms"))
+            } catch {
+                print(error)
+            }
+            
+        }
         
         
         /*--------- ボタンなどの設定 ---------*/

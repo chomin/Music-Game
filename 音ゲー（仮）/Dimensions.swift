@@ -9,7 +9,7 @@
 import UIKit
 
 /// rawvalueが音楽ファイル名に対応する列挙型
-/// 新曲を追加する際はここに曲名を追加する。
+/// 新曲を追加する際はここに曲名を追加する。(将来的にはファイル探索から)
 enum MusicName: String, EnumCollection {
     
     case yo_kosoJapariParkHe    = "ようこそジャパリパークへ"

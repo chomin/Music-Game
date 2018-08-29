@@ -555,17 +555,11 @@ class Note {
         self.beat = beat
         self.laneIndex = laneIndex
         self.baseSpeed = 1350 * CGFloat(speedRatio)
-//        self.setting = setting
-//        self.music = music
-        
-       
     }
     init() {
         self.beat = 0
         self.laneIndex = 0
         self.baseSpeed = 1350
-//        self.setting = Setting()
-//        self.music = Music(laneNum: 7)
     }
     
     deinit {
@@ -573,9 +567,9 @@ class Note {
     }
     
     /// クラスプロパティとappearTimeを設定.必ずパース後に実行すること.
-    static func initialize(_ BPMs: [(bpm: Double, startPos: Double)], _ duration: TimeInterval, _ notes: [Note], _ music: Music, _ setting: Setting) {
+    static func initialize(_ duration: TimeInterval, _ notes: [Note], _ music: Music, _ setting: Setting) {
         
-        guard !BPMs.isEmpty else {
+        guard !music.BPMs.isEmpty else {
             print("空のBPM配列")
             return
         }
@@ -597,7 +591,6 @@ class Note {
         }
         Note.majorBPM = BPMIntervals.max { $0.interval < $1.interval }!.bpm
         Note.BPMs = BPMs
-//        Note.setting = setting
         
         if !setting.isFitSizeToLane {
             Note.scale = CGFloat(setting.scaleRatio/7*Double(music.laneNum))
