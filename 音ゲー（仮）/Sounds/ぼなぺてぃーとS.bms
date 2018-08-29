@@ -2,9 +2,9 @@
 *---------------------- HEADER FIELD
 
 #PLAYER 1
-#GENRE ƒAƒjƒ
-#TITLE ‚Ú‚È‚Ø‚Ä‚¡[‚ÆS
-#ARTIST ƒuƒŒƒ“ƒhEA
+#GENRE ã‚¢ãƒ‹ãƒ¡
+#TITLE ã¼ãªãºã¦ãƒãƒ¼ã¨S
+#ARTIST ãƒ–ãƒ¬ãƒ³ãƒ‰ãƒ»A
 #BPM 152
 #PLAYLEVEL 20
 #RANK 1
@@ -12,17 +12,17 @@
 
 #LNTYPE 1
 
-#WAV01 ƒ^ƒbƒv.mp3
-#WAV02 ƒtƒŠƒbƒN.mp3
-#WAV03 Žn‚ß‚P.mp3
-#WAV04 “r’†‚P.mp3
-#WAV05 —£‚µ‚P.mp3
-#WAV06 ƒtƒŠƒbƒN—£‚µ‚P.mp3
-#WAV07 Žn‚ß‚Q.mp3
-#WAV08 “r’†‚Q.mp3
-#WAV09 —£‚µ‚Q.mp3
-#WAV0A ƒtƒŠƒbƒN—£‚µ‚Q.mp3
-#WAV10 ‚Ú‚È‚Ø‚Ä‚¡[‚ÆS.mp3
+#WAV01 ã‚¿ãƒƒãƒ—.mp3
+#WAV02 ãƒ•ãƒªãƒƒã‚¯.mp3
+#WAV03 å§‹ã‚ï¼‘.mp3
+#WAV04 é€”ä¸­ï¼‘.mp3
+#WAV05 é›¢ã—ï¼‘.mp3
+#WAV06 ãƒ•ãƒªãƒƒã‚¯é›¢ã—ï¼‘.mp3
+#WAV07 å§‹ã‚ï¼’.mp3
+#WAV08 é€”ä¸­ï¼’.mp3
+#WAV09 é›¢ã—ï¼’.mp3
+#WAV0A ãƒ•ãƒªãƒƒã‚¯é›¢ã—ï¼’.mp3
+#WAV10 ã¼ãªãºã¦ãƒãƒ¼ã¨S.mp3
 
 
 *---------------------- EXPANSION FIELD

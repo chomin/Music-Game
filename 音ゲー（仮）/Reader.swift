@@ -131,7 +131,7 @@ class Reader {
         if let path = Bundle.main.path(forResource: "Sounds/" + dataFileName, ofType: dataFileType) {
             do {
                 // ファイルの内容を取得する
-                let content = try String(contentsOfFile: path, encoding: String.Encoding.shiftJIS)
+                let content = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
                 
                 return content.components(separatedBy: .newlines)
             } catch {

@@ -11,15 +11,17 @@ import GameplayKit
 
 class ChooseMusicScene: SKScene {
     
+    
+    
     // 初期画面のボタンなど
     var picker: PickerKeyboard!
-    var playButton     = UIButton()
-    var settingButton  = UIButton()
-    var autoPlaySwitch = UISwitch()
-    var YouTubeSwitch  = UISwitch()
-    var autoPlayLabel  = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "自動演奏"
-    var YouTubeLabel   = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
-    
+    var playButton      = UIButton()
+    var settingButton   = UIButton()
+    var autoPlaySwitch  = UISwitch()
+    var YouTubeSwitch   = UISwitch()
+    var autoPlayLabel   = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "自動演奏"
+    var YouTubeLabel    = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
+    var difficultyLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
     var mainContents: [UIResponder] {
         get{
             var contents: [UIResponder] = []
@@ -112,16 +114,11 @@ class ChooseMusicScene: SKScene {
         
         // 将来的にはファイル探索から
         for musicStr in picker.musicNameArray {
-//            print(musicStr)
             do {
                 try musics.append(Reader.readHeadContents(fileName: musicStr + ".bms"))
             } catch {
                 print(error)
             }
-            
-        }
-        for i in musics{
-            print(i.musicName.rawValue)
         }
         
         /*--------- ボタンなどの設定 ---------*/
