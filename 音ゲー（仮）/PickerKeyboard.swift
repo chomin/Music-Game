@@ -13,7 +13,7 @@ class PickerKeyboard: UIControl {
     var musicNameArray: [String] = []                             // ピッカーに表示させるデータ(DimentionsファイルのMusicNameから自動生成)
     var textStore: String                                          // 入力文字列を保存するためのプロパティ(MusicName.first!.rawValueとするとfirstがnilになる)
     var isFirstMovedFromTitleLabel = false                      // 一番最初に選択されたラベルを強調するためのもの
-    
+    var selectedRow = 0
     
     // PickerViewで'選択されたデータ'を表示する
     override func draw(_ rect: CGRect) {
@@ -146,6 +146,7 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
         isFirstMovedFromTitleLabel = true
         
         textStore = musicNameArray[row]       // ピッカーから選択されたらその値をtextStoreへ入れる
+        selectedRow = row
         
         for dataIndex in 0 ... musicNameArray.count-1 {
             if let label = pickerView.view(forRow: dataIndex, forComponent: component) as? UILabel {
