@@ -12,7 +12,7 @@ import Foundation
 struct Music {
     var laneNum = 7
     var genre = ""                                      // ジャンル
-    var title = ""                                      // タイトル
+    var title = ""                                      // タイトル(正式名称。ファイル名は文字の制約があるためこっちを正式とする)
     var artist = ""                                     // アーティスト
     var videoID = ""                                    // YouTubeのvideoID
     var playLevel = 0                                   // 難易度

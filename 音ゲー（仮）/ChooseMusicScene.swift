@@ -140,9 +140,9 @@ class ChooseMusicScene: SKScene {
         self.view?.addSubview(picker!)
         
         // 将来的にはファイル探索から
-        for musicStr in picker.musicNameArray {
+        for fileMusicName in MusicName.allValues {
             do {
-                try musics.append(Reader.readHeadContents(fileName: musicStr + ".bms"))
+                try musics.append(Reader.readHeadContents(fileName: fileMusicName.rawValue + ".bms"))
             } catch {
                 print(error)
             }
