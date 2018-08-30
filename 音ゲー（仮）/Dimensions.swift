@@ -55,29 +55,15 @@ enum MusicName: String, EnumCollection {
     
     
     
-//    static func getPickerArray() -> [String] {
-//        
-//        var pickerArray: [String] = []
-//        
-////        print(MusicName.allValues)
-//        
-//        
-//        for musicName in MusicName.allValues {
-//            pickerArray.append(musicName.rawValue)
-////            print(musicName.rawValue)
-//            // YouTubeを実装しているものについてはYouTubeモードをピッカーに追加
-////            if musicName == .yo_kosoJapariParkHe ||
-////                musicName == .oracion ||
-////                musicName == .sakuraSkip ||
-////                musicName == .nimenseiUraomoteLife ||
-////                musicName == .level5 {
-////
-////                pickerArray.append(musicName.rawValue + "(YouTube)")
-////            }
-//        }
-//        return pickerArray
-//    }
-    
+    static func getPickerArray() -> [String] {
+        
+        var pickerArray: [String] = []
+        
+        for musicName in MusicName.allValues {
+            pickerArray.append(musicName.rawValue)
+        }
+        return pickerArray
+    }
 }
 
 /// rawvalueがYouTubeのvideoIDに対応する列挙型
