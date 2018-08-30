@@ -144,7 +144,9 @@ class ChooseMusicScene: SKScene {
             do {
                 try musics.append(Reader.readHeadContents(fileName: fileMusicName.rawValue + ".bms"))
             } catch {
+                print(error.localizedDescription + "@" + fileMusicName.rawValue)
                 print(error)
+                exit(1)
             }
         }
         

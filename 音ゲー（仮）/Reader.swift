@@ -136,7 +136,7 @@ class Reader {
                 return content.components(separatedBy: .newlines)
             } catch {
                 
-                throw FileError.readFailed("ファイルの内容取得に失敗")
+                throw FileError.readFailed("ファイルの内容取得に失敗(pathが不正、あるいはファイルのエンコードがutf8ではありません)")
             }
         } else {
             throw FileError.notFound("指定されたファイルが見つかりません")
