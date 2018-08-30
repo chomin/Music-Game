@@ -555,17 +555,11 @@ class Note {
         self.beat = beat
         self.laneIndex = laneIndex
         self.baseSpeed = 1350 * CGFloat(speedRatio)
-//        self.setting = setting
-//        self.music = music
-        
-       
     }
     init() {
         self.beat = 0
         self.laneIndex = 0
         self.baseSpeed = 1350
-//        self.setting = Setting()
-//        self.music = Music(laneNum: 7)
     }
     
     deinit {
@@ -573,9 +567,9 @@ class Note {
     }
     
     /// クラスプロパティとappearTimeを設定.必ずパース後に実行すること.
-    static func initialize(_ BPMs: [(bpm: Double, startPos: Double)], _ duration: TimeInterval, _ notes: [Note], _ music: Music, _ setting: Setting) {
+    static func initialize(_ duration: TimeInterval, _ notes: [Note], _ music: Music, _ setting: Setting) {
         
-        guard !BPMs.isEmpty else {
+        guard !music.BPMs.isEmpty else {
             print("空のBPM配列")
             return
         }
@@ -584,20 +578,19 @@ class Note {
         var timeSum: TimeInterval = 0
         var i = 0
         while true {
-            if i + 1 < BPMs.count {
-                let interval = TimeInterval((BPMs[i + 1].startPos - BPMs[i].startPos) / (BPMs[i].bpm/60))
-                BPMIntervals.append((BPMs[i].bpm, interval))
+            if i + 1 < music.BPMs.count {
+                let interval = TimeInterval((music.BPMs[i + 1].startPos - music.BPMs[i].startPos) / (music.BPMs[i].bpm/60))
+                BPMIntervals.append((music.BPMs[i].bpm, interval))
                 timeSum += interval
             } else {
                 let interval = duration - timeSum
-                BPMIntervals.append((BPMs[i].bpm, interval))
+                BPMIntervals.append((music.BPMs[i].bpm, interval))
                 break
             }
             i += 1
         }
         Note.majorBPM = BPMIntervals.max { $0.interval < $1.interval }!.bpm
-        Note.BPMs = BPMs
-//        Note.setting = setting
+        Note.BPMs = music.BPMs
         
         if !setting.isFitSizeToLane {
             Note.scale = CGFloat(setting.scaleRatio/7*Double(music.laneNum))

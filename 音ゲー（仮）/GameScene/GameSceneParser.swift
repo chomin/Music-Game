@@ -64,14 +64,14 @@ extension GameScene {   // bmsファイルを読み込む
         
         // コマンド文字列を命令と結びつける辞書
         let headerInstructionTable: [String: (String) -> ()] = [
-            "GENRE":     { value in self.genre     = value },
-            "TITLE":     { value in self.title     = value },
-            "ARTIST":    { value in self.artist    = value },
-            "VIDEOID":   { value in if self.playMode == .YouTube  { self.videoID = value } },
-            "VIDEOID2":  { value in if self.playMode == .YouTube2 { self.videoID = value } },
-            "BPM":       { value in if let num = Double(value) { self.BPMs = [(num, 0.0)] } },
-            "PLAYLEVEL": { value in if let num = Int(value) { self.playLevel = num } },
-            "VOLWAV":    { value in if let num = Int(value) { self.volWav = num } },
+            "GENRE":     { value in self.music.genre     = value },
+            "TITLE":     { value in self.music.title     = value },
+            "ARTIST":    { value in self.music.artist    = value },
+            "VIDEOID":   { value in if self.playMode == .YouTube  { self.music.videoID = value } },
+            "VIDEOID2":  { value in if self.playMode == .YouTube2 { self.music.videoID = value } },
+            "BPM":       { value in if let num = Double(value) { self.music.BPMs = [(num, 0.0)] } },
+            "PLAYLEVEL": { value in if let num = Int(value) { self.music.playLevel = num } },
+            "VOLWAV":    { value in if let num = Int(value) { self.music.volWav = num } },
             "LANE":      { value in if let num = Int(value) { self.music.laneNum = num } }
         ]
 
@@ -122,7 +122,7 @@ extension GameScene {   // bmsファイルを読み込む
         }
         
         if (playMode == .YouTube || playMode == .YouTube2) &&
-            videoID == "" {
+            music.videoID == "" {
             throw ParseError.lackOfVideoID("ファイル内にvideoIDが見つかりませんでした。BGMモードで実行します。")
         }
 
@@ -319,7 +319,7 @@ extension GameScene {   // bmsファイルを読み込む
                         }
                         if let newBPM = Int(ob, radix: 16) {
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
-                            BPMs.append((bpm: Double(newBPM), startPos: beat))
+                            music.BPMs.append((bpm: Double(newBPM), startPos: beat))
                         }
                     }
                 } else if channel == 8 {
@@ -327,7 +327,7 @@ extension GameScene {   // bmsファイルを読み込む
                     for (index, ob) in body.enumerated() {
                         if let newBPM = BPMTable[ob] {
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
-                            BPMs.append((bpm: Double(newBPM), startPos: beat))
+                            music.BPMs.append((bpm: Double(newBPM), startPos: beat))
                         }
                     }
                 } else if channel == 14 && music.laneNum == 6 {
@@ -365,7 +365,7 @@ extension GameScene {   // bmsファイルを読み込む
                 var i = 0
                 var timeInterval: TimeInterval = 0
                 while true {
-                    if i + 1 < BPMs.count {
+                    if i + 1 < music.BPMs.count {
                         timeInterval += (BPMs[i + 1].startPos - BPMs[i].startPos) / (BPMs[i].bpm/60)
                     } else {
                         timeInterval += (endPos - BPMs[i].startPos) / (BPMs[i].bpm/60)

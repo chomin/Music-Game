@@ -2,9 +2,9 @@
 *---------------------- HEADER FIELD
 
 #PLAYER 1
-#GENRE ƒAƒjƒ
+#GENRE ã‚¢ãƒ‹ãƒ¡
 #TITLE Growing Storm!
-#ARTIST ‰³—ƒXƒg[ƒ€!
+#ARTIST ä¹™å¥³ã‚¹ãƒˆãƒ¼ãƒ !
 #BPM 175
 #PLAYLEVEL 
 #RANK 3
@@ -12,22 +12,22 @@
 
 #LNTYPE 1
 
-#WAV01 ƒ^ƒbƒv.mp3
-#WAV02 ƒtƒŠƒbƒN.mp3
-#WAV03 Žn‚ß‚P.mp3
-#WAV04 “r’†‚P.mp3
-#WAV05 —£‚µ‚P.mp3
-#WAV06 ƒtƒŠƒbƒN—£‚µ‚P.mp3
-#WAV07 Žn‚ß‚Q.mp3
-#WAV08 “r’†‚Q.mp3
-#WAV09 —£‚µ‚Q.mp3
-#WAV0A ƒtƒŠƒbƒN—£‚µ‚Q.mp3
-#WAV0B ƒ^ƒbƒv‘å.mp3
-#WAV0C Žn‚ß‚P‘å.mp3
-#WAV0D —£‚µ‚P‘å.mp3
-#WAV0E Žn‚ß‚Q‘å.mp3
-#WAV0F —£‚µ‚Q‘å.mp3
-#WAV0G ƒ^ƒbƒv“Á‘å.mp3
+#WAV01 ã‚¿ãƒƒãƒ—.mp3
+#WAV02 ãƒ•ãƒªãƒƒã‚¯.mp3
+#WAV03 å§‹ã‚ï¼‘.mp3
+#WAV04 é€”ä¸­ï¼‘.mp3
+#WAV05 é›¢ã—ï¼‘.mp3
+#WAV06 ãƒ•ãƒªãƒƒã‚¯é›¢ã—ï¼‘.mp3
+#WAV07 å§‹ã‚ï¼’.mp3
+#WAV08 é€”ä¸­ï¼’.mp3
+#WAV09 é›¢ã—ï¼’.mp3
+#WAV0A ãƒ•ãƒªãƒƒã‚¯é›¢ã—ï¼’.mp3
+#WAV0B ã‚¿ãƒƒãƒ—å¤§.mp3
+#WAV0C å§‹ã‚ï¼‘å¤§.mp3
+#WAV0D é›¢ã—ï¼‘å¤§.mp3
+#WAV0E å§‹ã‚ï¼’å¤§.mp3
+#WAV0F é›¢ã—ï¼’å¤§.mp3
+#WAV0G ã‚¿ãƒƒãƒ—ç‰¹å¤§.mp3
 #WAV10 Growing Storm!.mp3
 
 
