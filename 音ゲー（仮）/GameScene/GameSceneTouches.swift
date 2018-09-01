@@ -14,12 +14,13 @@ extension GameScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         guard !isAutoPlay else { return }
-        
-        judgeQueue.sync {
+
+        judgeQueue.async {
+
             uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
-                
-                let pos = uiTouch.location(in: self.view?.superview)
-                
+                let pos = DispatchQueue.main.sync {
+                    return uiTouch.location(in: self.view?.superview)
+                }
                 // フリック判定したかを示すBoolを加えてallTouchにタッチ情報を付加
                 self.allGSTouches.append(GSTouch(touch: uiTouch, isJudgeableFlick: true, isJudgeableFlickEnd: false, storedFlickJudgeLaneIndex: nil))
                 
@@ -83,7 +84,7 @@ extension GameScene {
         
         guard !isAutoPlay else { return }
         
-        judgeQueue.sync {
+        judgeQueue.async {
             for i in self.lanes {
                 guard i.isTimeLagSet else { return }
             }
@@ -92,8 +93,9 @@ extension GameScene {
                 
                 let touchIndex = self.allGSTouches.index(where: { $0.touch == uiTouch } )!
                 
-                let pos = uiTouch.location(in: self.view?.superview)
-                let ppos = uiTouch.previousLocation(in: self.view?.superview)
+                let (pos, ppos) = DispatchQueue.main.sync {
+                    return (uiTouch.location(in: self.view?.superview), uiTouch.previousLocation(in: self.view?.superview))
+                }
                 
                 let moveDistance = sqrt(pow(pos.x - ppos.x, 2) + pow(pos.y - ppos.y, 2))
                 
@@ -167,7 +169,7 @@ extension GameScene {
                 if let buttonXAndLaneIndex = self.allGSTouches[touchIndex].storedFlickJudgeLaneIndex {
                     if !(Dimensions.judgeRects[buttonXAndLaneIndex].contains(pos)) {
                         
-                        storedFlickJudge(lane: lanes[buttonXAndLaneIndex])
+                        self.storedFlickJudge(lane: self.lanes[buttonXAndLaneIndex])
                     }
                 }
             }
@@ -179,7 +181,7 @@ extension GameScene {
         
         guard !isAutoPlay else { return }
 
-        judgeQueue.sync {
+        judgeQueue.async {
             
             for touch in touches {
                 
@@ -191,9 +193,10 @@ extension GameScene {
                 if isAllLanesTimeLagSet {
                     
                     let touchIndex = self.allGSTouches.index(where: { $0.touch == touch } )!
-                    
-                    let pos = touch.location(in: self.view?.superview)
-                    let ppos = touch.previousLocation(in: self.view?.superview)
+
+                    let (pos, ppos) = DispatchQueue.main.sync {
+                        return (touch.location(in: self.view?.superview), touch.previousLocation(in: self.view?.superview))
+                    }
                     
                     // pposループ
                     for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
@@ -228,7 +231,7 @@ extension GameScene {
                     }
                     // storedFlickが残っていないか確認
                     if let laneIndex = self.allGSTouches[touchIndex].storedFlickJudgeLaneIndex {
-                        storedFlickJudge(lane: lanes[laneIndex])
+                        self.storedFlickJudge(lane: self.lanes[laneIndex])
                     }
                     self.allGSTouches.remove(at: self.allGSTouches.index(where: { $0.touch == touch } )!)
                 } else {    // !(isAllTimeLagSet)
@@ -275,7 +278,6 @@ extension GameScene {
             print("判定対象ノーツ.isJudgeableがfalseです. laneIndex: \(lane.laneIndex)")
             return false
         }
-        
         
         // 以下は判定が確定しているものとする
         
