@@ -34,8 +34,8 @@ class Lane {
     var headNote: Note? { return laneNotes.first }
     func append(_ note: Note) { laneNotes.append(note) }
     func sort() { laneNotes.sort { $0.beat < $1.beat } }
-    // 先頭ノーツを判定し終えた時の処理をまとめて行う
-    func setHeadNoteJudged() {
+    /// 先頭ノーツを判定し終えた時の処理をまとめて行う
+    func setHeadNoteJudged() {  // TODO: 名前の変更
         laneNotes.first?.isJudged = true
         if !isEmpty {
         setNextIsJudgeable(judgeNote: laneNotes.first!)

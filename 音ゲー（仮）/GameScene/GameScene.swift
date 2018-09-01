@@ -109,13 +109,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     
     
-    init(size: CGSize, setting: Setting, music: Music) {
+    init(size: CGSize, setting: Setting, header: Header) {
 
-//        self.music.musicName = setting.musicName
         self.playMode = setting.playMode
         self.isAutoPlay = setting.isAutoPlay
         self.setting = setting
-        self.music = music
+        self.music = Music(header: header)
         
         super.init(size: size)
     }
@@ -268,7 +267,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         setImages()
         
         
-        self.mediaOffsetTime = (musicStartPos / music.BPMs[0].bpm) * 60
+        self.mediaOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
         self.isPrecedingStartValid = false
         for note in notes {
             switch note {
@@ -396,7 +395,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // レーンの更新(ノーツ更新後に実行)
         for lane in lanes {
-             lane.update(passedTime, music.BPMs)
+             lane.update(passedTime, BPMs)
         }
         
         // 同時押しラインの更新
@@ -457,7 +456,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             // レーンの更新(再)(判定後、laneNotes[0]が入れ替わるので、それを反映させる)
             for lane in lanes {
-                lane.update(passedTime, self.music.BPMs)
+                lane.update(passedTime, self.BPMs)
             }
         }
 
@@ -504,7 +503,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     /// BGMモードへ移行
     func reloadSceneAsBGMMode() {
         
-        let scene = GameScene(size: (self.view?.bounds.size)!, setting: setting, music: music)
+        let scene = GameScene(size: (self.view?.bounds.size)!, setting: setting, header: music.header)
         let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true

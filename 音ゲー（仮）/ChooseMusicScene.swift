@@ -121,7 +121,7 @@ class ChooseMusicScene: SKScene {
     var sizesPosY:CGFloat!
     
     var setting = Setting()
-    var musics: [Music] = []    // picker.selectedRowとindexを対応させる
+    var headers: [Header] = []    // picker.selectedRowとindexを対応させる
     
     override func didMove(to view: SKView) {
         
@@ -142,7 +142,7 @@ class ChooseMusicScene: SKScene {
         // 将来的にはファイル探索から
         for fileMusicName in MusicName.allValues {
             do {
-                try musics.append(Reader.readHeadContents(fileName: fileMusicName.rawValue + ".bms"))
+                try headers.append(Header(fileName: fileMusicName.rawValue + ".bms"))
             } catch {
                 print(error.localizedDescription + "@" + fileMusicName.rawValue)
                 print(error)
@@ -248,7 +248,7 @@ class ChooseMusicScene: SKScene {
             Label.horizontalAlignmentMode = .center
             Label.position = CGPoint(x: self.frame.width/2, y: self.frame.height/2 + Label.fontSize*2)
             Label.fontColor = SKColor.green
-            Label.text = Difficulty.getDifficulty(garupaPlayLevel: musics[picker!.selectedRow].playLevel).rawValue
+            Label.text = Difficulty.getDifficulty(garupaPlayLevel: headers[picker!.selectedRow].playLevel).rawValue
             
             self.addChild(Label)
             return Label
@@ -466,7 +466,7 @@ class ChooseMusicScene: SKScene {
         
         speedLabel.text = String(setting.speedRatioInt) + "%"
         noteSizeLabel.text = String(setting.scaleRatioInt) + "%"
-        difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: musics[picker!.selectedRow].playLevel).rawValue
+        difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: headers[picker!.selectedRow].playLevel).rawValue
     }
     
     override func willMove(from view: SKView) {
@@ -481,7 +481,7 @@ class ChooseMusicScene: SKScene {
         setting.save()
         
         // 移動
-        let scene = GameScene(size: (view?.bounds.size)!, setting: setting, music: musics[picker!.selectedRow])
+        let scene = GameScene(size: (view?.bounds.size)!, setting: setting, header: headers[picker!.selectedRow])
         let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true
