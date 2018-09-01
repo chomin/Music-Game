@@ -396,7 +396,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // レーンの更新(ノーツ更新後に実行)
         for lane in lanes {
-             lane.update(passedTime, music.BPMs)
+            lane.update(passedTime, music.BPMs)
         }
         
         // 同時押しラインの更新
@@ -422,12 +422,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         } else {
             // 判定関係
             // middleの判定（同じところで長押しのやつ）
-            judgeQueue.sync {
+            judgeQueue.async {
                 
                 
                 for gsTouch in self.allGSTouches {
                     
-                    let pos = gsTouch.touch.location(in: self.view?.superview)
+                    let pos = DispatchQueue.main.sync {
+                        return gsTouch.touch.location(in: self.view?.superview)
+                    }
                     
                     for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
                         
@@ -453,11 +455,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                         }
                     }
                 }
-            }
-            
-            // レーンの更新(再)(判定後、laneNotes[0]が入れ替わるので、それを反映させる)
-            for lane in lanes {
-                lane.update(passedTime, self.music.BPMs)
             }
         }
 
