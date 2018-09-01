@@ -9,7 +9,7 @@
 import UIKit
 
 /// rawvalueが音楽ファイル名に対応する列挙型
-/// 新曲を追加する際はここに曲名を追加する。
+/// 新曲を追加する際はここに曲名を追加する。(将来的にはファイル探索から)
 enum MusicName: String, EnumCollection {
     
     case yo_kosoJapariParkHe    = "ようこそジャパリパークへ"
@@ -18,7 +18,7 @@ enum MusicName: String, EnumCollection {
     case sakuraSkip             = "SAKURAスキップ"
     case zankokuNaTenshiNoThese = "残酷な天使のテーゼ"
     case nimenseiUraomoteLife   = "にめんせい☆ウラオモテライフ！"
-    case buonAppetitoS          = "ぼなぺてぃーとS"
+    case buonAppetitoS          = "ぼなぺてぃーと♡S"
     case level5                 = "LEVEL5-Judgelight-"
     
     /*--------ミリシタ楽曲---------*/
@@ -34,6 +34,10 @@ enum MusicName: String, EnumCollection {
     case utaMas                 = "THE IDOLM@STER"
     case marionettesNeverSleep  = "Marionetteは眠らない"
     case machiukePrince         = "待ち受けプリンス"
+    case princessBeAmbitious    = "Princess Be Ambitious!!"
+    case angelicParade          = "Angelic Parade♪"
+    case fairyTaleJairarenai    = "FairyTaleじゃいられない"
+    case union                  = "UNION!!"
     
     /*--------バンドリ楽曲---------*/
     case thisGameEx             = "This game(expert)"
@@ -47,31 +51,23 @@ enum MusicName: String, EnumCollection {
     case gogoManiac             = "GO!GO!MANIAC(expert)"
     case dontSayLazy            = "Don't say \"lazy\"(expert)"
     case dontSayLazySp          = "Don't say \"lazy\"(special)"
+    case teardrops              = "ティアドロップス(expert)"
+    case kirakiraDatoka         = "キラキラだとか夢だとか~Sing Girls~(expert)"
+    case godKnows               = "God knows…(expert)"
+    case shugabita              = "シュガーソングとビターステップ(expert)"
+    case pikopapi               = "ピコっと！パピっと！ガルパ☆ピコ！！！(expert)"
+    
     
     
     static func getPickerArray() -> [String] {
         
         var pickerArray: [String] = []
         
-//        print(MusicName.allValues)
-        
-        
         for musicName in MusicName.allValues {
             pickerArray.append(musicName.rawValue)
-//            print(musicName.rawValue)
-            // YouTubeを実装しているものについてはYouTubeモードをピッカーに追加
-//            if musicName == .yo_kosoJapariParkHe ||
-//                musicName == .oracion ||
-//                musicName == .sakuraSkip ||
-//                musicName == .nimenseiUraomoteLife ||
-//                musicName == .level5 {
-//
-//                pickerArray.append(musicName.rawValue + "(YouTube)")
-//            }
         }
         return pickerArray
     }
-    
 }
 
 /// rawvalueがYouTubeのvideoIDに対応する列挙型

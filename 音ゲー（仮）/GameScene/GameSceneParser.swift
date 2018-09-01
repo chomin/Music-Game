@@ -64,15 +64,15 @@ extension GameScene {   // bmsファイルを読み込む
         
         // コマンド文字列を命令と結びつける辞書
         let headerInstructionTable: [String: (String) -> ()] = [
-            "GENRE":     { value in self.genre     = value },
-            "TITLE":     { value in self.title     = value },
-            "ARTIST":    { value in self.artist    = value },
-            "VIDEOID":   { value in if self.playMode == .YouTube  { self.videoID = value } },
-            "VIDEOID2":  { value in if self.playMode == .YouTube2 { self.videoID = value } },
-            "BPM":       { value in if let num = Double(value) { self.BPMs = [(num, 0.0)] } },
-            "PLAYLEVEL": { value in if let num = Int(value) { self.playLevel = num } },
-            "VOLWAV":    { value in if let num = Int(value) { self.volWav = num } },
-            "LANE":      { value in if let num = Int(value) { self.laneNum = num } }
+            "GENRE":     { value in self.music.genre     = value },
+            "TITLE":     { value in self.music.title     = value },
+            "ARTIST":    { value in self.music.artist    = value },
+            "VIDEOID":   { value in if self.playMode == .YouTube  { self.music.videoID = value } },
+            "VIDEOID2":  { value in if self.playMode == .YouTube2 { self.music.videoID = value } },
+            "BPM":       { value in if let num = Double(value) { self.music.BPMs = [(num, 0.0)] } },
+            "PLAYLEVEL": { value in if let num = Int(value) { self.music.playLevel = num } },
+            "VOLWAV":    { value in if let num = Int(value) { self.music.volWav = num } },
+            "LANE":      { value in if let num = Int(value) { self.music.laneNum = num } }
         ]
 
         let headerEx = try! Regex("^#([A-Z][0-9A-Z]*)( .*)?$")   // ヘッダの行にマッチ
@@ -122,7 +122,7 @@ extension GameScene {   // bmsファイルを読み込む
         }
         
         if (playMode == .YouTube || playMode == .YouTube2) &&
-            videoID == "" {
+            music.videoID == "" {
             throw ParseError.lackOfVideoID("ファイル内にvideoIDが見つかりませんでした。BGMモードで実行します。")
         }
 
@@ -131,7 +131,7 @@ extension GameScene {   // bmsファイルを読み込む
 
         // チャンネルとレーンの対応付け(辞書)
         var laneMap: [Int : Int]
-        switch laneNum {
+        switch music.laneNum {
         case 1: laneMap = [                      14: 0                      ]
         case 2: laneMap = [               13: 0,        15: 1               ]
         case 3: laneMap = [               13: 0, 14: 1, 15: 2               ]
@@ -140,7 +140,7 @@ extension GameScene {   // bmsファイルを読み込む
         case 6: laneMap = [ 11: 0, 12: 1, 13: 2,        15: 3, 18: 4, 19: 5 ]
         case 7: laneMap = [ 11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6 ]
         default:
-            laneNum = 7
+            music.laneNum = 7
             laneMap = [11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6]
         }
         
@@ -225,7 +225,7 @@ extension GameScene {   // bmsファイルを読み込む
                         autoreleasepool {
                             
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
-                            let ratio = (speedRatioTable[beat] ?? 1.0) * userSpeedRatio
+                            let ratio = (speedRatioTable[beat] ?? 1.0) * setting.speedRatio
                             
                             switch NoteExpression(rawValue: ob) ?? NoteExpression.rest {
                             case .rest:
@@ -319,7 +319,7 @@ extension GameScene {   // bmsファイルを読み込む
                         }
                         if let newBPM = Int(ob, radix: 16) {
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
-                            BPMs.append((bpm: Double(newBPM), startPos: beat))
+                            music.BPMs.append((bpm: Double(newBPM), startPos: beat))
                         }
                     }
                 } else if channel == 8 {
@@ -327,15 +327,15 @@ extension GameScene {   // bmsファイルを読み込む
                     for (index, ob) in body.enumerated() {
                         if let newBPM = BPMTable[ob] {
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
-                            BPMs.append((bpm: Double(newBPM), startPos: beat))
+                            music.BPMs.append((bpm: Double(newBPM), startPos: beat))
                         }
                     }
-                } else if channel == 14 && laneNum == 6 {
+                } else if channel == 14 && music.laneNum == 6 {
                     // ミリシタ譜面の特大ノーツを処理
                     for (index, ob) in body.enumerated() {
                         if NoteExpression(rawValue: ob) == .tapLL {
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
-                            let ratio = (speedRatioTable[beat] ?? 1.0) * userSpeedRatio
+                            let ratio = (speedRatioTable[beat] ?? 1.0) * setting.speedRatio
                             notes.append(Tap(beatPos: beat, laneIndex: 2, speedRatio: ratio, isLarge: true))
                             notes.append(Tap(beatPos: beat, laneIndex: 3, speedRatio: ratio, isLarge: true))
                         }
@@ -365,7 +365,7 @@ extension GameScene {   // bmsファイルを読み込む
                 var i = 0
                 var timeInterval: TimeInterval = 0
                 while true {
-                    if i + 1 < BPMs.count {
+                    if i + 1 < music.BPMs.count {
                         timeInterval += (BPMs[i + 1].startPos - BPMs[i].startPos) / (BPMs[i].bpm/60)
                     } else {
                         timeInterval += (endPos - BPMs[i].startPos) / (BPMs[i].bpm/60)

@@ -11,43 +11,15 @@ import GameplayKit
 
 class ChooseMusicScene: SKScene {
     
-    enum Difficulty: String {
-        case cho           = "超級"
-        case jigoku        = "地獄級"
-        case chojigoku     = "超地獄級"
-        case zetujigoku    = "絶地獄級"
-        case chozetujigoku = "超絶地獄級"
-        case kaimetu       = "壊滅級"
-        case chokaimetu    = "超壊滅級"
-        
-        static func getDifficulty(garupaPlayLevel: Int) -> Difficulty { // ガルパのレベルをこのゲームの難易度に変換（ミリシタとかは任せます）
-            switch garupaPlayLevel {
-            case 29:
-                return Difficulty.kaimetu
-            case 28:
-                return Difficulty.chozetujigoku
-            case 27:
-                return Difficulty.zetujigoku
-            case 26:
-                return Difficulty.chojigoku
-            case 25:
-                return Difficulty.jigoku
-            default:
-                if garupaPlayLevel > 29 { return Difficulty.chokaimetu }
-                else                    { return Difficulty.cho        }
-            }
-        }
-    }
-    
     // 初期画面のボタンなど
     var picker: PickerKeyboard!
-    var playButton      = UIButton()
-    var settingButton   = UIButton()
-    var autoPlaySwitch  = UISwitch()
-    var YouTubeSwitch   = UISwitch()
-    var autoPlayLabel   = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "自動演奏"
-    var YouTubeLabel    = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
-    var difficultyLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "地獄級"
+    var playButton     = UIButton()
+    var settingButton  = UIButton()
+    var autoPlaySwitch = UISwitch()
+    var YouTubeSwitch  = UISwitch()
+    var autoPlayLabel  = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "自動演奏"
+    var YouTubeLabel   = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
+    
     var mainContents: [UIResponder] {
         get{
             var contents: [UIResponder] = []
@@ -58,7 +30,6 @@ class ChooseMusicScene: SKScene {
             contents.append(YouTubeSwitch)
             contents.append(autoPlayLabel)
             contents.append(YouTubeLabel)
-            contents.append(difficultyLabel)
             return contents
         }
     }
@@ -121,7 +92,7 @@ class ChooseMusicScene: SKScene {
     var sizesPosY:CGFloat!
     
     var setting = Setting()
-    var musics: [Music] = []    // picker.selectedRowとindexを対応させる
+    
     
     override func didMove(to view: SKView) {
         
@@ -139,16 +110,6 @@ class ChooseMusicScene: SKScene {
         
         self.view?.addSubview(picker!)
         
-        // 将来的にはファイル探索から
-        for fileMusicName in MusicName.allValues {
-            do {
-                try musics.append(Reader.readHeadContents(fileName: fileMusicName.rawValue + ".bms"))
-            } catch {
-                print(error.localizedDescription + "@" + fileMusicName.rawValue)
-                print(error)
-                exit(1)
-            }
-        }
         
         /*--------- ボタンなどの設定 ---------*/
         // 初期画面のボタン
@@ -236,19 +197,6 @@ class ChooseMusicScene: SKScene {
             Label.position.y -= autoPlaySwitch.bounds.height/5
             Label.fontColor = SKColor.black
             Label.text = "自動演奏:"
-            
-            self.addChild(Label)
-            return Label
-        }()
-        
-        difficultyLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
-            
-            Label.fontSize = self.frame.height/7
-            Label.horizontalAlignmentMode = .center
-            Label.position = CGPoint(x: self.frame.width/2, y: self.frame.height/2 + Label.fontSize*2)
-            Label.fontColor = SKColor.green
-            Label.text = Difficulty.getDifficulty(garupaPlayLevel: musics[picker!.selectedRow].playLevel).rawValue
             
             self.addChild(Label)
             return Label
@@ -466,7 +414,8 @@ class ChooseMusicScene: SKScene {
         
         speedLabel.text = String(setting.speedRatioInt) + "%"
         noteSizeLabel.text = String(setting.scaleRatioInt) + "%"
-        difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: musics[picker!.selectedRow].playLevel).rawValue
+        
+//        self.view?.addSubview(settingButton)
     }
     
     override func willMove(from view: SKView) {
@@ -481,7 +430,18 @@ class ChooseMusicScene: SKScene {
         setting.save()
         
         // 移動
-        let scene = GameScene(size: (view?.bounds.size)!, setting: setting, music: musics[picker!.selectedRow])
+        let scene = GameScene(size: (view?.bounds.size)!, setting: setting)
+//        if YouTubeSwitch.isOn {
+        
+//            if picker.textStore == "オラシオン" &&
+//                (setting.speedRatioInt <= 21 || setting.speedRatioInt >= 201 ) { setting.playMode = .YouTube2 /* 裏シオン */ }
+            
+//            scene = GameScene(size: (view?.bounds.size)!)
+//        }else{
+//            print(picker.textStore)
+//            scene = GameScene(musicName: MusicName(rawValue: picker.textStore)! , playMode: .BGM , isAutoPlay: autoPlaySwitch.isOn, size: (view?.bounds.size)!, speedRatioInt:UInt(defaults.integer(forKey: Keys.userSpeedRatioInt.rawValue)))
+//        }
+        
         let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true

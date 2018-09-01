@@ -7,13 +7,10 @@
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
 //
 
-
-
 import SpriteKit
 import GameplayKit
 import AVFoundation
 import youtube_ios_player_helper    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
-
 
 
 /// 判定関係のフラグ付きタッチ情報
@@ -94,17 +91,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var sameLines: [SameLine] = []  // 連動する始点側のノーツと同時押しライン
     
     // 楽曲データ
-    var musicName: MusicName    // 曲名
+    var music: Music
     var notes: [Note] = []      // ノーツの" 始 点 "の集合。
     var musicStartPos = 1.0     // BGM開始の"拍"！
-    var genre = ""              // ジャンル
-    var title = ""              // タイトル
-    var artist = ""             // アーティスト
-    var videoID = ""            // YouTubeのvideoID
-    var playLevel = 0           // 難易度
-    var volWav = 100            // 音量を現段階のn%として出力するか(TODO: 未実装)
-    var BPMs: [(bpm: Double, startPos: Double)] = []        // 可変BPM情報
-    var laneNum = 7             // レーン数(指定されなければデフォルトで7)
+    var BPMs: [(bpm: Double, startPos: Double)] {
+        return self.music.BPMs
+    }
     
     private var startTime: TimeInterval = 0.0       // 譜面再生開始時刻
     var duration: TimeInterval?                     // 譜面再生時間
@@ -112,17 +104,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     var lanes: [Lane] = []      // レーン
     
-    let userSpeedRatio: Double
-    
-    
-    
-    
-    init(musicName: MusicName, playMode: PlayMode, isAutoPlay: Bool,  size: CGSize, speedRatioInt: UInt) {
 
-        self.musicName = musicName
-        self.playMode = playMode
-        self.isAutoPlay = isAutoPlay
-        self.userSpeedRatio = Double(speedRatioInt) / 100
+    var setting: Setting
+    
+    
+    
+    init(size: CGSize, setting: Setting, music: Music) {
+
+//        self.music.musicName = setting.musicName
+        self.playMode = setting.playMode
+        self.isAutoPlay = setting.isAutoPlay
+        self.setting = setting
+        self.music = music
         
         super.init(size: size)
     }
@@ -135,7 +128,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     override func didMove(to view: SKView) {
         
-        
         appDelegate = UIApplication.shared.delegate as! AppDelegate // AppDelegateのインスタンスを取得
         appDelegate.gsDelegate = self   // 子(AppDelegate)の設定しているdelegateに自身をセット
         
@@ -145,7 +137,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // notesにノーツの"　始　点　"を入れる
         do {
-            try parse(fileName: musicName.rawValue + ".bms")
+            try parse(fileName: music.musicName.rawValue + ".bms")
         }
         catch FileError.invalidName     (let msg) { print(msg) }
         catch FileError.notFound        (let msg) { print(msg) }
@@ -163,10 +155,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         catch                                     { print("未知のエラー") }
         
         // 寸法に関するレーン数依存の定数をセット(必ずパース後に実行(laneNumを読み込むため))
-        Dimensions.updateInstance(laneNum: laneNum)
+        Dimensions.updateInstance(laneNum: music.laneNum)
         
         // Laneインスタンスを作成
-        for i in 0..<self.laneNum {
+        for i in 0..<self.music.laneNum {
             self.lanes.append(Lane(laneIndex: i))
         }
         
@@ -174,7 +166,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         switch playMode {
         case .BGM:
             // サウンドファイルのパスを生成
-            let Path = Bundle.main.path(forResource: "Sounds/" + musicName.rawValue, ofType: "mp3")!     // m4a,oggは不可
+            let Path = Bundle.main.path(forResource: "Sounds/" + music.musicName.rawValue, ofType: "mp3")!     // m4a,oggは不可
             let soundURL = URL(fileURLWithPath: Path)
             // AVAudioPlayerのインスタンスを作成
             do {
@@ -190,7 +182,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             self.playerView = YTPlayerViewHolder(frame: self.frame)
             // 詳しい使い方はJump to Definitionへ
-            if !(self.playerView.load(withVideoId: videoID, playerVars: ["autoplay": 1, "controls": 0, "playsinline": 1, "rel": 0, "showinfo": 0])) {
+            if !(self.playerView.load(withVideoId: music.videoID, playerVars: ["autoplay": 1, "controls": 0, "playsinline": 1, "rel": 0, "showinfo": 0])) {
                 print("ロードに失敗")
                 
                 reloadSceneAsBGMMode()
@@ -198,11 +190,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             }
         }
         
-        
         // Noteクラスのクラスプロパティを設定(必ずパース後にすること)
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration    // BGMまたは映像の長さ
-        Note.initialize(BPMs, duration, notes)
-        
+        Note.initialize(duration, notes, music, setting)   // 将来的にmusicに圧縮
         
         // ボタンの設定
         pauseButton = { () -> UIButton in
@@ -278,7 +268,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         setImages()
         
         
-        self.mediaOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
+        self.mediaOffsetTime = (musicStartPos / music.BPMs[0].bpm) * 60
         self.isPrecedingStartValid = false
         for note in notes {
             switch note {
@@ -381,27 +371,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     case .done:                   // mediaOffsettime < passedTime の時
                         self.passedTime = playerView.currentTime + mediaOffsetTime
                         playerView.countFrameForBaseline()
-//                        print(CACurrentMediaTime() - playerView.currentTime)
                         if isSupposedToPausePlayerView {
                             playerView.pauseVideo()
                             self.isSupposedToPausePlayerView = false
                         }
                     }
-                    
-
-                
-//                print(CACurrentMediaTime() - TimeInterval(playerView.view.currentTime()))
-//                if !(playerView.isSetStartTime) {
-//                    playerView.startTime = CACurrentMediaTime() - TimeInterval(playerView.view.currentTime())
-//                    playerView.isSetStartTime = true
-//                    print("set startTime")
-//                }
-//                self.passedTime = playerView.currentTime + mediaOffsetTime
-            
-//            } else {
-//                self.passedTime = 0
-                
-                
                 }
             } else {
                 self.passedTime = playerView.currentTime + mediaOffsetTime
@@ -422,7 +396,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // レーンの更新(ノーツ更新後に実行)
         for lane in lanes {
-            lane.update(passedTime, BPMs)
+            lane.update(passedTime, music.BPMs)
         }
         
         // 同時押しラインの更新
@@ -527,7 +501,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     /// BGMモードへ移行
     func reloadSceneAsBGMMode() {
         
-        let scene = GameScene(musicName: self.musicName, playMode: .BGM, isAutoPlay: self.isAutoPlay, size: (self.view?.bounds.size)!, speedRatioInt: UInt(self.userSpeedRatio*100))
+        let scene = GameScene(size: (self.view?.bounds.size)!, setting: setting, music: music)
         let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true
