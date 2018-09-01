@@ -52,10 +52,6 @@ class SameLine {
 /// 音ゲーをするシーン
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {
     
-    static var cnt = 0  // デバッグ用
-//    var tmpCounter = 0  //デバッグ用
-//    static var ultiateSuperGod = true 4月1日は終わりました
-    
     var playMode: PlayMode
     var isAutoPlay: Bool
     
@@ -426,7 +422,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // レーンの更新(ノーツ更新後に実行)
         for lane in lanes {
-             lane.update(passedTime, BPMs)
+            lane.update(passedTime, BPMs)
         }
         
         // 同時押しラインの更新
@@ -457,7 +453,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 
                 for gsTouch in self.allGSTouches {
                     
-                    let pos = gsTouch.touch.location(in: self.view?.superview)
+                    let pos = DispatchQueue.main.sync {
+                        return gsTouch.touch.location(in: self.view?.superview)
+                    }
                     
                     for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
                         
@@ -483,11 +481,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                         }
                     }
                 }
-            }
-            
-            // レーンの更新(再)(判定後、laneNotes[0]が入れ替わるので、それを反映させる)
-            for lane in lanes {
-                lane.update(passedTime, self.BPMs)
             }
         }
 
@@ -521,7 +514,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         judgeLabel.run(seq)
     }
     
-    func moveToResultScene() { print(GameScene.cnt)
+    func moveToResultScene() {
         let scene = ResultScene(size: (view?.bounds.size)!)
         let skView = view as SKView?
         skView?.showsFPS = true

@@ -21,9 +21,9 @@ extension GameScene {
         judgeQueue.async {
             
             uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
-                
-                let pos = uiTouch.location(in: self.view?.superview)
-                
+                let pos = DispatchQueue.main.sync {
+                    return uiTouch.location(in: self.view?.superview)
+                }
                 // フリック判定したかを示すBoolを加えてallTouchにタッチ情報を付加
                 self.allGSTouches.append(GSTouch(touch: uiTouch, isJudgeableFlick: true, isJudgeableFlickEnd: false, storedFlickJudgeLaneIndex: nil))
                 
@@ -101,8 +101,9 @@ extension GameScene {
                 
                 let touchIndex = self.allGSTouches.index(where: { $0.touch == uiTouch } )!
                 
-                let pos = uiTouch.location(in: self.view?.superview)
-                let ppos = uiTouch.previousLocation(in: self.view?.superview)
+                let (pos, ppos) = DispatchQueue.main.sync {
+                    return (uiTouch.location(in: self.view?.superview), uiTouch.previousLocation(in: self.view?.superview))
+                }
                 
                 let moveDistance = sqrt(pow(pos.x - ppos.x, 2) + pow(pos.y - ppos.y, 2))
                 
@@ -215,9 +216,9 @@ extension GameScene {
                     
                     let touchIndex = self.allGSTouches.index(where: { $0.touch == touch } )!
                     
-                    let pos = touch.location(in: self.view?.superview)
-                    let ppos = touch.previousLocation(in: self.view?.superview)
-                    
+                    let (pos, ppos) = DispatchQueue.main.sync {
+                        return (touch.location(in: self.view?.superview), touch.previousLocation(in: self.view?.superview))
+                    }
                     
                     // pposループ
                     for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
@@ -319,7 +320,6 @@ extension GameScene {
             print("判定対象ノーツ.isJudgeableがfalseです. laneIndex: \(lane.laneIndex)")
             return false
         }
-        GameScene.cnt += 1
         
         // 以下は判定が確定しているものとする
         
