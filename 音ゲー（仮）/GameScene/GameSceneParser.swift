@@ -96,7 +96,7 @@ extension GameScene {   // bmsファイルを読み込む
 //                    print("未定義のヘッダ命令: \(item)")
 //                }
 
-                print("ヘッダは無視します")
+//                print("ヘッダは無視します")
                 
             } else if let match = mainDataEx.firstMatch(bmsLine) {
                 // メインデータ(小節長変更命令以外)をパース

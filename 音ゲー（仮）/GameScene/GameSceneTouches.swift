@@ -201,6 +201,7 @@ extension GameScene {
                             
                             if self.lanes[index].middleObservationTimeState == .before {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, gsTouch: self.allGSTouches[touchIndex]) { break }
+                                // judgeが失敗するときはどんな状況？
                             }
                         }
                     }
