@@ -31,8 +31,6 @@ class GameViewController: UIViewController {
         view.addSubview(skView2)
         
         skView2.presentScene(scene)  // ChooseMusicSceneに移動
-        
-        
     }
     
     override var shouldAutorotate: Bool {

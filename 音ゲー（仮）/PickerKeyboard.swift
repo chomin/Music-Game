@@ -10,9 +10,9 @@ import UIKit
 
 class PickerKeyboard: UIControl {
     
-    var musicNameArray: [String] = []                             // ピッカーに表示させるデータ(DimentionsファイルのMusicNameから自動生成)
-    var textStore: String                                          // 入力文字列を保存するためのプロパティ(MusicName.first!.rawValueとするとfirstがnilになる)
-    var isFirstMovedFromTitleLabel = false                      // 一番最初に選択されたラベルを強調するためのもの
+    var musicNameArray: [String] = []       // ピッカーに表示させるデータ(DimentionsファイルのMusicNameから自動生成)
+    var textStore: String                   // 入力文字列を保存するためのプロパティ(MusicName.first!.rawValueとするとfirstがnilになる)
+    var isFirstMovedFromTitleLabel = false  // 一番最初に選択されたラベルを強調するためのもの
     var selectedRow: Int
     
     // PickerViewで'選択されたデータ'を表示する
@@ -28,11 +28,12 @@ class PickerKeyboard: UIControl {
     init(frame: CGRect, firstText: String) {
         
         textStore = firstText
+        
+        // ピッカーに初期値をセット(将来的にはファイル探索から)
         self.musicNameArray = MusicName.getPickerArray()
         selectedRow = musicNameArray.index(of: textStore)!
+        
         super.init(frame: frame)
-        // ピッカーに初期値をセット(将来的にはファイル探索から)
-       
         
         // viewのタッチジェスチャーを取る
         addTarget(self, action: #selector(PickerKeyboard.didTap(sender: )), for: .touchUpInside)
@@ -69,7 +70,6 @@ class PickerKeyboard: UIControl {
         let row = musicNameArray.index(of: textStore) ?? -1
         pickerView.selectRow(row, inComponent: 0, animated: true)
         pickerView.showsSelectionIndicator = true
-        
         
         return pickerView
     }
@@ -133,8 +133,6 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
         return musicNameArray.count
     }
     
-    
-    
     /*----------  UIPickerViewDelegateの関数 -----------*/
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
         return pickerView.frame.height/4
@@ -157,9 +155,7 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
                 if dataIndex == row    { setSelectedLabelColor   (label: label) }
                 else if dataIndex <= 7 { setBackLabelNormalColor (label: label) }
                 else                   { setBackLabelRedColor    (label: label) }
-                
             }
-            
         }
         setNeedsDisplay()
     }
@@ -168,7 +164,7 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         
         if view != nil {    // ここには入らない
-
+            
             return view!
         } else {
             
@@ -203,6 +199,4 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
         label.textColor = UIColor.red
         label.backgroundColor = UIColor.clear
     }
-    
-    
 }

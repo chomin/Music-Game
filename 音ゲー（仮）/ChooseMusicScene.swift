@@ -181,7 +181,7 @@ class ChooseMusicScene: SKScene {
             Button.addTarget(self, action: #selector(onClickSettingButton(_:)), for: .touchUpInside)
             Button.addTarget(self, action: #selector(onSettingButton(_:)), for: .touchDown)
             Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-
+            
             Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)// yは上からの座標
             Button.isHidden = false
             self.view?.addSubview(Button)
@@ -305,7 +305,7 @@ class ChooseMusicScene: SKScene {
         
         siPlusButton = {() -> UIButton in
             let Button = UIButton()
-
+            
             Button.setImage(plusImage, for: .normal)
             Button.setImage(plusImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickSIPlusButton(_:)), for: .touchUpInside)
@@ -314,10 +314,10 @@ class ChooseMusicScene: SKScene {
             Button.isHidden = true
             return Button
         }()
-
+        
         siPlus10Button = {() -> UIButton in
             let Button = UIButton()
-
+            
             Button.setImage(plus10Image, for: .normal)
             Button.setImage(plus10ImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickSIPlus10Button(_:)), for: .touchUpInside)
@@ -326,10 +326,10 @@ class ChooseMusicScene: SKScene {
             Button.isHidden = true
             return Button
         }()
-
+        
         siMinusButton = {() -> UIButton in
             let Button = UIButton()
-
+            
             Button.setImage(minusImage, for: .normal)
             Button.setImage(minusImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickSIMinusButton(_:)), for: .touchUpInside)
@@ -338,10 +338,10 @@ class ChooseMusicScene: SKScene {
             Button.isHidden = true
             return Button
         }()
-
+        
         siMinus10Button = {() -> UIButton in
             let Button = UIButton()
-
+            
             Button.setImage(minus10Image, for: .normal)
             Button.setImage(minus10ImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickSIMinus10Button(_:)), for: .touchUpInside)
@@ -459,7 +459,6 @@ class ChooseMusicScene: SKScene {
             self.addChild(Label)
             return Label
         }()
-        
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -488,8 +487,6 @@ class ChooseMusicScene: SKScene {
         skView?.ignoresSiblingOrder = true
         scene.scaleMode = .resizeFill
         skView?.presentScene(scene)  // GameSceneに移動
-        
-        
     }
     
     func showMainContents(){
@@ -532,9 +529,6 @@ class ChooseMusicScene: SKScene {
                 print("settingContentsの振り分け漏れ: \(content)")
             }
         }
-        
-        
-       
     }
     
     func hideSettingContents() {
@@ -626,6 +620,4 @@ class ChooseMusicScene: SKScene {
     @objc func pickerChanged(_ sender: PickerKeyboard){
         setting.musicName = MusicName(rawValue: sender.textStore)!
     }
-    
-    
 }

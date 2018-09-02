@@ -27,10 +27,8 @@ class YTPlayerViewHolder {
             // 誤差が大きければ補正
             if abs(diff - baseline!) > 1/150 {      // 閾値はiPhone8による測定値から決定。カクつきが目立たない値にする
                 offset += diff - baseline
-//                print("adjusted")
             }
         }
-        
         return currentTime + offset
     }
     
@@ -73,13 +71,12 @@ class YTPlayerViewHolder {
     func pauseVideo() {
         self.view.pauseVideo()
         baseline = nil
-//        print("paused")
     }
     
     func playerState() -> YTPlayerState {
         return self.view.playerState()
     }
-
+    
     private var frame = 0
     // 毎フレームに1度呼ぶこと
     func countFrameForBaseline() {
@@ -99,11 +96,4 @@ class YTPlayerViewHolder {
         baseline = CACurrentMediaTime() - (TimeInterval(view.currentTime()) + offset)
         print("baseline set")
     }
-
-    
 }
-
-
-
-
-

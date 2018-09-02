@@ -12,7 +12,6 @@ import GameplayKit
 import AVFoundation
 import youtube_ios_player_helper    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
 
-
 /// 判定関係のフラグ付きタッチ情報
 class GSTouch { // 参照型として扱いたい
     let touch: UITouch
@@ -44,7 +43,6 @@ class SameLine {
         self.line.removeFromParent()
     }
 }
-
 
 /// 音ゲーをするシーン
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {
@@ -104,13 +102,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     var lanes: [Lane] = []      // レーン
     
-
     var setting: Setting
     
     
-    
     init(size: CGSize, setting: Setting, header: Header) {
-
+        
         self.playMode = setting.playMode
         self.isAutoPlay = setting.isAutoPlay
         self.setting = setting
@@ -123,8 +119,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-    
     override func didMove(to view: SKView) {
         
         appDelegate = UIApplication.shared.delegate as! AppDelegate // AppDelegateのインスタンスを取得
@@ -132,7 +126,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         self.view?.isMultipleTouchEnabled = true    // 恐らくデフォルトではfalseになってる
         self.view?.superview?.isMultipleTouchEnabled = true
-        
         
         // notesにノーツの"　始　点　"を入れる
         do {
@@ -262,10 +255,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 }
             }
         }
-        
         // 画像の設定
         setImages()
-        
         
         self.mediaOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
         self.isPrecedingStartValid = false
@@ -303,7 +294,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         } else {
             playerView.delegate = self
             view.superview!.addSubview(playerView.view)
-            
             view.superview!.sendSubview(toBack: playerView.view)
             view.superview!.bringSubview(toFront: self.view!)
             self.backgroundColor = UIColor(white: 0, alpha: 0.5)
@@ -336,9 +326,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
     }
     
-    
     override func update(_ currentTime: TimeInterval) {
-       
+        
         // 経過時間の更新
         if self.playMode == .BGM {
             if BGM.currentTime > 0 {
@@ -355,7 +344,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     switch ytLaunchState {
                     case .loading:
                         playerView.pauseVideo()         // ロードが終わった瞬間にポーズして、ノーツとの同期を待つ
-//                        playerView.seek(toSeconds: 0, allowSeekAhead: true) // 0秒にシークするとなぜか再生に時間がかかる
+                        //                        playerView.seek(toSeconds: 0, allowSeekAhead: true) // 0秒にシークするとなぜか再生に時間がかかる
                         self.passedTime = 0
                         self.startTime = CACurrentMediaTime()
                         self.ytLaunchState = .initialPaused
@@ -395,7 +384,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // レーンの更新(ノーツ更新後に実行)
         for lane in lanes {
-             lane.update(passedTime, BPMs)
+            lane.update(passedTime, BPMs)
         }
         
         // 同時押しラインの更新
@@ -413,8 +402,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         if isAutoPlay {
             for lane in lanes {
                 if lane.timeLag <= 0 && !(lane.isEmpty) {
-
-
+                    
+                    
                     if !(judge(lane: lane, timeLag: 0, gsTouch: nil)) { print("判定失敗@自動演奏") }
                 }
             }
@@ -456,7 +445,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 }
             }
         }
-
+        
         // 終了時刻が指定されていればその時刻でシーン移動
         if duration != nil && passedTime > duration! {
             BGM = nil
@@ -509,7 +498,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         skView?.presentScene(scene)  // GameSceneに移動
     }
     
-    
     /* -------- ボタン関数群 -------- */
     
     @objc func onClickPauseButton(_ sender : UIButton){
@@ -536,9 +524,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             BGM?.currentTime -= 3   // 3秒巻き戻し
             BGM?.play()
         } else {
-//            let passedTime = playerView.pausedTime - playerView.startTime - playerView.timeOffset - 3
+            //            let passedTime = playerView.pausedTime - playerView.startTime - playerView.timeOffset - 3
             playerView.playVideo()
-//            playerView.timeOffset += CACurrentMediaTime() - playerView.pausedTime + 3
+            //            playerView.timeOffset += CACurrentMediaTime() - playerView.pausedTime + 3
         }
         
         setJudgeLabelText(text: "")
@@ -576,7 +564,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
     }
     
-    
     /* -------- 同時押し対策 -------- */
     
     @objc func onReturnButton(_ sender : UIButton){
@@ -612,7 +599,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 ytLaunchState = .done
                 self.playerView.renewTimeParams()
             } else if ytLaunchState == .done {      // プレイ再開時
-//                self.playerView.setBaseline()
+                //                self.playerView.setBaseline()
             }
         case .paused:       // ここはポーズ時になぜか2回呼ばれる
             if ytLaunchState == .initialPaused {
@@ -635,19 +622,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // play呼び出し→読み込み→再生開始となるが、通信環境によって読み込み時間がバラバラのため、最初だけは少し先読みしてから再生。
         playerView.playVideo()
-//        playerView.pauseVideo()
-//
-//        DispatchQueue.main.asyncAfter(deadline: .now()+3) {
-//            playerView.playVideo()
-//
-//            if self.isSupposedToPausePlayerView {
-//                self.applicationWillResignActive()
-//                self.isSupposedToPausePlayerView = false
-//            }
-//        }
-        
-       
-        
+        //        playerView.pauseVideo()
+        //
+        //        DispatchQueue.main.asyncAfter(deadline: .now()+3) {
+        //            playerView.playVideo()
+        //
+        //            if self.isSupposedToPausePlayerView {
+        //                self.applicationWillResignActive()
+        //                self.isSupposedToPausePlayerView = false
+        //            }
+        //        }
     }
     
     /// エラー処理
@@ -655,9 +639,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         print(error)
         reloadSceneAsBGMMode()
     }
-    
-    
-    
     
     /// アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
@@ -707,7 +688,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.pauseView?.addSubview(Button)
                 
                 return Button
-                }()
+            }()
             self.continueButton = { () -> UIButton in
                 let Button = UIButton()
                 
@@ -736,15 +717,4 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         enableAllButtonsOnPauseView()
     }
-    
-   
-    
 }
-
-
-
-
-
-
-
-

@@ -34,7 +34,6 @@ class ResultScene: SKScene {
             Label.fontColor = SKColor.white
             Label.numberOfLines = 7
             
-            
             Label.text =    // swift4からの書き方(改行入りのString)
             """
             parfect:\(ResultScene.parfect)
@@ -46,12 +45,9 @@ class ResultScene: SKScene {
             combo:\(ResultScene.maxCombo)
             """
             
-            
             self.addChild(Label)
             return Label
-                
         }()
-        
         
         //ボタンの設定
         replayButton.addTarget(self, action: #selector(onClickReplayButton(_: )), for: .touchUpInside)
@@ -67,7 +63,6 @@ class ResultScene: SKScene {
         replayButton.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y: 50)
         self.view?.addSubview(replayButton)
     }
-    
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered

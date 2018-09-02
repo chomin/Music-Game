@@ -58,7 +58,6 @@ enum MusicName: String, EnumCollection {
     case pikopapi               = "ピコっと！パピっと！ガルパ☆ピコ！！！(expert)"
     
     
-    
     static func getPickerArray() -> [String] {
         
         var pickerArray: [String] = []
@@ -108,8 +107,6 @@ enum ImageName: String {
     case pause               = "PauseIcon"
     case pauseSelected       = "PauseIconSelected"
 }
-
-
 
 enum PlayMode {
     case BGM, YouTube, YouTube2
@@ -196,5 +193,3 @@ class Dimensions {
         self.instance?.update(laneNum: laneNum)
     }
 }
-
-

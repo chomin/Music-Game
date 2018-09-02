@@ -54,7 +54,6 @@ class Header {
         // インデックス型テンポ変更用テーブル
         var BPMTable: [String : Double] = [:]
         
-        
         // コマンド文字列を命令と結びつける辞書
         let headerInstructionTable: [String: (String) -> ()] = [
             "GENRE":     { value in self.genre     = value },   // 構造体だと"Closure cannot implicitly capture a mutating self parameter"が発生する
