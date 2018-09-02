@@ -24,11 +24,10 @@ class Setting {
     private var speedRatioP:     Double
     private var scaleRatioIntP:  UInt
     private var scaleRatioP:     Double
-            var isYouTube:       Bool
-            var isAutoPlay:      Bool
-            var isFitSizeToLane: Bool
+    var isYouTube:       Bool
+    var isAutoPlay:      Bool
+    var isFitSizeToLane: Bool
     private var musicNameStr:    String
-    
     
     var playMode: PlayMode {
         get {
@@ -38,8 +37,6 @@ class Setting {
             else                                               { return .YouTube  }
         }
     }
-    
-    
     
     let defaults = UserDefaults.standard
     
@@ -119,5 +116,4 @@ class Setting {
             musicNameStr = newValue.rawValue
         }
     }
-    
 }

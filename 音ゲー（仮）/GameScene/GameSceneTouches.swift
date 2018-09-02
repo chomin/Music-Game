@@ -14,9 +14,9 @@ extension GameScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         guard !isAutoPlay else { return }
-
+        
         judgeQueue.async {
-
+            
             uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 let pos = DispatchQueue.main.sync {
                     return uiTouch.location(in: self.view?.superview)
@@ -31,7 +31,7 @@ extension GameScene {
                 guard Dimensions.judgeRects[0].YRange.contains(pos.y) else {     // 以下、ボタンの判定圏内にあるtouchのみを処理する(kara用)。judgeRect.YRangeは共通のはずなので、とりあえず先頭のものを使用。
                     continue
                 }
-
+                
                 // 判定対象を選ぶため、押された範囲のレーンから最近ノーツを取得
                 var nearbyNotes: [(laneIndex: Int, timelag: TimeInterval, note: Note, distanceXToButton: CGFloat)] = []
                 for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
@@ -65,11 +65,11 @@ extension GameScene {
                         if A.timelag == B.timelag { return A.distanceXToButton < B.distanceXToButton }
                         
                         return A.timelag < B.timelag
-                    }!
+                        }!
                     
                     if (nearestNote.note is Tap) ||
-                       (nearestNote.note is TapStart) ||
-                       (nearestNote.note is Middle) {
+                        (nearestNote.note is TapStart) ||
+                        (nearestNote.note is Middle) {
                         
                         if !self.judge(lane: self.lanes[nearestNote.laneIndex], timeLag: nearestNote.timelag, gsTouch: self.allGSTouches[self.allGSTouches.count-1]) {
                             print("判定失敗:tap")
@@ -104,7 +104,7 @@ extension GameScene {
                 
                 // pposループ
                 for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
-
+                    
                     if judgeRect.contains(ppos) {
                         if !(judgeRect.contains(pos)) { // 移動後にレーンから外れていた場合は、外れる直前にいた時間で判定
                             
@@ -123,7 +123,7 @@ extension GameScene {
                             
                             if ((judgeNote is Flick) && gsTouch.isJudgeableFlick) ||
                                 ((judgeNote is FlickEnd) && gsTouch.isJudgeableFlickEnd) {
-                           
+                                
                                 let distanceXToButton = abs(ppos.x - Dimensions.buttonX[index])
                                 
                                 nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: judgeNote, distanceXToButton: distanceXToButton))
@@ -131,8 +131,6 @@ extension GameScene {
                             }
                         }
                     }
-                    
-                   
                 }
                 
                 if !(nearbyNotes.isEmpty) {
@@ -141,7 +139,7 @@ extension GameScene {
                         if A.timelag == B.timelag { return A.distanceXToButton < B.distanceXToButton }
                         
                         return A.timelag < B.timelag
-                    }!
+                        }!
                     
                     if (nearestNote.note is Flick) || (nearestNote.note is FlickEnd) {    // nearbyNotesにはFlickかFlickEndしか入ってない。念のため
                         
@@ -151,13 +149,13 @@ extension GameScene {
                             self.allGSTouches[touchIndex].storedFlickJudgeLaneIndex = nearestNote.laneIndex
                             
                         } else if !self.judge(lane: self.lanes[nearestNote.laneIndex], timeLag: nearestNote.timelag, gsTouch: self.allGSTouches[touchIndex]) {
-                           
+                            
                             print("判定失敗: flick")     // 二重判定防止に成功した時とか
                         }
                     }
                 }
                 // middleの話。afterで、外から中に入ってきた時は、その時判定する
-               for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
+                for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
                     if !(judgeRect.contains(ppos)) && judgeRect.contains(pos) {
                         
                         if self.lanes[index].middleObservationTimeState == .after {    // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
@@ -180,7 +178,7 @@ extension GameScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         guard !isAutoPlay else { return }
-
+        
         judgeQueue.async {
             
             for touch in touches {
@@ -193,7 +191,7 @@ extension GameScene {
                 if isAllLanesTimeLagSet {
                     
                     let touchIndex = self.allGSTouches.index(where: { $0.touch == touch } )!
-
+                    
                     let (pos, ppos) = DispatchQueue.main.sync {
                         return (touch.location(in: self.view?.superview), touch.previousLocation(in: self.view?.superview))
                     }
@@ -204,6 +202,7 @@ extension GameScene {
                             
                             if self.lanes[index].middleObservationTimeState == .before {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, gsTouch: self.allGSTouches[touchIndex]) { break }
+                                // judgeが失敗するときはどんな状況？
                             }
                         }
                     }
@@ -222,7 +221,7 @@ extension GameScene {
                             if note is TapEnd {
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, gsTouch: self.allGSTouches[touchIndex]) { break }    // 離しの判定
                             } else if ((note is Flick    && self.allGSTouches[touchIndex].isJudgeableFlick) ||
-                                       (note is FlickEnd && self.allGSTouches[touchIndex].isJudgeableFlickEnd)) && self.lanes[index].isJudgeRange  {            // flickなのにflickせずに離したらmiss
+                                (note is FlickEnd && self.allGSTouches[touchIndex].isJudgeableFlickEnd)) && self.lanes[index].isJudgeRange  {            // flickなのにflickせずに離したらmiss
                                 
                                 self.missJudge(lane: self.lanes[index])
                             }
@@ -267,12 +266,11 @@ extension GameScene {
     func judge(lane: Lane, timeLag: TimeInterval, gsTouch: GSTouch?) -> Bool {
         
         guard !(lane.isEmpty),
-                lane.isJudgeRange else {
-                    print("laneが空、あるいは判定時間圏内にノーツがありません. laneIndex: \(lane.laneIndex)")
-                    return false
-                    
+            lane.isJudgeRange else {
+                print("laneが空、あるいは判定時間圏内にノーツがありません. laneIndex: \(lane.laneIndex)")
+                return false
         }
-
+        
         guard lane.headNote!.isJudgeable else {
             print("判定対象ノーツ.isJudgeableがfalseです. laneIndex: \(lane.laneIndex)")
             return false
@@ -305,11 +303,9 @@ extension GameScene {
         case is TapStart, is Middle:
             gsTouch?.isJudgeableFlick = false
             gsTouch?.isJudgeableFlickEnd = true
-       
-        default: break
             
+        default: break
         }
-       
         
         switch lane.getJudgeTimeState(timeLag: timeLag) {
         case .parfect:
@@ -362,7 +358,6 @@ extension GameScene {
         //（laneから呼び出され、すでに指が離れている場合はtouchはnilになる）
         if judge(lane: lane, timeLag: lane.storedFlickJudgeInformation!.timeLag, gsTouch: self.allGSTouches.first(where: { $0.touch == lane.storedFlickJudgeInformation!.touch })) {
             print("storedFlickJudgeに失敗")
-            
         }
     }
     
@@ -371,8 +366,8 @@ extension GameScene {
     func parfectMiddleJudge(lane: Lane, gsTouch: GSTouch) -> Bool {
         
         guard !(lane.isEmpty),
-              lane.headNote is Middle,
-              lane.headNote!.isJudgeable else { return false }
+            lane.headNote is Middle,
+            lane.headNote!.isJudgeable else { return false }
         
         if lane.judgeTimeState == .parfect {
             if !(judge(lane: lane, timeLag: lane.timeLag, gsTouch: gsTouch)) {
@@ -395,8 +390,4 @@ extension GameScene {
         lane.setHeadNoteJudged()
         return true
     }
-    
-    
-
 }
-

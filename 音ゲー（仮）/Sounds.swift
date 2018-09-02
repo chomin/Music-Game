@@ -119,17 +119,14 @@ class ActionSoundPlayers {
     private let middle3:   SoundSource
     private let middle4:   SoundSource
     
-    
     private let kara1: SoundSource
     private let kara2: SoundSource
-    
     
     enum SoundType{
         case tap, flick, kara, middle
     }
     
     init() {
-        
         alureInitDevice(nil, nil)
         
         // サウンドファイルのパスを生成

@@ -22,7 +22,6 @@ extension GameScene {
             line.alpha = 0.3
             
             self.addChild(line)
-            
         }
         
         // 判定ラインの描写
@@ -32,9 +31,6 @@ extension GameScene {
         judgeLine.strokeColor = UIColor.white
         judgeLine.position = CGPoint(x: Dimensions.laneWidth, y: Dimensions.judgeLineY)
         self.addChild(judgeLine)
-        
-        
-        
         
         var fNotes: [Note] = [] // firstNotes(最終的にロングノーツの始点の集合)
         var lNotes: [Note] = [] // lastNotes(ロングノーツの終点の集合)
@@ -67,7 +63,6 @@ extension GameScene {
                 fNotes.removeSubrange(i...i+1)
                 continue
             }
-            
             i += 1
         }
         
@@ -78,10 +73,8 @@ extension GameScene {
                 lNotes.removeSubrange(i...i+1)
                 continue
             }
-            
             i += 1
         }
-        
         
         for j in fNotes {       // 最後に始点と終点
             i = 0
@@ -92,15 +85,10 @@ extension GameScene {
                 } else if j.beat < lNotes[i].beat {
                     break
                 }
-                
                 i += 1
             }
         }
-        
     }
-    
-    
-    
     
     func paintSameLine(i: Note, j: Note) {
         // 同時押しラインの描写
@@ -114,6 +102,4 @@ extension GameScene {
         sameLines.append(SameLine(note1: i, note2: j, line: line))
         
     }
-    
-    
 }

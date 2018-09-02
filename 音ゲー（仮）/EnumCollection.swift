@@ -21,24 +21,22 @@ public extension EnumCollection {
             }
         }
     }
-    
     public static var allValues: [Self] {
         return Array(self.cases())  // Sequenceから配列を作る。(Array(1...4)で[1,2,3,4]を作るときも同じイニシャライザを使う)
     }
-    
     public static var first: Self? { return Self.allValues.first }
 }
 
 /*
  public protocol Sequence { // Swift Standard Library内にある。
-    public func makeIterator() -> Self.Iterator // IteratorProtocolに準拠するインスタンスを返す関数。（IteratorProtocolの説明は以下。）
+ public func makeIterator() -> Self.Iterator // IteratorProtocolに準拠するインスタンスを返す関数。（IteratorProtocolの説明は以下。）
  }
  
  makeIterator()を実装することでSequenceを適用できる(デフォルト実装を利用できる場合は自分で実装する必要なし。どっかにprotocol extensionがある？公式によると、デフォルトはReturns an iterator over the elements of this sequence.)。Sequenceを適用すると、「for i in ...」の中に入れられたり、mapやcontainsなどの関数を使えるようになる。
  
  
  public protocol IteratorProtocol {
-    public mutating func next() -> Self.Element?
+ public mutating func next() -> Self.Element?
  }
  
  next()を呼ぶたびに「次のElement」を返し、最後の要素の次はnilを返す。返り値は任意の要素型。
