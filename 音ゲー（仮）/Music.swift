@@ -22,9 +22,10 @@ struct Music {
     var videoID:   String { return header.videoID   }   // YouTubeのvideoID
     var playLevel: Int    { return header.playLevel }   // 難易度
     var volWav:    Int    { return header.volWav    }   // 音量を現段階のn%として出力するか(TODO: 未実装)
+    var bmsNameWithExtension: String { return header.bmsNameWithExtension }
 //    var BPMs: List<BPMInfo>{        // 可変BPM情報(headerだけでなくmain情報にも記述されるのでget onlyにしない)
 //        get { return header.BPMs }
 //        set { header.BPMs = newValue }
 //    }
-    var musicName: MusicName { return MusicName(rawValue: title)! }       // 曲名
+//    var musicName: String { return title }       // 曲名
 }

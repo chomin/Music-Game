@@ -131,15 +131,6 @@ class ChooseMusicScene: SKScene {
         
         backgroundColor = .white
         
-        // ピッカーキーボードの設置
-        let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
-        picker = PickerKeyboard(frame: rect, firstText: setting.musicName.rawValue)
-        picker.backgroundColor = .gray
-        picker.isHidden = false
-        picker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)
-        
-        self.view?.addSubview(picker!)
-        
         // Headerについて、ファイル探索→db更新→読み込み
         do {
             let fileNamesWithExtension = try FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath + "/Sounds").filter({$0.contains(".bms")})
@@ -149,17 +140,17 @@ class ChooseMusicScene: SKScene {
 //            try! realm.write {
 //                realm.deleteAll()
 //            }
-//            
+//
             let results = realm.objects(Header.self)
             
-            print(results)
+//            print(results)
             
             // fileに対応するdbが存在するか確認
             for fileName in fileNamesWithExtension {
                 
                 let filePath = Bundle.main.path(forAuxiliaryExecutable: "Sounds/" + fileName)!
                 
-                if let resultIndex = results.index(where: {$0.fileNameWithExtension == fileName}) { // ファイルに対応するdb発見
+                if let resultIndex = results.index(where: {$0.bmsNameWithExtension == fileName}) { // ファイルに対応するdb発見
                     
                     let DBHeader = results[resultIndex]
                     let attr = try FileManager.default.attributesOfItem(atPath: filePath)
@@ -187,7 +178,19 @@ class ChooseMusicScene: SKScene {
             exit(1)
         }
         
+        // ピッカーキーボードの設置
+        var musicNameArray: [String] = []   // ピッカーに表示する曲名
+        for header in headers {
+            musicNameArray.append(header.title)
+        }
         
+        let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
+        picker = PickerKeyboard(frame: rect, firstText: setting.musicName, musicNameArray: musicNameArray)
+        picker.backgroundColor = .gray
+        picker.isHidden = false
+        picker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)
+        
+        self.view?.addSubview(picker!)
         
         
         /*--------- ボタンなどの設定 ---------*/
@@ -516,7 +519,7 @@ class ChooseMusicScene: SKScene {
     
     @objc func onClickPlayButton(_ sender : UIButton) {
         
-        setting.musicName = MusicName(rawValue: picker.textStore)!
+        setting.musicName = picker.textStore
         setting.save()
         
         // 移動
@@ -658,6 +661,6 @@ class ChooseMusicScene: SKScene {
     
     // picker
     @objc func pickerChanged(_ sender: PickerKeyboard){
-        setting.musicName = MusicName(rawValue: sender.textStore)!
+        setting.musicName = sender.textStore
     }
 }

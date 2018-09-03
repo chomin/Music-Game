@@ -25,12 +25,12 @@ class PickerKeyboard: UIControl {
         textStore.draw(in:rect, withAttributes: attrs)
     }
     
-    init(frame: CGRect, firstText: String) {
+    init(frame: CGRect, firstText: String, musicNameArray: [String]) {
         
         textStore = firstText
         
         // ピッカーに初期値をセット(将来的にはファイル探索から)
-        self.musicNameArray = MusicName.getPickerArray()
+        self.musicNameArray = musicNameArray
         selectedRow = musicNameArray.index(of: textStore)!
         
         super.init(frame: frame)
@@ -41,7 +41,7 @@ class PickerKeyboard: UIControl {
     
     required init?(coder aDecoder: NSCoder) {
         
-        textStore = MusicName.first!.rawValue
+        textStore = ""
         selectedRow = 0
         super.init(coder: aDecoder)
         // viewのタッチジェスチャーを取る

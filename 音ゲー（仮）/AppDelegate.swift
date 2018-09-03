@@ -23,9 +23,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        // Realmのマイグレーションとスキーマのバージョン設定
+        // Realmのマイグレーションとスキーマのバージョン設定(マイグレーションのたびにschemaVersionの値を上げていく必要あり。また、(CMSceneで)realm.deleteAllすること。)
         let config = Realm.Configuration(
-            schemaVersion: 1,
+            schemaVersion: 2,
             migrationBlock: { migration, oldSchemaVersion in
                 if (oldSchemaVersion < 1) {}
         })

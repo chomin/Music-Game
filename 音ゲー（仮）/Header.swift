@@ -35,7 +35,7 @@ class Header: Object {
         }
     }
     
-    @objc dynamic var fileNameWithExtension = ""
+    @objc dynamic var bmsNameWithExtension = ""
     @objc dynamic var lastUpdateDate = ""
     @objc dynamic var laneNum = 7
     @objc dynamic var genre = ""        // ジャンル
@@ -77,7 +77,7 @@ class Header: Object {
         // 譜面データファイルを一行ごとに配列で保持
         let bmsData = try Header.readBMS(fileName: fileName)
         self.lastUpdateDate = bmsData.date
-        self.fileNameWithExtension = bmsData.fileNameWithExtension
+        self.bmsNameWithExtension = bmsData.fileNameWithExtension
         
         // 譜面データファイルのメインデータ
         var mainData: [(bar: Int, channel: Int, body: [String])] = []
