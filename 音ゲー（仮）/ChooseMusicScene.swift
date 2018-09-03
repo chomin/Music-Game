@@ -163,12 +163,14 @@ class ChooseMusicScene: SKScene {
                     if formatter.string(from: date) != results[resultIndex].lastUpdateDate {                                                                    // 更新日が異なればdbを更新
                         try! realm.write {   // (取り出されたものはmanaged objectなので。。。)
                             try DBHeader.setPropaties(fileName: fileName)                           // ファイルの更新日時が異なればdbを更新
+                            print(fileName + "のDBを更新しました")
                         }
                     }
                     headers.append(DBHeader)
                     
                 } else {
                     try headers.append(Header(fileName: fileName))                                  // ファイルから新たなdbを作成&保存
+                    print(fileName + "を追加しました")
                 }
             }
             
