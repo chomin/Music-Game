@@ -8,6 +8,7 @@
 
 import SpriteKit
 import GameplayKit
+import RealmSwift
 
 class ChooseMusicScene: SKScene {
     
@@ -139,16 +140,55 @@ class ChooseMusicScene: SKScene {
         
         self.view?.addSubview(picker!)
         
-        // 将来的にはファイル探索から
-        for fileMusicName in MusicName.allValues {
-            do {
-                try headers.append(Header(fileName: fileMusicName.rawValue + ".bms"))
-            } catch {
-                print(error.localizedDescription + "@" + fileMusicName.rawValue)
-                print(error)
-                exit(1)
+        // Headerについて、ファイル探索→db更新→読み込み
+        do {
+            let fileNamesWithExtension = try FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath + "/Sounds").filter({$0.contains(".bms")})
+            
+            let realm = try Realm()
+            
+//            try! realm.write {
+//                realm.deleteAll()
+//            }
+//            
+            let results = realm.objects(Header.self)
+            
+            print(results)
+            
+            // fileに対応するdbが存在するか確認
+            for fileName in fileNamesWithExtension {
+                
+                let filePath = Bundle.main.path(forAuxiliaryExecutable: "Sounds/" + fileName)!
+                
+                if let resultIndex = results.index(where: {$0.fileNameWithExtension == fileName}) { // ファイルに対応するdb発見
+                    
+                    let DBHeader = results[resultIndex]
+                    let attr = try FileManager.default.attributesOfItem(atPath: filePath)
+                    let date = attr[FileAttributeKey.modificationDate] as! Date
+                    let formatter = DateFormatter()
+                    formatter.dateStyle = .full // longかmediumでもいいかも
+                    formatter.timeStyle = .full
+                    formatter.locale = Locale(identifier: "ja_JP")
+                    
+                    if formatter.string(from: date) != results[resultIndex].lastUpdateDate {                                                                    // 更新日が異なればdbを更新
+                        try! realm.write {   // (取り出されたものはmanaged objectなので。。。)
+                            try DBHeader.setPropaties(fileName: fileName)                           // ファイルの更新日時が異なればdbを更新
+                        }
+                    }
+                    headers.append(DBHeader)
+                    
+                } else {
+                    try headers.append(Header(fileName: fileName))                                  // ファイルから新たなdbを作成&保存
+                }
             }
+            
+        } catch {
+            print(error)
+            print("エラー終了")
+            exit(1)
         }
+        
+        
+        
         
         /*--------- ボタンなどの設定 ---------*/
         // 初期画面のボタン

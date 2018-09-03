@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RealmSwift
 
 protocol GSAppDelegate {//子（呼び出し元)がAppDelegateクラス、親がGameSceneクラス
     func applicationWillResignActive()
@@ -21,6 +22,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        // Realmのマイグレーションとスキーマのバージョン設定
+        let config = Realm.Configuration(
+            schemaVersion: 1,
+            migrationBlock: { migration, oldSchemaVersion in
+                if (oldSchemaVersion < 1) {}
+        })
+        Realm.Configuration.defaultConfiguration = config
+        
         return true
     }
     
@@ -55,4 +65,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         print("WillTerminate")
     }
+    
+    
 }
