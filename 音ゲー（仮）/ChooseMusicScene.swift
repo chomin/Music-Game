@@ -181,7 +181,13 @@ class ChooseMusicScene: SKScene {
         }
         
         // ソート
-        headers.sort(by: { $0.group < $1.group })
+        headers.sort(by: {
+            
+            if ($0.group == $1.group) { return $0.playLevel < $1.playLevel }
+            
+            return $0.group < $1.group
+            
+        })
 //        print(headers)
         
         // ピッカーキーボードの設置
@@ -293,7 +299,7 @@ class ChooseMusicScene: SKScene {
         difficultyLabel = {() -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = self.frame.height/7
+            Label.fontSize = self.frame.height/10
             Label.horizontalAlignmentMode = .center
             Label.position = CGPoint(x: self.frame.width/2, y: self.frame.height/2 + Label.fontSize*2)
             Label.fontColor = SKColor.green
