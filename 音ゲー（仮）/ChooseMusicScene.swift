@@ -140,7 +140,7 @@ class ChooseMusicScene: SKScene {
 //            try! realm.write {
 //                realm.deleteAll()
 //            }
-//
+
             let results = realm.objects(Header.self)
             
 //            print(results)
@@ -180,14 +180,18 @@ class ChooseMusicScene: SKScene {
             exit(1)
         }
         
+        // ソート
+        headers.sort(by: { $0.group < $1.group })
+//        print(headers)
+        
         // ピッカーキーボードの設置
-        var musicNameArray: [String] = []   // ピッカーに表示する曲名
-        for header in headers {
-            musicNameArray.append(header.title)
-        }
+//        var musicNameArray: [String] = []   // ピッカーに表示する曲名
+//        for header in headers {
+//            musicNameArray.append(header.title)
+//        }
         
         let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
-        picker = PickerKeyboard(frame: rect, firstText: setting.musicName, musicNameArray: musicNameArray)
+        picker = PickerKeyboard(frame: rect, firstText: setting.musicName, headers: headers)
         picker.backgroundColor = .gray
         picker.isHidden = false
         picker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)

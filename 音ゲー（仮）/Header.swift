@@ -37,13 +37,14 @@ class Header: Object {
     
     @objc dynamic var bmsNameWithExtension = ""
     @objc dynamic var lastUpdateDate = ""
-    @objc dynamic var laneNum = 7
     @objc dynamic var genre = ""        // ジャンル
     @objc dynamic var title = ""        // タイトル(正式名称。ファイル名は文字の制約があるためこっちを正式とする)
     @objc dynamic var artist = ""       // アーティスト
-    @objc dynamic var videoID = ""      // YouTubeのvideoID
+    @objc dynamic var group = ""        // ソート用のグループ
     @objc dynamic var playLevel = 0     // 難易度
     @objc dynamic var volWav = 100      // 音量を現段階のn%として出力するか(TODO: 未実装)
+    @objc dynamic var laneNum = 7
+    
     
     /// DB上に存在しない場合にBMSから読み込み生成し、dbに保存する。db上に存在するときは作成しないこと。
     ///
@@ -90,11 +91,12 @@ class Header: Object {
             "GENRE":     { value in self.genre     = value },   // 構造体だと"Closure cannot implicitly capture a mutating self parameter"が発生する
             "TITLE":     { value in self.title     = value },
             "ARTIST":    { value in self.artist    = value },
-            "VIDEOID":   { value in self.videoID   = value },
-            "VIDEOID2":  { value in self.videoID   = value },
+//            "VIDEOID":   { value in self.videoID   = value },
+//            "VIDEOID2":  { value in self.videoID   = value },
+            "GROUP":     { value in self.group     = value },
             "PLAYLEVEL": { value in if let num = Int(value)    { self.playLevel = num } },
-            "VOLWAV":    { value in if let num = Int(value)    { self.volWav = num } },
-            "LANE":      { value in if let num = Int(value)    { self.laneNum = num } },
+            "VOLWAV":    { value in if let num = Int(value)    { self.volWav    = num } },
+            "LANE":      { value in if let num = Int(value)    { self.laneNum   = num } }
             ]
         
         let headerEx = try! Regex("^#([A-Z][0-9A-Z]*)( .*)?$")   // ヘッダの行にマッチ

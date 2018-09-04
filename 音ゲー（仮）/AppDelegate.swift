@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Realmのマイグレーションとスキーマのバージョン設定(マイグレーションのたびにschemaVersionの値を上げていく必要あり。また、(CMSceneで)realm.deleteAllすること。)
         let config = Realm.Configuration(
-            schemaVersion: 2,
+            schemaVersion: 4,
             migrationBlock: { migration, oldSchemaVersion in
                 if (oldSchemaVersion < 1) {}
         })

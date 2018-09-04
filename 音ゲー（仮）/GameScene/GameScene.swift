@@ -110,7 +110,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.playMode = setting.playMode
         self.isAutoPlay = setting.isAutoPlay
         self.setting = setting
-        self.music = Music(header: header, BPMs: [])
+        self.music = Music(header: header, BPMs: [], videoID: "")
         
         super.init(size: size)
     }
