@@ -62,18 +62,18 @@ extension GameScene {   // bmsファイルを読み込む
         var BPMTable: [String : Double] = [:]
         //
         //
-        //        // コマンド文字列を命令と結びつける辞書
-        //        let headerInstructionTable: [String: (String) -> ()] = [
-        //            "GENRE":     { value in self.music.genre     = value },
-        //            "TITLE":     { value in self.music.title     = value },
-        //            "ARTIST":    { value in self.music.artist    = value },
-        //            "VIDEOID":   { value in if self.playMode == .YouTube  { self.music.videoID = value } },
-        //            "VIDEOID2":  { value in if self.playMode == .YouTube2 { self.music.videoID = value } },
-        //            "BPM":       { value in if let num = Double(value) { self.music.BPMs = [(num, 0.0)] } },
-        //            "PLAYLEVEL": { value in if let num = Int(value) { self.music.playLevel = num } },
-        //            "VOLWAV":    { value in if let num = Int(value) { self.music.volWav = num } },
-        //            "LANE":      { value in if let num = Int(value) { self.music.laneNum = num } }
-        //        ]
+                // コマンド文字列を命令と結びつける辞書
+                let headerInstructionTable: [String: (String) -> ()] = [
+//                    "GENRE":     { value in self.music.genre     = value },
+//                    "TITLE":     { value in self.music.title     = value },
+//                    "ARTIST":    { value in self.music.artist    = value },
+                    "VIDEOID":   { value in if self.playMode == .YouTube  { self.music.videoID = value } },
+                    "VIDEOID2":  { value in if self.playMode == .YouTube2 { self.music.videoID = value } },
+                    "BPM":       { value in if let num = Double(value) { self.music.BPMs = [(num, 0.0)] } },
+//                    "PLAYLEVEL": { value in if let num = Int(value) { self.music.playLevel = num } },
+//                    "VOLWAV":    { value in if let num = Int(value) { self.music.volWav = num } },
+//                    "LANE":      { value in if let num = Int(value) { self.music.laneNum = num } }
+                ]
         //
         let headerEx = try! Regex("^#([A-Z][0-9A-Z]*)( .*)?$")   // ヘッダの行にマッチ
         let mainDataEx = try! Regex("^#([0-9]{3})([0-9]{2}):(([0-9A-Z]{2})+)$") // メインデータの小節長変更命令以外にマッチ
@@ -82,21 +82,20 @@ extension GameScene {   // bmsファイルを読み込む
         // BMS形式のテキストを1行ずつパース
         for bmsLine in bmsData {
             if let match = headerEx.firstMatch(bmsLine) {
-                //                let item = match.groups[0]!
-                //                let value = String(match.groups[1]?.dropFirst() ?? "")  // nilでなければ空白を取り除く
-                //                // ヘッダをパース
-                //                if let headerInstruction = headerInstructionTable[item] {   // 辞書に該当する命令がある場合
-                //                    headerInstruction(value)
-                //                } else if let bpmMatch = (try! Regex("^BPM([0-9A-F]{1,2})$")).firstMatch(item) {
-                //                    // BPM指定コマンドの時
-                //                    if let bpm = Double(value) {
-                //                       BPMTable[bpmMatch.groups[0]!] = bpm
-                //                    }
-                //                } else {
-                //                    print("未定義のヘッダ命令: \(item)")
-                //                }
+                                let item = match.groups[0]!
+                                let value = String(match.groups[1]?.dropFirst() ?? "")  // nilでなければ空白を取り除く
+                                // ヘッダをパース
+                                if let headerInstruction = headerInstructionTable[item] {   // 辞書に該当する命令がある場合
+                                    headerInstruction(value)
+                                } else if let bpmMatch = (try! Regex("^BPM([0-9A-F]{1,2})$")).firstMatch(item) {
+                                    // BPM指定コマンドの時
+                                    if let bpm = Double(value) {
+                                       BPMTable[bpmMatch.groups[0]!] = bpm
+                                    }
+                                } else {
+//                                    print("未定義のヘッダ命令: \(item)")
+                                }
                 
-                //                print("ヘッダは無視します")
                 
             } else if let match = mainDataEx.firstMatch(bmsLine) {
                 // メインデータ(小節長変更命令以外)をパース

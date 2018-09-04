@@ -14,6 +14,7 @@ class PickerKeyboard: UIControl {
     var textStore: String                   // 入力文字列を保存するためのプロパティ(MusicName.first!.rawValueとするとfirstがnilになる)
     var isFirstMovedFromTitleLabel = false  // 一番最初に選択されたラベルを強調するためのもの
     var selectedRow: Int
+    var headers: [Header] = []
     
     // PickerViewで'選択されたデータ'を表示する
     override func draw(_ rect: CGRect) {
@@ -25,12 +26,16 @@ class PickerKeyboard: UIControl {
         textStore.draw(in:rect, withAttributes: attrs)
     }
     
-    init(frame: CGRect, firstText: String) {
+    init(frame: CGRect, firstText: String, headers: [Header]) {
         
         textStore = firstText
         
         // ピッカーに初期値をセット(将来的にはファイル探索から)
-        self.musicNameArray = MusicName.getPickerArray()
+        for header in headers {
+            musicNameArray.append(header.title)
+        }
+        self.headers = headers
+        
         selectedRow = musicNameArray.index(of: textStore)!
         
         super.init(frame: frame)
@@ -41,7 +46,7 @@ class PickerKeyboard: UIControl {
     
     required init?(coder aDecoder: NSCoder) {
         
-        textStore = MusicName.first!.rawValue
+        textStore = ""
         selectedRow = 0
         super.init(coder: aDecoder)
         // viewのタッチジェスチャーを取る
@@ -152,9 +157,10 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
         for dataIndex in 0 ... musicNameArray.count-1 {
             if let label = pickerView.view(forRow: dataIndex, forComponent: component) as? UILabel {
                 
-                if dataIndex == row    { setSelectedLabelColor   (label: label) }
-                else if dataIndex <= 7 { setBackLabelNormalColor (label: label) }
-                else                   { setBackLabelRedColor    (label: label) }
+                if dataIndex == row                          { setSelectedLabelColor    (label: label) }
+                else if headers[dataIndex].group == "BDGP"   { setBackLabelPinkColor    (label: label) }
+                else if headers[dataIndex].group == "MLTD"   { setBackLabelRedColor     (label: label) }
+                else                                         { setBackLabelNormalColor  (label: label) }
             }
         }
         setNeedsDisplay()
@@ -175,9 +181,14 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
             label.textAlignment = .center
             label.font = UIFont.systemFont(ofSize: fontSize)
             label.frame = CGRect(x: label.frame.minX, y: label.frame.minY, width: label.frame.width, height: pickerView.frame.height/4)
-            if row > 7 {
-                label.textColor = UIColor.red
-            }
+            
+            
+            if headers[row].group == "BDGP"        { setBackLabelPinkColor    (label: label) }
+            else if headers[row].group == "MLTD"   { setBackLabelRedColor     (label: label) }
+            else                                   { setBackLabelNormalColor  (label: label) }
+//            if row > 7 {
+//                label.textColor = UIColor.red
+//            }
             
             if row == 0 && !isFirstMovedFromTitleLabel {
                 setSelectedLabelColor(label: label)
@@ -197,6 +208,10 @@ extension PickerKeyboard: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     func setBackLabelRedColor(label: UILabel) {
         label.textColor = UIColor.red
+        label.backgroundColor = UIColor.clear
+    }
+    func setBackLabelPinkColor(label: UILabel) {
+        label.textColor = UIColor.init(red: 1.0, green: 0.25, blue: 1.0, alpha: 1.0)
         label.backgroundColor = UIColor.clear
     }
 }

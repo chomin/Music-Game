@@ -1,12 +1,20 @@
 PODS:
+  - Realm (3.7.6):
+    - Realm/Headers (= 3.7.6)
+  - Realm/Headers (3.7.6)
+  - RealmSwift (3.7.6):
+    - Realm (= 3.7.6)
   - youtube-ios-player-helper (0.1.6)
 
 DEPENDENCIES:
+  - RealmSwift
   - youtube-ios-player-helper (~> 0.1)
 
 SPEC CHECKSUMS:
+  Realm: 9eaecad54712d6246d08ba34c10f354e4715d7d3
+  RealmSwift: 1fe08b4ebaeeaacf17f9ba0343f7b25c9fc31fa6
   youtube-ios-player-helper: 21ab92db027c7ff86cb17a3843a3f6eafc8158d2
 
-PODFILE CHECKSUM: 896c2abda9845cd27effa80992d1c028975e2943
+PODFILE CHECKSUM: 875cb42dbd8c3fc2adeffe7767acb611abdb1d5e
 
 COCOAPODS: 1.4.0

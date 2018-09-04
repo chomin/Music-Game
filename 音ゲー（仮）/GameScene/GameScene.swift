@@ -110,7 +110,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.playMode = setting.playMode
         self.isAutoPlay = setting.isAutoPlay
         self.setting = setting
-        self.music = Music(header: header)
+        self.music = Music(header: header, BPMs: [], videoID: "")
         
         super.init(size: size)
     }
@@ -129,7 +129,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // notesにノーツの"　始　点　"を入れる
         do {
-            try parse(fileName: music.musicName.rawValue + ".bms")
+            try parse(fileName: music.bmsNameWithExtension)
         }
         catch FileError.invalidName     (let msg) { print(msg) }
         catch FileError.notFound        (let msg) { print(msg) }
@@ -158,7 +158,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         switch playMode {
         case .BGM:
             // サウンドファイルのパスを生成
-            let Path = Bundle.main.path(forResource: "Sounds/" + music.musicName.rawValue, ofType: "mp3")!     // m4a,oggは不可
+            let Path = Bundle.main.path(forResource: "Sounds/" + music.title, ofType: "mp3")!     // m4a,oggは不可
             let soundURL = URL(fileURLWithPath: Path)
             // AVAudioPlayerのインスタンスを作成
             do {

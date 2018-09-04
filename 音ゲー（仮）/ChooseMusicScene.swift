@@ -8,6 +8,7 @@
 
 import SpriteKit
 import GameplayKit
+import RealmSwift
 
 class ChooseMusicScene: SKScene {
     
@@ -130,25 +131,79 @@ class ChooseMusicScene: SKScene {
         
         backgroundColor = .white
         
+        // Headerについて、ファイル探索→db更新→読み込み
+        do {
+            let fileNamesWithExtension = try FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath + "/Sounds").filter({$0.contains(".bms")})
+            
+            let realm = try Realm()
+            
+//            try! realm.write {
+//                realm.deleteAll()
+//            }
+
+            let results = realm.objects(Header.self)
+            
+//            print(results)
+            
+            // fileに対応するdbが存在するか確認
+            for fileName in fileNamesWithExtension {
+                
+                let filePath = Bundle.main.path(forAuxiliaryExecutable: "Sounds/" + fileName)!
+                
+                if let resultIndex = results.index(where: {$0.bmsNameWithExtension == fileName}) { // ファイルに対応するdb発見
+                    
+                    let DBHeader = results[resultIndex]
+                    let attr = try FileManager.default.attributesOfItem(atPath: filePath)
+                    let date = attr[FileAttributeKey.modificationDate] as! Date
+                    let formatter = DateFormatter()
+                    formatter.dateStyle = .full // longかmediumでもいいかも
+                    formatter.timeStyle = .full
+                    formatter.locale = Locale(identifier: "ja_JP")
+                    
+                    if formatter.string(from: date) != results[resultIndex].lastUpdateDate {                                                                    // 更新日が異なればdbを更新
+                        try! realm.write {   // (取り出されたものはmanaged objectなので。。。)
+                            try DBHeader.setPropaties(fileName: fileName)                           // ファイルの更新日時が異なればdbを更新
+                            print(fileName + "のDBを更新しました")
+                        }
+                    }
+                    headers.append(DBHeader)
+                    
+                } else {
+                    try headers.append(Header(fileName: fileName))                                  // ファイルから新たなdbを作成&保存
+                    print(fileName + "を追加しました")
+                }
+            }
+            
+        } catch {
+            print(error)
+            print("エラー終了")
+            exit(1)
+        }
+        
+        // ソート
+        headers.sort(by: {
+            
+            if ($0.group == $1.group) { return $0.playLevel < $1.playLevel }
+            
+            return $0.group < $1.group
+            
+        })
+//        print(headers)
+        
         // ピッカーキーボードの設置
+//        var musicNameArray: [String] = []   // ピッカーに表示する曲名
+//        for header in headers {
+//            musicNameArray.append(header.title)
+//        }
+        
         let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
-        picker = PickerKeyboard(frame: rect, firstText: setting.musicName.rawValue)
+        picker = PickerKeyboard(frame: rect, firstText: setting.musicName, headers: headers)
         picker.backgroundColor = .gray
         picker.isHidden = false
         picker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)
         
         self.view?.addSubview(picker!)
         
-        // 将来的にはファイル探索から
-        for fileMusicName in MusicName.allValues {
-            do {
-                try headers.append(Header(fileName: fileMusicName.rawValue + ".bms"))
-            } catch {
-                print(error.localizedDescription + "@" + fileMusicName.rawValue)
-                print(error)
-                exit(1)
-            }
-        }
         
         /*--------- ボタンなどの設定 ---------*/
         // 初期画面のボタン
@@ -244,7 +299,7 @@ class ChooseMusicScene: SKScene {
         difficultyLabel = {() -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = self.frame.height/7
+            Label.fontSize = self.frame.height/10
             Label.horizontalAlignmentMode = .center
             Label.position = CGPoint(x: self.frame.width/2, y: self.frame.height/2 + Label.fontSize*2)
             Label.fontColor = SKColor.green
@@ -476,7 +531,7 @@ class ChooseMusicScene: SKScene {
     
     @objc func onClickPlayButton(_ sender : UIButton) {
         
-        setting.musicName = MusicName(rawValue: picker.textStore)!
+        setting.musicName = picker.textStore
         setting.save()
         
         // 移動
@@ -618,6 +673,6 @@ class ChooseMusicScene: SKScene {
     
     // picker
     @objc func pickerChanged(_ sender: PickerKeyboard){
-        setting.musicName = MusicName(rawValue: sender.textStore)!
+        setting.musicName = sender.textStore
     }
 }

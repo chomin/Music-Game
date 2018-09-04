@@ -10,64 +10,64 @@ import UIKit
 
 /// rawvalueが音楽ファイル名に対応する列挙型
 /// 新曲を追加する際はここに曲名を追加する。(将来的にはファイル探索から)
-enum MusicName: String, EnumCollection {
-    
-    case yo_kosoJapariParkHe    = "ようこそジャパリパークへ"
-    case oracion                = "オラシオン"
-    case thisGame               = "This game"
-    case sakuraSkip             = "SAKURAスキップ"
-    case zankokuNaTenshiNoThese = "残酷な天使のテーゼ"
-    case nimenseiUraomoteLife   = "にめんせい☆ウラオモテライフ！"
-    case buonAppetitoS          = "ぼなぺてぃーと♡S"
-    case level5                 = "LEVEL5-Judgelight-"
-    
-    /*--------ミリシタ楽曲---------*/
-    case ready                  = "READY!!"
-    case jibunRestart           = "自分REST@RT"
-    case thankYou               = "Thank You!"
-    case welcome                = "Welcome!!"
-    case brandNewTheater        = "Brand New Theater!"
-    
-    case shootingStars          = "Shooting Stars"
-    case twinkleRhythm          = "ZETTAI × BREAK!! トゥインクルリズム"
-    case growingStorm           = "Growing Storm!"
-    case utaMas                 = "THE IDOLM@STER"
-    case marionettesNeverSleep  = "Marionetteは眠らない"
-    case machiukePrince         = "待ち受けプリンス"
-    case princessBeAmbitious    = "Princess Be Ambitious!!"
-    case angelicParade          = "Angelic Parade♪"
-    case fairyTaleJairarenai    = "FairyTaleじゃいられない"
-    case union                  = "UNION!!"
-    
-    /*--------バンドリ楽曲---------*/
-    case thisGameEx             = "This game(expert)"
-    case dreamParade            = "ドリームパレード(expert)"
-    case seikaihahitotujanai    = "正解はひとつ！じゃない！！(expert)"
-    case believeInMyExistence   = "Believe in my existence(expert)"
-    case redo                   = "Redo(expert)"
-    case kimijanakyadamemitai   = "君じゃなきゃダメみたい(expert)"
-    case rokuchonen             = "六兆年と一夜物語(expert)"
-    case heyDay                 = "Hey-day狂想曲(カプリチオ)(expert)"
-    case gogoManiac             = "GO!GO!MANIAC(expert)"
-    case dontSayLazy            = "Don't say \"lazy\"(expert)"
-    case dontSayLazySp          = "Don't say \"lazy\"(special)"
-    case teardrops              = "ティアドロップス(expert)"
-    case kirakiraDatoka         = "キラキラだとか夢だとか~Sing Girls~(expert)"
-    case godKnows               = "God knows…(expert)"
-    case shugabita              = "シュガーソングとビターステップ(expert)"
-    case pikopapi               = "ピコっと！パピっと！ガルパ☆ピコ！！！(expert)"
-    
-    
-    static func getPickerArray() -> [String] {
-        
-        var pickerArray: [String] = []
-        
-        for musicName in MusicName.allValues {
-            pickerArray.append(musicName.rawValue)
-        }
-        return pickerArray
-    }
-}
+//enum MusicName: String, EnumCollection {
+//    
+//    case yo_kosoJapariParkHe    = "ようこそジャパリパークへ"
+//    case oracion                = "オラシオン"
+//    case thisGame               = "This game"
+//    case sakuraSkip             = "SAKURAスキップ"
+//    case zankokuNaTenshiNoThese = "残酷な天使のテーゼ"
+//    case nimenseiUraomoteLife   = "にめんせい☆ウラオモテライフ！"
+//    case buonAppetitoS          = "ぼなぺてぃーと♡S"
+//    case level5                 = "LEVEL5-Judgelight-"
+//
+//    /*--------ミリシタ楽曲---------*/
+//    case ready                  = "READY!!"
+//    case jibunRestart           = "自分REST@RT"
+//    case thankYou               = "Thank You!"
+//    case welcome                = "Welcome!!"
+//    case brandNewTheater        = "Brand New Theater!"
+//
+//    case shootingStars          = "Shooting Stars"
+//    case twinkleRhythm          = "ZETTAI × BREAK!! トゥインクルリズム"
+//    case growingStorm           = "Growing Storm!"
+//    case utaMas                 = "THE IDOLM@STER"
+//    case marionettesNeverSleep  = "Marionetteは眠らない"
+//    case machiukePrince         = "待ち受けプリンス"
+//    case princessBeAmbitious    = "Princess Be Ambitious!!"
+//    case angelicParade          = "Angelic Parade♪"
+//    case fairyTaleJairarenai    = "FairyTaleじゃいられない"
+//    case union                  = "UNION!!"
+//
+//    /*--------バンドリ楽曲---------*/
+//    case thisGameEx             = "This game(expert)"
+//    case dreamParade            = "ドリームパレード(expert)"
+//    case seikaihahitotujanai    = "正解はひとつ！じゃない！！(expert)"
+//    case believeInMyExistence   = "Believe in my existence(expert)"
+//    case redo                   = "Redo(expert)"
+//    case kimijanakyadamemitai   = "君じゃなきゃダメみたい(expert)"
+//    case rokuchonen             = "六兆年と一夜物語(expert)"
+//    case heyDay                 = "Hey-day狂想曲(カプリチオ)(expert)"
+//    case gogoManiac             = "GO!GO!MANIAC(expert)"
+//    case dontSayLazy            = "Don't say \"lazy\"(expert)"
+//    case dontSayLazySp          = "Don't say \"lazy\"(special)"
+//    case teardrops              = "ティアドロップス(expert)"
+//    case kirakiraDatoka         = "キラキラだとか夢だとか~Sing Girls~(expert)"
+//    case godKnows               = "God knows…(expert)"
+//    case shugabita              = "シュガーソングとビターステップ(expert)"
+//    case pikopapi               = "ピコっと！パピっと！ガルパ☆ピコ！！！(expert)"
+//
+//
+//    static func getPickerArray() -> [String] {
+//
+//        var pickerArray: [String] = []
+//
+//        for musicName in MusicName.allValues {
+//            pickerArray.append(musicName.rawValue)
+//        }
+//        return pickerArray
+//    }
+//}
 
 /// rawvalueがYouTubeのvideoIDに対応する列挙型
 /// YouTubeを追加する際は MusicName.getPickerArray()のif分岐 への追加も忘れないように
