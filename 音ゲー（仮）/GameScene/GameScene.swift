@@ -89,7 +89,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var sameLines: [SameLine] = []  // 連動する始点側のノーツと同時押しライン
     
     // 楽曲データ
-    var music: Music
+    let music: Music
     var notes: [Note] = []      // ノーツの" 始 点 "の集合。
     var musicStartPos = 1.0     // BGM開始の"拍"！
     var BPMs: [(bpm: Double, startPos: Double)] {
@@ -110,7 +110,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.playMode = setting.playMode
         self.isAutoPlay = setting.isAutoPlay
         self.setting = setting
-        self.music = Music(header: header, BPMs: [], videoID: "")
+        self.music = Music(header: header)
         
         super.init(size: size)
     }

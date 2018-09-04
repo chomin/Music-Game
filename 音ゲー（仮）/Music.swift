@@ -10,9 +10,9 @@ import Foundation
 import RealmSwift
 
 /// bmsファイルから読み込まれた音楽情報をまとめたentity。ヘッダ情報とメイン情報を持つ。
-struct Music {
+class Music {
     
-    var header: Header
+    private let header: Header
     var BPMs: [(bpm: Double, startPos: Double)] = []
     var videoID: String = ""    // YouTubeのvideoID
     
@@ -24,9 +24,9 @@ struct Music {
     var playLevel: Int    { return header.playLevel }   // 難易度
     var volWav:    Int    { return header.volWav    }   // 音量を現段階のn%として出力するか(TODO: 未実装)
     var bmsNameWithExtension: String { return header.bmsNameWithExtension }
-//    var BPMs: List<BPMInfo>{        // 可変BPM情報(headerだけでなくmain情報にも記述されるのでget onlyにしない)
-//        get { return header.BPMs }
-//        set { header.BPMs = newValue }
-//    }
-//    var musicName: String { return title }       // 曲名
+
+    init(header: Header) {
+        self.header = header
+        // BMSファイルのメインデータをパース
+    }
 }

@@ -76,9 +76,9 @@ class Header: Object {
     func setPropaties(fileName: String) throws {
         
         // 譜面データファイルを一行ごとに配列で保持
-        let bmsData = try Header.readBMS(fileName: fileName)
-        self.lastUpdateDate = bmsData.date
-        self.bmsNameWithExtension = bmsData.fileNameWithExtension
+        let bmsFile = try readBMS(fileName: fileName)
+        self.lastUpdateDate = bmsFile.date
+        self.bmsNameWithExtension = bmsFile.fileNameWithExtension
         
         // 譜面データファイルのメインデータ
         var mainData: [(bar: Int, channel: Int, body: [String])] = []
@@ -104,7 +104,7 @@ class Header: Object {
         let barLengthEx = try! Regex("^#([0-9]{3})02:(([1-9]\\d*|0)(\\.\\d+)?)$") // メインデータの小節長変更命令にマッチ
         
         // BMS形式のテキストを1行ずつパース
-        for bmsLine in bmsData.contents {
+        for bmsLine in bmsFile.contents {
             if let match = headerEx.firstMatch(bmsLine) {
                 let item = match.groups[0]!
                 let value = String(match.groups[1]?.dropFirst() ?? "")  // nilでなければ空白を取り除く
@@ -157,15 +157,10 @@ class Header: Object {
     /// - Parameter fileName: ファイル名(拡張子不問)
     /// - Returns: 行ごとに分割されたファイルの内容, ファイルの更新日時
     /// - Throws: エラー
-    private static func readBMS(fileName: String) throws -> (contents: [String], date: String, fileNameWithExtension: String) {
+    private func readBMS(fileName: String) throws -> (contents: [String], date: String, fileNameWithExtension: String) {
         
-        let fileNameWithEntension = { () -> String in
-            if fileName.contains(".") {
-                return fileName
-            } else {
-                return fileName + ".bms"
-            }
-        }()
+        let fileNameWithEntension = fileName.contains(".") ? fileName : "\(fileName).bms"
+
         // ファイル名を名前と拡張子に分割
         let splittedName = fileNameWithEntension.components(separatedBy: ".")
         let dataFileName = splittedName[0]
@@ -186,7 +181,6 @@ class Header: Object {
                 
                 return (content.components(separatedBy: .newlines), formatter.string(from: date), fileNameWithEntension)
             } catch {
-                
                 throw FileError.readFailed("ファイルの内容取得に失敗(pathが不正、あるいはファイルのエンコードがutf8ではありません)")
             }
         } else {
