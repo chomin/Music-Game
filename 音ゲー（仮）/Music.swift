@@ -164,7 +164,7 @@ class Music {
         }
 
         /// Noteオブジェクトを生成。ロングノーツは始点から再帰的に生成
-        func generate(_ rawNote: RawNote) -> Note {
+        func generate(_ rawNote: RawNote, _ color: UIColor = UIColor.green) -> Note {
             var note = Note()
             let bpm = BPMs.filter { $0.startPos <= rawNote.beat } .last!.bpm   // このノーツが判定線に乗った時のBPM
             let speed = CGFloat(1350 * rawNote.speedRatio * setting.speedRatio * bpm / majorBPM)
@@ -182,21 +182,14 @@ class Music {
             // 後続ノーツを再帰的に生成
             if let tapStart = note as? TapStart {
                 if let next = rawNote.next {
-                    tapStart.next = generate(next)  // 再帰
-                    // ガイド円の色を設定
-                    if let middle = tapStart.next as? Middle {
-                        middle.longImages.circle.fillColor = tapStart.isLarge ? UIColor.yellow : UIColor.green
-                    }
+                    tapStart.next = generate(next, tapStart.longImages.circle.fillColor)  // 再帰
                 } else {
                     print("tapStartタイプのrawNoteにnextが設定されていません。")
                 }
             } else if let middle = note as? Middle {
                 if let next = rawNote.next {
-                    middle.next = generate(next)    // 再帰
-                    // ガイド円の色を設定
-                    if let middle2 = middle.next as? Middle {
-                        middle2.longImages.circle.fillColor = middle.longImages.circle.fillColor
-                    }
+                    middle.longImages.circle.fillColor = color      // ガイド円の色を設定
+                    middle.next = generate(next, middle.longImages.circle.fillColor)    // 再帰
                 } else {
                     print("middleタイプのrawNoteにnextが設定されていません。")
                 }
