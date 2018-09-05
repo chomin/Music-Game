@@ -96,7 +96,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     private var startTime: TimeInterval = 0.0       // 譜面再生開始時刻
-    var duration: TimeInterval?                     // 譜面再生時間
     var passedTime: TimeInterval = 0.0              // 経過時間
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     var lanes: [Lane] = []      // レーン
@@ -452,7 +451,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // 終了時刻が指定されていればその時刻でシーン移動
-        if duration != nil && passedTime > duration! {
+        if music.duration != nil && passedTime > music.duration! {
             BGM = nil
             moveToResultScene()
         }
