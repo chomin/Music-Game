@@ -54,7 +54,7 @@ class Music {
     // パースエラー定義列挙型
     enum ParseError: Error {
         case lackOfData(String)
-        case lackOfVideoID(String)
+//        case lackOfVideoID(String)
         case invalidValue(String)
         case noLongNoteStart(String)
         case noLongNoteEnd(String)
@@ -100,12 +100,12 @@ class Music {
         catch ParseError.noLongNoteStart(let msg) { print(msg) }
         catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
         catch ParseError.unexpected     (let msg) { print(msg) }
-        catch ParseError.lackOfVideoID  (let msg) {
-            print(msg)
+//        catch Music.ParseError.lackOfVideoID(let msg) {
+//            print(msg)
 //            reloadSceneAsBGMMode()
-            return
-        }
-        catch                                     { print("未知のエラー") }
+//            return
+//        }
+        catch { print("未知のエラー") }
     }
 
 
@@ -281,9 +281,9 @@ class Music {
             }
         }
 
-        if (playMode == .YouTube || playMode == .YouTube2) && videoID == "" {
-            throw ParseError.lackOfVideoID("ファイル内にvideoIDが見つかりませんでした。BGMモードで実行します。")
-        }
+//        if (playMode == .YouTube || playMode == .YouTube2) && videoID == "" {
+//            throw ParseError.lackOfVideoID("ファイル内にvideoIDが見つかりませんでした。BGMモードで実行します。")
+//        }
 
 
         /*--- メインデータからノーツの中間表現を生成 ---*/

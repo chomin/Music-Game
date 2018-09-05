@@ -17,7 +17,7 @@ class Header: Object {
         case notFound(String)
         case readFailed(String)
     }
-    
+
     
     @objc dynamic var bmsNameWithExtension = ""
     @objc dynamic var lastUpdateDate = ""
@@ -88,7 +88,6 @@ class Header: Object {
                     headerInstruction(value)
                 }
             } else if mainDataEx.matches(bmsLine) {
-                print(bmsLine)
                 break       // メインデータの部分に入れば終了
             }
         }
