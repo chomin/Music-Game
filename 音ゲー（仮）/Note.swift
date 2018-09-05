@@ -15,10 +15,10 @@ class Tap: Note {
     let isLarge: Bool                   // 大ノーツかどうか
     let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(rawNote: RawNote, speed: CGFloat, appearTime: TimeInterval) {
-        self.isLarge = rawNote.isLarge
+    init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
+        self.isLarge = noteMaterial.isLarge
         self.appearTime = appearTime
-        super.init(beatPos: rawNote.beat, laneIndex: rawNote.laneIndex, speed: speed)
+        super.init(beatPos: noteMaterial.beat, laneIndex: noteMaterial.laneIndex, speed: speed)
 
         // imageのインスタンス(白円or黄円)を作成
         self.image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
@@ -63,9 +63,9 @@ class Flick: Note {
     
     let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(rawNote: RawNote, speed: CGFloat, appearTime: TimeInterval) {
+    init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
         self.appearTime = appearTime
-        super.init(beatPos: rawNote.beat, laneIndex: rawNote.laneIndex, speed: speed)
+        super.init(beatPos: noteMaterial.beat, laneIndex: noteMaterial.laneIndex, speed: speed)
 
         // imageのインスタンス(マゼンタ三角形)を作成
         let length = Note.initialSize / 2   // 三角形一辺の長さの半分
@@ -118,10 +118,10 @@ class TapStart: Note {
     let isLarge: Bool                                               // 大ノーツかどうか
     let appearTime: TimeInterval                                // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(rawNote: RawNote, speed: CGFloat, appearTime: TimeInterval) {
-        self.isLarge = rawNote.isLarge
+    init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
+        self.isLarge = noteMaterial.isLarge
         self.appearTime = appearTime
-        super.init(beatPos: rawNote.beat, laneIndex: rawNote.laneIndex, speed: speed)
+        super.init(beatPos: noteMaterial.beat, laneIndex: noteMaterial.laneIndex, speed: speed)
 
         // imageのインスタンス(緑円or黄円)を作成
         image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
@@ -273,9 +273,9 @@ class Middle: Note {
         }
     }
     
-    init(rawNote: RawNote, speed: CGFloat, appearTime: TimeInterval) {
+    init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
         self.appearTime = appearTime
-        super.init(beatPos: rawNote.beat, laneIndex: rawNote.laneIndex, speed: speed)
+        super.init(beatPos: noteMaterial.beat, laneIndex: noteMaterial.laneIndex, speed: speed)
 
         self.isJudgeable = false
         
@@ -416,9 +416,9 @@ class TapEnd: Note {
 //    unowned var start = Note()  // 循環参照防止の為unowned参照にする
     let isLarge: Bool           // 大ノーツかどうか
     
-    init(rawNote: RawNote, speed: CGFloat) {
-        self.isLarge = rawNote.isLarge
-        super.init(beatPos: rawNote.beat, laneIndex: rawNote.laneIndex, speed: speed)
+    init(noteMaterial: NoteMaterial, speed: CGFloat) {
+        self.isLarge = noteMaterial.isLarge
+        super.init(beatPos: noteMaterial.beat, laneIndex: noteMaterial.laneIndex, speed: speed)
 
         self.isJudgeable = false
         
@@ -463,8 +463,8 @@ class FlickEnd: Note {
     
 //    unowned var start = Note()
 
-    init(rawNote: RawNote, speed: CGFloat) {
-        super.init(beatPos: rawNote.beat, laneIndex: rawNote.laneIndex, speed: speed)
+    init(noteMaterial: NoteMaterial, speed: CGFloat) {
+        super.init(beatPos: noteMaterial.beat, laneIndex: noteMaterial.laneIndex, speed: speed)
         
         self.isJudgeable = false
         
@@ -529,7 +529,6 @@ class Note {
     static var BPMs: [(bpm: Double, startPos: Double)] = [] // GameSceneのBPMsと同じもの
     fileprivate static let longScale: CGFloat = 0.8         // ノーツの幅に対するlongの幅の倍率
     fileprivate static let initialSize = CGFloat(100)       // ノーツの初期サイズ。ノーツ大きさはscaleで調節するのでどんな値でもよい
-//    private static var majorBPM: Double = 0.0               // 楽曲の基本BPM。BPM配列の中から最も持続時間が長いもの。
 
 
     /// Noteのイニシャライザ
@@ -553,75 +552,6 @@ class Note {
         self.image.removeFromParent()
     }
     
-//    /// クラスプロパティとappearTimeを設定.必ずパース後に実行すること.
-//    static func initialize(_ duration: TimeInterval, _ notes: [Note], _ music: Music, _ setting: Setting) {
-//
-//        guard !music.BPMs.isEmpty else {
-//            print("空のBPM配列")
-//            return
-//        }
-//
-//        var BPMIntervals: [(bpm: Double, interval: TimeInterval)] = []
-//        var timeSum: TimeInterval = 0
-//        var i = 0
-//        while true {
-//            if i + 1 < music.BPMs.count {
-//                let interval = TimeInterval((music.BPMs[i + 1].startPos - music.BPMs[i].startPos) / (music.BPMs[i].bpm/60))
-//                BPMIntervals.append((music.BPMs[i].bpm, interval))
-//                timeSum += interval
-//            } else {
-//                let interval = duration - timeSum
-//                BPMIntervals.append((music.BPMs[i].bpm, interval))
-//                break
-//            }
-//            i += 1
-//        }
-//        Note.majorBPM = BPMIntervals.max { $0.interval < $1.interval }!.bpm
-//        Note.BPMs = music.BPMs
-//
-//        if !setting.isFitSizeToLane {
-//            Note.scale = CGFloat(setting.scaleRatio/7*Double(music.laneNum))
-//        } else {
-//            Note.scale = CGFloat(setting.scaleRatio)
-//        }
-//
-//        // appearTimeの設定(end系以外)
-//        for note in notes {
-//            switch note {
-//            case is Tap:
-//                let tap = note as! Tap
-//                tap.appearTime = getAppearTime(note)
-//            case is Flick:
-//                let flick = note as! Flick
-//                flick.appearTime = getAppearTime(note)
-//            case is TapStart:
-//                let tapStart = note as! TapStart
-//                tapStart.appearTime = getAppearTime(note)
-//            case is Middle:
-//                let middle = note as! Middle
-//                middle.appearTime = getAppearTime(note)
-//            default:
-//                break
-//            }
-//        }
-//    }
-
-//    /// ノーツが画面上に現れる時刻を返す(updateするかの判定に使用)
-//    fileprivate func getAppearTime() -> TimeInterval {
-//
-//        var judgeTime: TimeInterval = 0.0   // 判定線上に乗る時刻
-//        var i = 0
-//        while i + 1 < Note.BPMs.count && Note.BPMs[i + 1].startPos < beat {
-//            judgeTime += (Note.BPMs[i + 1].startPos - Note.BPMs[i].startPos) / (Note.BPMs[i].bpm/60)
-//
-//            i += 1
-//        }
-//        judgeTime += (beat - Note.BPMs[i].startPos) / (Note.BPMs[i].bpm/60)
-//
-//        let appearTime = judgeTime - TimeInterval(Dimensions.laneLength / speed)   // judgeTime - レーン端から端までかかる時間
-//
-//        return appearTime
-//    }
 
     /// ノーツの表示状態の更新、毎フレーム呼ばれる
     /// 各派生クラスでオーバーライドされる

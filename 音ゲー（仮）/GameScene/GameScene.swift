@@ -133,27 +133,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         self.view?.isMultipleTouchEnabled = true    // 恐らくデフォルトではfalseになってる
         self.view?.superview?.isMultipleTouchEnabled = true
-        
-//        // notesにノーツの"　始　点　"を入れる
-//        do {
-//            try parse(fileName: music.bmsNameWithExtension)
-//        }
-//        catch FileError.invalidName     (let msg) { print(msg) }
-//        catch FileError.notFound        (let msg) { print(msg) }
-//        catch FileError.readFailed      (let msg) { print(msg) }
-//        catch ParseError.lackOfData     (let msg) { print(msg) }
-//        catch ParseError.invalidValue   (let msg) { print(msg) }
-//        catch ParseError.noLongNoteStart(let msg) { print(msg) }
-//        catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
-//        catch ParseError.unexpected     (let msg) { print(msg) }
-//        catch ParseError.lackOfVideoID  (let msg) {
-//            print(msg)
-//            reloadSceneAsBGMMode()
-//            return
-//        }
-//        catch                                     { print("未知のエラー") }
 
-        // 寸法に関するレーン数依存の定数をセット(必ずパース後に実行(laneNumを読み込むため))
+        // 寸法に関するレーン数依存の定数をセット
         Dimensions.updateInstance(laneNum: music.laneNum)
         
         // Laneインスタンスを作成
@@ -161,7 +142,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             self.lanes.append(Lane(laneIndex: i))
         }
         
-        // BGMまたはYouTubeのプレイヤーを作成(必ずパース後に実行する。(videoIDを読み込むため))
+        // BGMまたはYouTubeのプレイヤーを作成
         switch playMode {
         case .BGM:
             // サウンドファイルのパスを生成
@@ -189,7 +170,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             }
         }
         
-        // Noteクラスのクラスプロパティを設定(必ずパース後にすること)
+        // Noteクラスのクラスプロパティを設定
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration      // BGMまたは映像の長さ
         self.notes = music.generateNotes(setting: setting, duration: duration)      // ノーツ生成
         

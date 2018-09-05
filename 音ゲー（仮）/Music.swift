@@ -23,13 +23,13 @@ enum NoteType {
 }
 
 /// BMSのメインデータから得られるノーツ情報。このオブジェクトから最終的にノーツを生成する
-class RawNote {         // 【いい名前募集中】
+class NoteMaterial {
     let type: NoteType
     let beat: Double
     let laneIndex: Int
     let speedRatio: Double
     let isLarge: Bool
-    fileprivate(set) var next: RawNote?
+    fileprivate(set) var next: NoteMaterial?
 
     init(type: NoteType, beatPos beat: Double, laneIndex: Int, speedRatio: Double, isLarge: Bool = false) {
         self.type = type
@@ -61,16 +61,16 @@ class Music {
         case unexpected(String)
 
         /// 渡されたnoteのbeatが何小節目何拍目かを返す
-        static func getBeat(of rnote: RawNote) -> String {
-            let bar = Int(rnote.beat / 4.0)
-            let restBeat = rnote.beat - Double(bar * 4)
+        static func getBeat(of nmat: NoteMaterial) -> String {
+            let bar = Int(nmat.beat / 4.0)
+            let restBeat = nmat.beat - Double(bar * 4)
             return "\(bar)小節\(restBeat)拍目"
         }
     }
 
 
     private let header: Header                          // 楽曲のメタデータ
-    private var rawNotes: [RawNote] = []                // ノーツの中間表現。BMSの譜面部分と1対1に対応
+    private var noteMaterials: [NoteMaterial] = []      // ノーツの中間表現。BMSの譜面部分と1対1に対応
     var BPMs: [(bpm: Double, startPos: Double)] = []    // 楽曲中のBPMをその開始地点(拍)とともに格納
     var videoID: String = ""                            // YouTubeのvideoID
     var musicStartPos: Double = 0                       // BGM開始の拍
@@ -164,46 +164,40 @@ class Music {
         }
 
         /// Noteオブジェクトを生成。ロングノーツは始点から再帰的に生成
-        func generate(_ rawNote: RawNote, _ color: UIColor = UIColor.green) -> Note {
+        func generate(_ noteMaterial: NoteMaterial, _ color: UIColor = UIColor.green) -> Note {
             var note = Note()
-            let bpm = BPMs.filter { $0.startPos <= rawNote.beat } .last!.bpm   // このノーツが判定線に乗った時のBPM
-            let speed = CGFloat(1350 * rawNote.speedRatio * setting.speedRatio * bpm / majorBPM)
+            let bpm = BPMs.filter { $0.startPos <= noteMaterial.beat } .last!.bpm   // このノーツが判定線に乗った時のBPM
+            let speed = CGFloat(1350 * noteMaterial.speedRatio * setting.speedRatio * bpm / majorBPM)
             autoreleasepool {
-                switch rawNote.type {
-                case .tap:      note = Tap     (rawNote: rawNote, speed: speed, appearTime: getAppearTime(rawNote.beat, speed))
-                case .flick:    note = Flick   (rawNote: rawNote, speed: speed, appearTime: getAppearTime(rawNote.beat, speed))
-                case .tapStart: note = TapStart(rawNote: rawNote, speed: speed, appearTime: getAppearTime(rawNote.beat, speed))
-                case .middle:   note = Middle  (rawNote: rawNote, speed: speed, appearTime: getAppearTime(rawNote.beat, speed))
-                case .tapEnd:   note = TapEnd  (rawNote: rawNote, speed: speed)
-                case .flickEnd: note = FlickEnd(rawNote: rawNote, speed: speed)
+                switch noteMaterial.type {
+                case .tap:      note = Tap     (noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed))
+                case .flick:    note = Flick   (noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed))
+                case .tapStart: note = TapStart(noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed))
+                case .middle:   note = Middle  (noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed))
+                case .tapEnd:   note = TapEnd  (noteMaterial: noteMaterial, speed: speed)
+                case .flickEnd: note = FlickEnd(noteMaterial: noteMaterial, speed: speed)
                 }
             }
 
             // 後続ノーツを再帰的に生成
             if let tapStart = note as? TapStart {
-                if let next = rawNote.next {
+                if let next = noteMaterial.next {
                     tapStart.next = generate(next, tapStart.longImages.circle.fillColor)  // 再帰
                 } else {
-                    print("tapStartタイプのrawNoteにnextが設定されていません。")
+                    print("tapStartタイプのnoteMaterialにnextが設定されていません。")
                 }
             } else if let middle = note as? Middle {
-                if let next = rawNote.next {
+                if let next = noteMaterial.next {
                     middle.longImages.circle.fillColor = color      // ガイド円の色を設定
                     middle.next = generate(next, middle.longImages.circle.fillColor)    // 再帰
                 } else {
-                    print("middleタイプのrawNoteにnextが設定されていません。")
+                    print("middleタイプのnoteMaterialにnextが設定されていません。")
                 }
             }
             return note
         }
 
-        var notes: [Note] = []
-
-        for rawNote in rawNotes {
-            notes.append(generate(rawNote))
-        }
-
-        return notes
+        return noteMaterials.map { generate($0) }
     }
 
     /// 渡されたファイルを読んで譜面データを作成
@@ -236,7 +230,7 @@ class Music {
         ]
 
         let headerEx = try! Regex("^#([A-Z][0-9A-Z]*)( .*)?$")   // ヘッダの行にマッチ
-        let mainDataEx = try! Regex("^#([0-9]{3})([0-9]{2}):(([0-9A-Z]{2})+)$") // メインデータの小節長変更命令以外にマッチ
+        let mainDataEx = try! Regex("^#([0-9]{3})([0-9]{2}):(([0-9A-Z]{2})+)$")   // メインデータの小節長変更命令以外にマッチ
         let barLengthEx = try! Regex("^#([0-9]{3})02:(([1-9]\\d*|0)(\\.\\d+)?)$") // メインデータの小節長変更命令にマッチ
 
         // BMS形式のテキストを1行ずつパース
@@ -332,8 +326,8 @@ class Music {
             }
         }
 
-        var longNotes1: [RawNote] = []         // ロングノーツ1を一時的に格納
-        var longNotes2: [RawNote] = []         // ロングノーツ2を一時的に格納
+        var longNotes1: [NoteMaterial] = []         // ロングノーツ1を一時的に格納
+        var longNotes2: [NoteMaterial] = []         // ロングノーツ2を一時的に格納
         var musicStartPosSet: [PlayMode : Double] = [:] // 各モードのmusicStartPosを一時的に格納
         var musicEndPos: Double?            // 楽曲終了タイミング(拍単位)
         var beatOffset = 0  // その小節の全オブジェクトに対する拍数の調整。4/4以外の拍子があった場合に上下する
@@ -389,37 +383,37 @@ class Music {
                         case .rest:
                             break
                         case .tap:
-                            rawNotes  .append(RawNote(type: .tap,      beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
+                            noteMaterials.append(NoteMaterial(type: .tap,      beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
                         case .flick:
-                            rawNotes  .append(RawNote(type: .flick,    beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                            noteMaterials.append(NoteMaterial(type: .flick,    beatPos: beat, laneIndex: lane, speedRatio: ratio))
                         case .start1:
-                            longNotes1.append(RawNote(type: .tapStart, beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
+                            longNotes1   .append(NoteMaterial(type: .tapStart, beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
                         case .middle1:
-                            longNotes1.append(RawNote(type: .middle,   beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                            longNotes1   .append(NoteMaterial(type: .middle,   beatPos: beat, laneIndex: lane, speedRatio: ratio))
                         case .end1:
-                            longNotes1.append(RawNote(type: .tapEnd,   beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
+                            longNotes1   .append(NoteMaterial(type: .tapEnd,   beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
                         case .flickEnd1:
-                            longNotes1.append(RawNote(type: .flickEnd, beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                            longNotes1   .append(NoteMaterial(type: .flickEnd, beatPos: beat, laneIndex: lane, speedRatio: ratio))
                         case .start2:
-                            longNotes2.append(RawNote(type: .tapStart, beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
+                            longNotes2   .append(NoteMaterial(type: .tapStart, beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
                         case .middle2:
-                            longNotes2.append(RawNote(type: .middle,   beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                            longNotes2   .append(NoteMaterial(type: .middle,   beatPos: beat, laneIndex: lane, speedRatio: ratio))
                         case .end2:
-                            longNotes2.append(RawNote(type: .tapEnd,   beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
+                            longNotes2   .append(NoteMaterial(type: .tapEnd,   beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
                         case .flickEnd2:
-                            longNotes2.append(RawNote(type: .flickEnd, beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                            longNotes2   .append(NoteMaterial(type: .flickEnd, beatPos: beat, laneIndex: lane, speedRatio: ratio))
                         case .tapL:
-                            rawNotes  .append(RawNote(type: .tap,      beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
+                            noteMaterials.append(NoteMaterial(type: .tap,      beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
                         case .start1L:
-                            longNotes1.append(RawNote(type: .tapStart, beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
+                            longNotes1   .append(NoteMaterial(type: .tapStart, beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
                         case .end1L:
-                            longNotes1.append(RawNote(type: .tapEnd,   beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
+                            longNotes1   .append(NoteMaterial(type: .tapEnd,   beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
                         case .start2L:
-                            longNotes2.append(RawNote(type: .tapStart, beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
+                            longNotes2   .append(NoteMaterial(type: .tapStart, beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
                         case .end2L:
-                            longNotes2.append(RawNote(type: .tapEnd,   beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
+                            longNotes2   .append(NoteMaterial(type: .tapEnd,   beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
                         case .tapLL:
-                            rawNotes  .append(RawNote(type: .tap,      beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
+                            noteMaterials.append(NoteMaterial(type: .tap,      beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
                         }
                     }
                 } else if channel == 1 {
@@ -461,8 +455,8 @@ class Music {
                         if NoteExpression(rawValue: ob) == .tapLL {
                             let beat = Double(bar) * 4.0 + unitBeat * Double(index) + Double(beatOffset)
                             let ratio = speedRatioTable[beat] ?? 1.0
-                            rawNotes.append(RawNote(type: .tap, beatPos: beat, laneIndex: 2, speedRatio: ratio, isLarge: true))
-                            rawNotes.append(RawNote(type: .tap, beatPos: beat, laneIndex: 3, speedRatio: ratio, isLarge: true))
+                            noteMaterials.append(NoteMaterial(type: .tap, beatPos: beat, laneIndex: 2, speedRatio: ratio, isLarge: true))
+                            noteMaterials.append(NoteMaterial(type: .tap, beatPos: beat, laneIndex: 3, speedRatio: ratio, isLarge: true))
                         }
                     }
                 }
@@ -518,7 +512,7 @@ class Music {
             var i = 0
             while i < longNotes.count {
                 if longNotes[i].type == .tapStart {
-                    rawNotes.append(longNotes[i])
+                    noteMaterials.append(longNotes[i])
                     while longNotes[i].type != .tapEnd && longNotes[i].type != .flickEnd {
                         guard i + 1 < longNotes.count else {
                             throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません(\(ParseError.getBeat(of: longNotes[i])))")
@@ -543,7 +537,7 @@ class Music {
         }
 
         // 時間順にソート
-        rawNotes.sort(by: { $0.beat < $1.beat })
+        noteMaterials.sort(by: { $0.beat < $1.beat })
     }
 
     // ファイルの読み込み
