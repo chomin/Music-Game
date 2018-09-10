@@ -433,6 +433,7 @@ extension GameScene {   // bmsファイルを読み込む
                 }
                 i += 1
             } else {
+                print("ロングノーツ開始命令がありません(\(ParseError.getBeat(of: longNotes1[i])))")
                 throw ParseError.noLongNoteStart("ロングノーツ開始命令がありません(\(ParseError.getBeat(of: longNotes1[i])))")
             }
         }
