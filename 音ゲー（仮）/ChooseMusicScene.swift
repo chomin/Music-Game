@@ -133,7 +133,7 @@ class ChooseMusicScene: SKScene {
         
         // Headerについて、ファイル探索→db更新→読み込み
         do {
-            let fileNamesWithExtension = try FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath + "/Sounds").filter({$0.contains(".bms")})
+            let fileNamesWithExtension = try FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath + "/Sounds").filter { $0.hasSuffix(".bms") }
             
             let realm = try Realm()
             
@@ -147,12 +147,10 @@ class ChooseMusicScene: SKScene {
             
             // fileに対応するdbが存在するか確認
             for fileName in fileNamesWithExtension {
-                
-                let filePath = Bundle.main.path(forAuxiliaryExecutable: "Sounds/" + fileName)!
-                
-                if let resultIndex = results.index(where: {$0.bmsNameWithExtension == fileName}) { // ファイルに対応するdb発見
-                    
-                    let DBHeader = results[resultIndex]
+
+                if let DBHeader = results.filter({ $0.bmsNameWithExtension == fileName }).first { // ファイルに対応するdb発見
+
+                    let filePath = Bundle.main.path(forAuxiliaryExecutable: "Sounds/" + fileName)!
                     let attr = try FileManager.default.attributesOfItem(atPath: filePath)
                     let date = attr[FileAttributeKey.modificationDate] as! Date
                     let formatter = DateFormatter()
@@ -160,9 +158,9 @@ class ChooseMusicScene: SKScene {
                     formatter.timeStyle = .full
                     formatter.locale = Locale(identifier: "ja_JP")
                     
-                    if formatter.string(from: date) != results[resultIndex].lastUpdateDate {                                                                    // 更新日が異なればdbを更新
+                    if formatter.string(from: date) != DBHeader.lastUpdateDate {            // ファイルの更新日とDB上の更新日を比較。異なればdbを更新
                         try! realm.write {   // (取り出されたものはmanaged objectなので。。。)
-                            try DBHeader.setPropaties(fileName: fileName)                           // ファイルの更新日時が異なればdbを更新
+                            try DBHeader.setPropaties(fileName: fileName)                   // ファイルの更新日時が異なればdbを更新
                             print(fileName + "のDBを更新しました")
                         }
                     }

@@ -47,8 +47,8 @@ class SameLine {
 /// 音ゲーをするシーン
 class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDelegate {
     
-    var playMode: PlayMode
-    var isAutoPlay: Bool
+    let playMode: PlayMode
+    let isAutoPlay: Bool
     
     let judgeQueue = DispatchQueue(label: "judge_queue")    // キューに入れた処理内容を順番に実行(FPS落ち対策)
     
@@ -89,15 +89,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     var sameLines: [SameLine] = []  // 連動する始点側のノーツと同時押しライン
     
     // 楽曲データ
-    var music: Music
+    let music: Music
     var notes: [Note] = []      // ノーツの" 始 点 "の集合。
-    var musicStartPos = 1.0     // BGM開始の"拍"！
     var BPMs: [(bpm: Double, startPos: Double)] {
         return self.music.BPMs
     }
     
     private var startTime: TimeInterval = 0.0       // 譜面再生開始時刻
-    var duration: TimeInterval?                     // 譜面再生時間
     var passedTime: TimeInterval = 0.0              // 経過時間
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     var lanes: [Lane] = []      // レーン
@@ -106,12 +104,21 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     
     init(size: CGSize, setting: Setting, header: Header) {
-        
+
         self.playMode = setting.playMode
         self.isAutoPlay = setting.isAutoPlay
         self.setting = setting
-        self.music = Music(header: header, BPMs: [], videoID: "")
-        
+        self.music = Music(header: header, playMode: setting.playMode)
+
+        super.init(size: size)
+    }
+    init(size: CGSize, setting: Setting, music: Music) {
+
+        self.playMode = setting.playMode
+        self.isAutoPlay = setting.isAutoPlay
+        self.setting = setting
+        self.music = music
+
         super.init(size: size)
     }
     
@@ -126,27 +133,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         self.view?.isMultipleTouchEnabled = true    // 恐らくデフォルトではfalseになってる
         self.view?.superview?.isMultipleTouchEnabled = true
-        
-        // notesにノーツの"　始　点　"を入れる
-        do {
-            try parse(fileName: music.bmsNameWithExtension)
-        }
-        catch FileError.invalidName     (let msg) { print(msg) }
-        catch FileError.notFound        (let msg) { print(msg) }
-        catch FileError.readFailed      (let msg) { print(msg) }
-        catch ParseError.lackOfData     (let msg) { print(msg) }
-        catch ParseError.invalidValue   (let msg) { print(msg) }
-        catch ParseError.noLongNoteStart(let msg) { print(msg) }
-        catch ParseError.noLongNoteEnd  (let msg) { print(msg) }
-        catch ParseError.unexpected     (let msg) { print(msg) }
-        catch ParseError.lackOfVideoID  (let msg) {
-            print(msg)
-            reloadSceneAsBGMMode()
-            return
-        }
-        catch                                     { print("未知のエラー") }
-        
-        // 寸法に関するレーン数依存の定数をセット(必ずパース後に実行(laneNumを読み込むため))
+
+        // 寸法に関するレーン数依存の定数をセット
         Dimensions.updateInstance(laneNum: music.laneNum)
         
         // Laneインスタンスを作成
@@ -154,7 +142,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             self.lanes.append(Lane(laneIndex: i))
         }
         
-        // BGMまたはYouTubeのプレイヤーを作成(必ずパース後に実行する。(videoIDを読み込むため))
+        // BGMまたはYouTubeのプレイヤーを作成
         switch playMode {
         case .BGM:
             // サウンドファイルのパスを生成
@@ -182,9 +170,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             }
         }
         
-        // Noteクラスのクラスプロパティを設定(必ずパース後にすること)
-        let duration = (playMode == .BGM) ? BGM.duration : playerView.duration    // BGMまたは映像の長さ
-        Note.initialize(duration, notes, music, setting)   // 将来的にmusicに圧縮
+        // Noteクラスのクラスプロパティを設定
+        let duration = (playMode == .BGM) ? BGM.duration : playerView.duration      // BGMまたは映像の長さ
+        self.notes = music.generateNotes(setting: setting, duration: duration)      // ノーツ生成
         
         // ボタンの設定
         pauseButton = { () -> UIButton in
@@ -258,7 +246,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         // 画像の設定
         setImages()
         
-        self.mediaOffsetTime = (musicStartPos / BPMs[0].bpm) * 60
+        self.mediaOffsetTime = (music.musicStartPos / BPMs[0].bpm) * 60
         self.isPrecedingStartValid = false
         for note in notes {
             switch note {
@@ -402,8 +390,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         if isAutoPlay {
             for lane in lanes {
                 if lane.timeLag <= 0 && !(lane.isEmpty) {
-                    
-                    
                     if !(judge(lane: lane, timeLag: 0, gsTouch: nil)) { print("判定失敗@自動演奏") }
                 }
             }
@@ -411,7 +397,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             // 判定関係
             // middleの判定（同じところで長押しのやつ）
             judgeQueue.async {
-                
                 
                 for gsTouch in self.allGSTouches {
                     
@@ -447,7 +432,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // 終了時刻が指定されていればその時刻でシーン移動
-        if duration != nil && passedTime > duration! {
+        if music.duration != nil && passedTime > music.duration! {
             BGM = nil
             moveToResultScene()
         }
@@ -487,9 +472,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     /// BGMモードへ移行
-    func reloadSceneAsBGMMode() {
+    private func reloadSceneAsBGMMode() {
         
-        let scene = GameScene(size: (self.view?.bounds.size)!, setting: setting, header: music.header)
+        let scene = GameScene(size: (self.view?.bounds.size)!, setting: setting, music: music)
         let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true
