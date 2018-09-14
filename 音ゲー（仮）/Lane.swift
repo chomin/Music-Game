@@ -100,30 +100,29 @@ class Lane {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+    func updateTimeLag(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
         
         guard !(laneNotes.isEmpty) else {
             return
         }
         
         // timeLagの更新
-        GameScene.judgeQueue.async {
-            self.timeLag = -passedTime
-            
-            for (index, BPM) in BPMs.enumerated() {
-                if BPMs.count > index+1 &&
-                    self.laneNotes[0].beat > BPMs[index+1].startPos { // indexが最後でない場合
-                    
-                   self.timeLag += (BPMs[index+1].startPos - BPM.startPos) * 60 / BPM.bpm
-                    
-                } else {
-                    self.timeLag += (self.laneNotes[0].beat - BPM.startPos) * 60 / BPM.bpm
-                    self.currentBPM = BPM.bpm
-                    break
-                }
+        self.timeLag = -passedTime
+        
+        for (index, BPM) in BPMs.enumerated() {
+            if BPMs.count > index+1 &&
+                self.laneNotes[0].beat > BPMs[index+1].startPos { // indexが最後でない場合
+                
+                self.timeLag += (BPMs[index+1].startPos - BPM.startPos) * 60 / BPM.bpm
+                
+            } else {
+                self.timeLag += (self.laneNotes[0].beat - BPM.startPos) * 60 / BPM.bpm
+                self.currentBPM = BPM.bpm
+                break
             }
-            self.isTimeLagSet = true    // パース前はtimeLagは更新されないので(このレーンが使われない場合でも)通知する必要あり.
         }
+        self.isTimeLagSet = true    // パース前はtimeLagは更新されないので(このレーンが使われない場合でも)通知する必要あり.
+        
         
     }
     

@@ -15,7 +15,7 @@ extension GameScene {
         
         guard !isAutoPlay else { return }
         
-        GameScene.judgeQueue.async {
+        judgeQueue.async {
             
             uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 let pos = DispatchQueue.main.sync {
@@ -84,7 +84,7 @@ extension GameScene {
         
         guard !isAutoPlay else { return }
         
-        GameScene.judgeQueue.async {
+        judgeQueue.async {
             for i in self.lanes {
                 guard i.isTimeLagSet else { return }
             }
@@ -179,7 +179,7 @@ extension GameScene {
         
         guard !isAutoPlay else { return }
         
-        GameScene.judgeQueue.async {
+        judgeQueue.async {
             
             for touch in touches {
                 
