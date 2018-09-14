@@ -50,7 +50,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     let playMode: PlayMode
     let isAutoPlay: Bool
     
-    let judgeQueue = DispatchQueue(label: "judge_queue")    // キューに入れた処理内容を順番に実行(FPS落ち対策)
+    let judgeQueue = DispatchQueue(label: "judge_queue", qos: .userInteractive)    // キューに入れた処理内容を順番に実行(FPS落ち対策)
+    
     
     // appの起動、終了等に関するデリゲート
     var appDelegate: AppDelegate!
@@ -371,9 +372,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // レーンの更新(ノーツ更新後に実行)
-        for lane in lanes {
-            lane.update(passedTime, BPMs)
-        }
+        lanes.filter({ !($0.isEmpty) }).forEach({ lane in
+            judgeQueue.async {
+                lane.updateTimeLag(self.passedTime, self.BPMs)
+            }
+        })
+        
+//        for lane in lanes {
+//            lane.updateTimeLag(passedTime, BPMs)
+//        }
         
         // 同時押しラインの更新
         for sameLine in sameLines {

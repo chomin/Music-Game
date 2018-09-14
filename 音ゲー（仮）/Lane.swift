@@ -100,29 +100,30 @@ class Lane {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func update(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
+    func updateTimeLag(_ passedTime: TimeInterval, _ BPMs: [(bpm: Double, startPos: Double)]) {
         
         guard !(laneNotes.isEmpty) else {
             return
         }
         
         // timeLagの更新
-        
-        timeLag = -passedTime
+        self.timeLag = -passedTime
         
         for (index, BPM) in BPMs.enumerated() {
             if BPMs.count > index+1 &&
-                laneNotes[0].beat > BPMs[index+1].startPos { // indexが最後でない場合
+                self.laneNotes[0].beat > BPMs[index+1].startPos { // indexが最後でない場合
                 
-                timeLag += (BPMs[index+1].startPos - BPM.startPos) * 60 / BPM.bpm
+                self.timeLag += (BPMs[index+1].startPos - BPM.startPos) * 60 / BPM.bpm
                 
             } else {
-                timeLag += (laneNotes[0].beat - BPM.startPos) * 60 / BPM.bpm
-                currentBPM = BPM.bpm
+                self.timeLag += (self.laneNotes[0].beat - BPM.startPos) * 60 / BPM.bpm
+                self.currentBPM = BPM.bpm
                 break
             }
         }
         self.isTimeLagSet = true    // パース前はtimeLagは更新されないので(このレーンが使われない場合でも)通知する必要あり.
+        
+        
     }
     
     // 先頭ノーツを判定し終えた時の処理をまとめて行う
