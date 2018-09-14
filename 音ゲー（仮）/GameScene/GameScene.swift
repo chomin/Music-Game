@@ -50,7 +50,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     let playMode: PlayMode
     let isAutoPlay: Bool
     
-    let judgeQueue = DispatchQueue(label: "judge_queue")    // キューに入れた処理内容を順番に実行(FPS落ち対策)
+    static let judgeQueue = DispatchQueue(label: "judge_queue")    // キューに入れた処理内容を順番に実行(FPS落ち対策)
     
     // appの起動、終了等に関するデリゲート
     var appDelegate: AppDelegate!
@@ -396,7 +396,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         } else {
             // 判定関係
             // middleの判定（同じところで長押しのやつ）
-            judgeQueue.async {
+            GameScene.judgeQueue.async {
                 
                 for gsTouch in self.allGSTouches {
                     
