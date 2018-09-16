@@ -473,6 +473,10 @@ class Music {
         case .BGM:
             self.musicStartPos = musicStartPosSet[.BGM]!
         case .YouTube:
+            if musicStartPosSet[.YouTube] == nil {
+                print("YouTube用の楽曲開始命令がありません.BGM用の楽曲開始命令を使用します.")
+            }
+            
             self.musicStartPos = musicStartPosSet[.YouTube] ?? musicStartPosSet[.BGM]!
         case .YouTube2:
             self.musicStartPos = musicStartPosSet[.YouTube2] ?? musicStartPosSet[.YouTube] ?? musicStartPosSet[.BGM]!
