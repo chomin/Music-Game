@@ -377,11 +377,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         comboLabel.text = String(ResultScene.combo)
         
         // 各ノーツの位置や大きさを更新
-        DispatchQueue.global().sync {
-            for note in notes {
+        for note in notes {
+            DispatchQueue.global().sync { // syncでmainスレッドを待たせる
                 note.update(passedTime)
             }
         }
+        
         
         // レーンの更新(ノーツ更新後に実行.故にsync)
         lanes.filter({ !($0.isEmpty) }).forEach({ lane in
@@ -389,8 +390,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         })
         
         // 同時押しラインの更新
-        DispatchQueue.global().sync {
-            for sameLine in sameLines {
+        
+        for sameLine in sameLines {
+            DispatchQueue.global().sync {
                 let (note1, note2, line) = (sameLine.note1, sameLine.note2, sameLine.line)
                 // 同時押しラインを移動
                 line.position = note1.position
@@ -398,7 +400,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 // 表示状態の更新
                 line.isHidden = note1.image.isHidden || note2.image.isHidden
                 
-                guard !line.isHidden else { continue }
+//                guard !line.isHidden else { continue }
                 
                 // 大きさも変更
                 line.setScale(note1.size / Note.scale / Dimensions.laneWidth)
