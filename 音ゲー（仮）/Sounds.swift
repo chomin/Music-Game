@@ -152,26 +152,28 @@ class ActionSoundPlayers {
     }
     
     func play(type: SoundType) {
-        switch type {
-        case .tap:
-            if      !tap1.isPlaying { tap1.play() }
-            else if !tap2.isPlaying { tap2.play() }
-            else if !tap3.isPlaying { tap3.play() }
-            else if !tap4.isPlaying { tap4.play() }
-        case .flick:
-            if      !flick1.isPlaying { flick1.play() }
-            else if !flick2.isPlaying { flick2.play() }
-            else if !flick3.isPlaying { flick3.play() }
-            else if !flick4.isPlaying { flick4.play() }
-        case .middle:
-            if      !middle1.isPlaying { middle1.play() }
-            else if !middle2.isPlaying { middle2.play() }
-            else if !middle3.isPlaying { middle3.play() }
-            else if !middle4.isPlaying { middle4.play() }
-        case .kara:
-            if      !kara1.isPlaying { kara1.play() }
-            else if !kara2.isPlaying { kara2.play() }
-        }
+//        DispatchQueue.global().async {
+            switch type {
+            case .tap:
+                if      !self.tap1.isPlaying { self.tap1.play() }
+                else if !self.tap2.isPlaying { self.tap2.play() }
+                else if !self.tap3.isPlaying { self.tap3.play() }
+                else if !self.tap4.isPlaying { self.tap4.play() }
+            case .flick:
+                if      !self.flick1.isPlaying { self.flick1.play() }
+                else if !self.flick2.isPlaying { self.flick2.play() }
+                else if !self.flick3.isPlaying { self.flick3.play() }
+                else if !self.flick4.isPlaying { self.flick4.play() }
+            case .middle:
+                if      !self.middle1.isPlaying { self.middle1.play() }
+                else if !self.middle2.isPlaying { self.middle2.play() }
+                else if !self.middle3.isPlaying { self.middle3.play() }
+                else if !self.middle4.isPlaying { self.middle4.play() }
+            case .kara:
+                if      !self.kara1.isPlaying { self.kara1.play() }
+                else if !self.kara2.isPlaying { self.kara2.play() }
+            }
+//        }
     }
     
     func setVolume(_ value: Float) {

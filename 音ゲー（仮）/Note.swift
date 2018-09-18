@@ -558,6 +558,7 @@ class Note {
     ///
     /// - Parameter passedTime: プレイ開始からの経過時間(BGMの経過時間とは異なる)
     func update(_ passedTime: TimeInterval) {
+        
         setPositionOnLane(passedTime)
     }
     
