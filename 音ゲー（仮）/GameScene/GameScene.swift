@@ -377,95 +377,95 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         comboLabel.text = String(ResultScene.combo)
         
         // 各ノーツの位置や大きさを更新
-        let group = DispatchGroup()
+//        let group = DispatchGroup()
         for note in notes {
-            group.enter()
-            DispatchQueue.global().async { // syncでmainスレッドを待たせる
-                note.update(self.passedTime)
-                group.leave()
-            }
+//            group.enter()
+//            DispatchQueue.global().async(group: group) { // syncでmainスレッドを待たせる
+            note.update(self.passedTime)
+//                group.leave()
+//            }
         }
         
-        group.notify(queue: DispatchQueue.main) {
+//        _ = group.wait(timeout: .distantFuture)
+        
+        // レーンの更新(ノーツ更新後に実行.故にsync)
+        self.lanes.filter({ !($0.isEmpty) }).forEach({ lane in
+            lane.updateTimeLag(self.passedTime, self.BPMs)
+        })
+        
+        // 同時押しラインの更新
+        
+        for sameLine in self.sameLines {
+            //            group.enter()
+            //            DispatchQueue.global().async {
+            let (note1, note2, line) = (sameLine.note1, sameLine.note2, sameLine.line)
+            // 同時押しラインを移動
+            line.position = note1.position
             
-            // レーンの更新(ノーツ更新後に実行.故にsync)
-            self.lanes.filter({ !($0.isEmpty) }).forEach({ lane in
-                lane.updateTimeLag(self.passedTime, self.BPMs)
-            })
+            // 表示状態の更新
+            line.isHidden = note1.image.isHidden || note2.image.isHidden
             
-            // 同時押しラインの更新
+            //                guard !line.isHidden else { continue }
             
-            for sameLine in self.sameLines {
-                //            group.enter()
-                //            DispatchQueue.global().async {
-                let (note1, note2, line) = (sameLine.note1, sameLine.note2, sameLine.line)
-                // 同時押しラインを移動
-                line.position = note1.position
-                
-                // 表示状態の更新
-                line.isHidden = note1.image.isHidden || note2.image.isHidden
-                
-                //                guard !line.isHidden else { continue }
-                
-                // 大きさも変更
-                line.setScale(note1.size / Note.scale / Dimensions.laneWidth)
-                //                group.leave()
-                //            }
-            }
-            
-            
-            // 自動演奏or判定
-            if self.isAutoPlay {
-                for lane in self.lanes {
-                    if lane.timeLag <= 0 && !(lane.isEmpty) {
-                        if !(self.judge(lane: lane, timeLag: 0, gsTouch: nil)) { print("判定失敗@自動演奏") }
-                    }
-                }
-            } else {
-                // 判定関係
-                // middleの判定（同じところで長押しのやつ）
-                //            judgeQueue.sync { // 手前にsyncがあるので...
-                
-                for gsTouch in self.allGSTouches {
-                    
-                    let pos = gsTouch.touch.location(in: self.view?.superview)
-                    //                    let pos = DispatchQueue.main.sync {
-                    //                        return gsTouch.touch.location(in: self.view?.superview)
-                    //                    }
-                    //
-                    for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
-                        
-                        if judgeRect.contains(pos) {   // ボタンの範囲
-                            
-                            if self.parfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
-                                break   // このタッチでこのフレームでの判定はもう行わない
-                            }
-                        }
-                    }
-                }
-                
-                // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
-                for lane in self.lanes {
-                    if lane.judgeTimeState == .passed && !(lane.isEmpty) {
-                        
-                        self.missJudge(lane: lane)
-                        
-                    } else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
-                        if lane.timeLag < -storedFlickJudgeInformation.timeLag {
-                            
-                            self.storedFlickJudge(lane: lane)
-                        }
-                    }
-                }
-                //            }
-            }
-            
-            // 終了時刻が指定されていればその時刻でシーン移動
-            if self.music.duration != nil && self.passedTime > self.music.duration! {
-                self.BGM = nil
-                self.moveToResultScene()
-            }
+            // 大きさも変更
+            line.setScale(note1.size / Note.scale / Dimensions.laneWidth)
+            //                group.leave()
+            //            }
         }
+        
+        
+        // 自動演奏or判定
+        if self.isAutoPlay {
+            for lane in self.lanes {
+                if lane.timeLag <= 0 && !(lane.isEmpty) {
+                    if !(self.judge(lane: lane, timeLag: 0, gsTouch: nil)) { print("判定失敗@自動演奏") }
+                }
+            }
+        } else {
+            // 判定関係
+            // middleの判定（同じところで長押しのやつ）
+            //            judgeQueue.sync { // 手前にsyncがあるので...
+            
+            for gsTouch in self.allGSTouches {
+                
+                let pos = gsTouch.touch.location(in: self.view?.superview)
+                //                    let pos = DispatchQueue.main.sync {
+                //                        return gsTouch.touch.location(in: self.view?.superview)
+                //                    }
+                //
+                for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
+                    
+                    if judgeRect.contains(pos) {   // ボタンの範囲
+                        
+                        if self.parfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
+                            break   // このタッチでこのフレームでの判定はもう行わない
+                        }
+                    }
+                }
+            }
+            
+            // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
+            for lane in self.lanes {
+                if lane.judgeTimeState == .passed && !(lane.isEmpty) {
+                    
+                    self.missJudge(lane: lane)
+                    
+                } else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
+                    if lane.timeLag < -storedFlickJudgeInformation.timeLag {
+                        
+                        self.storedFlickJudge(lane: lane)
+                    }
+                }
+            }
+            //            }
+        }
+        
+        // 終了時刻が指定されていればその時刻でシーン移動
+        if self.music.duration != nil && self.passedTime > self.music.duration! {
+            self.BGM = nil
+            self.moveToResultScene()
+        }
+        
        
     }
     
