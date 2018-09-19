@@ -129,7 +129,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     override func didMove(to view: SKView) {
         
-        appDelegate = UIApplication.shared.delegate as! AppDelegate // AppDelegateのインスタンスを取得
+        appDelegate = (UIApplication.shared.delegate as! AppDelegate) // AppDelegateのインスタンスを取得
         appDelegate.gsDelegate = self   // 子(AppDelegate)の設定しているdelegateに自身をセット
         
         self.view?.isMultipleTouchEnabled = true    // 恐らくデフォルトではfalseになってる
@@ -283,8 +283,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         } else {
             playerView.delegate = self
             view.superview!.addSubview(playerView.view)
-            view.superview!.sendSubview(toBack: playerView.view)
-            view.superview!.bringSubview(toFront: self.view!)
+            view.superview!.sendSubviewToBack(playerView.view)
+            view.superview!.bringSubviewToFront(self.view!)
             self.backgroundColor = UIColor(white: 0, alpha: 0.5)
             self.view?.backgroundColor = .clear
             
@@ -670,10 +670,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 Button.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
                 Button.backgroundColor = .red
                 Button.layer.masksToBounds = true
-                Button.setTitle("中断する", for: UIControlState())
-                Button.setTitleColor(UIColor.white, for: UIControlState())
-                Button.setTitle("中断する", for: UIControlState.highlighted)
-                Button.setTitleColor(UIColor.black, for: UIControlState.highlighted)
+                Button.setTitle("中断する", for: UIControl.State())
+                Button.setTitleColor(UIColor.white, for: UIControl.State())
+                Button.setTitle("中断する", for: UIControl.State.highlighted)
+                Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
                 Button.isHidden = false
                 Button.layer.cornerRadius = 20.0
                 Button.layer.position = CGPoint(x: self.frame.midX + Button.frame.width*2/3, y: self.frame.midY)
@@ -690,10 +690,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 Button.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
                 Button.backgroundColor = .green
                 Button.layer.masksToBounds = true
-                Button.setTitle("続ける", for: UIControlState())
-                Button.setTitleColor(UIColor.white, for: UIControlState())
-                Button.setTitle("続ける", for: UIControlState.highlighted)
-                Button.setTitleColor(UIColor.black, for: UIControlState.highlighted)
+                Button.setTitle("続ける", for: UIControl.State())
+                Button.setTitleColor(UIColor.white, for: UIControl.State())
+                Button.setTitle("続ける", for: UIControl.State.highlighted)
+                Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
                 Button.isHidden = false
                 Button.layer.cornerRadius = 20.0
                 Button.layer.position = CGPoint(x: self.frame.midX - Button.frame.width*2/3, y: self.frame.midY)
@@ -703,7 +703,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             }()
         }
         self.view?.superview?.addSubview(pauseView!)
-        self.view?.superview?.bringSubview(toFront: pauseView!)
+        self.view?.superview?.bringSubviewToFront(pauseView!)
         
         self.isUserInteractionEnabled = false
         

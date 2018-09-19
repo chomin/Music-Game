@@ -54,10 +54,10 @@ class ResultScene: SKScene {
         replayButton.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
         replayButton.backgroundColor = UIColor.red
         replayButton.layer.masksToBounds = true
-        replayButton.setTitle("曲選択に戻る", for: UIControlState())
-        replayButton.setTitleColor(UIColor.white, for: UIControlState())
-        replayButton.setTitle("曲選択に戻る", for: UIControlState.highlighted)
-        replayButton.setTitleColor(UIColor.black, for: UIControlState.highlighted)
+        replayButton.setTitle("曲選択に戻る", for: UIControl.State())
+        replayButton.setTitleColor(UIColor.white, for: UIControl.State())
+        replayButton.setTitle("曲選択に戻る", for: UIControl.State.highlighted)
+        replayButton.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
         replayButton.isHidden = false
         replayButton.layer.cornerRadius = 20.0
         replayButton.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y: 50)
