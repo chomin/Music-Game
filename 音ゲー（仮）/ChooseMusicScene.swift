@@ -214,10 +214,10 @@ class ChooseMusicScene: SKScene {
             Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/5, height: 50)
             Button.backgroundColor = UIColor.red
             Button.layer.masksToBounds = true
-            Button.setTitle("この曲で遊ぶ", for: UIControlState())
-            Button.setTitleColor(UIColor.white, for: UIControlState())
-            Button.setTitle("この曲で遊ぶ", for: UIControlState.highlighted)
-            Button.setTitleColor(UIColor.black, for: UIControlState.highlighted)
+            Button.setTitle("この曲で遊ぶ", for: UIControl.State())
+            Button.setTitleColor(UIColor.white, for: UIControl.State())
+            Button.setTitle("この曲で遊ぶ", for: UIControl.State.highlighted)
+            Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
             Button.isHidden = false
             Button.layer.cornerRadius = 20.0
             Button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72)
