@@ -41,8 +41,7 @@ class PickerKeyboard: UIControl {
         }
         self.headers = headers
         
-        selectedRow = musicNameArray.index(of: firstText) ?? 9999
-        if selectedRow == 9999 { selectedRow = musicNameArray.index(of: "★" + firstText)!}
+        selectedRow = headers.map { $0.title } .index(of: firstText)!
         
         super.init(frame: frame)
         
