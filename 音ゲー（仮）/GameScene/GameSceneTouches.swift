@@ -15,12 +15,13 @@ extension GameScene {
         
         guard !isAutoPlay else { return }
         
-        judgeQueue.async {
-            
+//        judgeQueue.async {
+        
             uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
-                let pos = DispatchQueue.main.sync {
-                    return uiTouch.location(in: self.view?.superview)
-                }
+                let pos = uiTouch.location(in: self.view?.superview)
+//                let pos = DispatchQueue.main.sync {
+//                    return uiTouch.location(in: self.view?.superview)
+//                }
                 // フリック判定したかを示すBoolを加えてallTouchにタッチ情報を付加
                 self.allGSTouches.append(GSTouch(touch: uiTouch, isJudgeableFlick: true, isJudgeableFlickEnd: false, storedFlickJudgeLaneIndex: nil))
                 
@@ -77,14 +78,14 @@ extension GameScene {
                     }
                 }
             }
-        }
+//        }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         guard !isAutoPlay else { return }
         
-        judgeQueue.async {
+//        judgeQueue.async {
             for i in self.lanes {
                 guard i.isTimeLagSet else { return }
             }
@@ -93,9 +94,10 @@ extension GameScene {
                 
                 let touchIndex = self.allGSTouches.index(where: { $0.touch == uiTouch } )!
                 
-                let (pos, ppos) = DispatchQueue.main.sync {
-                    return (uiTouch.location(in: self.view?.superview), uiTouch.previousLocation(in: self.view?.superview))
-                }
+                let (pos, ppos) = (uiTouch.location(in: self.view?.superview), uiTouch.previousLocation(in: self.view?.superview))
+//                let (pos, ppos) = DispatchQueue.main.sync {
+//                    return (uiTouch.location(in: self.view?.superview), uiTouch.previousLocation(in: self.view?.superview))
+//                }
                 
                 let moveDistance = sqrt(pow(pos.x - ppos.x, 2) + pow(pos.y - ppos.y, 2))
                 
@@ -171,7 +173,7 @@ extension GameScene {
                     }
                 }
             }
-        }
+//        }
     }
     
     // touchMovedと似てる。TapEndの判定をするかだけが違う
@@ -179,8 +181,8 @@ extension GameScene {
         
         guard !isAutoPlay else { return }
         
-        judgeQueue.async {
-            
+//        judgeQueue.async {
+        
             for touch in touches {
                 
                 var isAllLanesTimeLagSet = true
@@ -192,9 +194,10 @@ extension GameScene {
                     
                     let touchIndex = self.allGSTouches.index(where: { $0.touch == touch } )!
                     
-                    let (pos, ppos) = DispatchQueue.main.sync {
-                        return (touch.location(in: self.view?.superview), touch.previousLocation(in: self.view?.superview))
-                    }
+                    let (pos, ppos) = (touch.location(in: self.view?.superview), touch.previousLocation(in: self.view?.superview))
+//                    let (pos, ppos) = DispatchQueue.main.sync {
+//                        return (touch.location(in: self.view?.superview), touch.previousLocation(in: self.view?.superview))
+//                    }
                     
                     // pposループ
                     for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
@@ -236,7 +239,7 @@ extension GameScene {
                     self.allGSTouches.remove(at: self.allGSTouches.index(where: { $0.touch == touch } )!)
                 }
             }
-        }
+//        }
     }
     
     

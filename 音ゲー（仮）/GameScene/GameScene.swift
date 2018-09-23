@@ -50,13 +50,14 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     let playMode: PlayMode
     let isAutoPlay: Bool
     
-    let judgeQueue = DispatchQueue(label: "judge_queue", qos: .userInteractive)    // キューに入れた処理内容を順番に実行(FPS落ち対策)
+//    let judgeQueue = DispatchQueue(label: "judge_queue", qos: .userInteractive)    // キューに入れた処理内容を順番に実行(FPS落ち対策)
+    let subQueue = DispatchQueue.global()
     
     
     // appの起動、終了等に関するデリゲート
     var appDelegate: AppDelegate!
     
-    // タッチ情報
+    // タッチ情報(メインスレッドでは扱わない。現時点ではサブスレッドで直列に扱う)
     var allGSTouches: [GSTouch] = []
     
     // ラベル
@@ -99,9 +100,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var startTime: TimeInterval = 0.0       // 譜面再生開始時刻
     var passedTime: TimeInterval = 0.0              // 経過時間
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
-    var lanes: [Lane] = []      // レーン
+    var lanes: [Lane] = []      // レーン(judgeQueueで扱うこと)
     
     var setting: Setting
+    
+    var frameCount = 0
     
     
     init(size: CGSize, setting: Setting, header: Header) {
@@ -138,10 +141,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         // 寸法に関するレーン数依存の定数をセット
         Dimensions.updateInstance(laneNum: music.laneNum)
         
-        // Laneインスタンスを作成
-        for i in 0..<self.music.laneNum {
-            self.lanes.append(Lane(laneIndex: i))
-        }
+        // Laneインスタンスを作成(realmの制約上、mainスレッドで実行する必要あり)
+        let laneNum = self.music.laneNum
+//        judgeQueue.sync {   // あとでsyncがあるのでここでもsync
+        
+            for i in 0 ..< laneNum {
+                self.lanes.append(Lane(laneIndex: i))
+            }
+//        }
+        
         
         // BGMまたはYouTubeのプレイヤーを作成
         switch playMode {
@@ -295,24 +303,26 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // 各レーンにノーツをセット
-        for note in notes {
-            lanes[note.laneIndex].append(note)
-            
-            if let start = note as? TapStart {
-                var following = start.next
-                while true {
-                    lanes[following.laneIndex].append(following)
-                    if let middle = following as? Middle {
-                        following = middle.next
-                    } else {
-                        break
+//        judgeQueue.sync {   // notesがあるので一旦syncにしておく
+            for note in self.notes {
+                self.lanes[note.laneIndex].append(note)
+                
+                if let start = note as? TapStart {
+                    var following = start.next
+                    while true {
+                        self.lanes[following.laneIndex].append(following)
+                        if let middle = following as? Middle {
+                            following = middle.next
+                        } else {
+                            break
+                        }
                     }
                 }
             }
-        }
-        for lane in lanes {
-            lane.sort()
-        }
+            for lane in self.lanes {
+                lane.sort()
+            }
+//        }
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -367,82 +377,96 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         comboLabel.text = String(ResultScene.combo)
         
         // 各ノーツの位置や大きさを更新
+//        let group = DispatchGroup()
         for note in notes {
-            note.update(passedTime)
+//            group.enter()
+//            DispatchQueue.global().async(group: group) { // syncでmainスレッドを待たせる
+            note.update(self.passedTime)
+//                group.leave()
+//            }
         }
         
-        // レーンの更新(ノーツ更新後に実行)
-        lanes.filter({ !($0.isEmpty) }).forEach({ lane in
-            judgeQueue.async {
-                lane.updateTimeLag(self.passedTime, self.BPMs)
-            }
+//        _ = group.wait(timeout: .distantFuture)
+        
+        // レーンの更新(ノーツ更新後に実行.故にsync)
+        self.lanes.filter({ !($0.isEmpty) }).forEach({ lane in
+            lane.updateTimeLag(self.passedTime, self.BPMs)
         })
         
-//        for lane in lanes {
-//            lane.updateTimeLag(passedTime, BPMs)
-//        }
-        
         // 同時押しラインの更新
-        for sameLine in sameLines {
+        
+        for sameLine in self.sameLines {
+            //            group.enter()
+            //            DispatchQueue.global().async {
             let (note1, note2, line) = (sameLine.note1, sameLine.note2, sameLine.line)
             // 同時押しラインを移動
             line.position = note1.position
+            
             // 表示状態の更新
             line.isHidden = note1.image.isHidden || note2.image.isHidden
+            
+            //                guard !line.isHidden else { continue }
+            
             // 大きさも変更
             line.setScale(note1.size / Note.scale / Dimensions.laneWidth)
+            //                group.leave()
+            //            }
         }
         
+        
         // 自動演奏or判定
-        if isAutoPlay {
-            for lane in lanes {
+        if self.isAutoPlay {
+            for lane in self.lanes {
                 if lane.timeLag <= 0 && !(lane.isEmpty) {
-                    if !(judge(lane: lane, timeLag: 0, gsTouch: nil)) { print("判定失敗@自動演奏") }
+                    if !(self.judge(lane: lane, timeLag: 0, gsTouch: nil)) { print("判定失敗@自動演奏") }
                 }
             }
         } else {
             // 判定関係
             // middleの判定（同じところで長押しのやつ）
-            judgeQueue.async {
+            //            judgeQueue.sync { // 手前にsyncがあるので...
+            
+            for gsTouch in self.allGSTouches {
                 
-                for gsTouch in self.allGSTouches {
+                let pos = gsTouch.touch.location(in: self.view?.superview)
+                //                    let pos = DispatchQueue.main.sync {
+                //                        return gsTouch.touch.location(in: self.view?.superview)
+                //                    }
+                //
+                for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
                     
-                    let pos = DispatchQueue.main.sync {
-                        return gsTouch.touch.location(in: self.view?.superview)
-                    }
-                    
-                    for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
+                    if judgeRect.contains(pos) {   // ボタンの範囲
                         
-                        if judgeRect.contains(pos) {   // ボタンの範囲
-                            
-                            if self.parfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
-                                break   // このタッチでこのフレームでの判定はもう行わない
-                            }
-                        }
-                    }
-                }
-                
-                // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
-                for lane in self.lanes {
-                    if lane.judgeTimeState == .passed && !(lane.isEmpty) {
-                        
-                        self.missJudge(lane: lane)
-                        
-                    } else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
-                        if lane.timeLag < -storedFlickJudgeInformation.timeLag {
-                            
-                            self.storedFlickJudge(lane: lane)
+                        if self.parfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
+                            break   // このタッチでこのフレームでの判定はもう行わない
                         }
                     }
                 }
             }
+            
+            // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
+            for lane in self.lanes {
+                if lane.judgeTimeState == .passed && !(lane.isEmpty) {
+                    
+                    self.missJudge(lane: lane)
+                    
+                } else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
+                    if lane.timeLag < -storedFlickJudgeInformation.timeLag {
+                        
+                        self.storedFlickJudge(lane: lane)
+                    }
+                }
+            }
+            //            }
         }
         
         // 終了時刻が指定されていればその時刻でシーン移動
-        if music.duration != nil && passedTime > music.duration! {
-            BGM = nil
-            moveToResultScene()
+        if self.music.duration != nil && self.passedTime > self.music.duration! {
+            self.BGM = nil
+            self.moveToResultScene()
         }
+        
+       
     }
     
     override func willMove(from view: SKView) {
