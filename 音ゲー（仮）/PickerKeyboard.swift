@@ -32,11 +32,17 @@ class PickerKeyboard: UIControl {
         
         // ピッカーに初期値をセット(将来的にはファイル探索から)
         for header in headers {
-            musicNameArray.append(header.title)
+            if header.videoID == "" && header.videoID2 == "" {
+                musicNameArray.append(header.title)
+            } else {
+                musicNameArray.append("★" + header.title)
+            }
+            
         }
         self.headers = headers
         
-        selectedRow = musicNameArray.index(of: textStore)!
+        selectedRow = musicNameArray.index(of: firstText) ?? 9999
+        if selectedRow == 9999 { selectedRow = musicNameArray.index(of: "★" + firstText)!}
         
         super.init(frame: frame)
         

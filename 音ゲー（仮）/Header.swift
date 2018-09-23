@@ -17,7 +17,6 @@ class Header: Object {
         case notFound(String)
         case readFailed(String)
     }
-
     
     @objc dynamic var bmsNameWithExtension = ""
     @objc dynamic var lastUpdateDate = ""
@@ -25,10 +24,11 @@ class Header: Object {
     @objc dynamic var title = ""        // タイトル(正式名称。ファイル名は文字の制約があるためこっちを正式とする)
     @objc dynamic var artist = ""       // アーティスト
     @objc dynamic var group = ""        // ソート用のグループ
+    @objc dynamic var videoID = ""
+    @objc dynamic var videoID2 = ""
     @objc dynamic var playLevel = 0     // 難易度
     @objc dynamic var volWav = 100      // 音量を現段階のn%として出力するか(TODO: 未実装)
     @objc dynamic var laneNum = 7
-    
     
     /// DB上に存在しない場合にBMSから読み込み生成し、dbに保存する。db上に存在するときは作成しないこと。
     ///
@@ -70,6 +70,8 @@ class Header: Object {
             "TITLE":     { value in self.title     = value },
             "ARTIST":    { value in self.artist    = value },
             "GROUP":     { value in self.group     = value },
+            "VIDEOID":   { value in self.videoID   = value },
+            "VIDEOID2":  { value in self.videoID2  = value },
             "PLAYLEVEL": { value in if let num = Int(value) { self.playLevel = num } },
             "VOLWAV":    { value in if let num = Int(value) { self.volWav    = num } },
             "LANE":      { value in if let num = Int(value) { self.laneNum   = num } }
