@@ -84,10 +84,14 @@ class Music {
     var volWav:    Int    { return header.volWav    }   // 音量を現段階のn%として出力するか(TODO: 未実装)
     var bmsNameWithExtension: String { return header.bmsNameWithExtension }
 
-
     init(header: Header, playMode: PlayMode) {
         self.header = header
 
+        if playMode == .YouTube {
+            videoID = header.videoID
+        } else if playMode == .YouTube2 {
+            videoID = header.videoID2
+        }
         /* BMSファイルのメインデータをパース */
         do {
             try parse(playMode)
@@ -217,9 +221,9 @@ class Music {
 
         // コマンド文字列を命令と結びつける辞書
         let headerInstructionTable: [String: (String) -> ()] = [
-            "VIDEOID":   { value in if playMode == .YouTube  { self.videoID = value } },
-            "VIDEOID2":  { value in if playMode == .YouTube2 { self.videoID = value } },
             "BPM":       { value in if let num = Double(value) { self.BPMs = [(num, 0.0)] } },
+            "VIDEOID":   { _ in () },
+            "VIDEOID2":  { _ in () },
             "GENRE":     { _ in () },   // NOP
             "TITLE":     { _ in () },
             "ARTIST":    { _ in () },

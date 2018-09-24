@@ -13,13 +13,13 @@ import RealmSwift
 class ChooseMusicScene: SKScene {
     
     enum Difficulty: String {
-        case cho           = "超級"
-        case jigoku        = "地獄級"
-        case chojigoku     = "超地獄級"
-        case zetujigoku    = "絶地獄級"
-        case chozetujigoku = "超絶地獄級"
-        case kaimetu       = "壊滅級"
-        case chokaimetu    = "超壊滅級"
+        case cho           = "超級(4)"
+        case jigoku        = "地獄級(5)"
+        case chojigoku     = "超地獄級(6)"
+        case zetujigoku    = "絶地獄級(7)"
+        case chozetujigoku = "超絶地獄級(8)"
+        case kaimetu       = "壊滅級(9)"
+        case chokaimetu    = "超壊滅級(10)"
         
         static func getDifficulty(garupaPlayLevel: Int) -> Difficulty { // ガルパのレベルをこのゲームの難易度に変換（ミリシタとかは任せます）
             switch garupaPlayLevel {
@@ -105,21 +105,21 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-    let settingImage = UIImage(named: ImageName.setting.rawValue)
-    let settingImageSelected = UIImage(named: ImageName.settingSelected.rawValue)
-    let plusImage = UIImage(named: ImageName.plus.rawValue)
-    let plusImageSelected = UIImage(named: ImageName.plusSelected.rawValue)
-    let minusImage = UIImage(named: ImageName.minus.rawValue)
-    let minusImageSelected = UIImage(named: ImageName.minusSelected.rawValue)
-    let plus10Image = UIImage(named: ImageName.plus10.rawValue)
-    let plus10ImageSelected = UIImage(named: ImageName.plus10Selected.rawValue)
-    let minus10Image = UIImage(named: ImageName.minus10.rawValue)
-    let minus10ImageSelected = UIImage(named: ImageName.minus10Selected.rawValue)
-    let saveAndBackImage = UIImage(named: ImageName.saveAndBack.rawValue)
+    let settingImage             = UIImage(named: ImageName.setting.rawValue)
+    let settingImageSelected     = UIImage(named: ImageName.settingSelected.rawValue)
+    let plusImage                = UIImage(named: ImageName.plus.rawValue)
+    let plusImageSelected        = UIImage(named: ImageName.plusSelected.rawValue)
+    let minusImage               = UIImage(named: ImageName.minus.rawValue)
+    let minusImageSelected       = UIImage(named: ImageName.minusSelected.rawValue)
+    let plus10Image              = UIImage(named: ImageName.plus10.rawValue)
+    let plus10ImageSelected      = UIImage(named: ImageName.plus10Selected.rawValue)
+    let minus10Image             = UIImage(named: ImageName.minus10.rawValue)
+    let minus10ImageSelected     = UIImage(named: ImageName.minus10Selected.rawValue)
+    let saveAndBackImage         = UIImage(named: ImageName.saveAndBack.rawValue)
     let saveAndBackImageSelected = UIImage(named: ImageName.saveAndBackSelected.rawValue)
     
-    var speedsPosY:CGFloat!
-    var sizesPosY:CGFloat!
+    var speedsPosY: CGFloat!
+    var sizesPosY:  CGFloat!
     
     var setting = Setting()
     var headers: [Header] = []    // picker.selectedRowとindexを対応させる
@@ -519,6 +519,18 @@ class ChooseMusicScene: SKScene {
         speedLabel.text = String(setting.speedRatioInt) + "%"
         noteSizeLabel.text = String(setting.scaleRatioInt) + "%"
         difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: headers[picker!.selectedRow].playLevel).rawValue
+        
+        guard picker != nil else { return }
+        
+        if headers[picker.selectedRow].videoID == "" && headers[picker.selectedRow].videoID2 == "" {
+            YouTubeSwitch.isOn = false
+            YouTubeSwitch.isEnabled = false
+        } else {
+            YouTubeSwitch.isOn = setting.isYouTube
+            YouTubeSwitch.isEnabled = true
+            
+//            print(headers[picker.selectedRow].videoID)
+        }
     }
     
     override func willMove(from view: SKView) {
@@ -530,6 +542,8 @@ class ChooseMusicScene: SKScene {
     @objc func onClickPlayButton(_ sender : UIButton) {
         
         setting.musicName = picker.textStore
+        setting.isYouTube = YouTubeSwitch.isOn
+        setting.isAutoPlay = autoPlaySwitch.isOn
         setting.save()
         
         // 移動
@@ -670,7 +684,17 @@ class ChooseMusicScene: SKScene {
     }
     
     // picker
+    /// 呼び出される条件が不明
+    ///
+    /// - Parameter sender: <#sender description#>
     @objc func pickerChanged(_ sender: PickerKeyboard){
-        setting.musicName = sender.textStore
+//        setting.musicName = sender.textStore
+//        if headers[sender.selectedRow].videoID == "" && headers[sender.selectedRow].videoID2 == "" {
+//            YouTubeSwitch.isOn = false
+//            YouTubeSwitch.isEnabled = false
+//        } else {
+//            YouTubeSwitch.isEnabled = true
+//            print(headers[sender.selectedRow].videoID)
+//        }
     }
 }
