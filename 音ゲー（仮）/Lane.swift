@@ -33,9 +33,9 @@ class Lane {
     
     private var laneNotes: [Note] = []  // 最初に全部格納する！
     var isEmpty: Bool { return laneNotes.isEmpty }
-    var headNote: Note? { return laneNotes.first }
+    var headNote: Note? { return laneNotes.last }
     func append(_ note: Note) { laneNotes.append(note) }
-    func sort() { laneNotes.sort { $0.beat < $1.beat } }
+    func sort() { laneNotes.sort { $0.beat > $1.beat } }  // 後のノーツが配列の前に来るようソート
     
     var storedFlickJudgeInformation: (timeLag: TimeInterval, touch: UITouch)? {// (判定予定時間(movedが呼ばれた時間), タッチ情報)
         didSet {
@@ -63,9 +63,12 @@ class Lane {
     /// それ以外の場合は.otherwiseを返す
     var middleObservationTimeState: ObsevationTimeState {
         
-        guard self.isTimeLagSet,
-            !(laneNotes.isEmpty)       else { return .otherwise }
-        guard laneNotes.first is Middle  else { return .otherwise }
+        guard self.isTimeLagSet, !(laneNotes.isEmpty) else {
+            return .otherwise
+        }
+        guard headNote is Middle else {
+            return .otherwise
+        }
         
         switch timeLag {
         case  parfectUpperBorder ..<  missUpperBorder:    return .before
@@ -77,10 +80,12 @@ class Lane {
     ///  次の判定ノーツがフリックで、前半判定圏内にあり、perfectでなければtrue。その他の場合falseを返す
     var isFlickAndBefore: Bool {
         
-        guard self.isTimeLagSet,
-            !(laneNotes.isEmpty)        else { return false }
-        guard laneNotes.first is Flick ||
-            laneNotes.first is FlickEnd else { return false }
+        guard self.isTimeLagSet, !(laneNotes.isEmpty) else {
+            return false
+        }
+        guard headNote is Flick || headNote is FlickEnd else {
+            return false
+        }
         
         return (parfectUpperBorder ..< missUpperBorder).contains(timeLag)
     }
@@ -111,12 +116,12 @@ class Lane {
         
         for (index, BPM) in BPMs.enumerated() {
             if BPMs.count > index+1 &&
-                self.laneNotes[0].beat > BPMs[index+1].startPos { // indexが最後でない場合
+                headNote!.beat > BPMs[index+1].startPos { // indexが最後でない場合
                 
                 self.timeLag += (BPMs[index+1].startPos - BPM.startPos) * 60 / BPM.bpm
                 
             } else {
-                self.timeLag += (self.laneNotes[0].beat - BPM.startPos) * 60 / BPM.bpm
+                self.timeLag += (headNote!.beat - BPM.startPos) * 60 / BPM.bpm
                 self.currentBPM = BPM.bpm
                 break
             }
@@ -128,13 +133,14 @@ class Lane {
     
     // 先頭ノーツを判定し終えた時の処理をまとめて行う
     func setHeadNoteJudged() {
-        laneNotes.first?.isJudged = true
+        headNote?.isJudged = true
         (headNote as? TapStart)?.next.isJudgeable = true
         (headNote as? Middle)?.next.isJudgeable = true
-        if laneNotes.count >= 2 {
-            timeLag += (laneNotes[1].beat - laneNotes[0].beat) / (currentBPM/60)    // 先頭ノーツが入れ替わるのでtimeLag更新
+        let lastIndex = laneNotes.count - 1
+        if lastIndex >= 1 {
+            timeLag += (laneNotes[lastIndex - 1].beat - laneNotes[lastIndex].beat) / (currentBPM/60)    // 先頭ノーツが入れ替わるのでtimeLag更新
         }
-        laneNotes.removeFirst()
+        self.laneNotes.removeLast()
     }
     
     // timeLagに対応する判定を返す
