@@ -311,8 +311,7 @@ class Middle: Note {
         }
         
         // 通過後のノーツはreturn
-        guard !(isJudged &&
-            image.isHidden && longImages.circle.isHidden && longImages.long.isHidden) else {
+        guard !(isJudged && image.isHidden && longImages.circle.isHidden && longImages.long.isHidden && positionOnLane < 0) else {
                 return
         }
         
