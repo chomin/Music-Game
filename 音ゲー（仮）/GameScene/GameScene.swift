@@ -407,9 +407,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 
                 for gsTouch in self.allGSTouches {
                     
-                    let pos = DispatchQueue.main.sync {
-                        return gsTouch.touch.location(in: self.view?.superview)
-                    }
+                    let pos = gsTouch.touch.location(in: self.view?.superview)
                     
                     for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
                         
