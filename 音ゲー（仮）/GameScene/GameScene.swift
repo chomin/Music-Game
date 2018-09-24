@@ -50,8 +50,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     let playMode: PlayMode
     let isAutoPlay: Bool
     
-    let judgeQueue = DispatchQueue(label: "judge_queue", qos: .userInteractive)    // キューに入れた処理内容を順番に実行(FPS落ち対策)
-    
+//    let judgeQueue = DispatchQueue(label: "judge_queue", qos: .userInteractive)    // キューに入れた処理内容を順番に実行(FPS落ち対策)
     
     // appの起動、終了等に関するデリゲート
     var appDelegate: AppDelegate!
@@ -373,9 +372,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // レーンの更新(ノーツ更新後に実行)
         lanes.filter({ !($0.isEmpty) }).forEach({ lane in
-            judgeQueue.async {
+//            judgeQueue.async {
                 lane.updateTimeLag(self.passedTime, self.BPMs)
-            }
+//            }
         })
         
 //        for lane in lanes {
@@ -403,8 +402,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         } else {
             // 判定関係
             // middleの判定（同じところで長押しのやつ）
-            judgeQueue.async {
-                
+//            judgeQueue.async {
+
                 for gsTouch in self.allGSTouches {
                     
                     let pos = gsTouch.touch.location(in: self.view?.superview)
@@ -433,7 +432,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                         }
                     }
                 }
-            }
+//            }
         }
         
         // 終了時刻が指定されていればその時刻でシーン移動
