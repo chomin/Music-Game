@@ -41,7 +41,14 @@ class PickerKeyboard: UIControl {
         }
         self.headers = headers
         
-        selectedRow = headers.map { $0.title } .index(of: firstText)!
+        if firstText.first == "★" {
+            var searchText = firstText
+            searchText.removeFirst()
+            selectedRow = headers.map { $0.title } .index(of: searchText)!
+        } else {
+            selectedRow = headers.map { $0.title } .index(of: firstText)!
+        }
+        
         
         super.init(frame: frame)
         
