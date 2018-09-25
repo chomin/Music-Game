@@ -23,25 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        // Realmのマイグレーションとスキーマのバージョン設定(マイグレーションのたびにschemaVersionの値を上げていく必要あり。
-        // また、(CMSceneで)realm.deleteAllすること。 or migration.enumerateObjectsすること。)
-        let config = Realm.Configuration(
-            schemaVersion: 5,
-            migrationBlock: { migration, oldSchemaVersion in
-                if oldSchemaVersion < 1 {}
-                if oldSchemaVersion < 5 {
-                    migration.enumerateObjects(
-                        ofType: Header.className(),
-                        { (oldObject, newObject) in
-                            let fileName = oldObject!["bmsNameWithExtension"] as! String
-                            
-                    })
-                }
-                
-        })
+        let config = Realm.Configuration(deleteRealmIfMigrationNeeded: true)
         Realm.Configuration.defaultConfiguration = config
-        
-        
         
         return true
     }

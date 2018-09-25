@@ -499,6 +499,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     @objc func onClickContinueButton(_ sender : UIButton) {
+        
         pauseView?.removeFromSuperview()
         self.isUserInteractionEnabled = true
         self.isSupposedToPausePlayerView = false
@@ -623,7 +624,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         reloadSceneAsBGMMode()
     }
     
-    /// アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
+    /// アプリが閉じそうなとき、ポーズボタンを押されたときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
         
         guard view?.scene is GameScene else { return }
