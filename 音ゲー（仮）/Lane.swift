@@ -34,7 +34,8 @@ class Lane {
     private var laneNotes: [Note] = []  // 最初に全部格納する！
     var isEmpty: Bool { return laneNotes.isEmpty }
     var headNote: Note? { return laneNotes.first }
-    func append(_ note: Note) { laneNotes.append(note) }
+    func append(_ note: Note) { self.laneNotes.append(note) }
+    func remove(_ note: Note) { if let i = laneNotes.index(of: note) { self.laneNotes.remove(at: i) } }
     func sort() { laneNotes.sort { $0.beat < $1.beat } }
     
     var storedFlickJudgeInformation: (timeLag: TimeInterval, touch: UITouch)? {// (判定予定時間(movedが呼ばれた時間), タッチ情報)

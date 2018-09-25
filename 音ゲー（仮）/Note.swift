@@ -15,15 +15,21 @@ class Tap: Note {
     let isLarge: Bool                   // 大ノーツかどうか
     let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
-        self.isLarge = noteMaterial.isLarge
+    private init(_ beatPos: Double, _ laneIndex: Int, _ isLarge: Bool, _ speed: CGFloat, _ appearTime: TimeInterval) {
+        self.isLarge = isLarge
         self.appearTime = appearTime
-        super.init(beatPos: noteMaterial.beat, laneIndex: noteMaterial.laneIndex, speed: speed)
+        super.init(beatPos: beatPos, laneIndex: laneIndex, speed: speed)
 
         // imageのインスタンス(白円or黄円)を作成
         self.image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
         image.fillColor = isLarge ? UIColor.yellow : UIColor.white
         image.isHidden = true   // 初期状態では隠しておく
+    }
+    convenience init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
+        self.init(noteMaterial.beat, noteMaterial.laneIndex, noteMaterial.isLarge, speed, appearTime)
+    }
+    convenience init(tapEnd: TapEnd) {
+        self.init(tapEnd.beat, tapEnd.laneIndex, tapEnd.isLarge, tapEnd.speed, 0)
     }
     
     override func update(_ passedTime: TimeInterval) {
@@ -63,9 +69,9 @@ class Flick: Note {
     
     let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
+    private init(_ beatPos: Double, _ laneIndex: Int, _ speed: CGFloat, _ appearTime: TimeInterval) {
         self.appearTime = appearTime
-        super.init(beatPos: noteMaterial.beat, laneIndex: noteMaterial.laneIndex, speed: speed)
+        super.init(beatPos: beatPos, laneIndex: laneIndex, speed: speed)
 
         // imageのインスタンス(マゼンタ三角形)を作成
         let length = Note.initialSize / 2   // 三角形一辺の長さの半分
@@ -81,6 +87,12 @@ class Flick: Note {
         image.fillColor = UIColor.magenta
         image.isHidden = true   // 初期状態では隠しておく
         
+    }
+    convenience init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
+        self.init(noteMaterial.beat, noteMaterial.laneIndex, speed, appearTime)
+    }
+    convenience init(flickEnd: FlickEnd) {
+        self.init(flickEnd.beat, flickEnd.laneIndex, flickEnd.speed, 0)
     }
     
     override func update(_ passedTime: TimeInterval) {
@@ -118,10 +130,10 @@ class TapStart: Note {
     let isLarge: Bool                                               // 大ノーツかどうか
     let appearTime: TimeInterval                                // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
     
-    init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
-        self.isLarge = noteMaterial.isLarge
+    private init(_ beatPos: Double, _ laneIndex: Int, _ isLarge: Bool, _ speed: CGFloat, _ appearTime: TimeInterval) {
+        self.isLarge = isLarge
         self.appearTime = appearTime
-        super.init(beatPos: noteMaterial.beat, laneIndex: noteMaterial.laneIndex, speed: speed)
+        super.init(beatPos: beatPos, laneIndex: laneIndex, speed: speed)
 
         // imageのインスタンス(緑円or黄円)を作成
         image = SKShapeNode(circleOfRadius: Note.initialSize / 2)
@@ -136,6 +148,15 @@ class TapStart: Note {
         longImages.long.isHidden = true
         longImages.circle.fillColor = isLarge ? UIColor.yellow : UIColor.green
         longImages.circle.isHidden = true
+    }
+    convenience init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
+        self.init(noteMaterial.beat, noteMaterial.laneIndex, noteMaterial.isLarge, speed, appearTime)
+    }
+    convenience init(middle: Middle) {
+        var following = middle.next
+        while let middle = following as? Middle { following = middle.next }
+        self.init(middle.beat, middle.laneIndex, (following as! TapEnd).isLarge, middle.speed, 0)
+        self.next = middle.next
     }
     
     deinit {
@@ -246,7 +267,7 @@ class TapStart: Note {
         } else {
             longImages.long.isHidden = false
         }
-        if position.y >= Dimensions.judgeLineY || next.position.y < Dimensions.judgeLineY {
+        if position.y >= Dimensions.judgeLineY || next.position.y < Dimensions.judgeLineY || next.isJudged {
             longImages.circle.isHidden = true
         } else {
             longImages.circle.isHidden = false
@@ -311,7 +332,7 @@ class Middle: Note {
         }
         
         // 通過後のノーツはreturn
-        guard !(isJudged && image.isHidden && longImages.circle.isHidden && longImages.long.isHidden && positionOnLane < 0) else {
+        guard !(isJudged && image.isHidden && longImages.circle.isHidden && longImages.long.isHidden) else {
                 return
         }
         
@@ -399,7 +420,7 @@ class Middle: Note {
         } else {
             longImages.long.isHidden = false
         }
-        if position.y >= Dimensions.judgeLineY || next.position.y < Dimensions.judgeLineY {
+        if (position.y >= Dimensions.judgeLineY) || next.position.y < Dimensions.judgeLineY || next.isJudged {
             longImages.circle.isHidden = true
         } else {
             longImages.circle.isHidden = false
@@ -618,5 +639,12 @@ class Note {
         } else {        // 線と三角形
             image.setScale(size / Note.initialSize)
         }
+    }
+}
+
+// Noteオブジェクトが==演算子を使えるように
+extension Note: Equatable {
+    public static func ==(lhs: Note, rhs: Note) -> Bool {
+        return lhs === rhs
     }
 }

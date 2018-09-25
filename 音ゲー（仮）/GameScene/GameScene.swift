@@ -542,15 +542,50 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 }
             }
         }
-        // 途中まで判定したロングノーツがあれば最後まで判定済みに
+        // 途中まで判定したロングノーツがあれば未判定のノーツを開始ノーツに変換
         for note in notes {
             if let start = note as? TapStart, start.isJudged {
                 var following = start.next
-                while let middle = following as? Middle {
-                    missJudge(lane: lanes[middle.laneIndex])
+                while let middle = following as? Middle, middle.isJudged {
                     following = middle.next
                 }
-                missJudge(lane: lanes[following.laneIndex])
+                guard !(following.isJudged) else {
+                    continue            // 最後まで判定済みだった場合はcontinue
+                }
+                following.image.removeFromParent()  // 一応消去(longImagesは放置)
+
+                // 新たな始点ノーツを生成
+                var newNote = Note()
+                switch following {
+                case is TapEnd:   newNote = Tap     (tapEnd:   following as! TapEnd)
+                case is FlickEnd: newNote = Flick   (flickEnd: following as! FlickEnd)
+                case is Middle:   newNote = TapStart(middle:   following as! Middle)
+                default:
+                    print("後続ノーツタイプが不正です")
+                    continue
+                }
+                // addChild
+                self.addChild(newNote.image)
+                if let tapStart = newNote as? TapStart {
+                    self.addChild(tapStart.longImages.circle)
+                    self.addChild(tapStart.longImages.long)
+                }
+                // ロングノーツの始点ノーツおよび、それに付随する同時線を削除
+                notes.remove(at: notes.index(of: start)!)
+                if let i = sameLines.index(where: { $0.note1 == note || $0.note2 == note }) {
+                    self.sameLines.remove(at: i)
+                }
+                // 旧ノーツに付随する同時線を更新
+                for i in 0..<sameLines.count {
+                    if sameLines[i].note1 == following { self.sameLines[i].note1 = newNote }
+                    if sameLines[i].note2 == following { self.sameLines[i].note2 = newNote }
+                }
+                notes.append(newNote)
+                // laneNotesも更新
+                let lane = lanes[following.laneIndex]
+                lane.remove(following)
+                lane.append(newNote)
+                lane.sort()
             }
         }
     }
