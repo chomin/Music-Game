@@ -247,28 +247,30 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         setImages()
         
         self.mediaOffsetTime = (music.musicStartPos / BPMs[0].bpm) * 60
-        self.isPrecedingStartValid = false
-        for note in notes {
-            switch note {
-            case is Tap:
-                let tap = note as! Tap
-                if tap.appearTime < mediaOffsetTime {
-                    self.isPrecedingStartValid = true
+        self.isPrecedingStartValid = {
+            for note in notes {
+                switch note {
+                case is Tap:
+                    let tap = note as! Tap
+                    if tap.appearTime < mediaOffsetTime {
+                        return true
+                    }
+                case is Flick:
+                    let flick = note as! Flick
+                    if flick.appearTime < mediaOffsetTime {
+                        return true
+                    }
+                case is TapStart:
+                    let tapStart = note as! TapStart
+                    if tapStart.appearTime < mediaOffsetTime {
+                        return true
+                    }
+                default:
+                    break
                 }
-            case is Flick:
-                let flick = note as! Flick
-                if flick.appearTime < mediaOffsetTime {
-                    self.isPrecedingStartValid = true
-                }
-            case is TapStart:
-                let tapStart = note as! TapStart
-                if tapStart.appearTime < mediaOffsetTime {
-                    self.isPrecedingStartValid = true
-                }
-            default:
-                break
             }
-        }
+            return false
+        }()
         
         // 再生時間や背景、ビューの前後関係などを指定
         if playMode == .BGM {
@@ -545,10 +547,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             if let start = note as? TapStart, start.isJudged {
                 var following = start.next
                 while let middle = following as? Middle {
-                    middle.isJudged = true
+                    missJudge(lane: lanes[middle.laneIndex])
                     following = middle.next
                 }
-                following.isJudged = true
+                missJudge(lane: lanes[following.laneIndex])
             }
         }
     }
@@ -631,6 +633,16 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     /// アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
+
+        if self.playMode == .BGM {
+            BGM?.pause()
+        } else {
+            if (isPrecedingStartValid && ytLaunchState == .done) || (!isPrecedingStartValid && playerView.playerState() == .playing) {
+                playerView.pauseVideo()
+                playerView.seek(toSeconds: Float(playerView.currentTime - 3), allowSeekAhead: true)
+            }
+        }
+
         // ポーズが可能な状態じゃない時は予約しておく
         if playMode == .BGM {
             if BGM.currentTime <= 0 {
@@ -641,16 +653,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.isSupposedToPausePlayerView = true
             }
         }
-        
-        if self.playMode == .BGM {
-            BGM?.pause()
-        } else {
-            if (isPrecedingStartValid && ytLaunchState == .done) || (!isPrecedingStartValid && playerView.playerState() == .playing) {
-                playerView.pauseVideo()
-                playerView.seek(toSeconds: Float(playerView.currentTime - 3), allowSeekAhead: true)
-            }
-        }
-        
+
         // 選択画面を出す
         if self.pauseView == nil {
             self.pauseView = { () -> UIView in
