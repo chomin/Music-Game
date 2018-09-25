@@ -49,7 +49,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     let playMode: PlayMode
     let isAutoPlay: Bool
-    
+
     // appの起動、終了等に関するデリゲート
     var appDelegate: AppDelegate!
     
@@ -245,28 +245,30 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         setImages()
         
         self.mediaOffsetTime = (music.musicStartPos / BPMs[0].bpm) * 60
-        self.isPrecedingStartValid = false
-        for note in notes {
-            switch note {
-            case is Tap:
-                let tap = note as! Tap
-                if tap.appearTime < mediaOffsetTime {
-                    self.isPrecedingStartValid = true
+        self.isPrecedingStartValid = {
+            for note in notes {
+                switch note {
+                case is Tap:
+                    let tap = note as! Tap
+                    if tap.appearTime < mediaOffsetTime {
+                        return true
+                    }
+                case is Flick:
+                    let flick = note as! Flick
+                    if flick.appearTime < mediaOffsetTime {
+                        return true
+                    }
+                case is TapStart:
+                    let tapStart = note as! TapStart
+                    if tapStart.appearTime < mediaOffsetTime {
+                        return true
+                    }
+                default:
+                    break
                 }
-            case is Flick:
-                let flick = note as! Flick
-                if flick.appearTime < mediaOffsetTime {
-                    self.isPrecedingStartValid = true
-                }
-            case is TapStart:
-                let tapStart = note as! TapStart
-                if tapStart.appearTime < mediaOffsetTime {
-                    self.isPrecedingStartValid = true
-                }
-            default:
-                break
             }
-        }
+            return false
+        }()
         
         // 再生時間や背景、ビューの前後関係などを指定
         if playMode == .BGM {
@@ -398,7 +400,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         } else {
             // 判定関係
             // middleの判定（同じところで長押しのやつ）
-            
+
             for gsTouch in self.allGSTouches {
                 
                 let pos = gsTouch.touch.location(in: self.view?.superview)
@@ -426,6 +428,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                         self.storedFlickJudge(lane: lane)
                     }
                 }
+//            }
             }
         }
         
@@ -535,15 +538,50 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 }
             }
         }
-        // 途中まで判定したロングノーツがあれば最後まで判定済みに
+        // 途中まで判定したロングノーツがあれば未判定のノーツを開始ノーツに変換
         for note in notes {
             if let start = note as? TapStart, start.isJudged {
                 var following = start.next
-                while let middle = following as? Middle {
-                    middle.isJudged = true
+                while let middle = following as? Middle, middle.isJudged {
                     following = middle.next
                 }
-                following.isJudged = true
+                guard !(following.isJudged) else {
+                    continue            // 最後まで判定済みだった場合はcontinue
+                }
+                following.image.removeFromParent()  // 一応消去(longImagesは放置)
+
+                // 新たな始点ノーツを生成
+                var newNote = Note()
+                switch following {
+                case is TapEnd:   newNote = Tap     (tapEnd:   following as! TapEnd)
+                case is FlickEnd: newNote = Flick   (flickEnd: following as! FlickEnd)
+                case is Middle:   newNote = TapStart(middle:   following as! Middle)
+                default:
+                    print("後続ノーツタイプが不正です")
+                    continue
+                }
+                // addChild
+                self.addChild(newNote.image)
+                if let tapStart = newNote as? TapStart {
+                    self.addChild(tapStart.longImages.circle)
+                    self.addChild(tapStart.longImages.long)
+                }
+                // ロングノーツの始点ノーツおよび、それに付随する同時線を削除
+                notes.remove(at: notes.index(of: start)!)
+                if let i = sameLines.index(where: { $0.note1 == note || $0.note2 == note }) {
+                    self.sameLines.remove(at: i)
+                }
+                // 旧ノーツに付随する同時線を更新
+                for i in 0..<sameLines.count {
+                    if sameLines[i].note1 == following { self.sameLines[i].note1 = newNote }
+                    if sameLines[i].note2 == following { self.sameLines[i].note2 = newNote }
+                }
+                notes.append(newNote)
+                // laneNotesも更新
+                let lane = lanes[following.laneIndex]
+                lane.remove(following)
+                lane.append(newNote)
+                lane.sort()
             }
         }
     }
@@ -626,9 +664,18 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     /// アプリが閉じそうなとき、ポーズボタンを押されたときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
-        
+
         guard view?.scene is GameScene else { return }
-        
+
+        if self.playMode == .BGM {
+            BGM?.pause()
+        } else {
+            if (isPrecedingStartValid && ytLaunchState == .done) || (!isPrecedingStartValid && playerView.playerState() == .playing) {
+                playerView.pauseVideo()
+                playerView.seek(toSeconds: Float(playerView.currentTime - 3), allowSeekAhead: true)
+            }
+        }
+
         // ポーズが可能な状態じゃない時は予約しておく
         if playMode == .BGM {
             if BGM.currentTime <= 0 {
@@ -639,16 +686,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 self.isSupposedToPausePlayerView = true
             }
         }
-        
-        if self.playMode == .BGM {
-            BGM?.pause()
-        } else {
-            if (isPrecedingStartValid && ytLaunchState == .done) || (!isPrecedingStartValid && playerView.playerState() == .playing) {
-                playerView.pauseVideo()
-                playerView.seek(toSeconds: Float(playerView.currentTime - 3), allowSeekAhead: true)
-            }
-        }
-        
+
         // 選択画面を出す
         if self.pauseView == nil {
             self.pauseView = { () -> UIView in
