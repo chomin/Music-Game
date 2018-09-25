@@ -49,9 +49,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     let playMode: PlayMode
     let isAutoPlay: Bool
-    
-//    let judgeQueue = DispatchQueue(label: "judge_queue", qos: .userInteractive)    // キューに入れた処理内容を順番に実行(FPS落ち対策)
-    
+
     // appの起動、終了等に関するデリゲート
     var appDelegate: AppDelegate!
     
@@ -374,14 +372,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // レーンの更新(ノーツ更新後に実行)
         lanes.filter({ !($0.isEmpty) }).forEach({ lane in
-//            judgeQueue.async {
-                lane.updateTimeLag(self.passedTime, self.BPMs)
-//            }
+            lane.updateTimeLag(self.passedTime, self.BPMs)
         })
         
-//        for lane in lanes {
-//            lane.updateTimeLag(passedTime, BPMs)
-//        }
+        //        for lane in lanes {
+        //            lane.updateTimeLag(passedTime, BPMs)
+        //        }
         
         // 同時押しラインの更新
         for sameLine in sameLines {
@@ -404,37 +400,36 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         } else {
             // 判定関係
             // middleの判定（同じところで長押しのやつ）
-//            judgeQueue.async {
 
-                for gsTouch in self.allGSTouches {
+            for gsTouch in self.allGSTouches {
+                
+                let pos = gsTouch.touch.location(in: self.view?.superview)
+                
+                for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
                     
-                    let pos = gsTouch.touch.location(in: self.view?.superview)
-                    
-                    for (laneIndex, judgeRect) in Dimensions.judgeRects.enumerated() {
+                    if judgeRect.contains(pos) {   // ボタンの範囲
                         
-                        if judgeRect.contains(pos) {   // ボタンの範囲
-                            
-                            if self.parfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
-                                break   // このタッチでこのフレームでの判定はもう行わない
-                            }
+                        if self.parfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
+                            break   // このタッチでこのフレームでの判定はもう行わない
                         }
                     }
                 }
-                
-                // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
-                for lane in self.lanes {
-                    if lane.judgeTimeState == .passed && !(lane.isEmpty) {
+            }
+            
+            // レーンの監視(過ぎて行ってないか&storedFlickJudgeの時間になっていないか)
+            for lane in self.lanes {
+                if lane.judgeTimeState == .passed && !(lane.isEmpty) {
+                    
+                    self.missJudge(lane: lane)
+                    
+                } else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
+                    if lane.timeLag < -storedFlickJudgeInformation.timeLag {
                         
-                        self.missJudge(lane: lane)
-                        
-                    } else if let storedFlickJudgeInformation = lane.storedFlickJudgeInformation {
-                        if lane.timeLag < -storedFlickJudgeInformation.timeLag {
-                            
-                            self.storedFlickJudge(lane: lane)
-                        }
+                        self.storedFlickJudge(lane: lane)
                     }
                 }
 //            }
+            }
         }
         
         // 終了時刻が指定されていればその時刻でシーン移動
@@ -507,6 +502,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     @objc func onClickContinueButton(_ sender : UIButton) {
+        
         pauseView?.removeFromSuperview()
         self.isUserInteractionEnabled = true
         self.isSupposedToPausePlayerView = false
@@ -666,8 +662,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         reloadSceneAsBGMMode()
     }
     
-    /// アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
+    /// アプリが閉じそうなとき、ポーズボタンを押されたときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
+
+        guard view?.scene is GameScene else { return }
 
         if self.playMode == .BGM {
             BGM?.pause()
