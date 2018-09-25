@@ -625,6 +625,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     /// アプリが閉じそうなときに呼ばれる(AppDelegate.swiftから)
     func applicationWillResignActive() {
+        
+        guard view?.scene is GameScene else { return }
+        
         // ポーズが可能な状態じゃない時は予約しておく
         if playMode == .BGM {
             if BGM.currentTime <= 0 {

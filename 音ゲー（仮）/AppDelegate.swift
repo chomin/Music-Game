@@ -52,6 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         print("move from active to inactive state")
         
+        
         self.gsDelegate?.applicationWillResignActive()
     }
     
