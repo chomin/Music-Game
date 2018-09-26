@@ -147,7 +147,19 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         switch playMode {
         case .BGM:
             // サウンドファイルのパスを生成
-            let Path = Bundle.main.path(forResource: "Sounds/" + music.title, ofType: "mp3")!     // m4a,oggは不可
+            let Path: String = {
+                if music.group != "BDGP" { return Bundle.main.path(forResource: "Sounds/" + music.title, ofType: "mp3")! }  // m4a,oggは不可
+                else                     {
+                    var mp3FileName = music.title
+                    let startIndex = mp3FileName.index(after:  mp3FileName.lastIndex(of: "(")!)
+                    let lastIndex  = mp3FileName.index(before: mp3FileName.lastIndex(of: ")")!)
+                    mp3FileName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
+                    let insertIndex = mp3FileName.index(after:  mp3FileName.lastIndex(of: "(")!)
+                    mp3FileName.insert(contentsOf: "BDGP", at: insertIndex)
+                    return Bundle.main.path(forResource: "Sounds/" + mp3FileName , ofType: "mp3")!
+                }
+            }()
+            
             let soundURL = URL(fileURLWithPath: Path)
             // AVAudioPlayerのインスタンスを作成
             do {
@@ -188,7 +200,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             return Button
         }()
         
-        //リザルトの初期化
+        // リザルトの初期化
         ResultScene.parfect = 0
         ResultScene.great = 0
         ResultScene.good = 0

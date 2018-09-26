@@ -80,6 +80,7 @@ class Music {
     var genre:     String { return header.genre     }   // ジャンル
     var title:     String { return header.title     }   // タイトル(正式名称。ファイル名は文字の制約があるためこっちを正式とする)
     var artist:    String { return header.artist    }   // アーティスト
+    var group:     String { return header.group     }
     var playLevel: Int    { return header.playLevel }   // 難易度
     var volWav:    Int    { return header.volWav    }   // 音量を現段階のn%として出力するか(TODO: 未実装)
     var bmsNameWithExtension: String { return header.bmsNameWithExtension }
