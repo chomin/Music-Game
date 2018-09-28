@@ -58,7 +58,8 @@ class Tap: Note {
 
 /// フリックノーツ
 /// 原則としてtouchesMovedが呼び出されたときに判定する。
-/// 呼び出し時にまだparfectの時間でない場合(before)について、後にparfect判定を行うかもしれないので、時間とUItouch情報を該当LaneインスタンスのstoredFlickJudgeに、レーン情報を該当GSTouchインスタンスのstoredFlickJudgeLaneIndexに格納し、後にこの情報をもとにGameSceneTouchesファイル内に記述されているGameScene.storedFlickJudge関数にて判定を行う。この呼出は情報が残っているときにのみ行われ、該当ノーツの判定後に各情報格納場所にnilが入る。storedFlickJudgeの呼び出しタイミングはtouchesMoved呼び出し時にレーンから指が外れた時、touchesEnded呼び出し時、これ以上待ってもより良い判定が来なくなる時（ノーツの正確なタイミングの時間についてtimeLag予定時間(>0)と対象な時間）である。
+/// 呼び出し時にまだparfectの時間でない場合(before)について、後にparfect判定を行うかもしれないので、時間とUItouch情報を該当LaneインスタンスのstoredFlickJudgeに、レーン情報を該当GSTouchインスタンスのstoredFlickJudgeLaneIndexに格納し、後にこの情報をもとにGameSceneTouchesファイル内に記述されているGameScene.storedFlickJudge関数にて判定を行う。
+/// この呼出は情報が残っているときにのみ行われ、該当ノーツの判定後に各情報格納場所にnilが入る。storedFlickJudgeの呼び出しタイミングはtouchesMoved呼び出し時にレーンから指が外れた時、touchesEnded呼び出し時、これ以上待ってもより良い判定が来なくなる時（ノーツの正確なタイミングの時間についてtimeLag予定時間(>0)と対象な時間）である。
 class Flick: Note {
     
     let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
