@@ -19,7 +19,7 @@ import SpriteKit
 
 
 enum NoteType {
-    case tap, flick, tapStart, middle, tapEnd, flickEnd
+    case tap, flick, right, left, tapStart, middle, tapEnd, flickEnd, rightEnd, leftEnd
 }
 
 /// BMSのメインデータから得られるノーツ情報。このオブジェクトから最終的にノーツを生成する
@@ -176,11 +176,15 @@ class Music {
             autoreleasepool {
                 switch noteMaterial.type {
                 case .tap:      note = Tap     (noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed))
-                case .flick:    note = Flick   (noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed))
+                case .flick:    note = Flick   (noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed), direction: .any   )
+                case .right:    note = Flick   (noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed), direction: .right )
+                case .left:     note = Flick   (noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed), direction: .left  )
                 case .tapStart: note = TapStart(noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed))
                 case .middle:   note = Middle  (noteMaterial: noteMaterial, speed: speed, appearTime: getAppearTime(noteMaterial.beat, speed))
                 case .tapEnd:   note = TapEnd  (noteMaterial: noteMaterial, speed: speed)
-                case .flickEnd: note = FlickEnd(noteMaterial: noteMaterial, speed: speed)
+                case .flickEnd: note = FlickEnd(noteMaterial: noteMaterial, speed: speed, direction: .any   )
+                case .rightEnd: note = FlickEnd(noteMaterial: noteMaterial, speed: speed, direction: .right )
+                case .leftEnd:  note = FlickEnd(noteMaterial: noteMaterial, speed: speed, direction: .left  )
                 }
             }
 
@@ -201,7 +205,6 @@ class Music {
             }
             return note
         }
-
         return noteMaterials.map { generate($0) }
     }
 
@@ -321,6 +324,12 @@ class Music {
             case start2L   = "0E"
             case end2L     = "0F"
             case tapLL     = "0G"
+            case right     = "0H"
+            case left      = "0I"
+            case rightEnd1 = "0J"
+            case leftEnd1  = "0K"
+            case rightEnd2 = "0L"
+            case leftEnd2  = "0M"
         }
 
         // mainDataを小節毎に分ける
@@ -391,6 +400,10 @@ class Music {
                             noteMaterials.append(NoteMaterial(type: .tap,      beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
                         case .flick:
                             noteMaterials.append(NoteMaterial(type: .flick,    beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                        case .right:
+                            noteMaterials.append(NoteMaterial(type: .right,    beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                        case .left:
+                            noteMaterials.append(NoteMaterial(type: .left,     beatPos: beat, laneIndex: lane, speedRatio: ratio))
                         case .start1:
                             longNotes1   .append(NoteMaterial(type: .tapStart, beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
                         case .middle1:
@@ -399,6 +412,10 @@ class Music {
                             longNotes1   .append(NoteMaterial(type: .tapEnd,   beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
                         case .flickEnd1:
                             longNotes1   .append(NoteMaterial(type: .flickEnd, beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                        case .rightEnd1:
+                            longNotes1   .append(NoteMaterial(type: .rightEnd, beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                        case .leftEnd1:
+                            longNotes1   .append(NoteMaterial(type: .leftEnd,  beatPos: beat, laneIndex: lane, speedRatio: ratio))
                         case .start2:
                             longNotes2   .append(NoteMaterial(type: .tapStart, beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
                         case .middle2:
@@ -407,6 +424,10 @@ class Music {
                             longNotes2   .append(NoteMaterial(type: .tapEnd,   beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: false))
                         case .flickEnd2:
                             longNotes2   .append(NoteMaterial(type: .flickEnd, beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                        case .rightEnd2:
+                            longNotes2   .append(NoteMaterial(type: .rightEnd, beatPos: beat, laneIndex: lane, speedRatio: ratio))
+                        case .leftEnd2:
+                            longNotes2   .append(NoteMaterial(type: .leftEnd,  beatPos: beat, laneIndex: lane, speedRatio: ratio))
                         case .tapL:
                             noteMaterials.append(NoteMaterial(type: .tap,      beatPos: beat, laneIndex: lane, speedRatio: ratio, isLarge: true))
                         case .start1L:
