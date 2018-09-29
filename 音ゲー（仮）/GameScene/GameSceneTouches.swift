@@ -113,14 +113,49 @@ extension GameScene {
                             self.lanes[index].judgeTimeState != .passed {
                             
                             let gsTouch = self.allGSTouches[touchIndex] // エイリアス
-                            
-                            if ((judgeNote is Flick) && gsTouch.isJudgeableFlick) ||
-                                ((judgeNote is FlickEnd) && gsTouch.isJudgeableFlickEnd) {
+                            let addToNeabyNotes = {
                                 
                                 let distanceXToButton = abs(ppos.x - Dimensions.buttonX[index])
-                                
                                 nearbyNotes.append((laneIndex: index, timelag: self.lanes[index].timeLag, note: judgeNote, distanceXToButton: distanceXToButton))
-                                continue
+                            }
+                            if let flickNote = judgeNote as? Flick {
+                                
+                                switch flickNote.direction {
+                                case .any:
+                                    if gsTouch.isJudgeableFlick {
+                                        addToNeabyNotes()
+                                        continue
+                                    }
+                                case .right:
+                                    if pos.x - ppos.x > 5 {
+                                        addToNeabyNotes()
+                                        continue
+                                    }
+                                case .left:
+                                    if pos.x - ppos.x < 5 {
+                                        addToNeabyNotes()
+                                        continue
+                                    }
+                                }
+                            } else if let flickEndNote = judgeNote as? FlickEnd {
+                                
+                                switch flickEndNote.direction {
+                                case .any:
+                                    if gsTouch.isJudgeableFlickEnd {
+                                        addToNeabyNotes()
+                                        continue
+                                    }
+                                case .right:
+                                    if pos.x - ppos.x > 5 {
+                                        addToNeabyNotes()
+                                        continue
+                                    }
+                                case .left:
+                                    if pos.x - ppos.x < 5 {
+                                        addToNeabyNotes()
+                                        continue
+                                    }
+                                }
                             }
                         }
                     }

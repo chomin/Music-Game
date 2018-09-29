@@ -8,6 +8,10 @@
 
 import SpriteKit
 
+enum FlickDirection {
+    case right, left, any
+}
+
 /// Tapノーツ。
 /// touchesBeganか呼び出されたときに判定する。
 class Tap: Note {
@@ -69,31 +73,60 @@ class Tap: Note {
 class Flick: Note {
     
     let appearTime: TimeInterval        // 演奏開始から水平線を超えるまでの時間。これ以降にposの計算&更新を行う。
+    let direction:  FlickDirection
     
-    private init(_ beatPos: Double, _ laneIndex: Int, _ speed: CGFloat, _ appearTime: TimeInterval) {
+    private init(_ beatPos: Double, _ laneIndex: Int, _ speed: CGFloat, _ appearTime: TimeInterval, _ direction: FlickDirection) {
         self.appearTime = appearTime
+        self.direction = direction
         super.init(beatPos: beatPos, laneIndex: laneIndex, speed: speed)
 
-        // imageのインスタンス(マゼンタ三角形)を作成
+        
         let length = Note.initialSize / 2   // 三角形一辺の長さの半分
-        // 始点から終点までの４点を指定(2点を一致させ三角形に).
-        var points = [
-            CGPoint(x: length,  y: 0.0),
-            CGPoint(x: -length, y: 0.0),
-            CGPoint(x: 0.0,     y: length),
-            CGPoint(x: length,  y: 0.0)
-        ]
-        self.image = SKShapeNode(points: &points, count: points.count)
+        
+        switch direction {
+        case .any:
+            // imageのインスタンス(マゼンタ三角形)を作成
+            // 始点から終点までの４点を指定(2点を一致させ三角形に).
+            var points = [
+                CGPoint(x: length,  y: 0.0),
+                CGPoint(x: -length, y: 0.0),
+                CGPoint(x: 0.0,     y: length),
+                CGPoint(x: length,  y: 0.0)
+            ]
+            self.image = SKShapeNode(points: &points, count: points.count)
+            image.fillColor = UIColor.magenta
+            
+        case .right:
+            var points = [
+                CGPoint(x: 0.0,     y: 0.0),
+                CGPoint(x: -length, y: -length),
+                CGPoint(x: length,  y: 0.0),
+                CGPoint(x: -length, y: length),
+                CGPoint(x: 0.0,     y: 0.0)
+            ]
+            self.image = SKShapeNode(points: &points, count: points.count)
+            image.fillColor = UIColor.cyan
+            
+        case .left:
+            var points = [
+                CGPoint(x: 0.0,     y: 0.0),
+                CGPoint(x: length,  y: -length),
+                CGPoint(x: -length, y: 0.0),
+                CGPoint(x: length,  y: length),
+                CGPoint(x: 0.0,     y: 0.0)
+            ]
+            self.image = SKShapeNode(points: &points, count: points.count)
+            image.fillColor = UIColor.purple
+        }
         image.lineWidth = 3.0
-        image.fillColor = UIColor.magenta
         image.isHidden = true   // 初期状態では隠しておく
         
     }
-    convenience init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval) {
-        self.init(noteMaterial.beat, noteMaterial.laneIndex, speed, appearTime)
+    convenience init(noteMaterial: NoteMaterial, speed: CGFloat, appearTime: TimeInterval, direction: FlickDirection) {
+        self.init(noteMaterial.beat, noteMaterial.laneIndex, speed, appearTime, direction)
     }
     convenience init(flickEnd: FlickEnd) {
-        self.init(flickEnd.beat, flickEnd.laneIndex, flickEnd.speed, 0)
+        self.init(flickEnd.beat, flickEnd.laneIndex, flickEnd.speed, 0, flickEnd.direction)
     }
     
     override func update(_ passedTime: TimeInterval) {
@@ -483,24 +516,56 @@ class TapEnd: Note {
 class FlickEnd: Note {
     
 //    unowned var start = Note()
+    let direction: FlickDirection
 
-    init(noteMaterial: NoteMaterial, speed: CGFloat) {
+    init(noteMaterial: NoteMaterial, speed: CGFloat, direction: FlickDirection) {
+        self.direction = direction
         super.init(beatPos: noteMaterial.beat, laneIndex: noteMaterial.laneIndex, speed: speed)
         
         self.isJudgeable = false
         
-        // imageのインスタンス(マゼンタ三角形)を作成
-        let length = Note.initialSize / 2   // 三角形一辺の長さの半分
-        // 始点から終点までの４点を指定(2点を一致させ三角形に).
-        var points = [
-            CGPoint(x: length,  y: 0.0),
-            CGPoint(x: -length, y: 0.0),
-            CGPoint(x: 0.0,     y: length),
-            CGPoint(x: length,  y: 0.0)
-        ]
-        image = SKShapeNode(points: &points, count: points.count)
-        image.lineWidth = 3.0
-        image.fillColor = UIColor.magenta
+        
+        switch direction {
+        case .any:
+            // imageのインスタンス(マゼンタ三角形)を作成
+            let length = Note.initialSize / 2   // 三角形一辺の長さの半分
+            // 始点から終点までの４点を指定(2点を一致させ三角形に).
+            var points = [
+                CGPoint(x: length,  y: 0.0),
+                CGPoint(x: -length, y: 0.0),
+                CGPoint(x: 0.0,     y: length),
+                CGPoint(x: length,  y: 0.0)
+            ]
+            self.image = SKShapeNode(points: &points, count: points.count)
+            image.lineWidth = 3.0
+            image.fillColor = UIColor.magenta
+            
+        case .right:
+            let length = Note.initialSize / 2
+            var points = [
+                CGPoint(x: 0.0,     y: 0.0),
+                CGPoint(x: -length, y: -length),
+                CGPoint(x: length,  y: 0.0),
+                CGPoint(x: -length, y: length),
+                CGPoint(x: 0.0,     y: 0.0)
+            ]
+            self.image = SKShapeNode(points: &points, count: points.count)
+            image.lineWidth = 3.0
+            image.fillColor = UIColor.cyan
+            
+        case .left:
+            let length = Note.initialSize / 2
+            var points = [
+                CGPoint(x: 0.0,     y: 0.0),
+                CGPoint(x: length,  y: -length),
+                CGPoint(x: -length, y: 0.0),
+                CGPoint(x: length,  y: length),
+                CGPoint(x: 0.0,     y: 0.0)
+            ]
+            self.image = SKShapeNode(points: &points, count: points.count)
+            image.lineWidth = 3.0
+            image.fillColor = UIColor.purple
+        }
         image.isHidden = true   // 初期状態では隠しておく
     }
     
@@ -527,7 +592,8 @@ class FlickEnd: Note {
     }
 }
 
-// ノーツ基本クラス
+/// ノーツ基本クラス
+/// TODO: protocolとextensionで抽象クラスっぽくできそう？
 class Note {
     
     let beat: Double            // "拍"単位！小節ではない！！！
@@ -602,7 +668,7 @@ class Note {
     fileprivate func setPos() {
         
         /* y座標の計算 */
-        // 球面?に投写
+        // 球面?に投写(現状は円柱の側面(曲面))
         let denomOfAtan = pow(Dimensions.R, 2) + Dimensions.horizontalDistance * positionOnLane     // atanの分母(denominator)
         guard 0 < denomOfAtan else {    // atan内の分母が0になるのを防止
             return
