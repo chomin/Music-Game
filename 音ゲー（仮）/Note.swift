@@ -80,10 +80,12 @@ class Flick: Note {
         self.direction = direction
         super.init(beatPos: beatPos, laneIndex: laneIndex, speed: speed)
 
+        
+        let length = Note.initialSize / 2   // 三角形一辺の長さの半分
+        
         switch direction {
         case .any:
             // imageのインスタンス(マゼンタ三角形)を作成
-            let length = Note.initialSize / 2   // 三角形一辺の長さの半分
             // 始点から終点までの４点を指定(2点を一致させ三角形に).
             var points = [
                 CGPoint(x: length,  y: 0.0),
@@ -92,11 +94,9 @@ class Flick: Note {
                 CGPoint(x: length,  y: 0.0)
             ]
             self.image = SKShapeNode(points: &points, count: points.count)
-            image.lineWidth = 3.0
             image.fillColor = UIColor.magenta
             
         case .right:
-            let length = Note.initialSize / 2
             var points = [
                 CGPoint(x: 0.0,     y: 0.0),
                 CGPoint(x: -length, y: -length),
@@ -105,11 +105,9 @@ class Flick: Note {
                 CGPoint(x: 0.0,     y: 0.0)
             ]
             self.image = SKShapeNode(points: &points, count: points.count)
-            image.lineWidth = 3.0
             image.fillColor = UIColor.cyan
             
         case .left:
-            let length = Note.initialSize / 2
             var points = [
                 CGPoint(x: 0.0,     y: 0.0),
                 CGPoint(x: length,  y: -length),
@@ -118,10 +116,9 @@ class Flick: Note {
                 CGPoint(x: 0.0,     y: 0.0)
             ]
             self.image = SKShapeNode(points: &points, count: points.count)
-            image.lineWidth = 3.0
             image.fillColor = UIColor.purple
         }
-       
+        image.lineWidth = 3.0
         image.isHidden = true   // 初期状態では隠しておく
         
     }
