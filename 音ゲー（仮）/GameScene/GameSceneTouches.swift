@@ -146,12 +146,12 @@ extension GameScene {
                                         continue
                                     }
                                 case .right:
-                                    if pos.x - ppos.x > 0 {
+                                    if pos.x - ppos.x > 5 {
                                         addToNeabyNotes()
                                         continue
                                     }
                                 case .left:
-                                    if pos.x - ppos.x < 0 {
+                                    if pos.x - ppos.x < 5 {
                                         addToNeabyNotes()
                                         continue
                                     }
