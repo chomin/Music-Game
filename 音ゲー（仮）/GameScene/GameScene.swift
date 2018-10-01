@@ -387,10 +387,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             lane.updateTimeLag(self.passedTime, self.BPMs)
         })
         
-        //        for lane in lanes {
-        //            lane.updateTimeLag(passedTime, BPMs)
-        //        }
-        
         // 同時押しラインの更新
         for sameLine in sameLines {
             let (note1, note2, line) = (sameLine.note1, sameLine.note2, sameLine.line)
@@ -440,7 +436,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                         self.storedFlickJudge(lane: lane)
                     }
                 }
-//            }
             }
         }
         
@@ -520,8 +515,8 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.isSupposedToPausePlayerView = false
         actionSoundSet.stopAll()
         if self.playMode == .BGM {
-            BGM?.currentTime -= 3   // 3秒巻き戻し
             BGM?.play()
+            BGM?.currentTime -= 3   // 3秒巻き戻し(ずれるので、必ずplay()のあとにずらすこと)
         } else {
             //            let passedTime = playerView.pausedTime - playerView.startTime - playerView.timeOffset - 3
             playerView.playVideo()
