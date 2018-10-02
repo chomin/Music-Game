@@ -1,4 +1,4 @@
-﻿
+
 *---------------------- HEADER FIELD
 
 #PLAYER 1
@@ -33,6 +33,7 @@
 
 *---------------------- EXPANSION FIELD
 #LANE 5
+#GROUP CGSS
 
 
 
