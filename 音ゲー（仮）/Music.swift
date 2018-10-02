@@ -577,9 +577,9 @@ class Music {
     private func readFile(fileName: String) throws -> [String] {
 
         // ファイル名を名前と拡張子に分割
-        let splittedName = fileName.components(separatedBy: ".")
-        let dataFileName = splittedName[0]
-        let dataFileType = splittedName[1]
+        var splittedName = fileName.components(separatedBy: ".")
+        let dataFileType = splittedName.popLast()
+        let dataFileName = splittedName.joined(separator: ".")
 
         // 譜面データファイルのパスを取得
         if let path = Bundle.main.path(forResource: "Sounds/" + dataFileName, ofType: dataFileType) {

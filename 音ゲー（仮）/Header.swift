@@ -102,13 +102,13 @@ class Header: Object {
     /// - Throws: エラー
     private func readBMS(fileName: String) throws -> (contents: [String], date: String, fileNameWithExtension: String) {
         
-        let fileNameWithEntension = fileName.contains(".") ? fileName : "\(fileName).bms"
+        let fileNameWithEntension = fileName.hasSuffix(".bms") ? fileName : "\(fileName).bms"
 
         // ファイル名を名前と拡張子に分割
-        let splittedName = fileNameWithEntension.components(separatedBy: ".")
-        let dataFileName = splittedName[0]
-        let dataFileType = splittedName[1]
-        
+        var splittedName = fileNameWithEntension.components(separatedBy: ".")
+        let dataFileType = splittedName.popLast()
+        let dataFileName = splittedName.joined(separator: ".")
+
         // 譜面データファイルのパスを取得
         if let path = Bundle.main.path(forResource: "Sounds/" + dataFileName, ofType: dataFileType) {
             do {
