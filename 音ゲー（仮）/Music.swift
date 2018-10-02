@@ -20,6 +20,10 @@ import SpriteKit
 
 enum NoteType {
     case tap, flick, right, left, tapStart, middle, tapEnd, flickEnd, rightEnd, leftEnd
+
+    var isEnd: Bool {
+        return self == NoteType.tapEnd || self == NoteType.flickEnd || self == NoteType.rightEnd || self == NoteType.leftEnd
+    }
 }
 
 /// BMSのメインデータから得られるノーツ情報。このオブジェクトから最終的にノーツを生成する
@@ -291,19 +295,20 @@ class Music {
         /*--- メインデータからノーツの中間表現を生成 ---*/
 
         // チャンネルとレーンの対応付け(辞書)
-        var laneMap: [Int : Int]
-        switch header.laneNum {
-        case 1: laneMap = [                      14: 0                      ]
-        case 2: laneMap = [               13: 0,        15: 1               ]
-        case 3: laneMap = [               13: 0, 14: 1, 15: 2               ]
-        case 4: laneMap = [        12: 0, 13: 1,        15: 2, 18: 3        ]
-        case 5: laneMap = [        12: 0, 13: 1, 14: 2, 15: 3, 18: 4        ]
-        case 6: laneMap = [ 11: 0, 12: 1, 13: 2,        15: 3, 18: 4, 19: 5 ]
-        case 7: laneMap = [ 11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6 ]
-        default:
-            header.laneNum = 7
-            laneMap = [11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6]
-        }
+        let laneMap = { () -> [Int: Int] in
+            switch header.laneNum {
+            case 1: return [                      14: 0                      ]
+            case 2: return [               13: 0,        15: 1               ]
+            case 3: return [               13: 0, 14: 1, 15: 2               ]
+            case 4: return [        12: 0, 13: 1,        15: 2, 18: 3        ]
+            case 5: return [        12: 0, 13: 1, 14: 2, 15: 3, 18: 4        ]
+            case 6: return [ 11: 0, 12: 1, 13: 2,        15: 3, 18: 4, 19: 5 ]
+            case 7: return [ 11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6 ]
+            default:
+                header.laneNum = 7
+                return [11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 18: 5, 19: 6]
+            }
+        }()
 
         // ファイル上のノーツ定義
         enum NoteExpression: String {
@@ -546,11 +551,11 @@ class Music {
             while i < longNotes.count {
                 if longNotes[i].type == .tapStart {
                     noteMaterials.append(longNotes[i])
-                    while longNotes[i].type != .tapEnd && longNotes[i].type != .flickEnd {
+                    while !(longNotes[i].type.isEnd) {
                         guard i + 1 < longNotes.count else {
                             throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません(\(ParseError.getBeat(of: longNotes[i])))")
                         }
-                        guard longNotes[i + 1].type == .middle || longNotes[i + 1].type == .tapEnd || longNotes[i + 1].type == .flickEnd else {
+                        guard longNotes[i + 1].type == .middle || longNotes[i + 1].type.isEnd else {
                             throw ParseError.noLongNoteEnd("ロングノーツ終了命令がありません(\(ParseError.getBeat(of: longNotes[i + 1])))")
                         }
                         if longNotes[i].type == .tapStart || longNotes[i].type == .middle {
