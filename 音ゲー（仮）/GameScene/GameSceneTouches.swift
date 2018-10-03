@@ -334,38 +334,38 @@ extension GameScene {
         switch lane.getJudgeTimeState(timeLag: timeLag) {
         case .parfect:
             setJudgeLabelText(text: "parfect!!")
-            ResultScene.parfect += 1
-            ResultScene.combo += 1
-            if ResultScene.combo > ResultScene.maxCombo {
-                ResultScene.maxCombo += 1
+            result.parfect += 1
+            result.combo += 1
+            if result.combo > result.maxCombo {
+                result.maxCombo += 1
             }
             lane.setHeadNoteJudged()
             return true
         case .great:
             setJudgeLabelText(text: "great!")
-            ResultScene.great += 1
-            ResultScene.combo += 1
-            if ResultScene.combo > ResultScene.maxCombo {
-                ResultScene.maxCombo += 1
+            result.great += 1
+            result.combo += 1
+            if result.combo > result.maxCombo {
+                result.maxCombo += 1
             }
             lane.setHeadNoteJudged()
             return true
         case .good:
             setJudgeLabelText(text: "good")
-            ResultScene.good += 1
-            ResultScene.combo = 0
+            result.good += 1
+            result.combo = 0
             lane.setHeadNoteJudged()
             return true
         case .bad:
             setJudgeLabelText(text: "bad")
-            ResultScene.bad += 1
-            ResultScene.combo = 0
+            result.bad += 1
+            result.combo = 0
             lane.setHeadNoteJudged()
             return true
         case .miss:
             setJudgeLabelText(text: "miss!")
-            ResultScene.miss += 1
-            ResultScene.combo = 0
+            result.miss += 1
+            result.combo = 0
             lane.setHeadNoteJudged()
             return true
         default:    // still,passedなら判定しない(guardで弾いてるはず。)
@@ -409,8 +409,8 @@ extension GameScene {
         guard !(lane.isEmpty), lane.headNote!.isJudgeable else { return false }
         
         setJudgeLabelText(text: "miss!")
-        ResultScene.miss += 1
-        ResultScene.combo = 0
+        result.miss += 1
+        result.combo = 0
         lane.setHeadNoteJudged()
         return true
     }

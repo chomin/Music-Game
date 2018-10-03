@@ -7,19 +7,41 @@
 //
 
 import SpriteKit
+
+struct Result {
+    var parfect = 0
+    var great = 0
+    var good = 0
+    var bad = 0
+    var miss = 0
+    var combo = 0
+    var maxCombo = 0
+}
+
 class ResultScene: SKScene {
-    static var parfect = 0
-    static var great = 0
-    static var good = 0
-    static var bad = 0
-    static var miss = 0
-    static var combo = 0
-    static var maxCombo = 0
     
     var label: SKLabelNode!
+    let labelText: String
     var resultFontSize: CGFloat!
     
     let replayButton = UIButton()
+    
+    init(size: CGSize, result: Result) {
+        self.labelText =  """
+        parfect:\(result.parfect)
+        great:\(result.great)
+        good:\(result.good)
+        bad:\(result.bad)
+        miss:\(result.miss)
+        
+        combo:\(result.maxCombo)
+        """
+        super.init(size: size)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func didMove(to view: SKView) {
         
@@ -34,16 +56,7 @@ class ResultScene: SKScene {
             Label.fontColor = SKColor.white
             Label.numberOfLines = 7
             
-            Label.text =    // swift4からの書き方(改行入りのString)
-            """
-            parfect:\(ResultScene.parfect)
-            great:\(ResultScene.great)
-            good:\(ResultScene.good)
-            bad:\(ResultScene.bad)
-            miss:\(ResultScene.miss)
-            
-            combo:\(ResultScene.maxCombo)
-            """
+            Label.text = labelText
             
             self.addChild(Label)
             return Label

@@ -100,6 +100,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     var setting: Setting
     
+    var result = Result()
     
     init(size: CGSize, setting: Setting, header: Header) {
 
@@ -197,15 +198,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             return Button
         }()
         
-        // リザルトの初期化
-        ResultScene.parfect = 0
-        ResultScene.great = 0
-        ResultScene.good = 0
-        ResultScene.bad = 0
-        ResultScene.miss = 0
-        ResultScene.combo = 0
-        ResultScene.maxCombo = 0
-        
         // ラベルの設定
         judgeLabel = { () -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
@@ -260,18 +252,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.isPrecedingStartValid = {
             for note in notes {
                 switch note {
-                case is Tap:
-                    let tap = note as! Tap
+                case let tap as Tap:
                     if tap.appearTime < mediaOffsetTime {
                         return true
                     }
-                case is Flick:
-                    let flick = note as! Flick
+                case let flick as Flick:
                     if flick.appearTime < mediaOffsetTime {
                         return true
                     }
-                case is TapStart:
-                    let tapStart = note as! TapStart
+                case let tapStart as TapStart:
                     if tapStart.appearTime < mediaOffsetTime {
                         return true
                     }
@@ -375,7 +364,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // ラベルの更新
-        comboLabel.text = String(ResultScene.combo)
+        comboLabel.text = String(result.combo)
         
         // 各ノーツの位置や大きさを更新
         for note in notes {
@@ -440,9 +429,12 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // 終了時刻が指定されていればその時刻でシーン移動
-        if music.duration != nil && passedTime > music.duration! {
+        switch music.duration {
+        case let duration? where passedTime > duration:
             BGM = nil
             moveToResultScene()
+        default:
+            break
         }
     }
     
@@ -470,7 +462,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     func moveToResultScene() {
-        let scene = ResultScene(size: (view?.bounds.size)!)
+        let scene = ResultScene(size: (view?.bounds.size)!, result: result)
         let skView = view as SKView?
         skView?.showsFPS = true
         skView?.showsNodeCount = true
@@ -622,7 +614,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
-        switch (state) {
+        switch state {
         case .playing:
             if ytLaunchState == .tryingToPlay {     // プレイ開始時
                 ytLaunchState = .done
