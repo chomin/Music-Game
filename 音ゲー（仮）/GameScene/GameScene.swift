@@ -252,20 +252,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.isPrecedingStartValid = {
             for note in notes {
                 switch note {
-                case let tap as Tap:
-                    if tap.appearTime < mediaOffsetTime {
-                        return true
-                    }
-                case let flick as Flick:
-                    if flick.appearTime < mediaOffsetTime {
-                        return true
-                    }
-                case let tapStart as TapStart:
-                    if tapStart.appearTime < mediaOffsetTime {
-                        return true
-                    }
-                default:
-                    break
+                case let tap      as Tap      where tap.appearTime < mediaOffsetTime      : return true
+                case let flick    as Flick    where flick.appearTime < mediaOffsetTime    : return true
+                case let tapStart as TapStart where tapStart.appearTime < mediaOffsetTime : return true
+                default                                                                   : break
                 }
             }
             return false
@@ -429,12 +419,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // 終了時刻が指定されていればその時刻でシーン移動
-        switch music.duration {
-        case let duration? where passedTime > duration:
+        if let duration = music.duration, passedTime > duration {
             BGM = nil
             moveToResultScene()
-        default:
-            break
         }
     }
     

@@ -16,6 +16,38 @@ struct Result {
     var miss = 0
     var combo = 0
     var maxCombo = 0
+    
+    mutating func countUp(judgeType: JudgeType) {
+        switch judgeType {
+        case .parfect:
+            self.parfect += 1
+            self.combo += 1
+            if self.combo > self.maxCombo {
+                self.maxCombo += 1
+            }
+        case .great:
+            self.great += 1
+            self.combo += 1
+            if self.combo > self.maxCombo {
+                self.maxCombo += 1
+            }
+        case .good:
+            self.good += 1
+            self.combo = 0
+            
+        case .bad:
+            self.bad += 1
+            self.combo = 0
+
+        case .miss:
+            self.miss += 1
+            self.combo = 0
+            
+        default:
+            break
+        }
+        
+    }
 }
 
 class ResultScene: SKScene {

@@ -334,38 +334,27 @@ extension GameScene {
         switch lane.getJudgeTimeState(timeLag: timeLag) {
         case .parfect:
             setJudgeLabelText(text: "parfect!!")
-            result.parfect += 1
-            result.combo += 1
-            if result.combo > result.maxCombo {
-                result.maxCombo += 1
-            }
+            result.countUp(judgeType: .parfect)
             lane.setHeadNoteJudged()
             return true
         case .great:
             setJudgeLabelText(text: "great!")
-            result.great += 1
-            result.combo += 1
-            if result.combo > result.maxCombo {
-                result.maxCombo += 1
-            }
+            result.countUp(judgeType: .great)
             lane.setHeadNoteJudged()
             return true
         case .good:
             setJudgeLabelText(text: "good")
-            result.good += 1
-            result.combo = 0
+            result.countUp(judgeType: .good)
             lane.setHeadNoteJudged()
             return true
         case .bad:
             setJudgeLabelText(text: "bad")
-            result.bad += 1
-            result.combo = 0
+            result.countUp(judgeType: .bad)
             lane.setHeadNoteJudged()
             return true
         case .miss:
             setJudgeLabelText(text: "miss!")
-            result.miss += 1
-            result.combo = 0
+            result.countUp(judgeType: .miss)
             lane.setHeadNoteJudged()
             return true
         default:    // still,passedなら判定しない(guardで弾いてるはず。)
