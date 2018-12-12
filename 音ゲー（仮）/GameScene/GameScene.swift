@@ -161,6 +161,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             // AVAudioPlayerのインスタンスを作成
             do {
                 BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
+                
             } catch {
                 print("AVAudioPlayerインスタンス作成失敗")
                 exit(1)
