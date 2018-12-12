@@ -10,5 +10,6 @@ target '音ゲー（仮）' do
   # Pods for 音ゲー（仮）
   pod "RealmSwift"
   pod "youtube-ios-player-helper-swift"
-
+  pod "GoogleAPIClientForREST/Drive", "~> 1.2.1"
+  pod "GTMAppAuth"
 end

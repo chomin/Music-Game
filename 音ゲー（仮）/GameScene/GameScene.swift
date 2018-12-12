@@ -10,7 +10,7 @@
 import SpriteKit
 import GameplayKit
 import AVFoundation
-import youtube_ios_player_helper_swift    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
+import youtube_ios_player_helper    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
 
 /// 判定関係のフラグ付きタッチ情報
 class GSTouch { // 参照型として扱いたい
@@ -100,7 +100,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     var setting: Setting
     
-    var result = Result()
     
     init(size: CGSize, setting: Setting, header: Header) {
 
@@ -145,7 +144,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         switch playMode {
         case .BGM:
             // サウンドファイルのパスを生成
-            let path: String = {
+            let Path: String = {
                 if music.group != "BDGP" { return Bundle.main.path(forResource: "Sounds/" + music.title, ofType: "mp3")! }  // m4a,oggは不可
                 else                     {
                     var mp3FileName = music.title
@@ -158,9 +157,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 }
             }()
             
+            let soundURL = URL(fileURLWithPath: Path)
             // AVAudioPlayerのインスタンスを作成
             do {
-                BGM = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
+                BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
             } catch {
                 print("AVAudioPlayerインスタンス作成失敗")
                 exit(1)
@@ -196,6 +196,15 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             return Button
         }()
+        
+        // リザルトの初期化
+        ResultScene.parfect = 0
+        ResultScene.great = 0
+        ResultScene.good = 0
+        ResultScene.bad = 0
+        ResultScene.miss = 0
+        ResultScene.combo = 0
+        ResultScene.maxCombo = 0
         
         // ラベルの設定
         judgeLabel = { () -> SKLabelNode in
@@ -251,10 +260,23 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.isPrecedingStartValid = {
             for note in notes {
                 switch note {
-                case let tap      as Tap      where tap.appearTime < mediaOffsetTime      : return true
-                case let flick    as Flick    where flick.appearTime < mediaOffsetTime    : return true
-                case let tapStart as TapStart where tapStart.appearTime < mediaOffsetTime : return true
-                default                                                                   : break
+                case is Tap:
+                    let tap = note as! Tap
+                    if tap.appearTime < mediaOffsetTime {
+                        return true
+                    }
+                case is Flick:
+                    let flick = note as! Flick
+                    if flick.appearTime < mediaOffsetTime {
+                        return true
+                    }
+                case is TapStart:
+                    let tapStart = note as! TapStart
+                    if tapStart.appearTime < mediaOffsetTime {
+                        return true
+                    }
+                default:
+                    break
                 }
             }
             return false
@@ -353,7 +375,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // ラベルの更新
-        comboLabel.text = String(result.combo)
+        comboLabel.text = String(ResultScene.combo)
         
         // 各ノーツの位置や大きさを更新
         for note in notes {
@@ -418,7 +440,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // 終了時刻が指定されていればその時刻でシーン移動
-        if let duration = music.duration, passedTime > duration {
+        if music.duration != nil && passedTime > music.duration! {
             BGM = nil
             moveToResultScene()
         }
@@ -431,9 +453,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     /// 判定ラベルのテキストを更新（アニメーション付き）
-    func setJudgeLabelText(judgeType: JudgeType) {
+    func setJudgeLabelText(text:String) {
         
-        judgeLabel.text = judgeType.rawValue
+        judgeLabel.text = text
         
         judgeLabel.removeAllActions()
         
@@ -448,7 +470,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     func moveToResultScene() {
-        let scene = ResultScene(size: (view?.bounds.size)!, result: result)
+        let scene = ResultScene(size: (view?.bounds.size)!)
         let skView = view as SKView?
         skView?.showsFPS = true
         skView?.showsNodeCount = true
@@ -501,7 +523,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             //            playerView.timeOffset += CACurrentMediaTime() - playerView.pausedTime + 3
         }
         
-        setJudgeLabelText(judgeType: .none)
+        setJudgeLabelText(text: "")
         
         // 表示されているノーツを非表示に
         for note in notes {
@@ -600,7 +622,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
-        switch state {
+        switch (state) {
         case .playing:
             if ytLaunchState == .tryingToPlay {     // プレイ開始時
                 ytLaunchState = .done
