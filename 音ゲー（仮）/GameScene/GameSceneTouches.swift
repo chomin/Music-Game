@@ -331,47 +331,43 @@ extension GameScene {
         default: break
         }
         
-        switch lane.getJudgeTimeState(timeLag: timeLag) {
-        case .parfect:
-            setJudgeLabelText(text: "parfect!!")
-            ResultScene.parfect += 1
-            ResultScene.combo += 1
-            if ResultScene.combo > ResultScene.maxCombo {
-                ResultScene.maxCombo += 1
-            }
-            lane.setHeadNoteJudged()
-            return true
-        case .great:
-            setJudgeLabelText(text: "great!")
-            ResultScene.great += 1
-            ResultScene.combo += 1
-            if ResultScene.combo > ResultScene.maxCombo {
-                ResultScene.maxCombo += 1
-            }
-            lane.setHeadNoteJudged()
-            return true
-        case .good:
-            setJudgeLabelText(text: "good")
-            ResultScene.good += 1
-            ResultScene.combo = 0
-            lane.setHeadNoteJudged()
-            return true
-        case .bad:
-            setJudgeLabelText(text: "bad")
-            ResultScene.bad += 1
-            ResultScene.combo = 0
-            lane.setHeadNoteJudged()
-            return true
-        case .miss:
-            setJudgeLabelText(text: "miss!")
-            ResultScene.miss += 1
-            ResultScene.combo = 0
-            lane.setHeadNoteJudged()
-            return true
-        default:    // still,passedなら判定しない(guardで弾いてるはず。)
-            print("judge error. laneIndex: \(lane.laneIndex)")
-            return false
-        }
+        
+        let judgeTimeState = lane.getJudgeTimeState(timeLag: timeLag)
+        setJudgeLabelText(judgeType: judgeTimeState)
+        result.countUp(judgeType: judgeTimeState)
+        lane.setHeadNoteJudged()
+        return true
+        
+//        switch lane.getJudgeTimeState(timeLag: timeLag) {
+//        case .parfect:
+//            setJudgeLabelText(text: "parfect!!")
+//            result.countUp(judgeType: .parfect)
+//            lane.setHeadNoteJudged()
+//            return true
+//        case .great:
+//            setJudgeLabelText(text: "great!")
+//            result.countUp(judgeType: .great)
+//            lane.setHeadNoteJudged()
+//            return true
+//        case .good:
+//            setJudgeLabelText(text: "good")
+//            result.countUp(judgeType: .good)
+//            lane.setHeadNoteJudged()
+//            return true
+//        case .bad:
+//            setJudgeLabelText(text: "bad")
+//            result.countUp(judgeType: .bad)
+//            lane.setHeadNoteJudged()
+//            return true
+//        case .miss:
+//            setJudgeLabelText(text: "miss!")
+//            result.countUp(judgeType: .miss)
+//            lane.setHeadNoteJudged()
+//            return true
+//        default:    // still,passedなら判定しない(guardで弾いてるはず。)
+//            print("judge error. laneIndex: \(lane.laneIndex)")
+//            return false
+//        }
     }
     
     /// parfect終了時(laneからのdelegate)または指が外れた時に呼び出される。
@@ -408,9 +404,9 @@ extension GameScene {
     func missJudge(lane: Lane) -> Bool {
         guard !(lane.isEmpty), lane.headNote!.isJudgeable else { return false }
         
-        setJudgeLabelText(text: "miss!")
-        ResultScene.miss += 1
-        ResultScene.combo = 0
+        setJudgeLabelText(judgeType: .miss)
+        result.miss += 1
+        result.combo = 0
         lane.setHeadNoteJudged()
         return true
     }

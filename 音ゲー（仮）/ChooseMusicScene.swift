@@ -522,7 +522,7 @@ class ChooseMusicScene: SKScene {
         
         guard picker != nil else { return }
         
-        if headers[picker.selectedRow].videoID == "" && headers[picker.selectedRow].videoID2 == "" {
+        if headers[picker.selectedRow].videoID.isEmpty && headers[picker.selectedRow].videoID2.isEmpty {
             YouTubeSwitch.isOn = false
             YouTubeSwitch.isEnabled = false
         } else {

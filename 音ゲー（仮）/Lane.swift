@@ -8,12 +8,20 @@
 
 import SpriteKit
 
+// TODO: 適切な記述場所へ移動
+enum JudgeType: String {    // enumはRange型をサポートしていないのでrawValueにRange型のものを代入することはできない
+    case miss    = "miss!"
+    case bad     = "bad"
+    case good    = "good"
+    case great   = "great!"
+    case parfect = "parfect!!"
+    case still   = "still"
+    case passed  = "passed"
+    case none    = ""
+}
 
 class Lane {
     
-    enum JudgeTimeState {    // enumはRange型をサポートしていないのでrawValueにRange型のものを代入することはできない
-        case miss, bad, good, great, parfect, still, passed
-    }
     
     enum ObsevationTimeState {
         case before, after, otherwise
@@ -86,7 +94,7 @@ class Lane {
         return (parfectUpperBorder ..< missUpperBorder).contains(timeLag)
     }
     
-    var judgeTimeState: JudgeTimeState {    // このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
+    var judgeTimeState: JudgeType {    // このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
         
         guard self.isTimeLagSet else { return .still }
         
@@ -139,7 +147,7 @@ class Lane {
     }
     
     // timeLagに対応する判定を返す
-    func getJudgeTimeState(timeLag: TimeInterval) -> JudgeTimeState {
+    func getJudgeTimeState(timeLag: TimeInterval) -> JudgeType {
         guard self.isTimeLagSet else {
             print("timeLagが不正です")
             return .still

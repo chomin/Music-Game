@@ -32,7 +32,7 @@ class PickerKeyboard: UIControl {
         
         // ピッカーに初期値をセット(将来的にはファイル探索から)
         for header in headers {
-            if header.videoID == "" && header.videoID2 == "" {
+            if header.videoID.isEmpty && header.videoID2.isEmpty {
                 musicNameArray.append(header.title)
             } else {
                 musicNameArray.append("★" + header.title)

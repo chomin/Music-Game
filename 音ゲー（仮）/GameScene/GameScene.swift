@@ -100,6 +100,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     var setting: Setting
     
+    var result = Result()
     
     init(size: CGSize, setting: Setting, header: Header) {
 
@@ -197,15 +198,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             return Button
         }()
         
-        // リザルトの初期化
-        ResultScene.parfect = 0
-        ResultScene.great = 0
-        ResultScene.good = 0
-        ResultScene.bad = 0
-        ResultScene.miss = 0
-        ResultScene.combo = 0
-        ResultScene.maxCombo = 0
-        
         // ラベルの設定
         judgeLabel = { () -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
@@ -260,23 +252,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         self.isPrecedingStartValid = {
             for note in notes {
                 switch note {
-                case is Tap:
-                    let tap = note as! Tap
-                    if tap.appearTime < mediaOffsetTime {
-                        return true
-                    }
-                case is Flick:
-                    let flick = note as! Flick
-                    if flick.appearTime < mediaOffsetTime {
-                        return true
-                    }
-                case is TapStart:
-                    let tapStart = note as! TapStart
-                    if tapStart.appearTime < mediaOffsetTime {
-                        return true
-                    }
-                default:
-                    break
+                case let tap      as Tap      where tap.appearTime < mediaOffsetTime      : return true
+                case let flick    as Flick    where flick.appearTime < mediaOffsetTime    : return true
+                case let tapStart as TapStart where tapStart.appearTime < mediaOffsetTime : return true
+                default                                                                   : break
                 }
             }
             return false
@@ -375,7 +354,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // ラベルの更新
-        comboLabel.text = String(ResultScene.combo)
+        comboLabel.text = String(result.combo)
         
         // 各ノーツの位置や大きさを更新
         for note in notes {
@@ -440,7 +419,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // 終了時刻が指定されていればその時刻でシーン移動
-        if music.duration != nil && passedTime > music.duration! {
+        if let duration = music.duration, passedTime > duration {
             BGM = nil
             moveToResultScene()
         }
@@ -453,9 +432,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     /// 判定ラベルのテキストを更新（アニメーション付き）
-    func setJudgeLabelText(text:String) {
+    func setJudgeLabelText(judgeType: JudgeType) {
         
-        judgeLabel.text = text
+        judgeLabel.text = judgeType.rawValue
         
         judgeLabel.removeAllActions()
         
@@ -470,7 +449,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     func moveToResultScene() {
-        let scene = ResultScene(size: (view?.bounds.size)!)
+        let scene = ResultScene(size: (view?.bounds.size)!, result: result)
         let skView = view as SKView?
         skView?.showsFPS = true
         skView?.showsNodeCount = true
@@ -523,7 +502,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             //            playerView.timeOffset += CACurrentMediaTime() - playerView.pausedTime + 3
         }
         
-        setJudgeLabelText(text: "")
+        setJudgeLabelText(judgeType: .none)
         
         // 表示されているノーツを非表示に
         for note in notes {
@@ -622,7 +601,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
-        switch (state) {
+        switch state {
         case .playing:
             if ytLaunchState == .tryingToPlay {     // プレイ開始時
                 ytLaunchState = .done
