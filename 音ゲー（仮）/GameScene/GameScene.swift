@@ -432,9 +432,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     /// 判定ラベルのテキストを更新（アニメーション付き）
-    func setJudgeLabelText(text:String) {
+    func setJudgeLabelText(judgeType: JudgeType) {
         
-        judgeLabel.text = text
+        judgeLabel.text = judgeType.rawValue
         
         judgeLabel.removeAllActions()
         
@@ -502,7 +502,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             //            playerView.timeOffset += CACurrentMediaTime() - playerView.pausedTime + 3
         }
         
-        setJudgeLabelText(text: "")
+        setJudgeLabelText(judgeType: .none)
         
         // 表示されているノーツを非表示に
         for note in notes {
