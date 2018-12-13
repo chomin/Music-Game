@@ -19,6 +19,13 @@ class GameViewController: UIViewController {
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
+//    func signedInUsername() -> String? {
+//        let auth = appDelegate.googleDriveServiceDrive.authorizer!
+//        let isSignenIn = auth.canAuthorize!
+//        if isSignenIn { return auth.userEmail }
+//        else          { return nil            }
+//    }
+    
     /**
      ブラウザ経由のGoogleDrive認証を行います。
      参考: https://github.com/google/GTMAppAuth
@@ -36,11 +43,12 @@ class GameViewController: UIViewController {
         // リダイレクト先URLを生成します。
         // <GoogleDriveのクライアントID>には、"SwiftでGoogleDrive APIを使用する準備を行う"で取得した
         // クライアントIDを設定してください。 BundleIdentifier依存なので端末ごとに変更する必要あり？
-        let redirectUriString = String(format: "com.googleusercontent.apps.%@:/oauthredirect", "724041097326-ti30u6m8583k6bkql2d9fs0tmt67cm18.apps.googleusercontent.com")
+        let redirectUriString = String(format: "com.googleusercontent.apps.%@:/oauthredirect", "724041097326-ti30u6m8583k6bkql2d9fs0tmt67cm18")
         guard let redirectURI = URL(string: redirectUriString) else {
             // URLが生成できない場合、処理を終了します。
             // 念のためのチェックです。
             // 必要に応じてエラー処理を行っていください。
+            print("redirectURI生成に失敗")
             return
         }
         
@@ -55,7 +63,7 @@ class GameViewController: UIViewController {
             // クライアントIDを設定してください。 BundleIdentifier依存なので端末ごとに変更する必要あり？
             let request = OIDAuthorizationRequest(
                 configuration: configuration,
-                clientId: "724041097326-ti30u6m8583k6bkql2d9fs0tmt67cm18.apps.googleusercontent.com",
+                clientId: "724041097326-ti30u6m8583k6bkql2d9fs0tmt67cm18",
                 scopes: ["https://www.googleapis.com/auth/drive"],
                 redirectURL: redirectURI,
                 responseType: OIDResponseTypeCode,
@@ -73,7 +81,10 @@ class GameViewController: UIViewController {
                 if let authorizer = self.appDelegate.googleDriveServiceDrive.authorizer, let canAuth = authorizer.canAuthorize, canAuth {
                     // サインイン済みの場合
                     // 必要な処理を記述してください。
-                    print("サインイン済み")
+                    print("サインイン完了")
+                    print(authorizer.userEmail) // これはなぜかnilになる、、、
+                    // ファイル情報リストを取得します。
+                    self.getFileInfoList()
                 }
             }
         }
@@ -205,20 +216,16 @@ class GameViewController: UIViewController {
         skView2.presentScene(scene)  // ChooseMusicSceneに移動
     }
     
-    /**
-     画面が表示される前に呼び出されれます。
-     
-     - Parameter animated: アニメーション指定
-     */
-    override func viewWillAppear(_ animated: Bool) {
+ 
+    
+    override func viewDidLoad() {
+        
         // ファイル情報リストをクリアします。
         fileInfoList.removeAll(keepingCapacity: false)
         
-        // ファイル情報リストを取得します。
-        getFileInfoList()
-    }
-    
-    override func viewDidLoad() {
+        authGoogleDriveInBrowser()
+        
+        
         // 寸法に関する定数をセット
         Dimensions.createInstance(frame: view.frame)
         
