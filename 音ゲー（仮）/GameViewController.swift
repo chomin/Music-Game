@@ -10,21 +10,27 @@
 import UIKit
 import SpriteKit
 import GameplayKit
-import AppAuth
 import GTMAppAuth
 import GoogleAPIClientForREST
 
-
 class GameViewController: UIViewController {
     
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
-//    func signedInUsername() -> String? {
-//        let auth = appDelegate.googleDriveServiceDrive.authorizer!
-//        let isSignenIn = auth.canAuthorize!
-//        if isSignenIn { return auth.userEmail }
-//        else          { return nil            }
-//    }
+    func moveToCMScene(){
+        let scene = ChooseMusicScene(size: view.bounds.size)
+        let skView2 = SKView(frame: view.frame)
+        skView2.showsFPS = true
+        skView2.showsNodeCount = true
+        skView2.showsDrawCount = true
+        
+        skView2.ignoresSiblingOrder = true
+        scene.scaleMode = .resizeFill
+        
+        view.addSubview(skView2)
+        
+        skView2.presentScene(scene)  // ChooseMusicSceneに移動
+    }
     
     /**
      ブラウザ経由のGoogleDrive認証を行います。
@@ -81,8 +87,8 @@ class GameViewController: UIViewController {
                 if let authorizer = self.appDelegate.googleDriveServiceDrive.authorizer, let canAuth = authorizer.canAuthorize, canAuth {
                     // サインイン済みの場合
                     // 必要な処理を記述してください。
-                    print("サインイン完了")
-                    print(authorizer.userEmail) // これはなぜかnilになる、、、
+//                    print("サインイン完了")
+//                    print(authorizer.userEmail) // これはなぜかnilになる、、、
                     // ファイル情報リストを取得します。
                     self.getFileInfoList()
                 }
@@ -119,8 +125,8 @@ class GameViewController: UIViewController {
         
         // 2-5. 次ページのトークンをセットします。
         //    nextPageTokenがnilならば、無視されます。
-        query.pageToken = nextPageToken
-        nextPageToken = nil
+        query.pageToken = GDFileManager.nextPageToken
+        GDFileManager.nextPageToken = nil
         
         // 2-6. クエリを実行した結果を処理するコールバックメソッドを登録します。
         let selector = #selector(displayResultWithTicket(_:finishedWithObject:error:))
@@ -139,7 +145,8 @@ class GameViewController: UIViewController {
      - Parameter error: エラー情報
      */
     @objc func displayResultWithTicket(_ ticket: GTLRServiceTicket, finishedWithObject response: GTLRDrive_FileList, error: Error?) {
-        if let error = error {
+        if error != nil {
+            print(error)
             // エラーの場合、処理を終了します。
             // 必要に応じてエラー処理を行ってください。
             return
@@ -149,46 +156,46 @@ class GameViewController: UIViewController {
         // 今回取得した分のファイルリストを取得します。
         var tempDriveFileList = [GTLRDrive_File]()
         if let driveFiles = response.files, !driveFiles.isEmpty {
-            if let temp = driveFiles as? [GTLRDrive_File] {
-                tempDriveFileList = temp
-            }
+            tempDriveFileList = driveFiles
+            
         }
         
         // 取得済みのファイル情報を一時ファイルリストに追加します。
-        for driveFile in fileInfoList {
+        for driveFile in GDFileManager.fileInfoList {
             tempDriveFileList.append(driveFile)
         }
         
         // ファイル情報リストをクリアします。
-        fileInfoList.removeAll(keepingCapacity: false)
+        GDFileManager.fileInfoList.removeAll(keepingCapacity: false)
         
         // 全ファイル情報分繰り返します。
         for driveFile in tempDriveFileList {
             // 名称を取得します。
-            guard let name = driveFile.name else {
+            guard driveFile.name != nil else {
                 // 名称が取得できない場合、次のファイルを処理します。
+                print("ファイル名の取得に失敗")
                 continue
             }
             
             // IDを取得します。
-            guard let id = driveFile.identifier else {
+            guard driveFile.identifier != nil else {
                 // IDが取得できない場合、次のファイルを処理します。
+                print("ファイルidの取得に失敗")
                 continue;
             }
             
             // 削除済みか判定します。
-            if isTrashed(driveFile) {
+            if GDFileManager.isTrashed(driveFile) {
                 // 削除済みの場合、次のファイルを処理します。
                 continue
             }
             
-            let dir = isDir(driveFile)
-            if dir {
+            if GDFileManager.isDir(driveFile) {
                 // ディレクトリの場合
 
             } else {
                 // ファイルの場合
-                fileInfoList.append(driveFile)
+                GDFileManager.fileInfoList.append(driveFile)
                 print(driveFile)
             }
         }
@@ -196,32 +203,18 @@ class GameViewController: UIViewController {
         // 次ページのトークンがある場合
         if let token = response.nextPageToken {
             // 次ページのファイル一覧を取得します。
-            nextPageToken = token
+            GDFileManager.nextPageToken = token
             getFileInfoList()
         }
         
-        let scene = ChooseMusicScene(size: view.bounds.size)
-        let skView2 = SKView(frame: view.frame)
-        skView2.showsFPS = true
-        skView2.showsNodeCount = true
-        skView2.showsDrawCount = true
-        
-        skView2.ignoresSiblingOrder = true
-        scene.scaleMode = .resizeFill
-        
-        view.addSubview(skView2)
-        
-        
-        
-        skView2.presentScene(scene)  // ChooseMusicSceneに移動
+        moveToCMScene()
     }
     
  
     
     override func viewDidLoad() {
-        
         // ファイル情報リストをクリアします。
-        fileInfoList.removeAll(keepingCapacity: false)
+        GDFileManager.fileInfoList.removeAll(keepingCapacity: false)
         
         authGoogleDriveInBrowser()
         
