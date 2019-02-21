@@ -101,15 +101,24 @@ class GDFileManager {
 //                print("保存に失敗しました：\(file.name!)")
 //            }
             
-            let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("\(file.name!)/")
+//            let dirURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+//            if !FileManager.default.fileExists(atPath: dirURL.absoluteString){
+//                do {
+//                    try FileManager.default.createDirectory( atPath: dirURL.absoluteString, withIntermediateDirectories: true, attributes: nil)
+//
+//                } catch {
+//                    print(error)
+//                    return
+//                }
+//            }
+            
+            let fileURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0].appendingPathComponent("\(file.name!)/")
             do{
-                try dat.write(to: url, options: .atomic)
+                try dat.write(to: fileURL, options: .atomic)
             }catch{
                 print("保存に失敗しました：\(file.name!)")
                 print(error)
             }
-            
-            
         })
     }
 }
