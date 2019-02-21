@@ -454,7 +454,7 @@ class Middle: Note {
         } else {
             longImages.long.isHidden = false
         }
-        if (position.y >= Dimensions.judgeLineY) || next.position.y < Dimensions.judgeLineY || next.isJudged {
+        if (position.y >= Dimensions.judgeLineY && !isJudged) || next.position.y < Dimensions.judgeLineY || next.isJudged {
             longImages.circle.isHidden = true
         } else {
             longImages.circle.isHidden = false
