@@ -196,7 +196,7 @@ class GameViewController: UIViewController {
             } else {
                 // ファイルの場合
                 GDFileManager.fileInfoList.append(driveFile)
-                print(driveFile)
+//                print(driveFile)
             }
         }
         
@@ -206,6 +206,14 @@ class GameViewController: UIViewController {
             GDFileManager.nextPageToken = token
             getFileInfoList()
         }
+        
+        
+        // 種類によって振り分け
+        GDFileManager.mp3FileList = GDFileManager.fileInfoList.filter({$0.fileExtension == "mp3"})
+        GDFileManager.bmsFileList = GDFileManager.fileInfoList.filter({$0.fileExtension == "bms"})
+        
+        
+        
         
         moveToCMScene()
     }
