@@ -10,7 +10,7 @@
 import SpriteKit
 import GameplayKit
 import AVFoundation
-import youtube_ios_player_helper    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
+import youtube_ios_player_helper_swift    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
 
 /// 判定関係のフラグ付きタッチ情報
 class GSTouch { // 参照型として扱いたい
@@ -144,7 +144,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         switch playMode {
         case .BGM:
             // サウンドファイルのパスを生成
-            let Path: String = {
+            let path: String = {
                 if music.group != "BDGP" { return Bundle.main.path(forResource: "Sounds/" + music.title, ofType: "mp3")! }  // m4a,oggは不可
                 else                     {
                     var mp3FileName = music.title
@@ -157,10 +157,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                 }
             }()
             
-            let soundURL = URL(fileURLWithPath: Path)
             // AVAudioPlayerのインスタンスを作成
             do {
-                BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
+                BGM = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
             } catch {
                 print("AVAudioPlayerインスタンス作成失敗")
                 exit(1)

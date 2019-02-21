@@ -9,7 +9,7 @@ target '音ゲー（仮）' do
 
   # Pods for 音ゲー（仮）
   pod "RealmSwift"
-  pod "youtube-ios-player-helper", "~> 0.1"
+  pod "youtube-ios-player-helper-swift"
 
   target '音ゲー（仮）Tests' do
     inherit! :search_paths
