@@ -59,6 +59,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // GTM認証結果を設定します。
             self.setGtmAuthorization(authorization)
         }
+        
+        googleDriveServiceDrive.shouldFetchNextPages = true 
     }
     
     /**

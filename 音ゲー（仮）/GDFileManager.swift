@@ -7,6 +7,7 @@
 //
 
 import GoogleAPIClientForREST
+import AVFoundation
 
 class GDFileManager {
     /// GooleDriveファイル情報リスト
@@ -49,12 +50,12 @@ class GDFileManager {
         return false
     }
     
-    /**
-     GoogleDrive APIで、ファイルデータを取得します。
-     
-     - Parameter fileName: ファイル名(実際はファイルのID)
-     */
-    static func getFileData(_ fileID: String) -> Data?{
+    
+    /// GoogleDrive APIで、ファイルデータを取得します。データはDBに格納（予定）
+    ///
+    /// - Parameters:
+    ///   - fileID: fileID
+    static func getFileData(_ fileID: String) {
         // 1. ファイルデータを取得するファイルのIDを指定してURL文字列を作成します。
         let urlString = "https://www.googleapis.com/drive/v3/files/\(fileID)?alt=media"
         
@@ -63,8 +64,9 @@ class GDFileManager {
         let serviceDrive = appDelegate.googleDriveServiceDrive
         let fetcher = serviceDrive.fetcherService.fetcher(withURLString: urlString)
         
+        
         // 3. fetcher(GTMSessionFetcherService)オブジェクトのbeginFetchメソッドを実行して、ファイルデータを取得します。
-        fetcher.beginFetch( completionHandler: { (data: Data?, error: Error?) -> Void in
+        fetcher.beginFetch( completionHandler: { (data: Data?, error: Error?) -> Void in // （デリゲートでもできる）
             if let error = error {
                 // 4. エラーの場合、処理を終了します。
                 // 必要に応じてエラー処理を行ってください。
@@ -72,7 +74,7 @@ class GDFileManager {
                 return
             }
             
-            guard data != nil else {
+            guard let dat = data else {
                 // データが取得できない場合、処理を終了します。
                 // 必要に応じてエラー処理を行ってください。
                 print("GoogleDriveからデータが取得できませんでした。")
@@ -86,10 +88,28 @@ class GDFileManager {
             // 　②テキストデータに変換する。
             // を行なっています。
             //
-            GDFileManager.mp3FileList = GDFileManager.fileInfoList.filter({$0.fileExtension == "mp3"})
-            GDFileManager.bmsFileList = GDFileManager.fileInfoList.filter({$0.fileExtension == "bms"})
+            
+            guard let file = GDFileManager.fileInfoList.first(where: {$0.identifier == fileID}) else {
+                print("指定されたファイルをリストから見つけられませんでした。（ドライブ上には存在します）")
+                return
+            }
+            
+            
+            // 保存
+            
+//            if !FileManager.default.createFile(atPath: "\(NSHomeDirectory())/Library/Application Support/\(file.name!)", contents: data, attributes: nil){
+//                print("保存に失敗しました：\(file.name!)")
+//            }
+            
+            let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("\(file.name!)/")
+            do{
+                try dat.write(to: url, options: .atomic)
+            }catch{
+                print("保存に失敗しました：\(file.name!)")
+                print(error)
+            }
+            
+            
         })
-        
-        return fetcher.downloadedData
     }
 }
