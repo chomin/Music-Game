@@ -11,14 +11,4 @@ target '音ゲー（仮）' do
   pod "RealmSwift"
   pod "youtube-ios-player-helper-swift"
 
-  target '音ゲー（仮）Tests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-
-  target '音ゲー（仮）UITests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-
 end
