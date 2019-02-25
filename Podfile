@@ -12,4 +12,5 @@ target '音ゲー（仮）' do
   pod "youtube-ios-player-helper-swift"
   pod "GoogleAPIClientForREST/Drive", "~> 1.2.1"
   pod "GTMAppAuth"
+  pod 'SVProgressHUD', :git => 'https://github.com/SVProgressHUD/SVProgressHUD.git'
 end

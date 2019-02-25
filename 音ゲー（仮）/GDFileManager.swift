@@ -8,6 +8,7 @@
 
 import GoogleAPIClientForREST
 import AVFoundation
+import SVProgressHUD
 
 class GDFileManager {
     /// GooleDriveファイル情報リスト
@@ -56,6 +57,20 @@ class GDFileManager {
     /// - Parameters:
     ///   - fileID: fileID
     static func getFileData(_ fileID: String) {
+        
+        guard let file = GDFileManager.fileInfoList.first(where: {$0.identifier == fileID}) else {
+            print("指定されたファイルをリストから見つけられませんでした。リストを更新してください。")
+            return
+        }
+        let fileURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("\(file.name!)/")
+        guard !FileManager.default.fileExists(atPath: fileURL.path) else {
+            print("\(file.name!)はすでにダウンロード済みです")
+            return
+        }
+        
+        // アニメーション立ち上げ
+        SVProgressHUD.show()
+        
         // 1. ファイルデータを取得するファイルのIDを指定してURL文字列を作成します。
         let urlString = "https://www.googleapis.com/drive/v3/files/\(fileID)?alt=media"
         
@@ -89,36 +104,18 @@ class GDFileManager {
             // を行なっています。
             //
             
-            guard let file = GDFileManager.fileInfoList.first(where: {$0.identifier == fileID}) else {
-                print("指定されたファイルをリストから見つけられませんでした。（ドライブ上には存在します）")
-                return
-            }
-            
+           
             
             // 保存
-            
-//            if !FileManager.default.createFile(atPath: "\(NSHomeDirectory())/Library/Application Support/\(file.name!)", contents: data, attributes: nil){
-//                print("保存に失敗しました：\(file.name!)")
-//            }
-            
-//            let dirURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-//            if !FileManager.default.fileExists(atPath: dirURL.absoluteString){
-//                do {
-//                    try FileManager.default.createDirectory( atPath: dirURL.absoluteString, withIntermediateDirectories: true, attributes: nil)
-//
-//                } catch {
-//                    print(error)
-//                    return
-//                }
-//            }
-            
-            let fileURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0].appendingPathComponent("\(file.name!)/")
             do{
                 try dat.write(to: fileURL, options: .atomic)
             }catch{
                 print("保存に失敗しました：\(file.name!)")
                 print(error)
             }
+            
+            SVProgressHUD.showSuccess(withStatus: "\(file.name!)")
+            SVProgressHUD.dismiss(withDelay: 1)
         })
     }
 }

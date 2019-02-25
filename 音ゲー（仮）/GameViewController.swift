@@ -146,7 +146,7 @@ class GameViewController: UIViewController {
      */
     @objc func displayResultWithTicket(_ ticket: GTLRServiceTicket, finishedWithObject response: GTLRDrive_FileList, error: Error?) {
         if error != nil {
-            print(error)
+            print(error!)
             // エラーの場合、処理を終了します。
             // 必要に応じてエラー処理を行ってください。
             return

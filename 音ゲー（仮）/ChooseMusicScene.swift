@@ -127,7 +127,7 @@ class ChooseMusicScene: SKScene {
     override func didMove(to view: SKView) {
         
         // ダウンロードテスト
-        print(GDFileManager.getFileData((GDFileManager.mp3FileList.first?.identifier)!))
+        print(GDFileManager.getFileData((GDFileManager.mp3FileList[2].identifier)!))
         
         speedsPosY = Dimensions.iconButtonSize*3
         sizesPosY  = speedsPosY*2
