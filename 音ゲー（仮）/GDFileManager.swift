@@ -57,17 +57,17 @@ class GDFileManager {
     ///
     /// - Parameters:
     ///   - fileID: fileID
-    static func getFileData(fileID: String, group: DispatchGroup) {
+    static func getFileData(fileID: String, group: DispatchGroup?) {
         
         guard let file = GDFileManager.fileInfoList.first(where: {$0.identifier == fileID}) else {
             print("指定されたファイルをリストから見つけられませんでした。リストを更新してください。")
-            group.leave()
+            group?.leave()
             return
         }
         let fileURL = cachesDirectoty.appendingPathComponent("\(file.name!)/")
         guard !FileManager.default.fileExists(atPath: fileURL.path) else {
             print("\(file.name!)はすでにダウンロード済みです")
-            group.leave()
+            group?.leave()
             return
         }
         // アニメーション立ち上げ
@@ -121,7 +121,7 @@ class GDFileManager {
             SVProgressHUD.showSuccess(withStatus: "\(file.name!)")
             SVProgressHUD.dismiss(withDelay: 1)
             
-            group.leave()
+            group?.leave()
         })
     }
 }
