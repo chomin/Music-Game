@@ -127,17 +127,25 @@ class ChooseMusicScene: SKScene {
     override func didMove(to view: SKView) {
         
         // ダウンロードテスト
-        print(GDFileManager.getFileData((GDFileManager.mp3FileList[2].identifier)!))
+//        print(GDFileManager.getFileData((GDFileManager.mp3FileList[2].identifier)!))
         
         speedsPosY = Dimensions.iconButtonSize*3
         sizesPosY  = speedsPosY*2
         
         backgroundColor = .white
         
-        // Headerについて、ファイル探索→db更新→読み込み
         do {
-            let fileNamesWithExtension = try FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath + "/Sounds").filter { $0.hasSuffix(".bms") }
+            // クラウドストレージの更新確認(mp3)
+            let directoryContents = try FileManager.default.contentsOfDirectory(atPath: GDFileManager.cachesDirectoty.path)
+            let mp3NamesWithExtension = directoryContents.filter { $0.hasSuffix(".mp3") }
+            var mp3DownloadingIDs: [String] = []
             
+            for file in GDFileManager.mp3FileList {
+                if !mp3NamesWithExtension.contains("\(file.name!).\(file.fileExtension!)"){ mp3DownloadingIDs.append(file.identifier!) }
+            }
+            
+            
+            // Headerについて、/Library/Cachesのbmsファイル探索→db更新→読み込み
             let realm = try Realm()
             
 //            try! realm.write {
@@ -149,7 +157,8 @@ class ChooseMusicScene: SKScene {
 //            print(results)
             
             // fileに対応するdbが存在するか確認
-            for fileName in fileNamesWithExtension {
+            let bmsNamesWithExtension = directoryContents.filter { $0.hasSuffix(".bms") }
+            for fileName in bmsNamesWithExtension {
 
                 if let DBHeader = results.filter({ $0.bmsNameWithExtension == fileName }).first { // ファイルに対応するdb発見
 
@@ -189,14 +198,8 @@ class ChooseMusicScene: SKScene {
             return $0.group < $1.group
             
         })
-//        print(headers)
         
         // ピッカーキーボードの設置
-//        var musicNameArray: [String] = []   // ピッカーに表示する曲名
-//        for header in headers {
-//            musicNameArray.append(header.title)
-//        }
-        
         let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
         picker = PickerKeyboard(frame: rect, firstText: setting.musicName, headers: headers)
         picker.backgroundColor = .gray

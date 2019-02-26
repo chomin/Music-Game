@@ -32,6 +32,38 @@ class GameViewController: UIViewController {
         skView2.presentScene(scene)  // ChooseMusicSceneに移動
     }
     
+    func downloadBMSs(){
+        
+        do{
+            let directoryContents = try FileManager.default.contentsOfDirectory(atPath: GDFileManager.cachesDirectoty.path)
+            let bmsNamesWithExtension = directoryContents.filter { $0.hasSuffix(".bms") }
+            var bmsDownloadingIDs: [String] = []
+            for file in GDFileManager.bmsFileList {
+                if !bmsNamesWithExtension.contains("\(file.name!)"){    // (file.nameは拡張子付き。)
+                    bmsDownloadingIDs.append(file.identifier!)
+                }
+            }
+            
+            let dispatchGroup = DispatchGroup()
+            // 直列キュー / attibutes指定なし
+            let dispatchQueue = DispatchQueue.main
+            
+            // ダウンロード（bmsのみ）
+            for id in bmsDownloadingIDs{
+                dispatchGroup.enter()
+                dispatchQueue.async(group: dispatchGroup){ () in
+                    GDFileManager.getFileData(fileID: id, group: dispatchGroup)
+                }
+            }
+            // 全ての非同期処理完了後にメインスレッドで処理
+            dispatchGroup.notify(queue: .main) {
+                self.moveToCMScene()
+            }
+        }catch{
+            print(error)
+        }
+    }
+    
     /**
      ブラウザ経由のGoogleDrive認証を行います。
      参考: https://github.com/google/GTMAppAuth
@@ -206,17 +238,14 @@ class GameViewController: UIViewController {
             GDFileManager.nextPageToken = token
             getFileInfoList()
         }
-        
-        
         // 種類によって振り分け
         GDFileManager.mp3FileList = GDFileManager.fileInfoList.filter({$0.fileExtension == "mp3"})
         GDFileManager.bmsFileList = GDFileManager.fileInfoList.filter({$0.fileExtension == "bms"})
         
-        
-        
-        
-        moveToCMScene()
+        downloadBMSs()
     }
+    
+    
     
  
     
@@ -226,9 +255,11 @@ class GameViewController: UIViewController {
         
         authGoogleDriveInBrowser()
         
-        
         // 寸法に関する定数をセット
         Dimensions.createInstance(frame: view.frame)
+        
+        
+        
         
         super.viewDidLoad()
        
