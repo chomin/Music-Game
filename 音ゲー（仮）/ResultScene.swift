@@ -87,7 +87,7 @@ class ResultScene: SKScene {
             Label.position = CGPoint(x: self.frame.midX, y: 0)
             Label.fontColor = SKColor.white
             Label.numberOfLines = 7
-            
+
             Label.text = labelText
             
             self.addChild(Label)
