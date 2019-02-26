@@ -8,7 +8,7 @@
 
 import SpriteKit
 class ResultScene: SKScene {
-    static var parfect = 0
+    static var perfect = 0
     static var great = 0
     static var good = 0
     static var bad = 0
@@ -36,7 +36,7 @@ class ResultScene: SKScene {
             
             Label.text =    // swift4からの書き方(改行入りのString)
             """
-            parfect:\(ResultScene.parfect)
+            perfect:\(ResultScene.perfect)
             great:\(ResultScene.great)
             good:\(ResultScene.good)
             bad:\(ResultScene.bad)

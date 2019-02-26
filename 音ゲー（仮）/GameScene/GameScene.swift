@@ -211,7 +211,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }()
         
         // リザルトの初期化
-        ResultScene.parfect = 0
+        ResultScene.perfect = 0
         ResultScene.great = 0
         ResultScene.good = 0
         ResultScene.bad = 0
@@ -430,7 +430,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     
                     if judgeRect.contains(pos) {   // ボタンの範囲
                         
-                        if self.parfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
+                        if self.perfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
                             break   // このタッチでこのフレームでの判定はもう行わない
                         }
                     }

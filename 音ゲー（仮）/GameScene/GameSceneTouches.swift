@@ -332,9 +332,9 @@ extension GameScene {
         }
         
         switch lane.getJudgeTimeState(timeLag: timeLag) {
-        case .parfect:
-            setJudgeLabelText(text: "parfect!!")
-            ResultScene.parfect += 1
+        case .perfect:
+            setJudgeLabelText(text: "perfect!!")
+            ResultScene.perfect += 1
             ResultScene.combo += 1
             if ResultScene.combo > ResultScene.maxCombo {
                 ResultScene.maxCombo += 1
@@ -387,15 +387,15 @@ extension GameScene {
     
     /// 受け取ったLaneの先頭ノーツを判定する。失敗したらfalseを返す。middleのperfect専用
     /// laneの先頭がMiddleであるか、それがparfect時間であるかの判定も兼ねている
-    func parfectMiddleJudge(lane: Lane, gsTouch: GSTouch) -> Bool {
+    func perfectMiddleJudge(lane: Lane, gsTouch: GSTouch) -> Bool {
         
         guard !(lane.isEmpty),
             lane.headNote is Middle,
             lane.headNote!.isJudgeable else { return false }
         
-        if lane.judgeTimeState == .parfect {
+        if lane.judgeTimeState == .perfect {
             if !(judge(lane: lane, timeLag: lane.timeLag, gsTouch: gsTouch)) {
-                print("parfectMiddleJugeに失敗")
+                print("perfectMiddleJugeに失敗")
                 return false
             } else {
                 return true

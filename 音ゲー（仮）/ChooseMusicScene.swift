@@ -551,14 +551,14 @@ class ChooseMusicScene: SKScene {
             ダウンロード
             して遊ぶ
             """
-//            playButton.titleEdgeInsets = .init(top: -playButton.frame.height/8, left: 0, bottom: playButton.frame.height/8, right: 0)
         } else {
             title = "この曲で遊ぶ"
-//            playButton.titleEdgeInsets = .zero
         }
         playButton.titleLabel?.numberOfLines = 2
         playButton.setTitle(title, for: UIControl.State())
         playButton.setTitle(title, for: UIControl.State.highlighted)
+        
+        
     }
     
     override func willMove(from view: SKView) {

@@ -12,7 +12,7 @@ import SpriteKit
 class Lane {
     
     enum JudgeTimeState {    // enumはRange型をサポートしていないのでrawValueにRange型のものを代入することはできない
-        case miss, bad, good, great, parfect, still, passed
+        case miss, bad, good, great, perfect, still, passed
     }
     
     enum ObsevationTimeState {
@@ -20,7 +20,7 @@ class Lane {
     }
     
     //判定時間に関する定数群
-    private let parfectUpperBorder = 0.05
+    private let perfectUpperBorder = 0.05
     private let greatUpperBorder = 0.08
     private let goodUpperBorder = 0.085
     private let badUpperBorder = 0.09
@@ -55,7 +55,7 @@ class Lane {
         guard isTimeLagSet else { return false }
         
         switch self.getJudgeTimeState(timeLag: timeLag) {
-        case .parfect, .great, .good, .bad, .miss : return true
+        case .perfect, .great, .good, .bad, .miss : return true
         default                                   : return false
         }
     }
@@ -69,8 +69,8 @@ class Lane {
         guard laneNotes.first is Middle  else { return .otherwise }
         
         switch timeLag {
-        case  parfectUpperBorder ..<  missUpperBorder:    return .before
-        case -missUpperBorder    ..< -parfectUpperBorder: return .after
+        case  perfectUpperBorder ..<  missUpperBorder:    return .before
+        case -missUpperBorder    ..< -perfectUpperBorder: return .after
         default:                                          return .otherwise
         }
     }
@@ -83,7 +83,7 @@ class Lane {
         guard laneNotes.first is Flick ||
             laneNotes.first is FlickEnd else { return false }
         
-        return (parfectUpperBorder ..< missUpperBorder).contains(timeLag)
+        return (perfectUpperBorder ..< missUpperBorder).contains(timeLag)
     }
     
     var judgeTimeState: JudgeTimeState {    // このインスタンスのtimeLagについてのTimeStateを取得するためのプロパティ
@@ -146,8 +146,8 @@ class Lane {
         }
         
         switch abs(timeLag) {
-        case 0                  ..< parfectUpperBorder  : return .parfect
-        case parfectUpperBorder ..< greatUpperBorder    : return .great
+        case 0                  ..< perfectUpperBorder  : return .perfect
+        case perfectUpperBorder ..< greatUpperBorder    : return .great
         case greatUpperBorder   ..< goodUpperBorder     : return .good
         case goodUpperBorder    ..< badUpperBorder      : return .bad
         case badUpperBorder     ..< missUpperBorder     : return .miss
