@@ -144,8 +144,21 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         switch playMode {
         case .BGM:
             // サウンドファイルのパスを生成
-            let Path: String = {
-                if music.group != "BDGP" { return Bundle.main.path(forResource: "Sounds/" + music.title, ofType: "mp3")! }  // m4a,oggは不可
+//            let Path: String = {
+//                if music.group != "BDGP" { return GDFileManager.cachesDirectoty.appendingPathComponent("\(music.title).mp3").path }  // m4a,oggは不可
+//                else                     {
+//                    var mp3FileName = music.title
+//                    let startIndex = mp3FileName.index(after:  mp3FileName.lastIndex(of: "(")!)
+//                    let lastIndex  = mp3FileName.index(before: mp3FileName.lastIndex(of: ")")!)
+//                    mp3FileName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
+//                    let insertIndex = mp3FileName.index(after:  mp3FileName.lastIndex(of: "(")!)
+//                    mp3FileName.insert(contentsOf: "BDGP", at: insertIndex)
+//                    return GDFileManager.cachesDirectoty.appendingPathComponent(mp3FileName).path
+//                }
+//            }()
+            
+            let soundURL: URL = {
+                if music.group != "BDGP" { return GDFileManager.cachesDirectoty.appendingPathComponent("\(music.title).mp3") }  // m4a,oggは不可
                 else                     {
                     var mp3FileName = music.title
                     let startIndex = mp3FileName.index(after:  mp3FileName.lastIndex(of: "(")!)
@@ -153,11 +166,10 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     mp3FileName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
                     let insertIndex = mp3FileName.index(after:  mp3FileName.lastIndex(of: "(")!)
                     mp3FileName.insert(contentsOf: "BDGP", at: insertIndex)
-                    return Bundle.main.path(forResource: "Sounds/" + mp3FileName , ofType: "mp3")!
+                    return GDFileManager.cachesDirectoty.appendingPathComponent("\(mp3FileName).mp3")
                 }
             }()
             
-            let soundURL = URL(fileURLWithPath: Path)
             // AVAudioPlayerのインスタンスを作成
             do {
                 BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
