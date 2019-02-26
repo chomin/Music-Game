@@ -17,7 +17,8 @@ class GDFileManager {
     static var bmsFileList  = [GTLRDrive_File]()
     /// 次ページ取得用トークン
     static var nextPageToken: String?
-    
+    /// 保存先のディレクトリ(長いので、、、)
+    static let cachesDirectoty = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     
     /**
      ディレクトリか判定します。
@@ -56,18 +57,19 @@ class GDFileManager {
     ///
     /// - Parameters:
     ///   - fileID: fileID
-    static func getFileData(_ fileID: String) {
+    static func getFileData(fileID: String, group: DispatchGroup) {
         
         guard let file = GDFileManager.fileInfoList.first(where: {$0.identifier == fileID}) else {
             print("指定されたファイルをリストから見つけられませんでした。リストを更新してください。")
+            group.leave()
             return
         }
-        let fileURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("\(file.name!)/")
+        let fileURL = cachesDirectoty.appendingPathComponent("\(file.name!)/")
         guard !FileManager.default.fileExists(atPath: fileURL.path) else {
             print("\(file.name!)はすでにダウンロード済みです")
+            group.leave()
             return
         }
-        
         // アニメーション立ち上げ
         SVProgressHUD.show()
         
@@ -86,6 +88,7 @@ class GDFileManager {
                 // 4. エラーの場合、処理を終了します。
                 // 必要に応じてエラー処理を行ってください。
                 print(error)
+                getFileData(fileID: fileID, group: group)
                 return
             }
             
@@ -93,6 +96,7 @@ class GDFileManager {
                 // データが取得できない場合、処理を終了します。
                 // 必要に応じてエラー処理を行ってください。
                 print("GoogleDriveからデータが取得できませんでした。")
+                getFileData(fileID: fileID, group: group)
                 return
             }
             
@@ -116,6 +120,8 @@ class GDFileManager {
             
             SVProgressHUD.showSuccess(withStatus: "\(file.name!)")
             SVProgressHUD.dismiss(withDelay: 1)
+            
+            group.leave()
         })
     }
 }
