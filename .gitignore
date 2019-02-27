@@ -47,14 +47,14 @@ playground.xcworkspace
 # https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
 #
 Pods/
-Podfile.lock
+*.xcworkspace
 
 # Carthage
 #
 # Add this line if you want to avoid checking in source code from Carthage dependencies.
 # Carthage/Checkouts
-
-Carthage/Build
+#
+# Carthage/Build
 
 # fastlane
 #
@@ -65,42 +65,12 @@ Carthage/Build
 
 fastlane/report.xml
 fastlane/Preview.html
-fastlane/screenshots
+fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# Code Injection
+#
+# After new code Injection tools there's a generated folder /iOSInjectionProject
+# https://github.com/johnno1962/injectionforxcode
 
-音ゲー（仮）.xcodeproj/
-
-xcuserdata/
-音ゲー（仮）.xcodeproj/xcuserdata
-
-.DS_Store
-音ゲー（仮）/.DS_Store
-
-音ゲー（仮）.xcodeproj/project.pbxproj
-音ゲー（仮）.xcodeproj/project.xcworkspace
-
-音ゲー（仮）.xcworkspace/contents.xcworkspacedata
-音ゲー（仮）.xcworkspace/xcuserdata
-
-# Mac
-.DS_Store
-
-# Xcode
-build/*
-*.pbxuser
-!default.pbxuser
-*.mode1v3
-!default.mode1v3
-*.mode2v3
-!default.mode2v3
-*.perspectivev3
-!default.perspectivev3
-*.xcworkspace
-!default.xcworkspace
-xcuserdata
-profile
-*.moved-aside
-
-#CocoaPod
-Pods/*
+iOSInjectionProject/

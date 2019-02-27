@@ -1,0 +1,30 @@
+PODS:
+  - Gemini (1.3.1)
+  - Realm (3.7.6):
+    - Realm/Headers (= 3.7.6)
+  - Realm/Headers (3.7.6)
+  - RealmSwift (3.7.6):
+    - Realm (= 3.7.6)
+  - youtube-ios-player-helper-swift (1.1)
+
+DEPENDENCIES:
+  - Gemini
+  - RealmSwift
+  - youtube-ios-player-helper-swift
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Gemini
+    - Realm
+    - RealmSwift
+    - youtube-ios-player-helper-swift
+
+SPEC CHECKSUMS:
+  Gemini: 25fd4ae5dcde4cbd136dac899faf38a1dddea1a8
+  Realm: 9eaecad54712d6246d08ba34c10f354e4715d7d3
+  RealmSwift: 1fe08b4ebaeeaacf17f9ba0343f7b25c9fc31fa6
+  youtube-ios-player-helper-swift: 51a3c5325317c8271d0c7985c1bbe5a252ffb2fd
+
+PODFILE CHECKSUM: 16775154af5bb0625b408bd4ea7528a14a8e5917
+
+COCOAPODS: 1.6.0

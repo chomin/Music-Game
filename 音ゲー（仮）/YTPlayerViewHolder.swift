@@ -6,7 +6,7 @@
 //  Copyright © 2018年 NakaiKohei. All rights reserved.
 //
 
-import youtube_ios_player_helper
+import youtube_ios_player_helper_swift
 
 class YTPlayerViewHolder {
     
@@ -19,7 +19,7 @@ class YTPlayerViewHolder {
     
     var currentTime: TimeInterval {
         
-        let currentTime = TimeInterval(view.currentTime())
+        let currentTime = TimeInterval(view.currentTime)
         
         // 再生開始から4フレーム以降(ポーズ中は除く)
         if baseline != nil {
@@ -32,7 +32,7 @@ class YTPlayerViewHolder {
         return currentTime + offset
     }
     
-    var duration: TimeInterval { return self.view.duration() }
+    var duration: TimeInterval { return self.view.duration }
     
     var delegate: YTPlayerViewDelegate? {
         get {
@@ -56,12 +56,12 @@ class YTPlayerViewHolder {
         self.view = YTPlayerView(frame: frame)
     }
     
-    func load(withVideoId: String, playerVars: [AnyHashable: Any]?) -> Bool {
-        return self.view.load(withVideoId: withVideoId, playerVars: playerVars)
+    func load(withVideoId: String, playerVars: [String: Any]) -> Bool {
+        return self.view.load(videoId: withVideoId, playerVars: playerVars)
     }
     
     func seek(toSeconds: Float, allowSeekAhead: Bool) {
-        self.view.seek(toSeconds: toSeconds, allowSeekAhead: allowSeekAhead)
+        self.view.seek(seekToSeconds: toSeconds, allowSeekAhead: allowSeekAhead)
     }
     
     func playVideo() {
@@ -74,18 +74,18 @@ class YTPlayerViewHolder {
     }
     
     func playerState() -> YTPlayerState {
-        return self.view.playerState()
+        return self.view.playerState
     }
     
     private var frame = 0
     // 毎フレームに1度呼ぶこと
     func countFrameForBaseline() {
-        if view.playerState() == .playing && baseline == nil {
+        if view.playerState == .playing && baseline == nil {
             frame += 1
             if frame == 60 {
                 renewTimeParams()
             }
-        } else if view.playerState() == .paused {
+        } else if view.playerState == .paused {
             frame = 0
         }
     }
@@ -93,7 +93,7 @@ class YTPlayerViewHolder {
     // 再生開始時に呼ぶこと
     func renewTimeParams() {
         offset = 0
-        baseline = CACurrentMediaTime() - (TimeInterval(view.currentTime()) + offset)
+        baseline = CACurrentMediaTime() - (TimeInterval(view.currentTime) + offset)
         print("baseline set")
     }
 }
