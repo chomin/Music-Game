@@ -20,37 +20,7 @@ class GDFileManager {
     /// 保存先のディレクトリ(長いので、、、)
     static let cachesDirectoty = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     
-    /**
-     ディレクトリか判定します。
-     
-     - Parameter file: ファイルオブジェクト
-     - Returns: true:ディレクトリ / false:ファイル
-     */
-    static func isDir(_ file: GTLRDrive_File) -> Bool {
-        var result = false
-        if let mimeType = file.mimeType {
-            let mimeTypes = mimeType.components(separatedBy: ".")
-            let lastIndex = mimeTypes.count - 1
-            let type = mimeTypes[lastIndex]
-            if type == "folder" {
-                result = true
-            }
-        }
-        return result
-    }
-    
-    /**
-     削除済みか判定します。
-     
-     - Parameter file: ファイルオブジェクト
-     - Returns: true:削除済み / false:削除されていない
-     */
-    static func isTrashed(_ file: GTLRDrive_File) -> Bool {
-        if let trashed = file.trashed, trashed == 1 {
-            return true
-        }
-        return false
-    }
+   
     
     
     /// GoogleDrive APIで、ファイルデータを取得します。データはDBに格納（予定）
@@ -88,6 +58,8 @@ class GDFileManager {
                 // 4. エラーの場合、処理を終了します。
                 // 必要に応じてエラー処理を行ってください。
                 print(error)
+                SVProgressHUD.showError(withStatus: "\(file.name!)")
+                SVProgressHUD.dismiss(withDelay: 1)
                 getFileData(fileID: fileID, group: group)
                 return
             }
@@ -96,6 +68,8 @@ class GDFileManager {
                 // データが取得できない場合、処理を終了します。
                 // 必要に応じてエラー処理を行ってください。
                 print("GoogleDriveからデータが取得できませんでした。")
+                SVProgressHUD.showError(withStatus: "\(file.name!)")
+                SVProgressHUD.dismiss(withDelay: 1)
                 getFileData(fileID: fileID, group: group)
                 return
             }
@@ -108,14 +82,16 @@ class GDFileManager {
             // を行なっています。
             //
             
-           
-            
             // 保存
             do{
                 try dat.write(to: fileURL, options: .atomic)
             }catch{
                 print("保存に失敗しました：\(file.name!)")
                 print(error)
+                SVProgressHUD.showError(withStatus: "\(file.name!)")
+                SVProgressHUD.dismiss(withDelay: 1)
+                getFileData(fileID: fileID, group: group)
+                return
             }
             
             SVProgressHUD.showSuccess(withStatus: "\(file.name!)")
@@ -123,5 +99,39 @@ class GDFileManager {
             
             group?.leave()
         })
+    }
+}
+
+extension GTLRDrive_File {
+    /**
+     ディレクトリか判定します。
+     
+     - Parameter file: ファイルオブジェクト
+     - Returns: true:ディレクトリ / false:ファイル
+     */
+     func isDir() -> Bool {
+        var result = false
+        if let mimeType = self.mimeType {
+            let mimeTypes = mimeType.components(separatedBy: ".")
+            let lastIndex = mimeTypes.count - 1
+            let type = mimeTypes[lastIndex]
+            if type == "folder" {
+                result = true
+            }
+        }
+        return result
+    }
+    
+    /**
+     削除済みか判定します。
+     
+     - Parameter file: ファイルオブジェクト
+     - Returns: true:削除済み / false:削除されていない
+     */
+    func isTrashed() -> Bool {
+        if let trashed = self.trashed, trashed == 1 {
+            return true
+        }
+        return false
     }
 }
