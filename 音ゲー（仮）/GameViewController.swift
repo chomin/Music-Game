@@ -34,33 +34,47 @@ class GameViewController: UIViewController {
     
     func downloadBMSs(){
         
-        do{
-            let directoryContents = try FileManager.default.contentsOfDirectory(atPath: GDFileManager.cachesDirectoty.path)
-            let bmsNamesWithExtension = directoryContents.filter { $0.hasSuffix(".bms") }
-            var bmsDownloadingIDs: [String] = []
-            for file in GDFileManager.bmsFileList {
-                if !bmsNamesWithExtension.contains("\(file.name!)"){    // (file.nameは拡張子付き。)
-                    bmsDownloadingIDs.append(file.identifier!)
-                }
-            }
+        
+        //            let directoryContents = try FileManager.default.contentsOfDirectory(atPath: GDFileManager.cachesDirectoty.path)
+        //            let bmsNamesWithExtension = directoryContents.filter { $0.hasSuffix(".bms") }
+        var bmsDownloadingIDs: [String] = []
+        for file in GDFileManager.bmsFileList {
             
-            let dispatchGroup = DispatchGroup()
-            // 直列キュー / attibutes指定なし
-            let dispatchQueue = DispatchQueue.main
+            if !file.isDownloaded() || file.isRenewed() { bmsDownloadingIDs.append(file.identifier!) }
             
-            // ダウンロード（bmsのみ）
-            for id in bmsDownloadingIDs{
-                dispatchGroup.enter()
-                dispatchQueue.async(group: dispatchGroup){ () in
-                    GDFileManager.getFileData(fileID: id, group: dispatchGroup)
-                }
+            //                if !bmsNamesWithExtension.contains("\(file.name!)"){    // (file.nameは拡張子付き。)
+            //
+            //                } else {
+            //                    // 更新時刻を比較し、更新があればダウンロードし上書き
+            //                    let cloudFileDate = file.modifiedTime!.date    // クラウド上のファイルのDate
+            //
+            //                    let filePath = GDFileManager.cachesDirectoty.appendingPathComponent(file.name!).path
+            //                    let attr = try FileManager.default.attributesOfItem(atPath: filePath)
+            //                    let localFileDate = attr[FileAttributeKey.modificationDate] as! Date
+            //
+            //                    if cloudFileDate.compare(localFileDate) == .orderedDescending {
+            //                        print("\(file.name!)を上書きします.")
+            //                        print(cloudFileDate)
+            //                        print(localFileDate)
+            //                        bmsDownloadingIDs.append(file.identifier!)
+            //                    }
+            //                }
+        }
+        
+        let dispatchGroup = DispatchGroup()
+        // 直列キュー / attibutes指定なし
+        let dispatchQueue = DispatchQueue.main
+        
+        // ダウンロード（bmsのみ）
+        for id in bmsDownloadingIDs{
+            dispatchGroup.enter()
+            dispatchQueue.async(group: dispatchGroup){ () in
+                GDFileManager.getFileData(fileID: id, group: dispatchGroup)
             }
-            // 全ての非同期処理完了後にメインスレッドで処理
-            dispatchGroup.notify(queue: .main) {
-                self.moveToCMScene()
-            }
-        }catch{
-            print(error)
+        }
+        // 全ての非同期処理完了後にメインスレッドで処理
+        dispatchGroup.notify(queue: .main) {
+            self.moveToCMScene()
         }
     }
     
@@ -258,11 +272,7 @@ class GameViewController: UIViewController {
         // 寸法に関する定数をセット
         Dimensions.createInstance(frame: view.frame)
         
-        
-        
-        
         super.viewDidLoad()
-       
     }
     
     override var shouldAutorotate: Bool {

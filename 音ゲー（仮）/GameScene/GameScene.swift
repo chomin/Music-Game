@@ -143,20 +143,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         // BGMまたはYouTubeのプレイヤーを作成
         switch playMode {
         case .BGM:
-            // サウンドファイルのパスを生成
-//            let Path: String = {
-//                if music.group != "BDGP" { return GDFileManager.cachesDirectoty.appendingPathComponent("\(music.title).mp3").path }  // m4a,oggは不可
-//                else                     {
-//                    var mp3FileName = music.title
-//                    let startIndex = mp3FileName.index(after:  mp3FileName.lastIndex(of: "(")!)
-//                    let lastIndex  = mp3FileName.index(before: mp3FileName.lastIndex(of: ")")!)
-//                    mp3FileName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
-//                    let insertIndex = mp3FileName.index(after:  mp3FileName.lastIndex(of: "(")!)
-//                    mp3FileName.insert(contentsOf: "BDGP", at: insertIndex)
-//                    return GDFileManager.cachesDirectoty.appendingPathComponent(mp3FileName).path
-//                }
-//            }()
-            
+            // サウンドファイルのURLを生成
             let soundURL: URL = {
                 if music.group != "BDGP" { return GDFileManager.cachesDirectoty.appendingPathComponent("\(music.title).mp3") }  // m4a,oggは不可
                 else                     {

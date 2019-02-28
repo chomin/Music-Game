@@ -20,9 +20,6 @@ class GDFileManager {
     /// 保存先のディレクトリ(長いので、、、)
     static let cachesDirectoty = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     
-   
-    
-    
     /// GoogleDrive APIで、ファイルデータを取得します。データはDBに格納（予定）
     ///
     /// - Parameters:
@@ -35,11 +32,11 @@ class GDFileManager {
             return
         }
         let fileURL = cachesDirectoty.appendingPathComponent("\(file.name!)/")
-        guard !FileManager.default.fileExists(atPath: fileURL.path) else {
-            print("\(file.name!)はすでにダウンロード済みです")
-            group?.leave()
-            return
-        }
+//        guard !FileManager.default.fileExists(atPath: fileURL.path) else {
+//            print("\(file.name!)はすでにダウンロード済みです")
+//            group?.leave()
+//            return
+//        }
         // アニメーション立ち上げ
         SVProgressHUD.show()
         
@@ -133,5 +130,41 @@ extension GTLRDrive_File {
             return true
         }
         return false
+    }
+    
+    func isDownloaded() -> Bool {
+        do {
+            let directoryContents = try FileManager.default.contentsOfDirectory(atPath: GDFileManager.cachesDirectoty.path)
+            return directoryContents.contains("\(self.name!)")
+        } catch {
+            print(error)
+            return self.isDownloaded()
+        }
+        
+    }
+    
+    /// ローカルファイルと比較して更新されているか
+    /// ダウンロードされていなければtrueを返す
+    /// 
+    /// - Returns: Bool
+    func isRenewed() -> Bool {
+        
+        guard self.isDownloaded() else {
+            return true
+        }
+        
+        let cloudFileDate = self.modifiedTime!.date    // クラウド上のファイルのDate
+        
+        do {
+            let filePath = GDFileManager.cachesDirectoty.appendingPathComponent(self.name!).path
+            let attr = try FileManager.default.attributesOfItem(atPath: filePath)
+            let localFileDate = attr[FileAttributeKey.modificationDate] as! Date
+            
+            if cloudFileDate.compare(localFileDate) == .orderedDescending { return true  }
+            else                                                          { return false }
+        } catch {
+            print(error)
+            return self.isRenewed()
+        }
     }
 }
