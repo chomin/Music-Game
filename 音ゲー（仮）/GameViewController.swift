@@ -217,12 +217,12 @@ class GameViewController: UIViewController {
             }
             
             // 削除済みか判定します。
-            if GDFileManager.isTrashed(driveFile) {
+            if driveFile.isTrashed() {
                 // 削除済みの場合、次のファイルを処理します。
                 continue
             }
             
-            if GDFileManager.isDir(driveFile) {
+            if driveFile.isDir() {
                 // ディレクトリの場合
 
             } else {

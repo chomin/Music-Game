@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /// 認証
     var googleDriveAuthorization: GTMAppAuthFetcherAuthorization?
     /// 現在の認証フロー
-    var googleDriveCurrentAuthorizationFlow: OIDAuthorizationFlowSession?
+    var googleDriveCurrentAuthorizationFlow: OIDExternalUserAgentSession?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
         // 現在のGoogleDriveの認証フローが有効な場合
         if let googleDriveCurrentAuthorizationFlow = googleDriveCurrentAuthorizationFlow {
-            if googleDriveCurrentAuthorizationFlow.resumeAuthorizationFlow(with: url) {
+            if googleDriveCurrentAuthorizationFlow.resumeExternalUserAgentFlow(with: url) {
                 self.googleDriveCurrentAuthorizationFlow = nil
                 return true
             }
