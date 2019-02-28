@@ -128,9 +128,6 @@ class ChooseMusicScene: SKScene {
     
     override func didMove(to view: SKView) {
         
-        // ダウンロードテスト
-//        print(GDFileManager.getFileData((GDFileManager.mp3FileList[2].identifier)!))
-        
         speedsPosY = Dimensions.iconButtonSize*3
         sizesPosY  = speedsPosY*2
         
@@ -138,11 +135,8 @@ class ChooseMusicScene: SKScene {
         
         do {
             // クラウドストレージの更新確認(mp3)
-            let directoryContents = try FileManager.default.contentsOfDirectory(atPath: GDFileManager.cachesDirectoty.path)
-            let mp3NamesWithExtension = directoryContents.filter { $0.hasSuffix(".mp3") }
-            
             for file in GDFileManager.mp3FileList {
-                if !mp3NamesWithExtension.contains("\(file.name!)"){ mp3DownloadingFiles.append(file) }
+                if !file.isDownloaded() || file.isRenewed() { mp3DownloadingFiles.append(file) }
             }
             
             // Headerについて、/Library/Cachesのbmsファイル探索→db更新→読み込み
@@ -154,15 +148,14 @@ class ChooseMusicScene: SKScene {
 
             let results = realm.objects(Header.self)
             
-//            print(results)
-            
             // fileに対応するdbが存在するか確認
+            let directoryContents = try FileManager.default.contentsOfDirectory(atPath: GDFileManager.cachesDirectoty.path)
             let bmsNamesWithExtension = directoryContents.filter { $0.hasSuffix(".bms") }
             for fileName in bmsNamesWithExtension {
 
                 if let DBHeader = results.filter({ $0.bmsNameWithExtension == fileName }).first { // ファイルに対応するdb発見
 
-                    let filePath = Bundle.main.path(forAuxiliaryExecutable: "Sounds/" + fileName)!
+                    let filePath = GDFileManager.cachesDirectoty.appendingPathComponent(fileName).path
                     let attr = try FileManager.default.attributesOfItem(atPath: filePath)
                     let date = attr[FileAttributeKey.modificationDate] as! Date
                     let formatter = DateFormatter()
