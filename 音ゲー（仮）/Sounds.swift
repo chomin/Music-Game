@@ -130,10 +130,10 @@ class ActionSoundPlayers {
         alureInitDevice(nil, nil)
         
         // サウンドファイルのパスを生成
-        let tapSoundPath    = Bundle.main.path(forResource: "Sounds/タップ",   ofType: "wav")!     // mp3,m4a,ogg は不可
-        let flickSoundPath  = Bundle.main.path(forResource: "Sounds/フリック", ofType: "wav")!
-        let middleSoundPath = Bundle.main.path(forResource: "Sounds/middleSound", ofType: "wav")!      // TODO: いい素材を見つける
-        let karaSoundPath   = Bundle.main.path(forResource: "Sounds/空打ち",   ofType: "wav")!
+        let tapSoundPath    = Bundle.main.path(forResource: "Sounds/タップ"       , ofType: "wav")!     // mp3,m4a,ogg は不可
+        let flickSoundPath  = Bundle.main.path(forResource: "Sounds/フリック"     , ofType: "wav")!
+        let middleSoundPath = Bundle.main.path(forResource: "Sounds/middleSound" , ofType: "wav")!      // TODO: いい素材を見つける
+        let karaSoundPath   = Bundle.main.path(forResource: "Sounds/空打ち"       , ofType: "wav")!
         
         tap1    = SoundSource(fullFilePath: tapSoundPath)    ?? SoundSource()
         tap2    = SoundSource(fullFilePath: tapSoundPath)    ?? SoundSource()
