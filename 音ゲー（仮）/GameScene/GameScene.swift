@@ -10,7 +10,7 @@
 import SpriteKit
 import GameplayKit
 import AVFoundation
-import youtube_ios_player_helper    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
+import youtube_ios_player_helper_swift    // 今後、これを利用するために.xcodeprojではなく、.xcworkspaceを開いて編集すること
 
 /// 判定関係のフラグ付きタッチ情報
 class GSTouch { // 参照型として扱いたい
@@ -100,6 +100,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     var setting: Setting
     
+    var result = Result()
     
     init(size: CGSize, setting: Setting, header: Header) {
 
@@ -195,15 +196,6 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             return Button
         }()
-        
-        // リザルトの初期化
-        ResultScene.perfect = 0
-        ResultScene.great = 0
-        ResultScene.good = 0
-        ResultScene.bad = 0
-        ResultScene.miss = 0
-        ResultScene.combo = 0
-        ResultScene.maxCombo = 0
         
         // ラベルの設定
         judgeLabel = { () -> SKLabelNode in
@@ -374,7 +366,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         }
         
         // ラベルの更新
-        comboLabel.text = String(ResultScene.combo)
+        comboLabel.text = String(result.combo)
         
         // 各ノーツの位置や大きさを更新
         for note in notes {
@@ -469,7 +461,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     func moveToResultScene() {
-        let scene = ResultScene(size: (view?.bounds.size)!)
+        let scene = ResultScene(size: (view?.bounds.size)!, result: result)
         let skView = view as SKView?
         skView?.showsFPS = true
         skView?.showsNodeCount = true

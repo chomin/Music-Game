@@ -9,7 +9,7 @@
 import SpriteKit
 
 struct Result {
-    var parfect = 0
+    var perfect = 0
     var great = 0
     var good = 0
     var bad = 0
@@ -19,8 +19,8 @@ struct Result {
     
     mutating func countUp(judgeType: JudgeType) {
         switch judgeType {
-        case .parfect:
-            self.parfect += 1
+        case .perfect:
+            self.perfect += 1
             self.combo += 1
             if self.combo > self.maxCombo {
                 self.maxCombo += 1
@@ -60,7 +60,7 @@ class ResultScene: SKScene {
     
     init(size: CGSize, result: Result) {
         self.labelText =  """
-        parfect:\(result.parfect)
+        perfect:\(result.perfect)
         great:\(result.great)
         good:\(result.good)
         bad:\(result.bad)

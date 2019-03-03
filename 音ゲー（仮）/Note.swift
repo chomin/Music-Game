@@ -68,7 +68,7 @@ class Tap: Note {
 
 /// フリックノーツ
 /// 原則としてtouchesMovedが呼び出されたときに判定する。
-/// 呼び出し時にまだparfectの時間でない場合(before)について、後にparfect判定を行うかもしれないので、時間とUItouch情報を該当LaneインスタンスのstoredFlickJudgeに、レーン情報を該当GSTouchインスタンスのstoredFlickJudgeLaneIndexに格納し、後にこの情報をもとにGameSceneTouchesファイル内に記述されているGameScene.storedFlickJudge関数にて判定を行う。
+/// 呼び出し時にまだperfectの時間でない場合(before)について、後にperfect判定を行うかもしれないので、時間とUItouch情報を該当LaneインスタンスのstoredFlickJudgeに、レーン情報を該当GSTouchインスタンスのstoredFlickJudgeLaneIndexに格納し、後にこの情報をもとにGameSceneTouchesファイル内に記述されているGameScene.storedFlickJudge関数にて判定を行う。
 /// この呼出は情報が残っているときにのみ行われ、該当ノーツの判定後に各情報格納場所にnilが入る。storedFlickJudgeの呼び出しタイミングはtouchesMoved呼び出し時にレーンから指が外れた時、touchesEnded呼び出し時、これ以上待ってもより良い判定が来なくなる時（ノーツの正確なタイミングの時間についてtimeLag予定時間(>0)と対象な時間）である。
 class Flick: Note {
     
@@ -311,8 +311,8 @@ class TapStart: Note {
 
 /// ロング通過位置判定ノーツ。ロング中、このノーツが通過する位置に指を置かなければならない。
 /// 初期状態ではisJudgeableがfalseであり、判定されない。先行するTapStartまたはMiddle判定後に判定可能になる。
-/// GameScene.update呼び出し時にparfect時間ならば判定する。
-/// parfect時間が来る前(before)、touchesMoved,touchesEnded関数呼出し時にレーンから外れた場合はその場で判定を行う。
+/// GameScene.update呼び出し時にperfect時間ならば判定する。
+/// perfect時間が来る前(before)、touchesMoved,touchesEnded関数呼出し時にレーンから外れた場合はその場で判定を行う。
 /// 上記のいずれの判定もされず残った場合、miss確定時間が来る前(after)にtouchesMoved,touchesEndedが呼び出され、指がレーンに入った場合はその時間で判定を行う。
 class Middle: Note {
     
@@ -512,7 +512,7 @@ class TapEnd: Note {
 /// ロングフリック離しノーツ。
 /// 初期状態ではisJudgeableがfalseであり、判定されない。先行するTapStartまたはMiddle判定後に判定可能になる。
 /// 原則としてtouchesMovedが呼び出されたときに判定する。
-/// 呼び出し時にまだparfectの時間でない場合(before)について、後にparfect判定を行うかもしれないので、時間とUItouch情報を該当LaneインスタンスのstoredFlickJudgeに、レーン情報を該当GSTouchインスタンスのstoredFlickJudgeLaneIndexに格納し、後にこの情報をもとにGameSceneTouchesファイル内に記述されているGameScene.storedFlickJudge関数にて判定を行う。この呼出は情報が残っているときにのみ行われ、該当ノーツの判定後に各情報格納場所にnilが入る。storedFlickJudgeの呼び出しタイミングはtouchesMoved呼び出し時にレーンから指が外れた時、touchesEnded呼び出し時、これ以上待ってもより良い判定が来なくなる時（ノーツの正確なタイミングの時間についてtimeLag予定時間(>0)と対象な時間）である。
+/// 呼び出し時にまだperfectの時間でない場合(before)について、後にperfect判定を行うかもしれないので、時間とUItouch情報を該当LaneインスタンスのstoredFlickJudgeに、レーン情報を該当GSTouchインスタンスのstoredFlickJudgeLaneIndexに格納し、後にこの情報をもとにGameSceneTouchesファイル内に記述されているGameScene.storedFlickJudge関数にて判定を行う。この呼出は情報が残っているときにのみ行われ、該当ノーツの判定後に各情報格納場所にnilが入る。storedFlickJudgeの呼び出しタイミングはtouchesMoved呼び出し時にレーンから指が外れた時、touchesEnded呼び出し時、これ以上待ってもより良い判定が来なくなる時（ノーツの正確なタイミングの時間についてtimeLag予定時間(>0)と対象な時間）である。
 class FlickEnd: Note {
     
 //    unowned var start = Note()

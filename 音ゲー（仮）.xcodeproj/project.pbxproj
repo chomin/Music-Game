@@ -7,38 +7,43 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0E9F10392223B2F600E0BC99 /* Gemini.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E9F10382223B2F600E0BC99 /* Gemini.framework */; };
-		0E9F103B2223B2F600E0BC99 /* youtube_ios_player_helper_swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E9F103A2223B2F600E0BC99 /* youtube_ios_player_helper_swift.framework */; };
-		0E9F103F2223BB8B00E0BC99 /* Podfile.lock in Resources */ = {isa = PBXBuildFile; fileRef = 0E9F103C2223BB8B00E0BC99 /* Podfile.lock */; };
 		0E9F10402223BB8B00E0BC99 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 0E9F103D2223BB8B00E0BC99 /* Podfile */; };
 		0E9F10412223BB8B00E0BC99 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0E9F103E2223BB8B00E0BC99 /* README.md */; };
 		0E9F10432223BBB600E0BC99 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 0E9F10422223BBB600E0BC99 /* .gitignore */; };
-		0EF7DA54221DC56F0021A3E4 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EF7DA53221DC56F0021A3E4 /* RealmSwift.framework */; };
 		0EF7DA662223B0C20021A3E4 /* GameSceneImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EF7DA632223B0C20021A3E4 /* GameSceneImages.swift */; };
 		0EF7DA672223B0C20021A3E4 /* GameSceneTouches.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EF7DA642223B0C20021A3E4 /* GameSceneTouches.swift */; };
 		0EF7DA682223B0C20021A3E4 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EF7DA652223B0C20021A3E4 /* GameScene.swift */; };
+		0F255AAE222BF38E0026DFE9 /* streamplay.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AA6222BF38D0026DFE9 /* streamplay.o */; };
+		0F255AAF222BF38E0026DFE9 /* istream.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AA7222BF38D0026DFE9 /* istream.o */; };
+		0F255AB0222BF38E0026DFE9 /* buffer.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AA8222BF38D0026DFE9 /* buffer.o */; };
+		0F255AB1222BF38E0026DFE9 /* alure.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AA9222BF38D0026DFE9 /* alure.o */; };
+		0F255AB2222BF38E0026DFE9 /* streamdec.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AAA222BF38D0026DFE9 /* streamdec.o */; };
+		0F255AB3222BF38E0026DFE9 /* codec_wav.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AAB222BF38E0026DFE9 /* codec_wav.o */; };
+		0F255AB4222BF38E0026DFE9 /* stream.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AAC222BF38E0026DFE9 /* stream.o */; };
+		0F255AB5222BF38E0026DFE9 /* codec_aiff.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AAD222BF38E0026DFE9 /* codec_aiff.o */; };
 		0F41C8DF1F7275C2007C6A38 /* ResultScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F41C8DE1F7275C2007C6A38 /* ResultScene.swift */; };
+		0F65E8AC222BDCF000BEF557 /* GDFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F65E8AB222BDCF000BEF557 /* GDFileManager.swift */; };
 		0F746F4B1F5EEEFF00C1D040 /* Sounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F746F4A1F5EEEFF00C1D040 /* Sounds.swift */; };
 		0F746F541F5F917E00C1D040 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F746F531F5F917E00C1D040 /* AVFoundation.framework */; };
 		0F746F5D1F5F950E00C1D040 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0F746F591F5F950E00C1D040 /* LaunchScreen.storyboard */; };
 		0F746F5E1F5F950E00C1D040 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0F746F5B1F5F950E00C1D040 /* Main.storyboard */; };
+		0FBC97CF222C065A00DC3927 /* AppAuth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FBC97CE222C065A00DC3927 /* AppAuth.framework */; };
+		0FBC97D1222C065A00DC3927 /* GoogleAPIClientForREST.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FBC97D0222C065A00DC3927 /* GoogleAPIClientForREST.framework */; };
+		0FBC97D3222C065A00DC3927 /* GTMAppAuth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FBC97D2222C065A00DC3927 /* GTMAppAuth.framework */; };
+		0FBC97D5222C065A00DC3927 /* GTMSessionFetcher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FBC97D4222C065A00DC3927 /* GTMSessionFetcher.framework */; };
+		0FBC97D7222C068500DC3927 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FBC97D6222C068500DC3927 /* Realm.framework */; };
+		0FBC97D9222C068500DC3927 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FBC97D8222C068500DC3927 /* RealmSwift.framework */; };
+		0FBC97DB222C068500DC3927 /* youtube_ios_player_helper_swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FBC97DA222C068500DC3927 /* youtube_ios_player_helper_swift.framework */; };
+		0FBC97DD222C071B00DC3927 /* SVProgressHUD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FBC97DC222C071B00DC3927 /* SVProgressHUD.framework */; };
+		0FF43AB4222BE830001A8B53 /* Podfile.lock in Resources */ = {isa = PBXBuildFile; fileRef = 0FF43AB3222BE82F001A8B53 /* Podfile.lock */; };
 		0FFD1B441F5E6D2B0007E555 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B431F5E6D2B0007E555 /* AppDelegate.swift */; };
 		0FFD1B4C1F5E6D2B0007E555 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B4B1F5E6D2B0007E555 /* GameViewController.swift */; };
 		0FFD1B511F5E6D2B0007E555 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0FFD1B501F5E6D2B0007E555 /* Assets.xcassets */; };
-		37A8842FFAD7FD2A712BE9A8 /* Pods________.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41D59B4DFA79502EFD8855D8 /* Pods________.framework */; };
 		F1007516213D701B00ED2EF3 /* ChooseMusicScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1007515213D701A00ED2EF3 /* ChooseMusicScene.swift */; };
 		F100ADDA213A6DC10027E2A2 /* Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = F100ADD7213A6DBF0027E2A2 /* Music.swift */; };
 		F100ADDC213A6DC10027E2A2 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F100ADD9213A6DC00027E2A2 /* Setting.swift */; };
 		F1092FCA1F84ABF0001963D3 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1092FC91F84ABF0001963D3 /* Note.swift */; };
 		F118E1652061F81400EDC8B8 /* Dimensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118E1642061F81400EDC8B8 /* Dimensions.swift */; };
-		F11A0DAB1FB74BF300B3990C /* streamdec.o in Frameworks */ = {isa = PBXBuildFile; fileRef = F11A0DA31FB74BF300B3990C /* streamdec.o */; };
-		F11A0DAC1FB74BF300B3990C /* stream.o in Frameworks */ = {isa = PBXBuildFile; fileRef = F11A0DA41FB74BF300B3990C /* stream.o */; };
-		F11A0DAD1FB74BF300B3990C /* alure.o in Frameworks */ = {isa = PBXBuildFile; fileRef = F11A0DA51FB74BF300B3990C /* alure.o */; };
-		F11A0DAE1FB74BF300B3990C /* streamplay.o in Frameworks */ = {isa = PBXBuildFile; fileRef = F11A0DA61FB74BF300B3990C /* streamplay.o */; };
-		F11A0DAF1FB74BF300B3990C /* codec_wav.o in Frameworks */ = {isa = PBXBuildFile; fileRef = F11A0DA71FB74BF300B3990C /* codec_wav.o */; };
-		F11A0DB01FB74BF300B3990C /* istream.o in Frameworks */ = {isa = PBXBuildFile; fileRef = F11A0DA81FB74BF300B3990C /* istream.o */; };
-		F11A0DB11FB74F4F00B3990C /* buffer.o in Frameworks */ = {isa = PBXBuildFile; fileRef = F11A0DA11FB74BF300B3990C /* buffer.o */; settings = {ATTRIBUTES = (Required, ); }; };
-		F11A0DB21FB74F4F00B3990C /* codec_aiff.o in Frameworks */ = {isa = PBXBuildFile; fileRef = F11A0DA21FB74BF300B3990C /* codec_aiff.o */; };
 		F127323A1FB5BB9500D7F5C8 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F12732391FB5BB8B00D7F5C8 /* OpenAL.framework */; };
 		F12ED65B2119815C0093CB80 /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12ED65A2119815C0093CB80 /* Regex.swift */; };
 		F148A4EC213C348600E57180 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = F148A4EB213C348500E57180 /* Header.swift */; };
@@ -66,28 +71,36 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0E9F10382223B2F600E0BC99 /* Gemini.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Gemini.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0E9F103A2223B2F600E0BC99 /* youtube_ios_player_helper_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = youtube_ios_player_helper_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0E9F103C2223BB8B00E0BC99 /* Podfile.lock */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile.lock; sourceTree = "<group>"; };
-		0E9F103D2223BB8B00E0BC99 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; };
+		0B02828396637911C78EE9D3 /* Pods-音ゲー（仮）.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-音ゲー（仮）.release.xcconfig"; path = "Target Support Files/Pods-音ゲー（仮）/Pods-音ゲー（仮）.release.xcconfig"; sourceTree = "<group>"; };
+		0E9F103D2223BB8B00E0BC99 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		0E9F103E2223BB8B00E0BC99 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0E9F10422223BBB600E0BC99 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		0EF7DA51221DC55E0021A3E4 /* youtube_ios_player_helper_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = youtube_ios_player_helper_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0EF7DA53221DC56F0021A3E4 /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0EF7DA5A2223B0640021A3E4 /* GTMAppAuth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = GTMAppAuth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0EF7DA5C2223B06C0021A3E4 /* youtube_ios_player_helper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = youtube_ios_player_helper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0EF7DA5E2223B0730021A3E4 /* SVProgressHUD.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SVProgressHUD.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0EF7DA602223B08B0021A3E4 /* GoogleAPIClientForREST.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = GoogleAPIClientForREST.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EF7DA632223B0C20021A3E4 /* GameSceneImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameSceneImages.swift; sourceTree = "<group>"; };
 		0EF7DA642223B0C20021A3E4 /* GameSceneTouches.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameSceneTouches.swift; sourceTree = "<group>"; };
 		0EF7DA652223B0C20021A3E4 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
-		0EF7DA692223B1110021A3E4 /* AppAuth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AppAuth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0EF7DA6B2223B1110021A3E4 /* GTMSessionFetcher.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = GTMSessionFetcher.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0F255AA6222BF38D0026DFE9 /* streamplay.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = streamplay.o; path = "../alure-1.2/build/streamplay.o"; sourceTree = "<group>"; };
+		0F255AA7222BF38D0026DFE9 /* istream.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = istream.o; path = "../alure-1.2/build/istream.o"; sourceTree = "<group>"; };
+		0F255AA8222BF38D0026DFE9 /* buffer.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = buffer.o; path = "../alure-1.2/build/buffer.o"; sourceTree = "<group>"; };
+		0F255AA9222BF38D0026DFE9 /* alure.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = alure.o; path = "../alure-1.2/build/alure.o"; sourceTree = "<group>"; };
+		0F255AAA222BF38D0026DFE9 /* streamdec.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = streamdec.o; path = "../alure-1.2/build/streamdec.o"; sourceTree = "<group>"; };
+		0F255AAB222BF38E0026DFE9 /* codec_wav.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = codec_wav.o; path = "../alure-1.2/build/codec_wav.o"; sourceTree = "<group>"; };
+		0F255AAC222BF38E0026DFE9 /* stream.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = stream.o; path = "../alure-1.2/build/stream.o"; sourceTree = "<group>"; };
+		0F255AAD222BF38E0026DFE9 /* codec_aiff.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = codec_aiff.o; path = "../alure-1.2/build/codec_aiff.o"; sourceTree = "<group>"; };
 		0F41C8DE1F7275C2007C6A38 /* ResultScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultScene.swift; sourceTree = "<group>"; };
+		0F65E8AB222BDCF000BEF557 /* GDFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDFileManager.swift; sourceTree = "<group>"; };
 		0F746F4A1F5EEEFF00C1D040 /* Sounds.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sounds.swift; sourceTree = "<group>"; };
 		0F746F531F5F917E00C1D040 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		0F746F5A1F5F950E00C1D040 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0F746F5C1F5F950E00C1D040 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		0FBC97CE222C065A00DC3927 /* AppAuth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AppAuth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0FBC97D0222C065A00DC3927 /* GoogleAPIClientForREST.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = GoogleAPIClientForREST.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0FBC97D2222C065A00DC3927 /* GTMAppAuth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = GTMAppAuth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0FBC97D4222C065A00DC3927 /* GTMSessionFetcher.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = GTMSessionFetcher.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0FBC97D6222C068500DC3927 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0FBC97D8222C068500DC3927 /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0FBC97DA222C068500DC3927 /* youtube_ios_player_helper_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = youtube_ios_player_helper_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0FBC97DC222C071B00DC3927 /* SVProgressHUD.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SVProgressHUD.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0FF43AB3222BE82F001A8B53 /* Podfile.lock */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile.lock; sourceTree = "<group>"; };
 		0FFD1B401F5E6D2B0007E555 /* 音ゲー（仮）.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "音ゲー（仮）.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0FFD1B431F5E6D2B0007E555 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0FFD1B4B1F5E6D2B0007E555 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
@@ -95,22 +108,12 @@
 		0FFD1B551F5E6D2B0007E555 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0FFD1B5A1F5E6D2B0007E555 /* 音ゲー（仮）Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "音ゲー（仮）Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0FFD1B651F5E6D2B0007E555 /* 音ゲー（仮）UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "音ゲー（仮）UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		307528B4710B034C339F5BB1 /* Pods-音ゲー（仮）.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-音ゲー（仮）.debug.xcconfig"; path = "Target Support Files/Pods-音ゲー（仮）/Pods-音ゲー（仮）.debug.xcconfig"; sourceTree = "<group>"; };
-		41D59B4DFA79502EFD8855D8 /* Pods________.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods________.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
-		80E2439256D84CE000F9BECC /* Pods-音ゲー（仮）.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-音ゲー（仮）.release.xcconfig"; path = "Target Support Files/Pods-音ゲー（仮）/Pods-音ゲー（仮）.release.xcconfig"; sourceTree = "<group>"; };
+		B455D9138378CDF255B3CB3A /* Pods-音ゲー（仮）.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-音ゲー（仮）.debug.xcconfig"; path = "Target Support Files/Pods-音ゲー（仮）/Pods-音ゲー（仮）.debug.xcconfig"; sourceTree = "<group>"; };
 		F1007515213D701A00ED2EF3 /* ChooseMusicScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseMusicScene.swift; sourceTree = "<group>"; };
 		F100ADD7213A6DBF0027E2A2 /* Music.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Music.swift; sourceTree = "<group>"; };
 		F100ADD9213A6DC00027E2A2 /* Setting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
 		F1092FC91F84ABF0001963D3 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		F118E1642061F81400EDC8B8 /* Dimensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dimensions.swift; sourceTree = "<group>"; };
-		F11A0DA11FB74BF300B3990C /* buffer.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = buffer.o; path = "../../alure-1.2/build/buffer.o"; sourceTree = "<group>"; };
-		F11A0DA21FB74BF300B3990C /* codec_aiff.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = codec_aiff.o; path = "../../alure-1.2/build/codec_aiff.o"; sourceTree = "<group>"; };
-		F11A0DA31FB74BF300B3990C /* streamdec.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = streamdec.o; path = "../../alure-1.2/build/streamdec.o"; sourceTree = "<group>"; };
-		F11A0DA41FB74BF300B3990C /* stream.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = stream.o; path = "../../alure-1.2/build/stream.o"; sourceTree = "<group>"; };
-		F11A0DA51FB74BF300B3990C /* alure.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = alure.o; path = "../../alure-1.2/build/alure.o"; sourceTree = "<group>"; };
-		F11A0DA61FB74BF300B3990C /* streamplay.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = streamplay.o; path = "../../alure-1.2/build/streamplay.o"; sourceTree = "<group>"; };
-		F11A0DA71FB74BF300B3990C /* codec_wav.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = codec_wav.o; path = "../../alure-1.2/build/codec_wav.o"; sourceTree = "<group>"; };
-		F11A0DA81FB74BF300B3990C /* istream.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = istream.o; path = "../../alure-1.2/build/istream.o"; sourceTree = "<group>"; };
 		F12732391FB5BB8B00D7F5C8 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		F12ED65A2119815C0093CB80 /* Regex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
 		F148A4EB213C348500E57180 /* Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
@@ -128,20 +131,24 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0E9F10392223B2F600E0BC99 /* Gemini.framework in Frameworks */,
-				0E9F103B2223B2F600E0BC99 /* youtube_ios_player_helper_swift.framework in Frameworks */,
-				0EF7DA54221DC56F0021A3E4 /* RealmSwift.framework in Frameworks */,
-				F11A0DAD1FB74BF300B3990C /* alure.o in Frameworks */,
-				F11A0DB11FB74F4F00B3990C /* buffer.o in Frameworks */,
-				F11A0DB21FB74F4F00B3990C /* codec_aiff.o in Frameworks */,
-				F11A0DAB1FB74BF300B3990C /* streamdec.o in Frameworks */,
-				F11A0DAC1FB74BF300B3990C /* stream.o in Frameworks */,
-				F11A0DAE1FB74BF300B3990C /* streamplay.o in Frameworks */,
-				F11A0DAF1FB74BF300B3990C /* codec_wav.o in Frameworks */,
-				F11A0DB01FB74BF300B3990C /* istream.o in Frameworks */,
+				0FBC97DD222C071B00DC3927 /* SVProgressHUD.framework in Frameworks */,
+				0FBC97D7222C068500DC3927 /* Realm.framework in Frameworks */,
+				0FBC97D9222C068500DC3927 /* RealmSwift.framework in Frameworks */,
+				0FBC97DB222C068500DC3927 /* youtube_ios_player_helper_swift.framework in Frameworks */,
+				0FBC97CF222C065A00DC3927 /* AppAuth.framework in Frameworks */,
+				0FBC97D1222C065A00DC3927 /* GoogleAPIClientForREST.framework in Frameworks */,
+				0FBC97D3222C065A00DC3927 /* GTMAppAuth.framework in Frameworks */,
+				0FBC97D5222C065A00DC3927 /* GTMSessionFetcher.framework in Frameworks */,
+				0F255AAE222BF38E0026DFE9 /* streamplay.o in Frameworks */,
+				0F255AAF222BF38E0026DFE9 /* istream.o in Frameworks */,
+				0F255AB0222BF38E0026DFE9 /* buffer.o in Frameworks */,
+				0F255AB1222BF38E0026DFE9 /* alure.o in Frameworks */,
+				0F255AB2222BF38E0026DFE9 /* streamdec.o in Frameworks */,
+				0F255AB3222BF38E0026DFE9 /* codec_wav.o in Frameworks */,
+				0F255AB4222BF38E0026DFE9 /* stream.o in Frameworks */,
+				0F255AB5222BF38E0026DFE9 /* codec_aiff.o in Frameworks */,
 				0F746F541F5F917E00C1D040 /* AVFoundation.framework in Frameworks */,
 				F127323A1FB5BB9500D7F5C8 /* OpenAL.framework in Frameworks */,
-				37A8842FFAD7FD2A712BE9A8 /* Pods________.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,28 +182,25 @@
 		0F746F521F5F917E00C1D040 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				0E9F10382223B2F600E0BC99 /* Gemini.framework */,
-				0E9F103A2223B2F600E0BC99 /* youtube_ios_player_helper_swift.framework */,
-				0EF7DA692223B1110021A3E4 /* AppAuth.framework */,
-				0EF7DA6B2223B1110021A3E4 /* GTMSessionFetcher.framework */,
-				0EF7DA602223B08B0021A3E4 /* GoogleAPIClientForREST.framework */,
-				0EF7DA5E2223B0730021A3E4 /* SVProgressHUD.framework */,
-				0EF7DA5C2223B06C0021A3E4 /* youtube_ios_player_helper.framework */,
-				0EF7DA5A2223B0640021A3E4 /* GTMAppAuth.framework */,
-				0EF7DA53221DC56F0021A3E4 /* RealmSwift.framework */,
-				0EF7DA51221DC55E0021A3E4 /* youtube_ios_player_helper_swift.framework */,
+				0FBC97DC222C071B00DC3927 /* SVProgressHUD.framework */,
+				0FBC97D6222C068500DC3927 /* Realm.framework */,
+				0FBC97D8222C068500DC3927 /* RealmSwift.framework */,
+				0FBC97DA222C068500DC3927 /* youtube_ios_player_helper_swift.framework */,
+				0FBC97CE222C065A00DC3927 /* AppAuth.framework */,
+				0FBC97D0222C065A00DC3927 /* GoogleAPIClientForREST.framework */,
+				0FBC97D2222C065A00DC3927 /* GTMAppAuth.framework */,
+				0FBC97D4222C065A00DC3927 /* GTMSessionFetcher.framework */,
+				0F255AA9222BF38D0026DFE9 /* alure.o */,
+				0F255AA8222BF38D0026DFE9 /* buffer.o */,
+				0F255AAD222BF38E0026DFE9 /* codec_aiff.o */,
+				0F255AAB222BF38E0026DFE9 /* codec_wav.o */,
+				0F255AA7222BF38D0026DFE9 /* istream.o */,
+				0F255AAC222BF38E0026DFE9 /* stream.o */,
+				0F255AAA222BF38D0026DFE9 /* streamdec.o */,
+				0F255AA6222BF38D0026DFE9 /* streamplay.o */,
 				F1E50457204C3A6F007A2F93 /* AudioToolbox.framework */,
-				F11A0DA51FB74BF300B3990C /* alure.o */,
-				F11A0DA71FB74BF300B3990C /* codec_wav.o */,
-				F11A0DA81FB74BF300B3990C /* istream.o */,
-				F11A0DA41FB74BF300B3990C /* stream.o */,
-				F11A0DA11FB74BF300B3990C /* buffer.o */,
-				F11A0DA21FB74BF300B3990C /* codec_aiff.o */,
-				F11A0DA31FB74BF300B3990C /* streamdec.o */,
-				F11A0DA61FB74BF300B3990C /* streamplay.o */,
 				F12732391FB5BB8B00D7F5C8 /* OpenAL.framework */,
 				0F746F531F5F917E00C1D040 /* AVFoundation.framework */,
-				41D59B4DFA79502EFD8855D8 /* Pods________.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -206,7 +210,7 @@
 			children = (
 				0E9F10422223BBB600E0BC99 /* .gitignore */,
 				0E9F103D2223BB8B00E0BC99 /* Podfile */,
-				0E9F103C2223BB8B00E0BC99 /* Podfile.lock */,
+				0FF43AB3222BE82F001A8B53 /* Podfile.lock */,
 				0E9F103E2223BB8B00E0BC99 /* README.md */,
 				0FFD1B421F5E6D2B0007E555 /* 音ゲー（仮） */,
 				0FFD1B411F5E6D2B0007E555 /* Products */,
@@ -230,6 +234,7 @@
 			children = (
 				0EF7DA622223B0C20021A3E4 /* GameScene */,
 				F1007515213D701A00ED2EF3 /* ChooseMusicScene.swift */,
+				0F65E8AB222BDCF000BEF557 /* GDFileManager.swift */,
 				F148A4EB213C348500E57180 /* Header.swift */,
 				F100ADD7213A6DBF0027E2A2 /* Music.swift */,
 				F100ADD9213A6DC00027E2A2 /* Setting.swift */,
@@ -258,8 +263,8 @@
 		92AD65EB525FAF5D8F4394BD /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				307528B4710B034C339F5BB1 /* Pods-音ゲー（仮）.debug.xcconfig */,
-				80E2439256D84CE000F9BECC /* Pods-音ゲー（仮）.release.xcconfig */,
+				B455D9138378CDF255B3CB3A /* Pods-音ゲー（仮）.debug.xcconfig */,
+				0B02828396637911C78EE9D3 /* Pods-音ゲー（仮）.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -271,11 +276,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0FFD1B6E1F5E6D2B0007E555 /* Build configuration list for PBXNativeTarget "音ゲー（仮）" */;
 			buildPhases = (
-				BC5408A5E25F3C117816D90C /* [CP] Check Pods Manifest.lock */,
+				9390EEB452307F4082D22969 /* [CP] Check Pods Manifest.lock */,
 				0FFD1B3C1F5E6D2B0007E555 /* Sources */,
 				0FFD1B3D1F5E6D2B0007E555 /* Frameworks */,
 				0FFD1B3E1F5E6D2B0007E555 /* Resources */,
-				E4AD8689F526EFF4C9FBF56C /* [CP] Embed Pods Frameworks */,
+				3F2992457A367CD47EAB848D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -334,7 +339,7 @@
 				TargetAttributes = {
 					0FFD1B3F1F5E6D2B0007E555 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = 5H677574QF;
+						DevelopmentTeam = UT6PG9K559;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
@@ -384,8 +389,8 @@
 				0FFD1B511F5E6D2B0007E555 /* Assets.xcassets in Resources */,
 				0F746F5E1F5F950E00C1D040 /* Main.storyboard in Resources */,
 				0E9F10412223BB8B00E0BC99 /* README.md in Resources */,
-				0E9F103F2223BB8B00E0BC99 /* Podfile.lock in Resources */,
 				F1B16F7E1FBC90940036FEE2 /* Sounds in Resources */,
+				0FF43AB4222BE830001A8B53 /* Podfile.lock in Resources */,
 				0F746F5D1F5F950E00C1D040 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -407,7 +412,43 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		BC5408A5E25F3C117816D90C /* [CP] Check Pods Manifest.lock */ = {
+		3F2992457A367CD47EAB848D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-音ゲー（仮）/Pods-音ゲー（仮）-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
+				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
+				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework",
+				"${BUILT_PRODUCTS_DIR}/youtube-ios-player-helper-swift/youtube_ios_player_helper_swift.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMAppAuth.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/youtube_ios_player_helper_swift.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-音ゲー（仮）/Pods-音ゲー（仮）-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9390EEB452307F4082D22969 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -429,34 +470,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E4AD8689F526EFF4C9FBF56C /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-音ゲー（仮）/Pods-音ゲー（仮）-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Gemini/Gemini.framework",
-				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
-				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
-				"${BUILT_PRODUCTS_DIR}/youtube-ios-player-helper-swift/youtube_ios_player_helper_swift.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Gemini.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/youtube_ios_player_helper_swift.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-音ゲー（仮）/Pods-音ゲー（仮）-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -468,6 +481,7 @@
 				0F41C8DF1F7275C2007C6A38 /* ResultScene.swift in Sources */,
 				0FFD1B4C1F5E6D2B0007E555 /* GameViewController.swift in Sources */,
 				F160B76B2086E8D900650512 /* YTPlayerViewHolder.swift in Sources */,
+				0F65E8AC222BDCF000BEF557 /* GDFileManager.swift in Sources */,
 				F100ADDA213A6DC10027E2A2 /* Music.swift in Sources */,
 				F148A4EC213C348600E57180 /* Header.swift in Sources */,
 				F15FB1DB204C546B00D42803 /* PickerKeyboard.swift in Sources */,
@@ -583,12 +597,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LIBRARY_SEARCH_PATHS = "/Users/uedanobuhiro/alure-1.2/build";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lc++";
+				PODS_ROOT = "${SRCROOT}/Pods";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OBJC_BRIDGING_HEADER = "音ゲー（仮）/Bridging-Header.h";
@@ -642,11 +655,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LIBRARY_SEARCH_PATHS = "/Users/uedanobuhiro/alure-1.2/build";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = "-lc++";
+				PODS_ROOT = "${SRCROOT}/Pods";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "音ゲー（仮）/Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -658,7 +670,7 @@
 		};
 		0FFD1B6F1F5E6D2B0007E555 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 307528B4710B034C339F5BB1 /* Pods-音ゲー（仮）.debug.xcconfig */;
+			baseConfigurationReference = B455D9138378CDF255B3CB3A /* Pods-音ゲー（仮）.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -669,7 +681,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5H677574QF;
+				DEVELOPMENT_TEAM = UT6PG9K559;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -683,10 +695,9 @@
 				INFOPLIST_FILE = "音ゲー（仮）/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(HOME)/alure-1.2/build";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-lc++";
-				PRODUCT_BUNDLE_IDENTIFIER = onlyMyIdentifierCanShootIt;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nakai.music;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INCLUDE_PATHS = "$(PROJECT)/$(TARGET_NAME)/**";
@@ -700,7 +711,7 @@
 		};
 		0FFD1B701F5E6D2B0007E555 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 80E2439256D84CE000F9BECC /* Pods-音ゲー（仮）.release.xcconfig */;
+			baseConfigurationReference = 0B02828396637911C78EE9D3 /* Pods-音ゲー（仮）.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -711,7 +722,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5H677574QF;
+				DEVELOPMENT_TEAM = UT6PG9K559;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -725,10 +736,9 @@
 				INFOPLIST_FILE = "音ゲー（仮）/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(HOME)/alure-1.2/build";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-lc++";
-				PRODUCT_BUNDLE_IDENTIFIER = onlyMyIdentifierCanShootIt;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nakai.music;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INCLUDE_PATHS = "$(PROJECT)/$(TARGET_NAME)/**";

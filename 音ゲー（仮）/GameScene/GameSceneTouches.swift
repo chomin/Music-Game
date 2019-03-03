@@ -173,7 +173,7 @@ extension GameScene {
                         
                         if self.lanes[nearestNote.laneIndex].isFlickAndBefore {      // judgeするにはまだ早いんだ！！可能性の芽を摘むな！
                             
-                            self.lanes[nearestNote.laneIndex].storedFlickJudgeInformation = (nearestNote.timelag, uiTouch)  // parfect前までは、後にperfectになるかもしれないので保持
+                            self.lanes[nearestNote.laneIndex].storedFlickJudgeInformation = (nearestNote.timelag, uiTouch)  // perfect前までは、後にperfectになるかもしれないので保持
                             self.allGSTouches[touchIndex].storedFlickJudgeLaneIndex = nearestNote.laneIndex
                             
                         } else if !self.judge(lane: self.lanes[nearestNote.laneIndex], timeLag: nearestNote.timelag, gsTouch: self.allGSTouches[touchIndex]) {
@@ -186,7 +186,7 @@ extension GameScene {
                 for (index, judgeRect) in Dimensions.judgeRects.enumerated() {
                     if !(judgeRect.contains(ppos)) && judgeRect.contains(pos) {
                         
-                        if self.lanes[index].middleObservationTimeState == .after {    // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
+                        if self.lanes[index].middleObservationTimeState == .after {    // 入った先のレーンの最初がmiddleで、それがperfect時刻を過ぎても判定されずに残っている場合
                             if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, gsTouch: self.allGSTouches[touchIndex]) { break }
                         }
                     }
@@ -236,7 +236,7 @@ extension GameScene {
                         if judgeRect.contains(pos) {  // ボタンの範囲
                             if self.lanes[index].middleObservationTimeState == .before { // 早めに指を離した場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, gsTouch: self.allGSTouches[touchIndex]) { break }
-                            } else if self.lanes[index].middleObservationTimeState == .after { // 入った先のレーンの最初がmiddleで、それがparfect時刻を過ぎても判定されずに残っている場合
+                            } else if self.lanes[index].middleObservationTimeState == .after { // 入った先のレーンの最初がmiddleで、それがperfect時刻を過ぎても判定されずに残っている場合
                                 if self.judge(lane: self.lanes[index], timeLag: self.lanes[index].timeLag, gsTouch: self.allGSTouches[touchIndex]) { break }
                             }
                             
@@ -332,15 +332,15 @@ extension GameScene {
         }
         
         let judgeTimeState = lane.getJudgeTimeState(timeLag: timeLag)
-        setJudgeLabelText(judgeType: judgeTimeState)
+        setJudgeLabelText(text: judgeTimeState.rawValue)
         result.countUp(judgeType: judgeTimeState)
         lane.setHeadNoteJudged()
         return true
         
 //        switch lane.getJudgeTimeState(timeLag: timeLag) {
-//        case .parfect:
-//            setJudgeLabelText(text: "parfect!!")
-//            result.countUp(judgeType: .parfect)
+//        case .perfect:
+//            setJudgeLabelText(text: "perfect!!")
+//            result.countUp(judgeType: .perfect)
 //            lane.setHeadNoteJudged()
 //            return true
 //        case .great:
@@ -369,7 +369,7 @@ extension GameScene {
 //        }
     }
     
-    /// parfect終了時(laneからのdelegate)または指が外れた時に呼び出される。
+    /// perfect終了時(laneからのdelegate)または指が外れた時に呼び出される。
     func storedFlickJudge(lane: Lane) {
         
         guard lane.storedFlickJudgeInformation != nil else { return }
@@ -381,7 +381,7 @@ extension GameScene {
     }
     
     /// 受け取ったLaneの先頭ノーツを判定する。失敗したらfalseを返す。middleのperfect専用
-    /// laneの先頭がMiddleであるか、それがparfect時間であるかの判定も兼ねている
+    /// laneの先頭がMiddleであるか、それがperfect時間であるかの判定も兼ねている
     func perfectMiddleJudge(lane: Lane, gsTouch: GSTouch) -> Bool {
         
         guard !(lane.isEmpty),
@@ -403,7 +403,7 @@ extension GameScene {
     func missJudge(lane: Lane) -> Bool {
         guard !(lane.isEmpty), lane.headNote!.isJudgeable else { return false }
         
-        setJudgeLabelText(judgeType: .miss)
+        setJudgeLabelText(text: "miss")
         result.miss += 1
         result.combo = 0
         lane.setHeadNoteJudged()

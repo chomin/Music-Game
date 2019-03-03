@@ -14,7 +14,7 @@ enum JudgeType: String {    // enumはRange型をサポートしていないの�
     case bad     = "bad"
     case good    = "good"
     case great   = "great!"
-    case parfect = "parfect!!"
+    case perfect = "perfect!!"
     case still   = "still"
     case passed  = "passed"
     case none    = ""
