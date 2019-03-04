@@ -7,20 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E87380B222D02040094335B /* streamdec.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E873803222D02040094335B /* streamdec.o */; };
+		0E87380C222D02040094335B /* codec_aiff.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E873804222D02040094335B /* codec_aiff.o */; };
+		0E87380D222D02040094335B /* stream.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E873805222D02040094335B /* stream.o */; };
+		0E87380E222D02040094335B /* streamplay.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E873806222D02040094335B /* streamplay.o */; };
+		0E87380F222D02040094335B /* istream.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E873807222D02040094335B /* istream.o */; };
+		0E873810222D02040094335B /* codec_wav.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E873808222D02040094335B /* codec_wav.o */; };
+		0E873811222D02040094335B /* alure.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E873809222D02040094335B /* alure.o */; };
+		0E873812222D02040094335B /* buffer.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E87380A222D02040094335B /* buffer.o */; };
 		0E9F10402223BB8B00E0BC99 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 0E9F103D2223BB8B00E0BC99 /* Podfile */; };
 		0E9F10412223BB8B00E0BC99 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0E9F103E2223BB8B00E0BC99 /* README.md */; };
 		0E9F10432223BBB600E0BC99 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 0E9F10422223BBB600E0BC99 /* .gitignore */; };
+		0EBBE3DA222D00EF00CF696D /* MusicPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EBBE3D9222D00EF00CF696D /* MusicPicker.swift */; };
+		0EBBE3DC222D012B00CF696D /* Gemini.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EBBE3DB222D012B00CF696D /* Gemini.framework */; };
 		0EF7DA662223B0C20021A3E4 /* GameSceneImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EF7DA632223B0C20021A3E4 /* GameSceneImages.swift */; };
 		0EF7DA672223B0C20021A3E4 /* GameSceneTouches.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EF7DA642223B0C20021A3E4 /* GameSceneTouches.swift */; };
 		0EF7DA682223B0C20021A3E4 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EF7DA652223B0C20021A3E4 /* GameScene.swift */; };
-		0F255AAE222BF38E0026DFE9 /* streamplay.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AA6222BF38D0026DFE9 /* streamplay.o */; };
-		0F255AAF222BF38E0026DFE9 /* istream.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AA7222BF38D0026DFE9 /* istream.o */; };
-		0F255AB0222BF38E0026DFE9 /* buffer.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AA8222BF38D0026DFE9 /* buffer.o */; };
-		0F255AB1222BF38E0026DFE9 /* alure.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AA9222BF38D0026DFE9 /* alure.o */; };
-		0F255AB2222BF38E0026DFE9 /* streamdec.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AAA222BF38D0026DFE9 /* streamdec.o */; };
-		0F255AB3222BF38E0026DFE9 /* codec_wav.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AAB222BF38E0026DFE9 /* codec_wav.o */; };
-		0F255AB4222BF38E0026DFE9 /* stream.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AAC222BF38E0026DFE9 /* stream.o */; };
-		0F255AB5222BF38E0026DFE9 /* codec_aiff.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F255AAD222BF38E0026DFE9 /* codec_aiff.o */; };
 		0F41C8DF1F7275C2007C6A38 /* ResultScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F41C8DE1F7275C2007C6A38 /* ResultScene.swift */; };
 		0F65E8AC222BDCF000BEF557 /* GDFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F65E8AB222BDCF000BEF557 /* GDFileManager.swift */; };
 		0F746F4B1F5EEEFF00C1D040 /* Sounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F746F4A1F5EEEFF00C1D040 /* Sounds.swift */; };
@@ -39,6 +41,7 @@
 		0FFD1B441F5E6D2B0007E555 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B431F5E6D2B0007E555 /* AppDelegate.swift */; };
 		0FFD1B4C1F5E6D2B0007E555 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD1B4B1F5E6D2B0007E555 /* GameViewController.swift */; };
 		0FFD1B511F5E6D2B0007E555 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0FFD1B501F5E6D2B0007E555 /* Assets.xcassets */; };
+		AB29B65410888E548870925A /* Pods________.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A9CAED45A0458003AAF174B /* Pods________.framework */; };
 		F1007516213D701B00ED2EF3 /* ChooseMusicScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1007515213D701A00ED2EF3 /* ChooseMusicScene.swift */; };
 		F100ADDA213A6DC10027E2A2 /* Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = F100ADD7213A6DBF0027E2A2 /* Music.swift */; };
 		F100ADDC213A6DC10027E2A2 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F100ADD9213A6DC00027E2A2 /* Setting.swift */; };
@@ -72,9 +75,19 @@
 
 /* Begin PBXFileReference section */
 		0B02828396637911C78EE9D3 /* Pods-音ゲー（仮）.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-音ゲー（仮）.release.xcconfig"; path = "Target Support Files/Pods-音ゲー（仮）/Pods-音ゲー（仮）.release.xcconfig"; sourceTree = "<group>"; };
+		0E873803222D02040094335B /* streamdec.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = streamdec.o; path = "../../alure-1.2/build/streamdec.o"; sourceTree = "<group>"; };
+		0E873804222D02040094335B /* codec_aiff.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = codec_aiff.o; path = "../../alure-1.2/build/codec_aiff.o"; sourceTree = "<group>"; };
+		0E873805222D02040094335B /* stream.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = stream.o; path = "../../alure-1.2/build/stream.o"; sourceTree = "<group>"; };
+		0E873806222D02040094335B /* streamplay.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = streamplay.o; path = "../../alure-1.2/build/streamplay.o"; sourceTree = "<group>"; };
+		0E873807222D02040094335B /* istream.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = istream.o; path = "../../alure-1.2/build/istream.o"; sourceTree = "<group>"; };
+		0E873808222D02040094335B /* codec_wav.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = codec_wav.o; path = "../../alure-1.2/build/codec_wav.o"; sourceTree = "<group>"; };
+		0E873809222D02040094335B /* alure.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = alure.o; path = "../../alure-1.2/build/alure.o"; sourceTree = "<group>"; };
+		0E87380A222D02040094335B /* buffer.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = buffer.o; path = "../../alure-1.2/build/buffer.o"; sourceTree = "<group>"; };
 		0E9F103D2223BB8B00E0BC99 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		0E9F103E2223BB8B00E0BC99 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0E9F10422223BBB600E0BC99 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		0EBBE3D9222D00EF00CF696D /* MusicPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicPicker.swift; sourceTree = "<group>"; };
+		0EBBE3DB222D012B00CF696D /* Gemini.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Gemini.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EF7DA632223B0C20021A3E4 /* GameSceneImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameSceneImages.swift; sourceTree = "<group>"; };
 		0EF7DA642223B0C20021A3E4 /* GameSceneTouches.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameSceneTouches.swift; sourceTree = "<group>"; };
 		0EF7DA652223B0C20021A3E4 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -108,6 +121,7 @@
 		0FFD1B551F5E6D2B0007E555 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0FFD1B5A1F5E6D2B0007E555 /* 音ゲー（仮）Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "音ゲー（仮）Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0FFD1B651F5E6D2B0007E555 /* 音ゲー（仮）UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "音ゲー（仮）UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A9CAED45A0458003AAF174B /* Pods________.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods________.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B455D9138378CDF255B3CB3A /* Pods-音ゲー（仮）.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-音ゲー（仮）.debug.xcconfig"; path = "Target Support Files/Pods-音ゲー（仮）/Pods-音ゲー（仮）.debug.xcconfig"; sourceTree = "<group>"; };
 		F1007515213D701A00ED2EF3 /* ChooseMusicScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseMusicScene.swift; sourceTree = "<group>"; };
 		F100ADD7213A6DBF0027E2A2 /* Music.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Music.swift; sourceTree = "<group>"; };
@@ -131,6 +145,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0EBBE3DC222D012B00CF696D /* Gemini.framework in Frameworks */,
+				0E87380B222D02040094335B /* streamdec.o in Frameworks */,
+				0E87380C222D02040094335B /* codec_aiff.o in Frameworks */,
+				0E87380D222D02040094335B /* stream.o in Frameworks */,
+				0E87380E222D02040094335B /* streamplay.o in Frameworks */,
+				0E87380F222D02040094335B /* istream.o in Frameworks */,
+				0E873810222D02040094335B /* codec_wav.o in Frameworks */,
+				0E873811222D02040094335B /* alure.o in Frameworks */,
+				0E873812222D02040094335B /* buffer.o in Frameworks */,
 				0FBC97DD222C071B00DC3927 /* SVProgressHUD.framework in Frameworks */,
 				0FBC97D7222C068500DC3927 /* Realm.framework in Frameworks */,
 				0FBC97D9222C068500DC3927 /* RealmSwift.framework in Frameworks */,
@@ -139,16 +162,9 @@
 				0FBC97D1222C065A00DC3927 /* GoogleAPIClientForREST.framework in Frameworks */,
 				0FBC97D3222C065A00DC3927 /* GTMAppAuth.framework in Frameworks */,
 				0FBC97D5222C065A00DC3927 /* GTMSessionFetcher.framework in Frameworks */,
-				0F255AAE222BF38E0026DFE9 /* streamplay.o in Frameworks */,
-				0F255AAF222BF38E0026DFE9 /* istream.o in Frameworks */,
-				0F255AB0222BF38E0026DFE9 /* buffer.o in Frameworks */,
-				0F255AB1222BF38E0026DFE9 /* alure.o in Frameworks */,
-				0F255AB2222BF38E0026DFE9 /* streamdec.o in Frameworks */,
-				0F255AB3222BF38E0026DFE9 /* codec_wav.o in Frameworks */,
-				0F255AB4222BF38E0026DFE9 /* stream.o in Frameworks */,
-				0F255AB5222BF38E0026DFE9 /* codec_aiff.o in Frameworks */,
 				0F746F541F5F917E00C1D040 /* AVFoundation.framework in Frameworks */,
 				F127323A1FB5BB9500D7F5C8 /* OpenAL.framework in Frameworks */,
+				AB29B65410888E548870925A /* Pods________.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,6 +198,15 @@
 		0F746F521F5F917E00C1D040 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0E873809222D02040094335B /* alure.o */,
+				0E87380A222D02040094335B /* buffer.o */,
+				0E873804222D02040094335B /* codec_aiff.o */,
+				0E873808222D02040094335B /* codec_wav.o */,
+				0E873807222D02040094335B /* istream.o */,
+				0E873805222D02040094335B /* stream.o */,
+				0E873803222D02040094335B /* streamdec.o */,
+				0E873806222D02040094335B /* streamplay.o */,
+				0EBBE3DB222D012B00CF696D /* Gemini.framework */,
 				0FBC97DC222C071B00DC3927 /* SVProgressHUD.framework */,
 				0FBC97D6222C068500DC3927 /* Realm.framework */,
 				0FBC97D8222C068500DC3927 /* RealmSwift.framework */,
@@ -201,6 +226,7 @@
 				F1E50457204C3A6F007A2F93 /* AudioToolbox.framework */,
 				F12732391FB5BB8B00D7F5C8 /* OpenAL.framework */,
 				0F746F531F5F917E00C1D040 /* AVFoundation.framework */,
+				7A9CAED45A0458003AAF174B /* Pods________.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -212,7 +238,7 @@
 				0E9F103D2223BB8B00E0BC99 /* Podfile */,
 				0FF43AB3222BE82F001A8B53 /* Podfile.lock */,
 				0E9F103E2223BB8B00E0BC99 /* README.md */,
-				0FFD1B421F5E6D2B0007E555 /* 音ゲー（仮） */,
+				0FFD1B421F5E6D2B0007E555 /* 音ゲー（仮） */,
 				0FFD1B411F5E6D2B0007E555 /* Products */,
 				0F746F521F5F917E00C1D040 /* Frameworks */,
 				92AD65EB525FAF5D8F4394BD /* Pods */,
@@ -229,9 +255,10 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		0FFD1B421F5E6D2B0007E555 /* 音ゲー（仮） */ = {
+		0FFD1B421F5E6D2B0007E555 /* 音ゲー（仮） */ = {
 			isa = PBXGroup;
 			children = (
+				0EBBE3D9222D00EF00CF696D /* MusicPicker.swift */,
 				0EF7DA622223B0C20021A3E4 /* GameScene */,
 				F1007515213D701A00ED2EF3 /* ChooseMusicScene.swift */,
 				0F65E8AB222BDCF000BEF557 /* GDFileManager.swift */,
@@ -339,7 +366,7 @@
 				TargetAttributes = {
 					0FFD1B3F1F5E6D2B0007E555 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = UT6PG9K559;
+						DevelopmentTeam = 5H677574QF;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
@@ -424,6 +451,7 @@
 				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/Gemini/Gemini.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
@@ -437,6 +465,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMAppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Gemini.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
@@ -482,6 +511,7 @@
 				0FFD1B4C1F5E6D2B0007E555 /* GameViewController.swift in Sources */,
 				F160B76B2086E8D900650512 /* YTPlayerViewHolder.swift in Sources */,
 				0F65E8AC222BDCF000BEF557 /* GDFileManager.swift in Sources */,
+				0EBBE3DA222D00EF00CF696D /* MusicPicker.swift in Sources */,
 				F100ADDA213A6DC10027E2A2 /* Music.swift in Sources */,
 				F148A4EC213C348600E57180 /* Header.swift in Sources */,
 				F15FB1DB204C546B00D42803 /* PickerKeyboard.swift in Sources */,
@@ -681,7 +711,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = UT6PG9K559;
+				DEVELOPMENT_TEAM = 5H677574QF;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -697,7 +727,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-lc++";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nakai.music;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ueda.music;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INCLUDE_PATHS = "$(PROJECT)/$(TARGET_NAME)/**";
@@ -722,7 +752,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = UT6PG9K559;
+				DEVELOPMENT_TEAM = 5H677574QF;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -738,7 +768,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-lc++";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nakai.music;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ueda.music;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INCLUDE_PATHS = "$(PROJECT)/$(TARGET_NAME)/**";
