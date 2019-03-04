@@ -5,7 +5,6 @@
 //  Created by 植田暢大 on 2019/02/26.
 //  Copyright © 2019 NakaiKohei. All rights reserved.
 //
-
 import UIKit
 import SpriteKit
 import Gemini
@@ -16,57 +15,48 @@ protocol MusicPickerDelegate {
 
 class MusicPicker: NSObject {
     
-//    let collectionView = GeminiCollectionView(frame: CGRect(x: 100, y: 200, width: 500, height: 500))  // TODO: fix hard coding
     var collectionView: GeminiCollectionView!
     var mpDelegate: MusicPickerDelegate?
+    let musics: [String]
     
-    let musics = ["one", "two", "three", "four", "five"]
+    init(headers: [Header]) {
+        musics = headers.map { $0.title }
+        super.init()
+    }
     
     func didMove(to view: SKView) {
-        let layout: UICollectionViewLayout = {
-            let layout = UICollectionViewFlowLayout()
-            layout.itemSize = CGSize(width: 150, height: 150)
-            layout.sectionInset = UIEdgeInsets(top: 15,
-                                               left: (view.bounds.width - 150) / 2,
-                                               bottom: 15,
-                                               right: (view.bounds.width - 150) / 2)
-            layout.minimumLineSpacing = 15
+        let layout: UICollectionViewPagingFlowLayout = {
+            let layout = UICollectionViewPagingFlowLayout()
             layout.scrollDirection = .vertical
+            layout.itemSize = CGSize(width: 500, height: 50)
+            layout.sectionInset = UIEdgeInsets(top: 10, left: 100, bottom: 10, right: 100)  // cellの上下左右の余白
+            layout.minimumLineSpacing = 20
+            layout.minimumInteritemSpacing = 20
             return layout
         }()
         self.collectionView = GeminiCollectionView(frame: view.frame, collectionViewLayout: layout)
+        collectionView.backgroundColor = UIColor.white
+        collectionView.register(MusicNameCell.self, forCellWithReuseIdentifier: "MusicNameCell")
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.allowsSelection = true
+        collectionView.decelerationRate = UIScrollView.DecelerationRate.fast
         
-        self.collectionView.delegate = self
-        self.collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.dataSource = self
         
-//        self.collectionView.collectionViewLayout = {
-//            let layout = UICollectionViewFlowLayout()
-//            layout.itemSize = CGSize(width: 150, height: 150)
-//            layout.sectionInset = UIEdgeInsets(top: 15,
-//                                               left: (view.bounds.width - 150) / 2,
-//                                               bottom: 15,
-//                                               right: (view.bounds.width - 150) / 2)
-//            layout.minimumLineSpacing = 15
-//            layout.scrollDirection = .vertical
-//            return layout
-//        }()
-        
-        self.collectionView.gemini
-            .customAnimation()
-            .backgroundColor(startColor: UIColor(red: 38 / 255, green: 194 / 255, blue: 129 / 255, alpha: 1),
-                             endColor: UIColor(red: 89 / 255, green: 171 / 255, blue: 227 / 255, alpha: 1))
-            .ease(.easeOutSine)
-            .cornerRadius(75)
-        self.collectionView.animateVisibleCells()
+        collectionView.gemini
+            .scaleAnimation()
+            .scale(0.75)
+            .scaleEffect(.scaleUp)
+            .ease(.easeOutQuart)
         view.addSubview(collectionView)
     }
-    
 }
 
 // UIScrollViewDelegate
 extension MusicPicker {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        self.collectionView.animateVisibleCells()
+        collectionView.animateVisibleCells()
     }
 }
 
@@ -85,20 +75,40 @@ extension MusicPicker: UICollectionViewDataSource {
         return 1
     }
     
+    // セルの数を返す
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.musics.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
-        cell.backgroundColor = .red
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MusicNameCell", for: indexPath) as! MusicNameCell
         
-//        // Set image only when animation type is custom1
-//        if animationType == .custom1 {
-//            cell.configure(with: images[indexPath.row])
-//        }
-        
-        self.collectionView.animateCell(cell as! GeminiCell)
+        if !collectionView.subviews.contains(cell) {
+            cell.setup(title: musics[indexPath.item])
+            self.collectionView.addSubview(cell)
+            print("cell added")
+        }
+        self.collectionView.animateCell(cell)
         return cell
+    }
+    
+    // cell選択時の処理
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print(collectionView.cellForItem(at: indexPath).debugDescription)
+        //        collectionView.cellForItem(at: indexPath)?.isHighlighted = true
+    }
+}
+
+// Inherite GeminiCell
+class MusicNameCell: GeminiCell {
+    private let titleLabel = UILabel()
+    
+    func setup(title: String) {
+        titleLabel.text = title
+        titleLabel.frame = self.frame
+        titleLabel.textColor = UIColor.black
+        titleLabel.backgroundColor = .lightGray
+        titleLabel.textAlignment = .center
+        self.addSubview(titleLabel)
     }
 }

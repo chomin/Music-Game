@@ -11,7 +11,7 @@ import GameplayKit
 import RealmSwift
 import GoogleAPIClientForREST
 
-class ChooseMusicScene: SKScene {
+class ChooseMusicScene: SKScene, MusicPickerDelegate {
     
     enum Difficulty: String {
         case cho           = "超級(4)"
@@ -43,6 +43,8 @@ class ChooseMusicScene: SKScene {
     
     // 初期画面のボタンなど
     var picker: PickerKeyboard!
+    var musicPicker: MusicPicker!
+    
     var playButton      = UIButton()
     var settingButton   = UIButton()
     var autoPlaySwitch  = UISwitch()
@@ -191,6 +193,10 @@ class ChooseMusicScene: SKScene {
             return $0.group < $1.group
             
         })
+        
+        self.musicPicker = MusicPicker(headers: headers)
+        self.musicPicker.mpDelegate = self
+        self.musicPicker.didMove(to: view)
         
         // ピッカーキーボードの設置
         let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
