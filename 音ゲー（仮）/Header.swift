@@ -19,7 +19,7 @@ class Header: Object {
     }
     
     @objc dynamic var bmsNameWithExtension = ""
-    @objc dynamic var lastUpdateDate = ""
+    @objc dynamic var lastUpdateDate = "" // 例: ""
     @objc dynamic var genre = ""        // ジャンル
     @objc dynamic var title = ""        // タイトル(正式名称。ファイル名は文字の制約があるためこっちを正式とする)
     @objc dynamic var artist = ""       // アーティスト
@@ -103,31 +103,23 @@ class Header: Object {
     private func readBMS(fileName: String) throws -> (contents: [String], date: String, fileNameWithExtension: String) {
         
         let fileNameWithEntension = fileName.hasSuffix(".bms") ? fileName : "\(fileName).bms"
-
-        // ファイル名を名前と拡張子に分割
-        var splittedName = fileNameWithEntension.components(separatedBy: ".")
-        let dataFileType = splittedName.popLast()
-        let dataFileName = splittedName.joined(separator: ".")
-
+        
         // 譜面データファイルのパスを取得
-        if let path = Bundle.main.path(forResource: "Sounds/" + dataFileName, ofType: dataFileType) {
-            do {
-                // ファイルの内容と更新日時を取得する
-                let content = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
-                let attr = try FileManager.default.attributesOfItem(atPath: path)
-//                let date = NSDictionary.fileModificationDate(NSDictionary(dictionary: attr))
-                let date = attr[FileAttributeKey.modificationDate] as! Date
-                let formatter = DateFormatter()
-                formatter.dateStyle = .full
-                formatter.timeStyle = .full
-                formatter.locale = Locale(identifier: "ja_JP")
-                
-                return (content.components(separatedBy: .newlines), formatter.string(from: date), fileNameWithEntension)
-            } catch {
-                throw FileError.readFailed("ファイルの内容取得に失敗(pathが不正、あるいはファイルのエンコードがutf8ではありません)")
-            }
-        } else {
-            throw FileError.notFound("指定されたファイルが見つかりません")
+        let path = GDFileManager.cachesDirectoty.appendingPathComponent(fileName).path
+        do {
+            // ファイルの内容と更新日時を取得する
+            let content = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
+            let attr = try FileManager.default.attributesOfItem(atPath: path)
+            //                let date = NSDictionary.fileModificationDate(NSDictionary(dictionary: attr))
+            let date = attr[FileAttributeKey.modificationDate] as! Date
+            let formatter = DateFormatter()
+            formatter.dateStyle = .full
+            formatter.timeStyle = .full
+            formatter.locale = Locale(identifier: "ja_JP")
+            
+            return (content.components(separatedBy: .newlines), formatter.string(from: date), fileNameWithEntension)
+        } catch {
+            throw FileError.readFailed("ファイルの内容取得に失敗(pathが不正、あるいはファイルのエンコードがutf8ではありません)")
         }
     }
 }

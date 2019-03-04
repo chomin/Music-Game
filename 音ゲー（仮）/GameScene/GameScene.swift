@@ -144,9 +144,9 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         // BGMまたはYouTubeのプレイヤーを作成
         switch playMode {
         case .BGM:
-            // サウンドファイルのパスを生成
-            let path: String = {
-                if music.group != "BDGP" { return Bundle.main.path(forResource: "Sounds/" + music.title, ofType: "mp3")! }  // m4a,oggは不可
+            // サウンドファイルのURLを生成
+            let soundURL: URL = {
+                if music.group != "BDGP" { return GDFileManager.cachesDirectoty.appendingPathComponent("\(music.title).mp3") }  // m4a,oggは不可
                 else                     {
                     var mp3FileName = music.title
                     let startIndex = mp3FileName.index(after:  mp3FileName.lastIndex(of: "(")!)
@@ -154,13 +154,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     mp3FileName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
                     let insertIndex = mp3FileName.index(after:  mp3FileName.lastIndex(of: "(")!)
                     mp3FileName.insert(contentsOf: "BDGP", at: insertIndex)
-                    return Bundle.main.path(forResource: "Sounds/" + mp3FileName , ofType: "mp3")!
+                    return GDFileManager.cachesDirectoty.appendingPathComponent("\(mp3FileName).mp3")
                 }
             }()
             
             // AVAudioPlayerのインスタンスを作成
             do {
-                BGM = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
+                BGM = try AVAudioPlayer(contentsOf: soundURL, fileTypeHint: "public.mp3")
             } catch {
                 print("AVAudioPlayerインスタンス作成失敗")
                 exit(1)
@@ -395,7 +395,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
                     
                     if judgeRect.contains(pos) {   // ボタンの範囲
                         
-                        if self.parfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
+                        if self.perfectMiddleJudge(lane: self.lanes[laneIndex], gsTouch: gsTouch) { // middleの判定
                             break   // このタッチでこのフレームでの判定はもう行わない
                         }
                     }
@@ -471,11 +471,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     /* -------- ボタン関数群 -------- */
     
-    @objc func onClickPauseButton(_ sender : UIButton){
+    @objc func onClickPauseButton(_ sender : UIButton) {
         applicationWillResignActive()
     }
     
-    @objc func onClickReturnButton(_ sender : UIButton){
+    @objc func onClickReturnButton(_ sender : UIButton) {
         
         let scene = ChooseMusicScene(size: (view?.bounds.size)!)
         let skView = view as SKView?
@@ -573,13 +573,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     /* -------- 同時押し対策 -------- */
     
-    @objc func onReturnButton(_ sender : UIButton){
+    @objc func onReturnButton(_ sender : UIButton) {
         self.continueButton.isEnabled = false
     }
-    @objc func onContinueButton(_ sender : UIButton){
+    @objc func onContinueButton(_ sender : UIButton) {
         self.returnButton.isEnabled = false
     }
-    @objc func touchUpOutsideButton(_ sender : UIButton){
+    @objc func touchUpOutsideButton(_ sender : UIButton) {
         enableAllButtonsOnPauseView()
     }
     func enableAllButtonsOnPauseView() {
@@ -600,7 +600,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     }
     
     func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
-        switch state {
+        switch (state) {
         case .playing:
             if ytLaunchState == .tryingToPlay {     // プレイ開始時
                 ytLaunchState = .done

@@ -1,30 +1,62 @@
 PODS:
-  - Gemini (1.3.1)
-  - Realm (3.7.6):
-    - Realm/Headers (= 3.7.6)
-  - Realm/Headers (3.7.6)
-  - RealmSwift (3.7.6):
-    - Realm (= 3.7.6)
+  - AppAuth (0.95.0)
+  - GoogleAPIClientForREST/Core (1.2.1):
+    - GTMSessionFetcher (>= 1.1.7)
+  - GoogleAPIClientForREST/Drive (1.2.1):
+    - GoogleAPIClientForREST/Core
+    - GTMSessionFetcher (>= 1.1.7)
+  - GTMAppAuth (0.7.1):
+    - AppAuth (~> 0.95)
+    - GTMSessionFetcher (~> 1.1)
+  - GTMSessionFetcher (1.2.1):
+    - GTMSessionFetcher/Full (= 1.2.1)
+  - GTMSessionFetcher/Core (1.2.1)
+  - GTMSessionFetcher/Full (1.2.1):
+    - GTMSessionFetcher/Core (= 1.2.1)
+  - Realm (3.13.1):
+    - Realm/Headers (= 3.13.1)
+  - Realm/Headers (3.13.1)
+  - RealmSwift (3.13.1):
+    - Realm (= 3.13.1)
+  - SVProgressHUD (2.2.5)
   - youtube-ios-player-helper-swift (1.1)
 
 DEPENDENCIES:
-  - Gemini
+  - GoogleAPIClientForREST/Drive (~> 1.2.1)
+  - GTMAppAuth
   - RealmSwift
+  - SVProgressHUD (from `https://github.com/SVProgressHUD/SVProgressHUD.git`)
   - youtube-ios-player-helper-swift
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
-    - Gemini
+    - AppAuth
+    - GoogleAPIClientForREST
+    - GTMAppAuth
+    - GTMSessionFetcher
     - Realm
     - RealmSwift
     - youtube-ios-player-helper-swift
 
+EXTERNAL SOURCES:
+  SVProgressHUD:
+    :git: https://github.com/SVProgressHUD/SVProgressHUD.git
+
+CHECKOUT OPTIONS:
+  SVProgressHUD:
+    :commit: e2a6aaa12321962cbe9fbecc370475f369c6566c
+    :git: https://github.com/SVProgressHUD/SVProgressHUD.git
+
 SPEC CHECKSUMS:
-  Gemini: 25fd4ae5dcde4cbd136dac899faf38a1dddea1a8
-  Realm: 9eaecad54712d6246d08ba34c10f354e4715d7d3
-  RealmSwift: 1fe08b4ebaeeaacf17f9ba0343f7b25c9fc31fa6
+  AppAuth: 137f6bb6fc9dfbaf2cf9f6fcff1d336ff0163bc6
+  GoogleAPIClientForREST: a8b95a252014ce2e618df6b75dc72eca2c00b4af
+  GTMAppAuth: c5e41aaf039ac1ccc41543e6ea2ef7abd255ad41
+  GTMSessionFetcher: 32aeca0aa144acea523e1c8e053089dec2cb98ca
+  Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
+  RealmSwift: 8a1e6a02b7a08cd17a31e3115143fb69fe5f3fb9
+  SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   youtube-ios-player-helper-swift: 51a3c5325317c8271d0c7985c1bbe5a252ffb2fd
 
-PODFILE CHECKSUM: 16775154af5bb0625b408bd4ea7528a14a8e5917
+PODFILE CHECKSUM: 740c7f09a0328facf8edb40bb0ab8ca89b5acc77
 
-COCOAPODS: 1.6.0
+COCOAPODS: 1.6.1

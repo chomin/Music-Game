@@ -5,7 +5,7 @@
 //  Created by Kohei Nakai on 2017/09/05.
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
 //
-//（9/11の成果が残っている？）
+
 
 import SpriteKit
 import AVFoundation
@@ -122,7 +122,7 @@ class ActionSoundPlayers {
     private let kara1: SoundSource
     private let kara2: SoundSource
     
-    enum SoundType{
+    enum SoundType {
         case tap, flick, kara, middle
     }
     
@@ -130,10 +130,10 @@ class ActionSoundPlayers {
         alureInitDevice(nil, nil)
         
         // サウンドファイルのパスを生成
-        let tapSoundPath    = Bundle.main.path(forResource: "Sounds/タップ",   ofType: "wav")!     // mp3,m4a,ogg は不可
-        let flickSoundPath  = Bundle.main.path(forResource: "Sounds/フリック", ofType: "wav")!
-        let middleSoundPath = Bundle.main.path(forResource: "Sounds/middleSound", ofType: "wav")!      // TODO: いい素材を見つける
-        let karaSoundPath   = Bundle.main.path(forResource: "Sounds/空打ち",   ofType: "wav")!
+        let tapSoundPath    = Bundle.main.path(forResource: "Sounds/タップ"       , ofType: "wav")!     // mp3,m4a,ogg は不可
+        let flickSoundPath  = Bundle.main.path(forResource: "Sounds/フリック"     , ofType: "wav")!
+        let middleSoundPath = Bundle.main.path(forResource: "Sounds/middleSound" , ofType: "wav")!      // TODO: いい素材を見つける
+        let karaSoundPath   = Bundle.main.path(forResource: "Sounds/空打ち"       , ofType: "wav")!
         
         tap1    = SoundSource(fullFilePath: tapSoundPath)    ?? SoundSource()
         tap2    = SoundSource(fullFilePath: tapSoundPath)    ?? SoundSource()

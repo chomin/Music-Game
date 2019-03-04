@@ -9,6 +9,7 @@
 import SpriteKit
 import GameplayKit
 import RealmSwift
+import GoogleAPIClientForREST
 
 class ChooseMusicScene: SKScene {
     
@@ -50,7 +51,7 @@ class ChooseMusicScene: SKScene {
     var YouTubeLabel    = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
     var difficultyLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "地獄級"
     var mainContents: [UIResponder] {
-        get{
+        get {
             var contents: [UIResponder] = []
             contents.append(picker)
             contents.append(playButton)
@@ -82,7 +83,7 @@ class ChooseMusicScene: SKScene {
     var noteSizeTitleLabel  = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "ノーツの大きさ"
     var fstlSwitchLabel     = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "ノーツの大きさをレーン幅に合わせる"
     var settingContents: [UIResponder] {
-        get{
+        get {
             var contents: [UIResponder] = []
             contents.append(spPlusButton)
             contents.append(spPlus10Button)
@@ -123,6 +124,7 @@ class ChooseMusicScene: SKScene {
     
     var setting = Setting()
     var headers: [Header] = []    // picker.selectedRowとindexを対応させる
+    var mp3FilesToDownload: [GTLRDrive_File] = []
     
     override func didMove(to view: SKView) {
         
@@ -131,10 +133,13 @@ class ChooseMusicScene: SKScene {
         
         backgroundColor = .white
         
-        // Headerについて、ファイル探索→db更新→読み込み
         do {
-            let fileNamesWithExtension = try FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath + "/Sounds").filter { $0.hasSuffix(".bms") }
+            // クラウドストレージの更新確認(mp3)
+            for file in GDFileManager.mp3FileList {
+                if !file.isDownloaded() || file.isRenewed() { mp3FilesToDownload.append(file) }
+            }
             
+            // Headerについて、/Library/Cachesのbmsファイル探索→db更新→読み込み
             let realm = try Realm()
             
 //            try! realm.write {
@@ -143,14 +148,14 @@ class ChooseMusicScene: SKScene {
 
             let results = realm.objects(Header.self)
             
-//            print(results)
-            
             // fileに対応するdbが存在するか確認
-            for fileName in fileNamesWithExtension {
+            let directoryContents = try FileManager.default.contentsOfDirectory(atPath: GDFileManager.cachesDirectoty.path)
+            let bmsNamesWithExtension = directoryContents.filter { $0.hasSuffix(".bms") }
+            for fileName in bmsNamesWithExtension {
 
                 if let DBHeader = results.filter({ $0.bmsNameWithExtension == fileName }).first { // ファイルに対応するdb発見
 
-                    let filePath = Bundle.main.path(forAuxiliaryExecutable: "Sounds/" + fileName)!
+                    let filePath = GDFileManager.cachesDirectoty.appendingPathComponent(fileName).path
                     let attr = try FileManager.default.attributesOfItem(atPath: filePath)
                     let date = attr[FileAttributeKey.modificationDate] as! Date
                     let formatter = DateFormatter()
@@ -167,7 +172,7 @@ class ChooseMusicScene: SKScene {
                     headers.append(DBHeader)
                     
                 } else {
-                    try headers.append(Header(fileName: fileName))                                  // ファイルから新たなdbを作成&保存
+                    try headers.append(Header(fileName: fileName))                          // ファイルから新たなdbを作成&保存
                     print(fileName + "を追加しました")
                 }
             }
@@ -186,14 +191,8 @@ class ChooseMusicScene: SKScene {
             return $0.group < $1.group
             
         })
-//        print(headers)
         
         // ピッカーキーボードの設置
-//        var musicNameArray: [String] = []   // ピッカーに表示する曲名
-//        for header in headers {
-//            musicNameArray.append(header.title)
-//        }
-        
         let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
         picker = PickerKeyboard(frame: rect, firstText: setting.musicName, headers: headers)
         picker.backgroundColor = .gray
@@ -211,12 +210,10 @@ class ChooseMusicScene: SKScene {
             Button.addTarget(self, action: #selector(onClickPlayButton(_:)), for: .touchUpInside)
             Button.addTarget(self, action: #selector(onPlayButton(_:)), for: .touchDown)
             Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-            Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/5, height: 50)
+            Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
             Button.backgroundColor = UIColor.red
             Button.layer.masksToBounds = true
-            Button.setTitle("この曲で遊ぶ", for: UIControl.State())
             Button.setTitleColor(UIColor.white, for: UIControl.State())
-            Button.setTitle("この曲で遊ぶ", for: UIControl.State.highlighted)
             Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
             Button.isHidden = false
             Button.layer.cornerRadius = 20.0
@@ -528,9 +525,32 @@ class ChooseMusicScene: SKScene {
         } else {
             YouTubeSwitch.isOn = setting.isYouTube
             YouTubeSwitch.isEnabled = true
-            
-//            print(headers[picker.selectedRow].videoID)
         }
+        
+        var selectedMusicName = headers[picker.selectedRow].title
+        if selectedMusicName.hasSuffix("(expert)") || selectedMusicName.hasSuffix("(special)") { // BDGP曲で新たな難易度を実装する際には適宜追加
+            let startIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
+            let lastIndex  = selectedMusicName.index(before: selectedMusicName.lastIndex(of: ")")!)
+            selectedMusicName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
+            let insertIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
+            selectedMusicName.insert(contentsOf: "BDGP", at: insertIndex)
+        }
+        
+        var title = ""
+        if mp3FilesToDownload.contains(where: {$0.name == "\(selectedMusicName).mp3"}) {
+            title =
+            """
+            ダウンロード
+            して遊ぶ
+            """
+        } else {
+            title = "この曲で遊ぶ"
+        }
+        playButton.titleLabel?.numberOfLines = 2
+        playButton.setTitle(title, for: UIControl.State())
+        playButton.setTitle(title, for: UIControl.State.highlighted)
+        
+        
     }
     
     override func willMove(from view: SKView) {
@@ -546,17 +566,47 @@ class ChooseMusicScene: SKScene {
         setting.isAutoPlay = autoPlaySwitch.isOn
         setting.save()
         
-        // 移動
-        let scene = GameScene(size: (view?.bounds.size)!, setting: setting, header: headers[picker!.selectedRow])
-        let skView = view as SKView?    // このviewはGameViewControllerのskView2
-        skView?.showsFPS = true
-        skView?.showsNodeCount = true
-        skView?.ignoresSiblingOrder = true
-        scene.scaleMode = .resizeFill
-        skView?.presentScene(scene)  // GameSceneに移動
+        var selectedMusicName = headers[picker.selectedRow].title
+        if selectedMusicName.hasSuffix("(expert)") || selectedMusicName.hasSuffix("(special)") {
+            let startIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
+            let lastIndex  = selectedMusicName.index(before: selectedMusicName.lastIndex(of: ")")!)
+            selectedMusicName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
+            let insertIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
+            selectedMusicName.insert(contentsOf: "BDGP", at: insertIndex)
+        }
+        
+        let dispatchGroup = DispatchGroup()
+        // 直列キュー / attibutes指定なし
+//        let dispatchQueue = DispatchQueue.main
+        
+        if mp3FilesToDownload.contains(where: {$0.name == "\(selectedMusicName).mp3"}) { // ダウンロード
+            let file = mp3FilesToDownload.first(where: {$0.name == "\(selectedMusicName).mp3"})
+            dispatchGroup.enter()
+            GDFileManager.getFileData(fileID: file!.identifier!, group: dispatchGroup)
+            
+            dispatchGroup.notify(queue: .main) {
+                // 移動
+                let scene = GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[self.picker!.selectedRow])
+                let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
+                skView?.showsFPS = true
+                skView?.showsNodeCount = true
+                skView?.ignoresSiblingOrder = true
+                scene.scaleMode = .resizeFill
+                skView?.presentScene(scene)  // GameSceneに移動
+            }
+        } else {
+            // 移動
+            let scene = GameScene(size: (view?.bounds.size)!, setting: setting, header: headers[picker!.selectedRow])
+            let skView = view as SKView?    // このviewはGameViewControllerのskView2
+            skView?.showsFPS = true
+            skView?.showsNodeCount = true
+            skView?.ignoresSiblingOrder = true
+            scene.scaleMode = .resizeFill
+            skView?.presentScene(scene)  // GameSceneに移動
+        }
     }
     
-    func showMainContents(){
+    func showMainContents() {
         for content in mainContents {
             if let view = content as? UIControl {
                 view.isHidden = false
@@ -571,7 +621,7 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-    func hideMainContents(){
+    func hideMainContents() {
         for content in mainContents {
             if let view = content as? UIView {
                 view.isHidden = true
@@ -585,7 +635,7 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-    func showSettingContents(){
+    func showSettingContents() {
         
         for content in settingContents {
             if let view = content as? UIView {
@@ -611,47 +661,47 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-    @objc func onClickSettingButton(_ sender : UIButton){
+    @objc func onClickSettingButton(_ sender : UIButton) {
         
         hideMainContents()
         showSettingContents()
     }
     
-    @objc func onClickSPPlusButton(_ sender : UIButton){
+    @objc func onClickSPPlusButton(_ sender : UIButton) {
         setting.speedRatioInt += 1
     }
     
-    @objc func onClickSPPlus10Button(_ sender : UIButton){
+    @objc func onClickSPPlus10Button(_ sender : UIButton) {
         setting.speedRatioInt += 10
     }
     
-    @objc func onClickSPMinusButton(_ sender : UIButton){
+    @objc func onClickSPMinusButton(_ sender : UIButton) {
         if setting.speedRatioInt > 0 { setting.speedRatioInt -= 1 }
     }
     
-    @objc func onClickSPMinus10Button(_ sender : UIButton){
+    @objc func onClickSPMinus10Button(_ sender : UIButton) {
         if setting.speedRatioInt > 10 { setting.speedRatioInt -= 10 }
         else 			              { setting.speedRatioInt  =  0 }
     }
     
-    @objc func onClickSIPlusButton(_ sender : UIButton){
+    @objc func onClickSIPlusButton(_ sender : UIButton) {
         setting.scaleRatioInt += 1
     }
     
-    @objc func onClickSIPlus10Button(_ sender : UIButton){
+    @objc func onClickSIPlus10Button(_ sender : UIButton) {
         setting.scaleRatioInt += 10
     }
     
-    @objc func onClickSIMinusButton(_ sender : UIButton){
+    @objc func onClickSIMinusButton(_ sender : UIButton) {
         if setting.scaleRatioInt > 0 { setting.scaleRatioInt -= 1 }
     }
     
-    @objc func onClickSIMinus10Button(_ sender : UIButton){
+    @objc func onClickSIMinus10Button(_ sender : UIButton) {
         if setting.scaleRatioInt > 10 { setting.scaleRatioInt -= 10 }
         else                             { setting.scaleRatioInt  =  0 }
     }
     
-    @objc func onClickSaveAndBackButton(_ sender : UIButton){
+    @objc func onClickSaveAndBackButton(_ sender : UIButton) {
         //保存
         setting.save()
         
@@ -661,25 +711,25 @@ class ChooseMusicScene: SKScene {
     }
     
     // 同時押し対策
-    @objc func onSettingButton(_ sender : UIButton){
+    @objc func onSettingButton(_ sender : UIButton) {
         playButton.isEnabled = false
     }
-    @objc func onPlayButton(_ sender : UIButton){
+    @objc func onPlayButton(_ sender : UIButton) {
         settingButton.isEnabled = false
     }
-    @objc func touchUpOutsideButton(_ sender : UIButton){
+    @objc func touchUpOutsideButton(_ sender : UIButton) {
         playButton.isEnabled = true
         settingButton.isEnabled = true
     }
     
     // switch
-    @objc func youTubeSwitchChanged(_ sender: UISwitch){
+    @objc func youTubeSwitchChanged(_ sender: UISwitch) {
         setting.isYouTube = sender.isOn
     }
-    @objc func autoPlaySwitchChanged(_ sender: UISwitch){
+    @objc func autoPlaySwitchChanged(_ sender: UISwitch) {
         setting.isAutoPlay = sender.isOn
     }
-    @objc func fitSizeToLaneSwitchChanged(_ sender: UISwitch){
+    @objc func fitSizeToLaneSwitchChanged(_ sender: UISwitch) {
         setting.isFitSizeToLane = sender.isOn
     }
     
@@ -687,7 +737,7 @@ class ChooseMusicScene: SKScene {
     /// 呼び出される条件が不明
     ///
     /// - Parameter sender: <#sender description#>
-    @objc func pickerChanged(_ sender: PickerKeyboard){
+    @objc func pickerChanged(_ sender: PickerKeyboard) {
 //        setting.musicName = sender.textStore
 //        if headers[sender.selectedRow].videoID == "" && headers[sender.selectedRow].videoID2 == "" {
 //            YouTubeSwitch.isOn = false

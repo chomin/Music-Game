@@ -581,30 +581,22 @@ class Music {
     // ファイルの読み込み
     private func readFile(fileName: String) throws -> [String] {
 
-        // ファイル名を名前と拡張子に分割
-        var splittedName = fileName.components(separatedBy: ".")
-        let dataFileType = splittedName.popLast()
-        let dataFileName = splittedName.joined(separator: ".")
-
         // 譜面データファイルのパスを取得
-        if let path = Bundle.main.path(forResource: "Sounds/" + dataFileName, ofType: dataFileType) {
+        let path = GDFileManager.cachesDirectoty.appendingPathComponent(fileName).path
+        do {
+            // ファイルの内容を取得する
+            let content = try String(contentsOfFile: path, encoding: String.Encoding.shiftJIS)
+            
+            return content.components(separatedBy: .newlines)
+        } catch {
             do {
                 // ファイルの内容を取得する
-                let content = try String(contentsOfFile: path, encoding: String.Encoding.shiftJIS)
-
+                let content = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
+                
                 return content.components(separatedBy: .newlines)
             } catch {
-                do {
-                    // ファイルの内容を取得する
-                    let content = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
-
-                    return content.components(separatedBy: .newlines)
-                } catch {
-                    throw FileError.readFailed("ファイルの内容取得に失敗")
-                }
+                throw FileError.readFailed("ファイルの内容取得に失敗")
             }
-        } else {
-            throw FileError.notFound("指定されたファイルが見つかりません")
         }
     }
 }
