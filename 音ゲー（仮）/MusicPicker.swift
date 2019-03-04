@@ -29,7 +29,7 @@ class MusicPicker: NSObject {
             let layout = UICollectionViewPagingFlowLayout()
             layout.scrollDirection = .vertical
             layout.itemSize = CGSize(width: 500, height: 50)
-            layout.sectionInset = UIEdgeInsets(top: 10, left: 100, bottom: 10, right: 100)  // cellの上下左右の余白
+            layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)  // cellの上下左右の余白
             layout.minimumLineSpacing = 20
             layout.minimumInteritemSpacing = 20
             return layout
@@ -39,7 +39,7 @@ class MusicPicker: NSObject {
         collectionView.register(MusicNameCell.self, forCellWithReuseIdentifier: "MusicNameCell")
         collectionView.showsVerticalScrollIndicator = false
         collectionView.allowsSelection = true
-        collectionView.decelerationRate = UIScrollView.DecelerationRate.fast
+//        collectionView.decelerationRate = UIScrollView.DecelerationRate.fast
         
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -82,12 +82,9 @@ extension MusicPicker: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MusicNameCell", for: indexPath) as! MusicNameCell
-        
-        if !collectionView.subviews.contains(cell) {
-            cell.setup(title: musics[indexPath.item])
-            self.collectionView.addSubview(cell)
-            print("cell added")
-        }
+
+        cell.titleLabel.text = self.musics[indexPath.item]
+
         self.collectionView.animateCell(cell)
         return cell
     }
@@ -99,16 +96,24 @@ extension MusicPicker: UICollectionViewDataSource {
     }
 }
 
-// Inherite GeminiCell
+//// Inherite GeminiCell
 class MusicNameCell: GeminiCell {
-    private let titleLabel = UILabel()
+    var titleLabel: UILabel!
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setup()
+    }
     
-    func setup(title: String) {
-        titleLabel.text = title
-        titleLabel.frame = self.frame
+    private func setup() {
+        titleLabel = UILabel(frame: self.contentView.frame)
         titleLabel.textColor = UIColor.black
         titleLabel.backgroundColor = .lightGray
         titleLabel.textAlignment = .center
-        self.addSubview(titleLabel)
+        self.contentView.addSubview(titleLabel)
     }
 }
