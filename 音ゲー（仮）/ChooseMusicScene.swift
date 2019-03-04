@@ -46,9 +46,9 @@ class ChooseMusicScene: SKScene {
     var playButton      = UIButton()
     var settingButton   = UIButton()
     var autoPlaySwitch  = UISwitch()
-    var YouTubeSwitch   = UISwitch()
+    var youtubeSwitch   = UISwitch()
     var autoPlayLabel   = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "自動演奏"
-    var YouTubeLabel    = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
+    var youtubeLabel    = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
     var difficultyLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "地獄級"
     var mainContents: [UIResponder] {
         get {
@@ -57,9 +57,9 @@ class ChooseMusicScene: SKScene {
             contents.append(playButton)
             contents.append(settingButton)
             contents.append(autoPlaySwitch)
-            contents.append(YouTubeSwitch)
+            contents.append(youtubeSwitch)
             contents.append(autoPlayLabel)
-            contents.append(YouTubeLabel)
+            contents.append(youtubeLabel)
             contents.append(difficultyLabel)
             return contents
         }
@@ -238,7 +238,7 @@ class ChooseMusicScene: SKScene {
             return Button
         }()
         
-        YouTubeSwitch = {() -> UISwitch in
+        youtubeSwitch = {() -> UISwitch in
             let swicth: UISwitch = UISwitch()
             swicth.layer.position = CGPoint(x: self.frame.width/4, y: self.frame.height/3)
             swicth.tintColor = .black   // Swicthの枠線を表示する.
@@ -261,14 +261,14 @@ class ChooseMusicScene: SKScene {
         }()
         
         // スイッチの種類を示すラベル(スイッチに連動させるため、スイッチの設定後に行うこと)
-        YouTubeLabel = {() -> SKLabelNode in
+        youtubeLabel = {() -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = YouTubeSwitch.bounds.height*2/3
+            Label.fontSize = youtubeSwitch.bounds.height*2/3
             Label.horizontalAlignmentMode = .right // 右寄せ
-            Label.position = convertPoint(fromView: YouTubeSwitch.layer.position)   // view形式の座標をscene形式に変換
-            Label.position.x -= YouTubeSwitch.bounds.width/2
-            Label.position.y -= YouTubeSwitch.bounds.height/5
+            Label.position = convertPoint(fromView: youtubeSwitch.layer.position)   // view形式の座標をscene形式に変換
+            Label.position.x -= youtubeSwitch.bounds.width/2
+            Label.position.y -= youtubeSwitch.bounds.height/5
             Label.fontColor = SKColor.black
             Label.text = "YouTube:"
             
@@ -520,11 +520,11 @@ class ChooseMusicScene: SKScene {
         guard picker != nil else { return }
         
         if headers[picker.selectedRow].videoID.isEmpty && headers[picker.selectedRow].videoID2.isEmpty {
-            YouTubeSwitch.isOn = false
-            YouTubeSwitch.isEnabled = false
+            youtubeSwitch.isOn = false
+            youtubeSwitch.isEnabled = false
         } else {
-            YouTubeSwitch.isOn = setting.isYouTube
-            YouTubeSwitch.isEnabled = true
+            youtubeSwitch.isOn = setting.isYouTube
+            youtubeSwitch.isEnabled = true
         }
         
         var selectedMusicName = headers[picker.selectedRow].title
@@ -562,7 +562,7 @@ class ChooseMusicScene: SKScene {
     @objc func onClickPlayButton(_ sender : UIButton) {
         
         setting.musicName = picker.textStore
-        setting.isYouTube = YouTubeSwitch.isOn
+        setting.isYouTube = youtubeSwitch.isOn
         setting.isAutoPlay = autoPlaySwitch.isOn
         setting.save()
         
