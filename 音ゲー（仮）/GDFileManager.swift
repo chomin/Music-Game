@@ -73,16 +73,11 @@ class GDFileManager {
             
             // 正常終了の場合の処理を記述してください。
             // 取得したファイルデータはData型のため、ファイルの内容に合わせて適切に変換してください。
-            // PWEditorでは、
-            // 　①ファイルデータがテキストデータかチェックする。
-            // 　②テキストデータに変換する。
-            // を行なっています。
-            //
             
             // 保存
             do{
                 try dat.write(to: fileURL, options: .atomic)
-            }catch{
+            } catch {
                 print("保存に失敗しました：\(file.name!)")
                 print(error)
                 SVProgressHUD.showError(withStatus: "\(file.name!)")
@@ -102,21 +97,19 @@ class GDFileManager {
 extension GTLRDrive_File {
     /**
      ディレクトリか判定します。
+     mimeTypeが取得できなければ(暫定)falseを返します。
      
      - Parameter file: ファイルオブジェクト
      - Returns: true:ディレクトリ / false:ファイル
      */
      func isDir() -> Bool {
-        var result = false
         if let mimeType = self.mimeType {
             let mimeTypes = mimeType.components(separatedBy: ".")
             let lastIndex = mimeTypes.count - 1
             let type = mimeTypes[lastIndex]
-            if type == "folder" {
-                result = true
-            }
+            return type == "folder"
         }
-        return result
+        return false
     }
     
     /**

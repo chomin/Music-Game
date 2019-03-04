@@ -332,7 +332,7 @@ extension GameScene {
         }
         
         let judgeTimeState = lane.getJudgeTimeState(timeLag: timeLag)
-        setJudgeLabelText(text: judgeTimeState.rawValue)
+        setJudgeLabelText(judgeType: judgeTimeState)
         result.countUp(judgeType: judgeTimeState)
         lane.setHeadNoteJudged()
         return true
@@ -403,7 +403,7 @@ extension GameScene {
     func missJudge(lane: Lane) -> Bool {
         guard !(lane.isEmpty), lane.headNote!.isJudgeable else { return false }
         
-        setJudgeLabelText(text: "miss")
+        setJudgeLabelText(judgeType: .miss)
         result.miss += 1
         result.combo = 0
         lane.setHeadNoteJudged()

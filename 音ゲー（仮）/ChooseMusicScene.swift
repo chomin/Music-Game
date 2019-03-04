@@ -527,8 +527,7 @@ class ChooseMusicScene: SKScene {
             YouTubeSwitch.isEnabled = true
         }
         
-        let str = headers[picker.selectedRow].bmsNameWithExtension
-        var selectedMusicName = String(str.prefix(str.count-4))
+        var selectedMusicName = headers[picker.selectedRow].title
         if selectedMusicName.hasSuffix("(expert)") || selectedMusicName.hasSuffix("(special)") { // BDGP曲で新たな難易度を実装する際には適宜追加
             let startIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
             let lastIndex  = selectedMusicName.index(before: selectedMusicName.lastIndex(of: ")")!)
@@ -567,8 +566,7 @@ class ChooseMusicScene: SKScene {
         setting.isAutoPlay = autoPlaySwitch.isOn
         setting.save()
         
-        let str = headers[picker.selectedRow].bmsNameWithExtension
-        var selectedMusicName = String(str.prefix(str.count-4))
+        var selectedMusicName = headers[picker.selectedRow].title
         if selectedMusicName.hasSuffix("(expert)") || selectedMusicName.hasSuffix("(special)") {
             let startIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
             let lastIndex  = selectedMusicName.index(before: selectedMusicName.lastIndex(of: ")")!)
