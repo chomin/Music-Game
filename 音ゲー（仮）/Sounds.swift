@@ -122,7 +122,7 @@ class ActionSoundPlayers {
     private let kara1: SoundSource
     private let kara2: SoundSource
     
-    enum SoundType{
+    enum SoundType {
         case tap, flick, kara, middle
     }
     

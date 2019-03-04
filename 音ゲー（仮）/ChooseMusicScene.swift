@@ -51,7 +51,7 @@ class ChooseMusicScene: SKScene {
     var YouTubeLabel    = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
     var difficultyLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "地獄級"
     var mainContents: [UIResponder] {
-        get{
+        get {
             var contents: [UIResponder] = []
             contents.append(picker)
             contents.append(playButton)
@@ -83,7 +83,7 @@ class ChooseMusicScene: SKScene {
     var noteSizeTitleLabel  = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "ノーツの大きさ"
     var fstlSwitchLabel     = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "ノーツの大きさをレーン幅に合わせる"
     var settingContents: [UIResponder] {
-        get{
+        get {
             var contents: [UIResponder] = []
             contents.append(spPlusButton)
             contents.append(spPlus10Button)
@@ -124,7 +124,7 @@ class ChooseMusicScene: SKScene {
     
     var setting = Setting()
     var headers: [Header] = []    // picker.selectedRowとindexを対応させる
-    var mp3DownloadingFiles: [GTLRDrive_File] = []
+    var mp3FilesToDownload: [GTLRDrive_File] = []
     
     override func didMove(to view: SKView) {
         
@@ -136,7 +136,7 @@ class ChooseMusicScene: SKScene {
         do {
             // クラウドストレージの更新確認(mp3)
             for file in GDFileManager.mp3FileList {
-                if !file.isDownloaded() || file.isRenewed() { mp3DownloadingFiles.append(file) }
+                if !file.isDownloaded() || file.isRenewed() { mp3FilesToDownload.append(file) }
             }
             
             // Headerについて、/Library/Cachesのbmsファイル探索→db更新→読み込み
@@ -537,7 +537,7 @@ class ChooseMusicScene: SKScene {
         }
         
         var title = ""
-        if mp3DownloadingFiles.contains(where: {$0.name == "\(selectedMusicName).mp3"}) {
+        if mp3FilesToDownload.contains(where: {$0.name == "\(selectedMusicName).mp3"}) {
             title =
             """
             ダウンロード
@@ -579,8 +579,8 @@ class ChooseMusicScene: SKScene {
         // 直列キュー / attibutes指定なし
 //        let dispatchQueue = DispatchQueue.main
         
-        if mp3DownloadingFiles.contains(where: {$0.name == "\(selectedMusicName).mp3"}) { // ダウンロード
-            let file = mp3DownloadingFiles.first(where: {$0.name == "\(selectedMusicName).mp3"})
+        if mp3FilesToDownload.contains(where: {$0.name == "\(selectedMusicName).mp3"}) { // ダウンロード
+            let file = mp3FilesToDownload.first(where: {$0.name == "\(selectedMusicName).mp3"})
             dispatchGroup.enter()
             GDFileManager.getFileData(fileID: file!.identifier!, group: dispatchGroup)
             

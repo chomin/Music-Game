@@ -34,31 +34,10 @@ class GameViewController: UIViewController {
     
     func downloadBMSs(){
         
-        
-        //            let directoryContents = try FileManager.default.contentsOfDirectory(atPath: GDFileManager.cachesDirectoty.path)
-        //            let bmsNamesWithExtension = directoryContents.filter { $0.hasSuffix(".bms") }
-        var bmsDownloadingIDs: [String] = []
+        var bmsIDsToDownload: [String] = []
         for file in GDFileManager.bmsFileList {
             
-            if !file.isDownloaded() || file.isRenewed() { bmsDownloadingIDs.append(file.identifier!) }
-            
-            //                if !bmsNamesWithExtension.contains("\(file.name!)"){    // (file.nameは拡張子付き。)
-            //
-            //                } else {
-            //                    // 更新時刻を比較し、更新があればダウンロードし上書き
-            //                    let cloudFileDate = file.modifiedTime!.date    // クラウド上のファイルのDate
-            //
-            //                    let filePath = GDFileManager.cachesDirectoty.appendingPathComponent(file.name!).path
-            //                    let attr = try FileManager.default.attributesOfItem(atPath: filePath)
-            //                    let localFileDate = attr[FileAttributeKey.modificationDate] as! Date
-            //
-            //                    if cloudFileDate.compare(localFileDate) == .orderedDescending {
-            //                        print("\(file.name!)を上書きします.")
-            //                        print(cloudFileDate)
-            //                        print(localFileDate)
-            //                        bmsDownloadingIDs.append(file.identifier!)
-            //                    }
-            //                }
+            if !file.isDownloaded() || file.isRenewed() { bmsIDsToDownload.append(file.identifier!) }
         }
         
         let dispatchGroup = DispatchGroup()
@@ -66,7 +45,7 @@ class GameViewController: UIViewController {
         let dispatchQueue = DispatchQueue.main
         
         // ダウンロード（bmsのみ）
-        for id in bmsDownloadingIDs{
+        for id in bmsIDsToDownload{
             dispatchGroup.enter()
             dispatchQueue.async(group: dispatchGroup){ () in
                 GDFileManager.getFileData(fileID: id, group: dispatchGroup)

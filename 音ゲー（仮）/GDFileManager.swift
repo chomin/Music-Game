@@ -17,10 +17,10 @@ class GDFileManager {
     static var bmsFileList  = [GTLRDrive_File]()
     /// 次ページ取得用トークン
     static var nextPageToken: String?
-    /// 保存先のディレクトリ(長いので、、、)
+    /// 保存先のディレクトリ（エイリアス）
     static let cachesDirectoty = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     
-    /// GoogleDrive APIで、ファイルデータを取得します。データはDBに格納（予定）
+    /// GoogleDrive APIで、ファイルデータを取得します。データはDBに格納
     ///
     /// - Parameters:
     ///   - fileID: fileID
@@ -32,11 +32,6 @@ class GDFileManager {
             return
         }
         let fileURL = cachesDirectoty.appendingPathComponent("\(file.name!)/")
-//        guard !FileManager.default.fileExists(atPath: fileURL.path) else {
-//            print("\(file.name!)はすでにダウンロード済みです")
-//            group?.leave()
-//            return
-//        }
         // アニメーション立ち上げ
         SVProgressHUD.show()
         
@@ -47,7 +42,6 @@ class GDFileManager {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let serviceDrive = appDelegate.googleDriveServiceDrive
         let fetcher = serviceDrive.fetcherService.fetcher(withURLString: urlString)
-        
         
         // 3. fetcher(GTMSessionFetcherService)オブジェクトのbeginFetchメソッドを実行して、ファイルデータを取得します。
         fetcher.beginFetch( completionHandler: { (data: Data?, error: Error?) -> Void in // （デリゲートでもできる）
@@ -75,7 +69,7 @@ class GDFileManager {
             // 取得したファイルデータはData型のため、ファイルの内容に合わせて適切に変換してください。
             
             // 保存
-            do{
+            do {
                 try dat.write(to: fileURL, options: .atomic)
             } catch {
                 print("保存に失敗しました：\(file.name!)")
@@ -133,7 +127,6 @@ extension GTLRDrive_File {
             print(error)
             return self.isDownloaded()
         }
-        
     }
     
     /// ローカルファイルと比較して更新されているか
@@ -153,8 +146,7 @@ extension GTLRDrive_File {
             let attr = try FileManager.default.attributesOfItem(atPath: filePath)
             let localFileDate = attr[FileAttributeKey.modificationDate] as! Date
             
-            if cloudFileDate.compare(localFileDate) == .orderedDescending { return true  }
-            else                                                          { return false }
+            return cloudFileDate.compare(localFileDate) == .orderedDescending
         } catch {
             print(error)
             return self.isRenewed()

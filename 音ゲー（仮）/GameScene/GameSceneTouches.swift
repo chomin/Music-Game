@@ -336,37 +336,6 @@ extension GameScene {
         result.countUp(judgeType: judgeTimeState)
         lane.setHeadNoteJudged()
         return true
-        
-//        switch lane.getJudgeTimeState(timeLag: timeLag) {
-//        case .perfect:
-//            setJudgeLabelText(text: "perfect!!")
-//            result.countUp(judgeType: .perfect)
-//            lane.setHeadNoteJudged()
-//            return true
-//        case .great:
-//            setJudgeLabelText(text: "great!")
-//            result.countUp(judgeType: .great)
-//            lane.setHeadNoteJudged()
-//            return true
-//        case .good:
-//            setJudgeLabelText(text: "good")
-//            result.countUp(judgeType: .good)
-//            lane.setHeadNoteJudged()
-//            return true
-//        case .bad:
-//            setJudgeLabelText(text: "bad")
-//            result.countUp(judgeType: .bad)
-//            lane.setHeadNoteJudged()
-//            return true
-//        case .miss:
-//            setJudgeLabelText(text: "miss!")
-//            result.countUp(judgeType: .miss)
-//            lane.setHeadNoteJudged()
-//            return true
-//        default:    // still,passedなら判定しない(guardで弾いてるはず。)
-//            print("judge error. laneIndex: \(lane.laneIndex)")
-//            return false
-//        }
     }
     
     /// perfect終了時(laneからのdelegate)または指が外れた時に呼び出される。

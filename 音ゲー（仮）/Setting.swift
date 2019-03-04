@@ -109,12 +109,4 @@ class Setting {
             scaleRatioIntP = UInt(newValue*100)
         }
     }
-//    var musicName: MusicName {
-//        get {
-//            return MusicName(rawValue: musicNameStr)!
-//        }
-//        set {
-//            musicNameStr = newValue.rawValue
-//        }
-//    }
 }
