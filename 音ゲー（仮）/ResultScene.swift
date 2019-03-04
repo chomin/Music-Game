@@ -113,7 +113,7 @@ class ResultScene: SKScene {
         // Called before each frame is rendered
     }
     
-    @objc func onClickReplayButton(_ sender: UIButton){
+    @objc func onClickReplayButton(_ sender: UIButton) {
         
         replayButton.isHidden = true
         

@@ -606,7 +606,7 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-    func showMainContents(){
+    func showMainContents() {
         for content in mainContents {
             if let view = content as? UIControl {
                 view.isHidden = false
@@ -621,7 +621,7 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-    func hideMainContents(){
+    func hideMainContents() {
         for content in mainContents {
             if let view = content as? UIView {
                 view.isHidden = true
@@ -635,7 +635,7 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-    func showSettingContents(){
+    func showSettingContents() {
         
         for content in settingContents {
             if let view = content as? UIView {
@@ -661,47 +661,47 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-    @objc func onClickSettingButton(_ sender : UIButton){
+    @objc func onClickSettingButton(_ sender : UIButton) {
         
         hideMainContents()
         showSettingContents()
     }
     
-    @objc func onClickSPPlusButton(_ sender : UIButton){
+    @objc func onClickSPPlusButton(_ sender : UIButton) {
         setting.speedRatioInt += 1
     }
     
-    @objc func onClickSPPlus10Button(_ sender : UIButton){
+    @objc func onClickSPPlus10Button(_ sender : UIButton) {
         setting.speedRatioInt += 10
     }
     
-    @objc func onClickSPMinusButton(_ sender : UIButton){
+    @objc func onClickSPMinusButton(_ sender : UIButton) {
         if setting.speedRatioInt > 0 { setting.speedRatioInt -= 1 }
     }
     
-    @objc func onClickSPMinus10Button(_ sender : UIButton){
+    @objc func onClickSPMinus10Button(_ sender : UIButton) {
         if setting.speedRatioInt > 10 { setting.speedRatioInt -= 10 }
         else 			              { setting.speedRatioInt  =  0 }
     }
     
-    @objc func onClickSIPlusButton(_ sender : UIButton){
+    @objc func onClickSIPlusButton(_ sender : UIButton) {
         setting.scaleRatioInt += 1
     }
     
-    @objc func onClickSIPlus10Button(_ sender : UIButton){
+    @objc func onClickSIPlus10Button(_ sender : UIButton) {
         setting.scaleRatioInt += 10
     }
     
-    @objc func onClickSIMinusButton(_ sender : UIButton){
+    @objc func onClickSIMinusButton(_ sender : UIButton) {
         if setting.scaleRatioInt > 0 { setting.scaleRatioInt -= 1 }
     }
     
-    @objc func onClickSIMinus10Button(_ sender : UIButton){
+    @objc func onClickSIMinus10Button(_ sender : UIButton) {
         if setting.scaleRatioInt > 10 { setting.scaleRatioInt -= 10 }
         else                             { setting.scaleRatioInt  =  0 }
     }
     
-    @objc func onClickSaveAndBackButton(_ sender : UIButton){
+    @objc func onClickSaveAndBackButton(_ sender : UIButton) {
         //保存
         setting.save()
         
@@ -711,25 +711,25 @@ class ChooseMusicScene: SKScene {
     }
     
     // 同時押し対策
-    @objc func onSettingButton(_ sender : UIButton){
+    @objc func onSettingButton(_ sender : UIButton) {
         playButton.isEnabled = false
     }
-    @objc func onPlayButton(_ sender : UIButton){
+    @objc func onPlayButton(_ sender : UIButton) {
         settingButton.isEnabled = false
     }
-    @objc func touchUpOutsideButton(_ sender : UIButton){
+    @objc func touchUpOutsideButton(_ sender : UIButton) {
         playButton.isEnabled = true
         settingButton.isEnabled = true
     }
     
     // switch
-    @objc func youTubeSwitchChanged(_ sender: UISwitch){
+    @objc func youTubeSwitchChanged(_ sender: UISwitch) {
         setting.isYouTube = sender.isOn
     }
-    @objc func autoPlaySwitchChanged(_ sender: UISwitch){
+    @objc func autoPlaySwitchChanged(_ sender: UISwitch) {
         setting.isAutoPlay = sender.isOn
     }
-    @objc func fitSizeToLaneSwitchChanged(_ sender: UISwitch){
+    @objc func fitSizeToLaneSwitchChanged(_ sender: UISwitch) {
         setting.isFitSizeToLane = sender.isOn
     }
     
@@ -737,7 +737,7 @@ class ChooseMusicScene: SKScene {
     /// 呼び出される条件が不明
     ///
     /// - Parameter sender: <#sender description#>
-    @objc func pickerChanged(_ sender: PickerKeyboard){
+    @objc func pickerChanged(_ sender: PickerKeyboard) {
 //        setting.musicName = sender.textStore
 //        if headers[sender.selectedRow].videoID == "" && headers[sender.selectedRow].videoID2 == "" {
 //            YouTubeSwitch.isOn = false

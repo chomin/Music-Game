@@ -471,11 +471,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     /* -------- ボタン関数群 -------- */
     
-    @objc func onClickPauseButton(_ sender : UIButton){
+    @objc func onClickPauseButton(_ sender : UIButton) {
         applicationWillResignActive()
     }
     
-    @objc func onClickReturnButton(_ sender : UIButton){
+    @objc func onClickReturnButton(_ sender : UIButton) {
         
         let scene = ChooseMusicScene(size: (view?.bounds.size)!)
         let skView = view as SKView?
@@ -573,13 +573,13 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     /* -------- 同時押し対策 -------- */
     
-    @objc func onReturnButton(_ sender : UIButton){
+    @objc func onReturnButton(_ sender : UIButton) {
         self.continueButton.isEnabled = false
     }
-    @objc func onContinueButton(_ sender : UIButton){
+    @objc func onContinueButton(_ sender : UIButton) {
         self.returnButton.isEnabled = false
     }
-    @objc func touchUpOutsideButton(_ sender : UIButton){
+    @objc func touchUpOutsideButton(_ sender : UIButton) {
         enableAllButtonsOnPauseView()
     }
     func enableAllButtonsOnPauseView() {

@@ -17,7 +17,7 @@ class GameViewController: UIViewController {
     
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
-    func moveToCMScene(){
+    func moveToCMScene() {
         let scene = ChooseMusicScene(size: view.bounds.size)
         let skView2 = SKView(frame: view.frame)
         skView2.showsFPS = true
@@ -32,7 +32,7 @@ class GameViewController: UIViewController {
         skView2.presentScene(scene)  // ChooseMusicSceneに移動
     }
     
-    func downloadBMSs(){
+    func downloadBMSs() {
         
         var bmsIDsToDownload: [String] = []
         for file in GDFileManager.bmsFileList {
@@ -45,9 +45,9 @@ class GameViewController: UIViewController {
         let dispatchQueue = DispatchQueue.main
         
         // ダウンロード（bmsのみ）
-        for id in bmsIDsToDownload{
+        for id in bmsIDsToDownload {
             dispatchGroup.enter()
-            dispatchQueue.async(group: dispatchGroup){ () in
+            dispatchQueue.async(group: dispatchGroup) { () in
                 GDFileManager.getFileData(fileID: id, group: dispatchGroup)
             }
         }

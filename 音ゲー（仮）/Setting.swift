@@ -61,7 +61,7 @@ class Setting {
         scaleRatioP = Double(scaleRatioIntP)/100
     }
     
-    func save(){
+    func save() {
         defaults.set(speedRatioInt, forKey: Keys.userSpeedRatioInt.rawValue)
         defaults.set(scaleRatioInt, forKey: Keys.userNoteSizeRatioInt.rawValue)
         defaults.set(isYouTube, forKey: Keys.userIsYouTube.rawValue)
