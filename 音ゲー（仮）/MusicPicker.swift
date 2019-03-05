@@ -15,27 +15,30 @@ protocol MusicPickerDelegate {
 
 class MusicPicker: NSObject {
     
-    var collectionView: GeminiCollectionView!
+    private var collectionView: GeminiCollectionView!
+    private let headers: [Header]
+    var selectedHeader: Header
     var mpDelegate: MusicPickerDelegate?
-    let musics: [String]
     
     init(headers: [Header]) {
-        musics = headers.map { $0.title }
+        self.headers = headers
+        self.selectedHeader = headers.first!
         super.init()
     }
     
     func didMove(to view: SKView) {
-        let layout: UICollectionViewPagingFlowLayout = {
+        self.collectionView = {
             let layout = UICollectionViewPagingFlowLayout()
             layout.scrollDirection = .vertical
-            layout.itemSize = CGSize(width: 500, height: 50)
+            layout.itemSize = CGSize(width: 300, height: 50)
             layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)  // cellの上下左右の余白
-            layout.minimumLineSpacing = 20
-            layout.minimumInteritemSpacing = 20
-            return layout
+            layout.minimumLineSpacing = 10
+            layout.minimumInteritemSpacing = 10
+            
+            let frame = CGRect(x: 0, y: 0, width: view.frame.width / 2, height: view.frame.height)
+            return GeminiCollectionView(frame: frame, collectionViewLayout: layout)
         }()
-        self.collectionView = GeminiCollectionView(frame: view.frame, collectionViewLayout: layout)
-        collectionView.backgroundColor = UIColor.white
+        collectionView.backgroundColor = .white
         collectionView.register(MusicNameCell.self, forCellWithReuseIdentifier: "MusicNameCell")
         collectionView.showsVerticalScrollIndicator = false
         collectionView.allowsSelection = true
@@ -46,10 +49,14 @@ class MusicPicker: NSObject {
         
         collectionView.gemini
             .scaleAnimation()
-            .scale(0.75)
+            .scale(0.5)
             .scaleEffect(.scaleUp)
             .ease(.easeOutQuart)
         view.addSubview(collectionView)
+    }
+    
+    func removeFromParent() {
+        collectionView.removeFromSuperview()
     }
 }
 
@@ -77,13 +84,13 @@ extension MusicPicker: UICollectionViewDataSource {
     
     // セルの数を返す
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.musics.count
+        return self.headers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MusicNameCell", for: indexPath) as! MusicNameCell
 
-        cell.titleLabel.text = self.musics[indexPath.item]
+        cell.titleLabel.text = self.headers[indexPath.item].title
 
         self.collectionView.animateCell(cell)
         return cell
@@ -91,8 +98,7 @@ extension MusicPicker: UICollectionViewDataSource {
     
     // cell選択時の処理
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print(collectionView.cellForItem(at: indexPath).debugDescription)
-        //        collectionView.cellForItem(at: indexPath)?.isHighlighted = true
+        self.selectedHeader = headers[indexPath.item]
     }
 }
 

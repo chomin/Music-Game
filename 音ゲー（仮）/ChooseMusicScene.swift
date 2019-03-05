@@ -41,25 +41,25 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         }
     }
     
-    // 初期画面のボタンなど
-    var picker: PickerKeyboard!
     var musicPicker: MusicPicker!
-    
-    var playButton      = UIButton()
-    var settingButton   = UIButton()
-    var autoPlaySwitch  = UISwitch()
-    var youtubeSwitch   = UISwitch()
-    var autoPlayLabel   = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "自動演奏"
-    var youtubeLabel    = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
-    var difficultyLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "地獄級"
+
+    // 初期画面のボタンなど
+    var playButton:         UIButton!
+    var settingButton:      UIButton!
+    var autoPlaySwitch:     UISwitch!
+    var youtubeSwitch:      UISwitch!
+    var selectedMusicLabel: SKLabelNode!
+    var autoPlayLabel:      SKLabelNode!  // "自動演奏"
+    var youtubeLabel:       SKLabelNode!  // "YouTube"
+    var difficultyLabel:    SKLabelNode!  // "地獄級"
     var mainContents: [UIResponder] {
         get {
             var contents: [UIResponder] = []
-            contents.append(picker)
             contents.append(playButton)
             contents.append(settingButton)
             contents.append(autoPlaySwitch)
             contents.append(youtubeSwitch)
+            contents.append(selectedMusicLabel)
             contents.append(autoPlayLabel)
             contents.append(youtubeLabel)
             contents.append(difficultyLabel)
@@ -125,20 +125,20 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
     var sizesPosY:  CGFloat!
     
     var setting = Setting()
-    var headers: [Header] = []    // picker.selectedRowとindexを対応させる
+    var headers: [Header] = []
     var mp3FilesToDownload: [GTLRDrive_File] = []
     
     override func didMove(to view: SKView) {
         
-        speedsPosY = Dimensions.iconButtonSize*3
-        sizesPosY  = speedsPosY*2
+        speedsPosY = Dimensions.iconButtonSize * 3
+        sizesPosY  = speedsPosY * 2
         
         backgroundColor = .white
         
         do {
             // クラウドストレージの更新確認(mp3)
-            for file in GDFileManager.mp3FileList {
-                if !file.isDownloaded() || file.isRenewed() { mp3FilesToDownload.append(file) }
+            mp3FilesToDownload += GDFileManager.mp3FileList.filter { file in
+                !file.isDownloaded() || file.isRenewed()
             }
             
             // Headerについて、/Library/Cachesのbmsファイル探索→db更新→読み込み
@@ -187,25 +187,13 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         
         // ソート
         headers.sort(by: {
-            
             if ($0.group == $1.group) { return $0.playLevel < $1.playLevel }
-            
             return $0.group < $1.group
-            
         })
         
         self.musicPicker = MusicPicker(headers: headers)
         self.musicPicker.mpDelegate = self
         self.musicPicker.didMove(to: view)
-        
-        // ピッカーキーボードの設置
-        let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
-        picker = PickerKeyboard(frame: rect, firstText: setting.musicName, headers: headers)
-        picker.backgroundColor = .gray
-        picker.isHidden = false
-        picker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)
-        
-        self.view?.addSubview(picker!)
         
         
         /*--------- ボタンなどの設定 ---------*/
@@ -223,7 +211,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
             Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
             Button.isHidden = false
             Button.layer.cornerRadius = 20.0
-            Button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72)
+            Button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/4, y: self.frame.height * 4/5)
             self.view?.addSubview(Button)
             
             return Button
@@ -237,8 +225,10 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
             Button.addTarget(self, action: #selector(onClickSettingButton(_:)), for: .touchUpInside)
             Button.addTarget(self, action: #selector(onSettingButton(_:)), for: .touchDown)
             Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-            
-            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)// yは上からの座標
+            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize,
+                                  y: 0,
+                                  width: Dimensions.iconButtonSize,
+                                  height: Dimensions.iconButtonSize)  // yは上からの座標
             Button.isHidden = false
             self.view?.addSubview(Button)
             return Button
@@ -246,7 +236,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         
         youtubeSwitch = {() -> UISwitch in
             let swicth: UISwitch = UISwitch()
-            swicth.layer.position = CGPoint(x: self.frame.width/4, y: self.frame.height/3)
+            swicth.layer.position = CGPoint(x: self.frame.width * 4/5, y: self.frame.height * 1/2)
             swicth.tintColor = .black   // Swicthの枠線を表示する.
             swicth.isOn = setting.isYouTube
             swicth.addTarget(self, action: #selector(youTubeSwitchChanged(_:)), for: .valueChanged)
@@ -257,7 +247,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         
         autoPlaySwitch = {() -> UISwitch in
             let swicth: UISwitch = UISwitch()
-            swicth.layer.position = CGPoint(x: self.frame.width/4, y: self.frame.height/3 + swicth.bounds.height*1.5)
+            swicth.layer.position = CGPoint(x: self.frame.width * 4/5, y: self.frame.height * 1/2 + swicth.bounds.height * 1.5)
             swicth.tintColor = .black   // Swicthの枠線を表示する.
             swicth.isOn = setting.isAutoPlay
             swicth.addTarget(self, action: #selector(autoPlaySwitchChanged(_:)), for: .valueChanged)
@@ -270,7 +260,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         youtubeLabel = {() -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = youtubeSwitch.bounds.height*2/3
+            Label.fontSize = youtubeSwitch.bounds.height * 2/3
             Label.horizontalAlignmentMode = .right // 右寄せ
             Label.position = convertPoint(fromView: youtubeSwitch.layer.position)   // view形式の座標をscene形式に変換
             Label.position.x -= youtubeSwitch.bounds.width/2
@@ -285,7 +275,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         autoPlayLabel = {() -> SKLabelNode in
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = autoPlaySwitch.bounds.height*2/3
+            Label.fontSize = autoPlaySwitch.bounds.height * 2/3
             Label.horizontalAlignmentMode = .right // 右寄せ
             Label.position = convertPoint(fromView: autoPlaySwitch.layer.position)
             Label.position.x -= autoPlaySwitch.bounds.width/2
@@ -302,9 +292,22 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
             
             Label.fontSize = self.frame.height/10
             Label.horizontalAlignmentMode = .center
-            Label.position = CGPoint(x: self.frame.width/2, y: self.frame.height/2 + Label.fontSize*2)
+            Label.position = CGPoint(x: self.frame.width * 3/4, y: self.frame.height - Label.fontSize * 3/2)
             Label.fontColor = SKColor.green
-            Label.text = Difficulty.getDifficulty(garupaPlayLevel: headers[picker!.selectedRow].playLevel).rawValue
+            Label.text = Difficulty.getDifficulty(garupaPlayLevel: musicPicker.selectedHeader.playLevel).rawValue
+            
+            self.addChild(Label)
+            return Label
+        }()
+        
+        selectedMusicLabel = {() -> SKLabelNode in
+            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            
+            Label.fontSize = self.frame.midX / CGFloat(musicPicker.selectedHeader.title.count)
+            Label.horizontalAlignmentMode = .center
+            Label.position = CGPoint(x: self.frame.width * 3/4, y: self.frame.height * 2/3)
+            Label.fontColor = SKColor.black
+            Label.text = musicPicker.selectedHeader.title
             
             self.addChild(Label)
             return Label
@@ -478,7 +481,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
             Label.fontSize = Dimensions.iconButtonSize * 0.8
-            Label.horizontalAlignmentMode = .center//中央寄せ
+            Label.horizontalAlignmentMode = .center  // 中央寄せ
             Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - sizesPosY - Dimensions.iconButtonSize*0.8)
             Label.fontColor = SKColor.black
             Label.isHidden = true
@@ -491,7 +494,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
             Label.fontSize = Dimensions.iconButtonSize * 0.6
-            Label.horizontalAlignmentMode = .center //中央寄せ
+            Label.horizontalAlignmentMode = .center  // 中央寄せ
             Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - sizesPosY)
             Label.fontColor = SKColor.black
             Label.isHidden = true
@@ -505,8 +508,8 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
             let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
             Label.fontSize = Dimensions.iconButtonSize * 0.3
-            Label.horizontalAlignmentMode = .center //中央寄せ
-            Label.position = CGPoint(x:self.frame.midX + Dimensions.iconButtonSize*5.5, y:self.frame.height - sizesPosY)
+            Label.horizontalAlignmentMode = .center  // 中央寄せ
+            Label.position = CGPoint(x: self.frame.midX + Dimensions.iconButtonSize*5.5, y: self.frame.height - sizesPosY)
             Label.fontColor = SKColor.black
             Label.isHidden = true
             Label.numberOfLines = 2
@@ -518,14 +521,15 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
     }
     
     override func update(_ currentTime: TimeInterval) {
+        let selectedMusic = musicPicker.selectedHeader
         
         speedLabel.text = String(setting.speedRatioInt) + "%"
         noteSizeLabel.text = String(setting.scaleRatioInt) + "%"
-        difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: headers[picker!.selectedRow].playLevel).rawValue
-        
-        guard picker != nil else { return }
-        
-        if headers[picker.selectedRow].videoID.isEmpty && headers[picker.selectedRow].videoID2.isEmpty {
+        difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: selectedMusic.playLevel).rawValue
+        selectedMusicLabel.text = selectedMusic.title
+        selectedMusicLabel.fontSize = self.frame.midX / CGFloat(selectedMusic.title.count)
+
+        if selectedMusic.videoID.isEmpty && selectedMusic.videoID2.isEmpty {
             youtubeSwitch.isOn = false
             youtubeSwitch.isEnabled = false
         } else {
@@ -533,82 +537,54 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
             youtubeSwitch.isEnabled = true
         }
         
-        var selectedMusicName = headers[picker.selectedRow].title
-        if selectedMusicName.hasSuffix("(expert)") || selectedMusicName.hasSuffix("(special)") { // BDGP曲で新たな難易度を実装する際には適宜追加
-            let startIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
-            let lastIndex  = selectedMusicName.index(before: selectedMusicName.lastIndex(of: ")")!)
-            selectedMusicName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
-            let insertIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
-            selectedMusicName.insert(contentsOf: "BDGP", at: insertIndex)
-        }
-        
-        var title = ""
-        if mp3FilesToDownload.contains(where: {$0.name == "\(selectedMusicName).mp3"}) {
-            title =
-            """
-            ダウンロード
-            して遊ぶ
-            """
-        } else {
-            title = "この曲で遊ぶ"
-        }
+        let title: String = {
+            if mp3FilesToDownload.contains(where: { $0.name == selectedMusic.mp3FileName }) {
+                return "ダウンロード\nして遊ぶ"
+            } else {
+                return "この曲で遊ぶ"
+            }
+        }()
         playButton.titleLabel?.numberOfLines = 2
         playButton.setTitle(title, for: UIControl.State())
         playButton.setTitle(title, for: UIControl.State.highlighted)
-        
-        
     }
     
     override func willMove(from view: SKView) {
         // 消す
         hideMainContents()
-        picker.resignFirstResponder()   // FirstResponderを放棄
+        musicPicker.removeFromParent()
+//        picker.resignFirstResponder()   // FirstResponderを放棄
     }
     
     @objc func onClickPlayButton(_ sender : UIButton) {
+        let selectedMusic = musicPicker.selectedHeader
         
-        setting.musicName = picker.textStore
+        setting.musicName = selectedMusic.title
         setting.isYouTube = youtubeSwitch.isOn
         setting.isAutoPlay = autoPlaySwitch.isOn
         setting.save()
-        
-        var selectedMusicName = headers[picker.selectedRow].title
-        if selectedMusicName.hasSuffix("(expert)") || selectedMusicName.hasSuffix("(special)") {
-            let startIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
-            let lastIndex  = selectedMusicName.index(before: selectedMusicName.lastIndex(of: ")")!)
-            selectedMusicName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
-            let insertIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
-            selectedMusicName.insert(contentsOf: "BDGP", at: insertIndex)
-        }
         
         let dispatchGroup = DispatchGroup()
         // 直列キュー / attibutes指定なし
 //        let dispatchQueue = DispatchQueue.main
         
-        if mp3FilesToDownload.contains(where: {$0.name == "\(selectedMusicName).mp3"}) { // ダウンロード
-            let file = mp3FilesToDownload.first(where: {$0.name == "\(selectedMusicName).mp3"})
-            dispatchGroup.enter()
-            GDFileManager.getFileData(fileID: file!.identifier!, group: dispatchGroup)
-            
-            dispatchGroup.notify(queue: .main) {
-                // 移動
-                let scene = GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[self.picker!.selectedRow])
-                let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
-                skView?.showsFPS = true
-                skView?.showsNodeCount = true
-                skView?.ignoresSiblingOrder = true
-                scene.scaleMode = .resizeFill
-                skView?.presentScene(scene)  // GameSceneに移動
-            }
-        } else {
+        let moveToGameScene = {
             // 移動
-            let scene = GameScene(size: (view?.bounds.size)!, setting: setting, header: headers[picker!.selectedRow])
-            let skView = view as SKView?    // このviewはGameViewControllerのskView2
+            let scene = GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: selectedMusic)
+            let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
             skView?.showsFPS = true
             skView?.showsNodeCount = true
             skView?.ignoresSiblingOrder = true
             scene.scaleMode = .resizeFill
             skView?.presentScene(scene)  // GameSceneに移動
+        }
+        
+        if let mp3File = mp3FilesToDownload.first(where: {$0.name == selectedMusic.mp3FileName}) {  // ダウンロード
+            dispatchGroup.enter()
+            GDFileManager.getFileData(fileID: mp3File.identifier!, group: dispatchGroup)
+            dispatchGroup.notify(queue: .main, execute: moveToGameScene)
+        } else {
+            moveToGameScene()
         }
     }
     
@@ -737,20 +713,5 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
     }
     @objc func fitSizeToLaneSwitchChanged(_ sender: UISwitch) {
         setting.isFitSizeToLane = sender.isOn
-    }
-    
-    // picker
-    /// 呼び出される条件が不明
-    ///
-    /// - Parameter sender: <#sender description#>
-    @objc func pickerChanged(_ sender: PickerKeyboard) {
-//        setting.musicName = sender.textStore
-//        if headers[sender.selectedRow].videoID == "" && headers[sender.selectedRow].videoID2 == "" {
-//            YouTubeSwitch.isOn = false
-//            YouTubeSwitch.isEnabled = false
-//        } else {
-//            YouTubeSwitch.isEnabled = true
-//            print(headers[sender.selectedRow].videoID)
-//        }
     }
 }

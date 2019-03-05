@@ -30,6 +30,18 @@ class Header: Object {
     @objc dynamic var volWav = 100      // 音量を現段階のn%として出力するか(TODO: 未実装)
     @objc dynamic var laneNum = 7
     
+    var mp3FileName: String {
+        var title = self.title
+        if title.hasSuffix("(expert)") || title.hasSuffix("(special)") {
+            let startIndex = title.index(after:  title.lastIndex(of: "(")!)
+            let lastIndex  = title.index(before: title.lastIndex(of: ")")!)
+            title.removeSubrange(startIndex ... lastIndex)  // "曲名()"になる
+            let insertIndex = title.index(after:  title.lastIndex(of: "(")!)
+            title.insert(contentsOf: "BDGP", at: insertIndex)
+        }
+        return title + ".mp3"
+    }
+    
     /// DB上に存在しない場合にBMSから読み込み生成し、dbに保存する。db上に存在するときは作成しないこと。
     ///
     /// - Parameter fileName: bmsファイルのファイル名(拡張子の有無は不問)
