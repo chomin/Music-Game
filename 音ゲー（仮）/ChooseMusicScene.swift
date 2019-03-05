@@ -199,39 +199,39 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         /*--------- ボタンなどの設定 ---------*/
         // 初期画面のボタン
         playButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.addTarget(self, action: #selector(onClickPlayButton(_:)), for: .touchUpInside)
-            Button.addTarget(self, action: #selector(onPlayButton(_:)), for: .touchDown)
-            Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-            Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
-            Button.backgroundColor = UIColor.red
-            Button.layer.masksToBounds = true
-            Button.setTitleColor(UIColor.white, for: UIControl.State())
-            Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
-            Button.isHidden = false
-            Button.layer.cornerRadius = 20.0
-            Button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/4, y: self.frame.height * 4/5)
-            self.view?.addSubview(Button)
+            button.addTarget(self, action: #selector(onClickPlayButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(onPlayButton(_:)), for: .touchDown)
+            button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+            button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
+            button.backgroundColor = UIColor.red
+            button.layer.masksToBounds = true
+            button.setTitleColor(UIColor.white, for: UIControl.State())
+            button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
+            button.isHidden = false
+            button.layer.cornerRadius = 20.0
+            button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/4, y: self.frame.height * 4/5)
+            self.view?.addSubview(button)
             
-            return Button
+            return button
         }()
         
         settingButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(settingImage, for: .normal)
-            Button.setImage(settingImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickSettingButton(_:)), for: .touchUpInside)
-            Button.addTarget(self, action: #selector(onSettingButton(_:)), for: .touchDown)
-            Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize,
+            button.setImage(settingImage, for: .normal)
+            button.setImage(settingImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(onClickSettingButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(onSettingButton(_:)), for: .touchDown)
+            button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+            button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize,
                                   y: 0,
                                   width: Dimensions.iconButtonSize,
                                   height: Dimensions.iconButtonSize)  // yは上からの座標
-            Button.isHidden = false
-            self.view?.addSubview(Button)
-            return Button
+            button.isHidden = false
+            self.view?.addSubview(button)
+            return button
         }()
         
         youtubeSwitch = {() -> UISwitch in
@@ -258,168 +258,168 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         
         // スイッチの種類を示すラベル(スイッチに連動させるため、スイッチの設定後に行うこと)
         youtubeLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = youtubeSwitch.bounds.height * 2/3
-            Label.horizontalAlignmentMode = .right // 右寄せ
-            Label.position = convertPoint(fromView: youtubeSwitch.layer.position)   // view形式の座標をscene形式に変換
-            Label.position.x -= youtubeSwitch.bounds.width/2
-            Label.position.y -= youtubeSwitch.bounds.height/5
-            Label.fontColor = SKColor.black
-            Label.text = "YouTube:"
+            label.fontSize = youtubeSwitch.bounds.height * 2/3
+            label.horizontalAlignmentMode = .right // 右寄せ
+            label.position = convertPoint(fromView: youtubeSwitch.layer.position)   // view形式の座標をscene形式に変換
+            label.position.x -= youtubeSwitch.bounds.width/2
+            label.position.y -= youtubeSwitch.bounds.height/5
+            label.fontColor = SKColor.black
+            label.text = "YouTube:"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         autoPlayLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = autoPlaySwitch.bounds.height * 2/3
-            Label.horizontalAlignmentMode = .right // 右寄せ
-            Label.position = convertPoint(fromView: autoPlaySwitch.layer.position)
-            Label.position.x -= autoPlaySwitch.bounds.width/2
-            Label.position.y -= autoPlaySwitch.bounds.height/5
-            Label.fontColor = SKColor.black
-            Label.text = "自動演奏:"
+            label.fontSize = autoPlaySwitch.bounds.height * 2/3
+            label.horizontalAlignmentMode = .right // 右寄せ
+            label.position = convertPoint(fromView: autoPlaySwitch.layer.position)
+            label.position.x -= autoPlaySwitch.bounds.width/2
+            label.position.y -= autoPlaySwitch.bounds.height/5
+            label.fontColor = SKColor.black
+            label.text = "自動演奏:"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         difficultyLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = self.frame.height/10
-            Label.horizontalAlignmentMode = .center
-            Label.position = CGPoint(x: self.frame.width * 3/4, y: self.frame.height - Label.fontSize * 3/2)
-            Label.fontColor = SKColor.green
-            Label.text = Difficulty.getDifficulty(garupaPlayLevel: musicPicker.selectedHeader.playLevel).rawValue
+            label.fontSize = self.frame.height/10
+            label.horizontalAlignmentMode = .center
+            label.position = CGPoint(x: self.frame.width * 3/4, y: self.frame.height - label.fontSize * 3/2)
+            label.fontColor = SKColor.green
+            label.text = Difficulty.getDifficulty(garupaPlayLevel: musicPicker.selectedHeader.playLevel).rawValue
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         selectedMusicLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = self.frame.midX / CGFloat(musicPicker.selectedHeader.title.count)
-            Label.horizontalAlignmentMode = .center
-            Label.position = CGPoint(x: self.frame.width * 3/4, y: self.frame.height * 2/3)
-            Label.fontColor = SKColor.black
-            Label.text = musicPicker.selectedHeader.title
+            label.fontSize = self.frame.midX / CGFloat(musicPicker.selectedHeader.title.count)
+            label.horizontalAlignmentMode = .center
+            label.position = CGPoint(x: self.frame.width * 3/4, y: self.frame.height * 2/3)
+            label.fontColor = SKColor.black
+            label.text = musicPicker.selectedHeader.title
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         // 設定画面のボタン
         spPlusButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(plusImage, for: .normal)
-            Button.setImage(plusImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickSPPlusButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(plusImage, for: .normal)
+            button.setImage(plusImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(onClickSPPlusButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         spPlus10Button = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(plus10Image, for: .normal)
-            Button.setImage(plus10ImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickSPPlus10Button(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(plus10Image, for: .normal)
+            button.setImage(plus10ImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(onClickSPPlus10Button(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         spMinusButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(minusImage, for: .normal)
-            Button.setImage(minusImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickSPMinusButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(minusImage, for: .normal)
+            button.setImage(minusImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(onClickSPMinusButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         spMinus10Button = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(minus10Image, for: .normal)
-            Button.setImage(minus10ImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickSPMinus10Button(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(minus10Image, for: .normal)
+            button.setImage(minus10ImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(onClickSPMinus10Button(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         siPlusButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(plusImage, for: .normal)
-            Button.setImage(plusImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickSIPlusButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(plusImage, for: .normal)
+            button.setImage(plusImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(onClickSIPlusButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         siPlus10Button = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(plus10Image, for: .normal)
-            Button.setImage(plus10ImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickSIPlus10Button(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(plus10Image, for: .normal)
+            button.setImage(plus10ImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(onClickSIPlus10Button(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         siMinusButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(minusImage, for: .normal)
-            Button.setImage(minusImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickSIMinusButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(minusImage, for: .normal)
+            button.setImage(minusImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(onClickSIMinusButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         siMinus10Button = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(minus10Image, for: .normal)
-            Button.setImage(minus10ImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickSIMinus10Button(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(minus10Image, for: .normal)
+            button.setImage(minus10ImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(onClickSIMinus10Button(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         saveAndBackButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(saveAndBackImage, for: .normal)
-            Button.setImage(saveAndBackImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickSaveAndBackButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.width*9.4/10, y: self.frame.height - Dimensions.iconButtonSize, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(saveAndBackImage, for: .normal)
+            button.setImage(saveAndBackImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(onClickSaveAndBackButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.width*9.4/10, y: self.frame.height - Dimensions.iconButtonSize, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         fitSizeToLaneSwitch = {() -> UISwitch in
@@ -437,86 +437,86 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         
         // ラベルの設定
         settingLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = self.frame.height/13
-            Label.horizontalAlignmentMode = .center //中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - settingLabel.fontSize*3/2)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
-            Label.text = "設定画面"
+            label.fontSize = self.frame.height/13
+            label.horizontalAlignmentMode = .center //中央寄せ
+            label.position = CGPoint(x:self.frame.midX, y:self.frame.height - settingLabel.fontSize*3/2)
+            label.fontColor = SKColor.black
+            label.isHidden = true
+            label.text = "設定画面"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         speedLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = Dimensions.iconButtonSize * 0.8
-            Label.horizontalAlignmentMode = .center//中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY - Dimensions.iconButtonSize*0.8)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
+            label.fontSize = Dimensions.iconButtonSize * 0.8
+            label.horizontalAlignmentMode = .center//中央寄せ
+            label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY - Dimensions.iconButtonSize*0.8)
+            label.fontColor = SKColor.black
+            label.isHidden = true
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         speedTitleLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = Dimensions.iconButtonSize * 0.6
-            Label.horizontalAlignmentMode = .center //中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
-            Label.text = "速さ"
+            label.fontSize = Dimensions.iconButtonSize * 0.6
+            label.horizontalAlignmentMode = .center //中央寄せ
+            label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY)
+            label.fontColor = SKColor.black
+            label.isHidden = true
+            label.text = "速さ"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         noteSizeLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = Dimensions.iconButtonSize * 0.8
-            Label.horizontalAlignmentMode = .center  // 中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - sizesPosY - Dimensions.iconButtonSize*0.8)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
+            label.fontSize = Dimensions.iconButtonSize * 0.8
+            label.horizontalAlignmentMode = .center  // 中央寄せ
+            label.position = CGPoint(x:self.frame.midX, y:self.frame.height - sizesPosY - Dimensions.iconButtonSize*0.8)
+            label.fontColor = SKColor.black
+            label.isHidden = true
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         noteSizeTitleLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = Dimensions.iconButtonSize * 0.6
-            Label.horizontalAlignmentMode = .center  // 中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - sizesPosY)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
-            Label.text = "大きさ"
+            label.fontSize = Dimensions.iconButtonSize * 0.6
+            label.horizontalAlignmentMode = .center  // 中央寄せ
+            label.position = CGPoint(x:self.frame.midX, y:self.frame.height - sizesPosY)
+            label.fontColor = SKColor.black
+            label.isHidden = true
+            label.text = "大きさ"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         fstlSwitchLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = Dimensions.iconButtonSize * 0.3
-            Label.horizontalAlignmentMode = .center  // 中央寄せ
-            Label.position = CGPoint(x: self.frame.midX + Dimensions.iconButtonSize*5.5, y: self.frame.height - sizesPosY)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
-            Label.numberOfLines = 2
-            Label.text = "ノーツの大きさを\nレーン幅に合わせる"
+            label.fontSize = Dimensions.iconButtonSize * 0.3
+            label.horizontalAlignmentMode = .center  // 中央寄せ
+            label.position = CGPoint(x: self.frame.midX + Dimensions.iconButtonSize*5.5, y: self.frame.height - sizesPosY)
+            label.fontColor = SKColor.black
+            label.isHidden = true
+            label.numberOfLines = 2
+            label.text = "ノーツの大きさを\nレーン幅に合わせる"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
     }
     
