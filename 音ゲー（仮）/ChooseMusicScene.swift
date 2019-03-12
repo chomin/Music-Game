@@ -43,19 +43,26 @@ class ChooseMusicScene: SKScene {
     
     // 初期画面のボタンなど
     var picker: PickerKeyboard!
-    var playButton      = UIButton()
-    var settingButton   = UIButton()
-    var autoPlaySwitch  = UISwitch()
-    var YouTubeSwitch   = UISwitch()
-    var autoPlayLabel   = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "自動演奏"
-    var YouTubeLabel    = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
-    var difficultyLabel = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "地獄級"
+    var playButton       = UIButton()
+    var randomPlayButton = UIButton()
+    var settingButton    = UIButton()
+    var autoPlaySwitch   = UISwitch()
+    var YouTubeSwitch    = UISwitch()
+    var autoPlayLabel    = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "自動演奏"
+    var YouTubeLabel     = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
+    var difficultyLabel  = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "地獄級"
+    var mainButtons: [UIButton] {
+        var contents: [UIButton] = []
+        contents.append(playButton)
+        contents.append(randomPlayButton)
+        contents.append(settingButton)
+        return contents
+    }
     var mainContents: [UIResponder] {
         get {
             var contents: [UIResponder] = []
+            mainButtons.forEach({contents.append($0)})
             contents.append(picker)
-            contents.append(playButton)
-            contents.append(settingButton)
             contents.append(autoPlaySwitch)
             contents.append(YouTubeSwitch)
             contents.append(autoPlayLabel)
@@ -208,7 +215,7 @@ class ChooseMusicScene: SKScene {
             let Button = UIButton()
             
             Button.addTarget(self, action: #selector(onClickPlayButton(_:)), for: .touchUpInside)
-            Button.addTarget(self, action: #selector(onPlayButton(_:)), for: .touchDown)
+            Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
             Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
             Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
             Button.backgroundColor = UIColor.red
@@ -223,13 +230,33 @@ class ChooseMusicScene: SKScene {
             return Button
         }()
         
+        randomPlayButton = {() -> UIButton in
+            let Button = UIButton()
+            
+            Button.addTarget(self, action: #selector(onClickPlayButton(_:)), for: .touchUpInside)
+            Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
+            Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+            Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
+            Button.backgroundColor = UIColor.green
+            Button.layer.masksToBounds = true
+            Button.setTitle("おまかせ選曲", for: UIControl.State())
+            Button.setTitleColor(UIColor.white, for: UIControl.State())
+            Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
+            Button.isHidden = false
+            Button.layer.cornerRadius = 20.0
+            Button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72 + Button.frame.height)
+            self.view?.addSubview(Button)
+            
+            return Button
+        }()
+        
         settingButton = {() -> UIButton in
             let Button = UIButton()
             
             Button.setImage(settingImage, for: .normal)
             Button.setImage(settingImageSelected, for: .highlighted)
             Button.addTarget(self, action: #selector(onClickSettingButton(_:)), for: .touchUpInside)
-            Button.addTarget(self, action: #selector(onSettingButton(_:)), for: .touchDown)
+            Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
             Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
             
             Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)// yは上からの座標
@@ -559,6 +586,7 @@ class ChooseMusicScene: SKScene {
         picker.resignFirstResponder()   // FirstResponderを放棄
     }
     
+    
     @objc func onClickPlayButton(_ sender : UIButton) {
         
         setting.musicName = picker.textStore
@@ -566,7 +594,9 @@ class ChooseMusicScene: SKScene {
         setting.isAutoPlay = autoPlaySwitch.isOn
         setting.save()
         
-        var selectedMusicName = headers[picker.selectedRow].title
+        let index = sender == playButton ? picker.selectedRow : Int.random(in: 0...picker.musicNameArray.count)
+        
+        var selectedMusicName = headers[index].title
         if selectedMusicName.hasSuffix("(expert)") || selectedMusicName.hasSuffix("(special)") {
             let startIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
             let lastIndex  = selectedMusicName.index(before: selectedMusicName.lastIndex(of: ")")!)
@@ -586,7 +616,7 @@ class ChooseMusicScene: SKScene {
             
             dispatchGroup.notify(queue: .main) {
                 // 移動
-                let scene = GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[self.picker!.selectedRow])
+                let scene = GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[index])
                 let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
                 skView?.showsFPS = true
                 skView?.showsNodeCount = true
@@ -596,7 +626,7 @@ class ChooseMusicScene: SKScene {
             }
         } else {
             // 移動
-            let scene = GameScene(size: (view?.bounds.size)!, setting: setting, header: headers[picker!.selectedRow])
+            let scene = GameScene(size: (view?.bounds.size)!, setting: setting, header: headers[index])
             let skView = view as SKView?    // このviewはGameViewControllerのskView2
             skView?.showsFPS = true
             skView?.showsNodeCount = true
@@ -711,15 +741,17 @@ class ChooseMusicScene: SKScene {
     }
     
     // 同時押し対策
-    @objc func onSettingButton(_ sender : UIButton) {
-        playButton.isEnabled = false
+    @objc func onButton(_ sender : UIButton) {
+        for button in mainButtons {
+            guard button != sender else { continue }
+            button.isEnabled = false
+        }
     }
-    @objc func onPlayButton(_ sender : UIButton) {
-        settingButton.isEnabled = false
-    }
+    
     @objc func touchUpOutsideButton(_ sender : UIButton) {
-        playButton.isEnabled = true
-        settingButton.isEnabled = true
+        for button in mainButtons {
+            button.isEnabled = true
+        }
     }
     
     // switch
