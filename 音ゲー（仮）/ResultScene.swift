@@ -95,7 +95,7 @@ class ResultScene: SKScene {
         }()
         
         //ボタンの設定
-        replayButton.addTarget(self, action: #selector(onClickReplayButton(_: )), for: .touchUpInside)
+        replayButton.addTarget(self, action: #selector(didTapReplayButton(_: )), for: .touchUpInside)
         replayButton.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
         replayButton.backgroundColor = UIColor.red
         replayButton.layer.masksToBounds = true
@@ -113,7 +113,7 @@ class ResultScene: SKScene {
         // Called before each frame is rendered
     }
     
-    @objc func onClickReplayButton(_ sender: UIButton) {
+    @objc func didTapReplayButton(_ sender: UIButton) {
         
         replayButton.isHidden = true
         

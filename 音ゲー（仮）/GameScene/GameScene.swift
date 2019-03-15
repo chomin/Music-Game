@@ -190,7 +190,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             
             Button.setImage(UIImage(named: ImageName.pause.rawValue), for: .normal)
             Button.setImage(UIImage(named: ImageName.pauseSelected.rawValue), for: .highlighted)
-            Button.addTarget(self, action: #selector(onClickPauseButton(_:)), for: .touchUpInside)
+            Button.addTarget(self, action: #selector(didTapPauseButton(_:)), for: .touchUpInside)
             Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize) // yは上からの座標
             self.view?.addSubview(Button)
             
@@ -471,11 +471,11 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     
     /* -------- ボタン関数群 -------- */
     
-    @objc func onClickPauseButton(_ sender : UIButton) {
+    @objc func didTapPauseButton(_ sender : UIButton) {
         applicationWillResignActive()
     }
     
-    @objc func onClickReturnButton(_ sender : UIButton) {
+    @objc func didTapReturnButton(_ sender : UIButton) {
         
         let scene = ChooseMusicScene(size: (view?.bounds.size)!)
         let skView = view as SKView?
@@ -486,7 +486,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         skView?.presentScene(scene)     // ChooseMusicSceneに移動
     }
     
-    @objc func onClickContinueButton(_ sender : UIButton) {
+    @objc func didTapContinueButton(_ sender : UIButton) {
         
         pauseView?.removeFromSuperview()
         self.isUserInteractionEnabled = true
@@ -682,7 +682,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             self.returnButton = { () -> UIButton in
                 let Button = UIButton()
                 
-                Button.addTarget(self, action: #selector(onClickReturnButton(_:)), for: .touchUpInside)
+                Button.addTarget(self, action: #selector(didTapReturnButton(_:)), for: .touchUpInside)
                 Button.addTarget(self, action: #selector(onReturnButton(_:)), for: .touchDown)
                 Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
                 Button.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
@@ -702,7 +702,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
             self.continueButton = { () -> UIButton in
                 let Button = UIButton()
                 
-                Button.addTarget(self, action: #selector(onClickContinueButton(_:)), for: .touchUpInside)
+                Button.addTarget(self, action: #selector(didTapContinueButton(_:)), for: .touchUpInside)
                 Button.addTarget(self, action: #selector(onContinueButton(_:)), for: .touchDown)
                 Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
                 Button.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
