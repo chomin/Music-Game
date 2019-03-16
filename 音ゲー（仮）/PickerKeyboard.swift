@@ -87,6 +87,8 @@ class PickerKeyboard: UIControl {
     
     @objc func didTapRandom(sender: UIButton) {
         pickerView.selectRow(Int.random(in: 0..<musicNameArray.count), inComponent: 0, animated: true)
+        pickerView(pickerView, didSelectRow: pickerView.selectedRow(inComponent: 0), inComponent: 0)
+        pickerView.updateConstraints()
     }
     
     @objc func onButton(sender: UIButton) {
@@ -157,7 +159,6 @@ class PickerKeyboard: UIControl {
             
             return button
         }()
-        
         
         return view
     }
