@@ -6,6 +6,7 @@
 //  Copyright © 2017年 NakaiKohei. All rights reserved.
 //
 
+
 import UIKit
 
 class PickerKeyboard: UIControl {
@@ -15,6 +16,16 @@ class PickerKeyboard: UIControl {
     var isFirstMovedFromTitleLabel = false  // 一番最初に選択されたラベルを強調するためのもの
     var selectedRow: Int
     var headers: [Header] = []
+    let pickerView = UIPickerView()
+    
+    var doneButton  : UIButton!
+    var randomButton: UIButton!
+    var buttons: [UIButton] {
+        var buttons: [UIButton] = []
+        buttons.append(doneButton)
+        buttons.append(randomButton)
+        return buttons
+    }
     
     // PickerViewで'選択されたデータ'を表示する
     override func draw(_ rect: CGRect) {
@@ -49,7 +60,6 @@ class PickerKeyboard: UIControl {
             selectedRow = headers.map { $0.title } .index(of: firstText)!
         }
         
-        
         super.init(frame: frame)
         
         // viewのタッチジェスチャーを取る
@@ -75,6 +85,25 @@ class PickerKeyboard: UIControl {
         resignFirstResponder()
     }
     
+    @objc func didTapRandom(sender: UIButton) {
+        pickerView.selectRow(Int.random(in: 0..<musicNameArray.count), inComponent: 0, animated: true)
+        pickerView(pickerView, didSelectRow: pickerView.selectedRow(inComponent: 0), inComponent: 0)
+        pickerView.updateConstraints()
+    }
+    
+    @objc func onButton(sender: UIButton) {
+        for button in buttons {
+            guard sender != button else { continue }
+            button.isEnabled = false
+        }
+    }
+    
+    @objc func touchUpOutsideButton(sender: UIButton) {
+        for button in buttons {
+            button.isEnabled = true
+        }
+    }
+    
     // First Responderになるためにはこのメソッドは常にtrueを返す必要がある
     override var canBecomeFirstResponder: Bool {
         return true
@@ -82,7 +111,6 @@ class PickerKeyboard: UIControl {
     
     // inputViewをオーバーライドさせてシステムキーボードの代わりにPickerViewを表示(初期配置)
     override var inputView: UIView? {
-        let pickerView = UIPickerView()
         pickerView.delegate = self
         let row = musicNameArray.index(of: textStore) ?? -1
         pickerView.selectRow(row, inComponent: 0, animated: true)
@@ -92,22 +120,45 @@ class PickerKeyboard: UIControl {
     }
     
     override var inputAccessoryView: UIView? {
-        // キーボードを閉じるための完了ボタン
-        let button = UIButton(type: .system)
-        button.setTitle("Done", for: .normal)
-        button.addTarget(self, action: #selector(PickerKeyboard.didTapDone(sender: )), for: .touchUpInside)
-        button.sizeToFit()
-        
         // キーボードの上に置くアクセサリービュー
         let view = UIView(frame: CGRect(x: 0, y: 0, width: self.bounds.width, height: 44))
         view.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         view.backgroundColor = .groupTableViewBackground
         
-        // ボタンをアクセサリービュー上に設置
-        button.frame.origin.x = 16
-        button.center.y = view.center.y
-        button.autoresizingMask = [.flexibleRightMargin, .flexibleBottomMargin, .flexibleTopMargin]
-        view.addSubview(button)
+        let doneButtonX: CGFloat = 16
+        // キーボードを閉じるための完了ボタン
+        doneButton = { () -> UIButton in
+            let button = UIButton(type: .system)
+            button.setTitle("Done", for: .normal)
+            button.addTarget(self, action: #selector(PickerKeyboard.didTapDone(sender: )), for: .touchUpInside)
+            button.addTarget(self, action: #selector(PickerKeyboard.onButton(sender: )), for: .touchDown)
+            button.addTarget(self, action: #selector(PickerKeyboard.touchUpOutsideButton(sender: )), for: .touchUpOutside)
+            button.sizeToFit()
+            // ボタンをアクセサリービュー上に設置
+            button.frame.origin.x = doneButtonX
+            button.center.y = view.center.y
+            button.autoresizingMask = [.flexibleRightMargin, .flexibleBottomMargin, .flexibleTopMargin]
+            view.addSubview(button)
+            
+            return button
+        }()
+        
+        // おまかせ選曲ボタン
+        randomButton = { () -> UIButton in
+            let button = UIButton(type: .system)
+            button.setTitle("Random", for: .normal)
+            button.addTarget(self, action: #selector(PickerKeyboard.didTapRandom(sender: )), for: .touchUpInside)
+            button.addTarget(self, action: #selector(PickerKeyboard.onButton(sender: )), for: .touchDown)
+            button.addTarget(self, action: #selector(PickerKeyboard.touchUpOutsideButton(sender: )), for: .touchUpOutside)
+            button.sizeToFit()
+            // ボタンをアクセサリービュー上に設置
+            button.frame.origin.x = doneButtonX + button.frame.width*1.2
+            button.center.y = view.center.y
+            button.autoresizingMask = [.flexibleRightMargin, .flexibleBottomMargin, .flexibleTopMargin]
+            view.addSubview(button)
+            
+            return button
+        }()
         
         return view
     }
