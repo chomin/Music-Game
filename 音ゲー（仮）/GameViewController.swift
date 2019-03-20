@@ -63,6 +63,7 @@ class GameViewController: UIViewController {
      http://qiita.com/doki_k/items/fc317dafd714967809cd
      */
     func authGoogleDriveInBrowser() {
+
         // issuerのURLを生成します。
         guard let issuer = URL(string: "https://accounts.google.com") else {
             // URLが生成できない場合、処理を終了します。
@@ -237,16 +238,18 @@ class GameViewController: UIViewController {
         
         downloadBMSs()
     }
-    
-    
-    
- 
-    
+
     override func viewDidLoad() {
         // ファイル情報リストをクリアします。
         GDFileManager.fileInfoList.removeAll(keepingCapacity: false)
-        
-        authGoogleDriveInBrowser()
+
+        let authorizer = appDelegate.googleDriveServiceDrive.authorizer
+        if authorizer?.canAuthorize == true {
+            getFileInfoList()
+        } else {
+            authGoogleDriveInBrowser()
+        }
+
         
         // 寸法に関する定数をセット
         Dimensions.createInstance(frame: view.frame)
