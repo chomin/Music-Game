@@ -311,7 +311,7 @@ class TapStart: Note {
 
 /// ロング通過位置判定ノーツ。ロング中、このノーツが通過する位置に指を置かなければならない。
 /// 初期状態ではisJudgeableがfalseであり、判定されない。先行するTapStartまたはMiddle判定後に判定可能になる。
-/// GameScene.update呼び出し時にperfect時間ならば判定する。
+/// PlayMusicScenes.update呼び出し時にperfect時間ならば判定する。
 /// perfect時間が来る前(before)、touchesMoved,touchesEnded関数呼出し時にレーンから外れた場合はその場で判定を行う。
 /// 上記のいずれの判定もされず残った場合、miss確定時間が来る前(after)にtouchesMoved,touchesEndedが呼び出され、指がレーンに入った場合はその時間で判定を行う。
 class Middle: Note {

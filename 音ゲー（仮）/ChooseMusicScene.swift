@@ -592,6 +592,17 @@ class ChooseMusicScene: SKScene {
         }
     }
     
+    func moveScene() {
+        // 移動
+        let scene = autoPlaySwitch.isOn ? AutoPlayScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[picker.selectedRow]) : GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[picker.selectedRow])
+        let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
+        skView?.showsFPS = true
+        skView?.showsNodeCount = true
+        skView?.ignoresSiblingOrder = true
+        scene.scaleMode = .resizeFill
+        skView?.presentScene(scene)  // GameSceneに移動
+    }
+    
     @objc func didTapPlayButton(_ sender : UIButton) {
         
         setting.musicName = picker.textStore
@@ -611,34 +622,13 @@ class ChooseMusicScene: SKScene {
         }
         
         let dispatchGroup = DispatchGroup()
-        // 直列キュー / attibutes指定なし
-//        let dispatchQueue = DispatchQueue.main
-        
         if mp3FilesToDownload.contains(where: {$0.name == "\(selectedMusicName).mp3"}) { // ダウンロード
             let file = mp3FilesToDownload.first(where: {$0.name == "\(selectedMusicName).mp3"})
             dispatchGroup.enter()
             GDFileManager.getFileData(fileID: file!.identifier!, group: dispatchGroup)
             
-            dispatchGroup.notify(queue: .main) {
-                // 移動
-                let scene = GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[index])
-                let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
-                skView?.showsFPS = true
-                skView?.showsNodeCount = true
-                skView?.ignoresSiblingOrder = true
-                scene.scaleMode = .resizeFill
-                skView?.presentScene(scene)  // GameSceneに移動
-            }
-        } else {
-            // 移動
-            let scene = GameScene(size: (view?.bounds.size)!, setting: setting, header: headers[index])
-            let skView = view as SKView?    // このviewはGameViewControllerのskView2
-            skView?.showsFPS = true
-            skView?.showsNodeCount = true
-            skView?.ignoresSiblingOrder = true
-            scene.scaleMode = .resizeFill
-            skView?.presentScene(scene)  // GameSceneに移動
-        }
+            dispatchGroup.notify(queue: .main) { self.moveScene() }
+        } else { moveScene() }
     }
     
 //    @objc func didTapRandomSelectButton(_ sender : UIButton) {
