@@ -44,7 +44,7 @@ class ChooseMusicScene: SKScene {
     // 初期画面のボタンなど
     var picker: PickerKeyboard!
     var playButton       = UIButton()
-//    var randomSelectButton = UIButton()
+    var offsetButton     = UIButton()
     var settingButton    = UIButton()
     var autoPlaySwitch   = UISwitch()
     var YouTubeSwitch    = UISwitch()
@@ -54,7 +54,7 @@ class ChooseMusicScene: SKScene {
     var mainButtons: [UIButton] {
         var contents: [UIButton] = []
         contents.append(playButton)
-//        contents.append(randomSelectButton)
+        contents.append(offsetButton)
         contents.append(settingButton)
         return contents
     }
@@ -230,25 +230,25 @@ class ChooseMusicScene: SKScene {
             return Button
         }()
         
-//        randomSelectButton = {() -> UIButton in
-//            let Button = UIButton()
-//
-//            Button.addTarget(self, action: #selector(didTapRandomSelectButton(_:)), for: .touchUpInside)
-//            Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
-//            Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-//            Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
-//            Button.backgroundColor = UIColor.green
-//            Button.layer.masksToBounds = true
-//            Button.setTitle("おまかせ選曲", for: UIControl.State())
-//            Button.setTitleColor(UIColor.white, for: UIControl.State())
-//            Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
-//            Button.isHidden = false
-//            Button.layer.cornerRadius = 20.0
-//            Button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72 + Button.frame.height*1.2)
-//            self.view?.addSubview(Button)
-//
-//            return Button
-//        }()
+        offsetButton = {() -> UIButton in
+            let Button = UIButton()
+
+            Button.addTarget(self, action: #selector(didTapPlayButton(_:)), for: .touchUpInside)
+            Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
+            Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+            Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
+            Button.backgroundColor = UIColor.green
+            Button.layer.masksToBounds = true
+            Button.setTitle("この曲を調整する", for: UIControl.State())
+            Button.setTitleColor(UIColor.white, for: UIControl.State())
+            Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
+            Button.isHidden = false
+            Button.layer.cornerRadius = 20.0
+            Button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72 + Button.frame.height*1.2)
+            self.view?.addSubview(Button)
+
+            return Button
+        }()
         
         settingButton = {() -> UIButton in
             let Button = UIButton()
@@ -592,14 +592,12 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-    func moveScene() {
+    func moveScene(_ scene: SKScene) {
         // 移動
-        let scene = autoPlaySwitch.isOn ? AutoPlayScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[picker.selectedRow]) : GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[picker.selectedRow])
         let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true
         skView?.ignoresSiblingOrder = true
-        scene.scaleMode = .resizeFill
         skView?.presentScene(scene)  // GameSceneに移動
     }
     
@@ -620,6 +618,16 @@ class ChooseMusicScene: SKScene {
             let insertIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
             selectedMusicName.insert(contentsOf: "BDGP", at: insertIndex)
         }
+
+        var scene = SKScene()
+        switch sender {
+        case playButton:
+            scene = autoPlaySwitch.isOn ? AutoPlayScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[picker.selectedRow]) : GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[picker.selectedRow])
+        case offsetButton:
+            scene = OffsetScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[picker.selectedRow])
+        default: break
+        }
+        scene.scaleMode = .resizeFill
         
         let dispatchGroup = DispatchGroup()
         if mp3FilesToDownload.contains(where: {$0.name == "\(selectedMusicName).mp3"}) { // ダウンロード
@@ -627,8 +635,8 @@ class ChooseMusicScene: SKScene {
             dispatchGroup.enter()
             GDFileManager.getFileData(fileID: file!.identifier!, group: dispatchGroup)
             
-            dispatchGroup.notify(queue: .main) { self.moveScene() }
-        } else { moveScene() }
+            dispatchGroup.notify(queue: .main) { self.moveScene(scene) }
+        } else { moveScene(scene) }
     }
     
 //    @objc func didTapRandomSelectButton(_ sender : UIButton) {

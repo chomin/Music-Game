@@ -30,7 +30,7 @@ class Header: Object {
     @objc dynamic var playLevel = 0     // 難易度
     @objc dynamic var volWav = 100      // 音量を現段階のn%として出力するか(TODO: 未実装)
     @objc dynamic var laneNum = 7
-    @objc dynamic var offset = 0        // 曲と譜面のずれを調整するための値（+1で曲を0.01秒早める予定） OffsetSceneでのみ変更、保存可能
+    @objc dynamic var offset = 0        // 曲と譜面のずれを調整するための値（+1でmediaOffsetTimeを+0.05する） OffsetSceneでのみ変更、保存可能
     @objc dynamic var youTubeOffset = 0
     
     /// DB上に存在しない場合にBMSから読み込み生成し、dbに保存する。db上に存在するときは作成しないこと。
