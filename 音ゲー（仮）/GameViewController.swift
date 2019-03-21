@@ -240,8 +240,6 @@ class GameViewController: UIViewController {
     
     
     
- 
-    
     override func viewDidLoad() {
         // ファイル情報リストをクリアします。
         GDFileManager.fileInfoList.removeAll(keepingCapacity: false)
