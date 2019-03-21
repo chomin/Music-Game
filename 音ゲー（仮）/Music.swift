@@ -90,6 +90,7 @@ class Music {
     var bmsNameWithExtension: String { return header.bmsNameWithExtension }
     var offset:               Int    { return header.offset               }
     var youTubeOffset:        Int    { return header.youTubeOffset        }
+    var youTubeExists:        Bool   { return header.youTubeExists        }
 
     init(header: Header, playMode: PlayMode) {
         self.header = header
@@ -119,6 +120,9 @@ class Music {
         catch { print("未知のエラー") }
     }
 
+    convenience init(music: Music, playMode: PlayMode) {
+        self.init(header: music.header, playMode: playMode)
+    }
 
     /// BMSファイルから得たノーツの中間表現からNoteオブジェクトを生成
     ///

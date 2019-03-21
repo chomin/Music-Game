@@ -32,6 +32,9 @@ class Header: Object {
     @objc dynamic var laneNum = 7
     @objc dynamic var offset = 0        // 曲と譜面のずれを調整するための値（+1でmediaOffsetTimeを+0.05する） OffsetSceneでのみ変更、保存可能
     @objc dynamic var youTubeOffset = 0
+    var youTubeExists: Bool {
+        return !(videoID.isEmpty && videoID2.isEmpty)
+    }
     
     /// DB上に存在しない場合にBMSから読み込み生成し、dbに保存する。db上に存在するときは作成しないこと。
     ///
