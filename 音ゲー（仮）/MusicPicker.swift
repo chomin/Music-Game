@@ -9,9 +9,11 @@ import UIKit
 import SpriteKit
 import Gemini
 
+
 protocol MusicPickerDelegate {
     
 }
+
 
 class MusicPicker: NSObject {
     
@@ -31,8 +33,8 @@ class MusicPicker: NSObject {
             let layout = UICollectionViewPagingFlowLayout()
             layout.scrollDirection = .vertical
             layout.itemSize = CGSize(width: 300, height: 50)
-            layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)  // cellの上下左右の余白
-            layout.minimumLineSpacing = 10
+            layout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)  // cellの上下左右の余白
+//            layout.minimumLineSpacing = 10
             layout.minimumInteritemSpacing = 10
             
             let frame = CGRect(x: 0, y: 0, width: view.frame.width / 2, height: view.frame.height)
@@ -60,12 +62,18 @@ class MusicPicker: NSObject {
     }
 }
 
+
 // UIScrollViewDelegate
 extension MusicPicker {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         collectionView.animateVisibleCells()
+        let cellItemsHeight = floor(scrollView.contentSize.height / 3.0)  // 表示したい要素群のwidthを計算
+        if (scrollView.contentOffset.y <= 0.0) || (scrollView.contentOffset.y > cellItemsHeight * 2.0) {  // スクロールした位置がしきい値を超えたら中央に戻す
+            scrollView.contentOffset.y = cellItemsHeight
+        }
     }
 }
+
 
 // Delegate を実装
 extension MusicPicker: UICollectionViewDelegate {
@@ -76,6 +84,7 @@ extension MusicPicker: UICollectionViewDelegate {
     }
 }
 
+
 // DataSourceを実装
 extension MusicPicker: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -84,13 +93,14 @@ extension MusicPicker: UICollectionViewDataSource {
     
     // セルの数を返す
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.headers.count
+        return self.headers.count * 3  // 無限スクロールのために実際の数の3倍のセルを用意
     }
     
+    // セルを作成
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MusicNameCell", for: indexPath) as! MusicNameCell
 
-        cell.titleLabel.text = self.headers[indexPath.item].title
+        cell.titleLabel.text = self.headers[indexPath.item % headers.count].title
 
         self.collectionView.animateCell(cell)
         return cell
@@ -98,9 +108,12 @@ extension MusicPicker: UICollectionViewDataSource {
     
     // cell選択時の処理
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.selectedHeader = headers[indexPath.item]
+        let index = indexPath.item % self.headers.count
+        self.selectedHeader = headers[index]
+        self.collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: true)
     }
 }
+
 
 //// Inherite GeminiCell
 class MusicNameCell: GeminiCell {

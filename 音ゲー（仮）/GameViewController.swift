@@ -246,8 +246,13 @@ class GameViewController: UIViewController {
         // ファイル情報リストをクリアします。
         GDFileManager.fileInfoList.removeAll(keepingCapacity: false)
         
-        authGoogleDriveInBrowser()
-        
+//        authGoogleDriveInBrowser()
+        let authorizer = appDelegate.googleDriveServiceDrive.authorizer
+        if authorizer?.canAuthorize == true {
+            getFileInfoList()
+        } else {
+            authGoogleDriveInBrowser()
+        }
         // 寸法に関する定数をセット
         Dimensions.createInstance(frame: view.frame)
         
