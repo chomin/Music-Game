@@ -29,44 +29,32 @@ final class UICollectionViewPagingFlowLayout: UICollectionViewFlowLayout {
 //    }
     
     override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
-        if let collectionViewBounds = self.collectionView?.bounds {
-            let halfHeightOfVC = collectionViewBounds.size.height * 0.5
-            let proposedContentOffsetCenterY = proposedContentOffset.y + halfHeightOfVC
+        if let collectionViewBounds = self.collectionView?.bounds {  // collectionView の表示領域
             
             if let attributesForVisibleCells = self.layoutAttributesForElements(in: collectionViewBounds) {
-                var candidateAttribute : UICollectionViewLayoutAttributes?
+                let halfHeightOfVC = collectionViewBounds.size.height * 0.5
+                let proposedContentOffsetCenterY = proposedContentOffset.y + halfHeightOfVC  // 補正しない場合の停止位置画面中央の offset
                 
-                for attributes in attributesForVisibleCells {
-                    let candAttr : UICollectionViewLayoutAttributes? = candidateAttribute
-                    if candAttr != nil {
-                        let a = abs(attributes.center.y - proposedContentOffsetCenterY)
-                        let b = abs(candAttr!.center.y - proposedContentOffsetCenterY)
-                        if a < b {
-                            candidateAttribute = attributes
-                        }
-                    } else {
-                        candidateAttribute = attributes
-                        continue
-                    }
-                }
-                
-                if candidateAttribute != nil {
-                    return CGPoint(x: proposedContentOffset.x, y: candidateAttribute!.center.y - halfHeightOfVC);
+                // 補正しない場合の停止位置に最も近いセルを探索
+                if let candidateAttribute = attributesForVisibleCells.min(by: {
+                    abs($0.center.y - proposedContentOffsetCenterY) < abs($1.center.y - proposedContentOffsetCenterY)
+                }) {
+                    return CGPoint(x: proposedContentOffset.x, y: candidateAttribute.center.y - halfHeightOfVC)
                 }
             }
         }
         return CGPoint.zero
     }
     
-    private var isVertical: Bool {
-        return scrollDirection == .vertical
-    }
-    
-    private var pageSize: CGFloat {
-        if isVertical {
-            return itemSize.height + minimumInteritemSpacing
-        } else {
-            return itemSize.width + minimumLineSpacing
-        }
-    }
+//    private var isVertical: Bool {
+//        return scrollDirection == .vertical
+//    }
+//
+//    private var pageSize: CGFloat {
+//        if isVertical {
+//            return itemSize.height + minimumInteritemSpacing
+//        } else {
+//            return itemSize.width + minimumLineSpacing
+//        }
+//    }
 }
