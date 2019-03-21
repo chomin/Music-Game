@@ -11,7 +11,7 @@ import GameplayKit
 import RealmSwift
 import GoogleAPIClientForREST
 
-class ChooseMusicScene: SKScene, MusicPickerDelegate {
+class ChooseMusicScene: SKScene {
     
     enum Difficulty: String {
         case cho           = "超級(4)"
@@ -126,6 +126,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
     
     var setting = Setting()
     var headers: [Header] = []
+    var selectedHeader: Header!
     var mp3FilesToDownload: [GTLRDrive_File] = []
     
     override func didMove(to view: SKView) {
@@ -190,8 +191,9 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
             if ($0.group == $1.group) { return $0.playLevel < $1.playLevel }
             return $0.group < $1.group
         })
-        
-        self.musicPicker = MusicPicker(headers: headers)
+        let selectedHeaderIndex = headers.firstIndex(where: { $0.title == setting.musicName })!
+        self.selectedHeader = headers[selectedHeaderIndex]
+        self.musicPicker = MusicPicker(headers: headers, initialIndex: selectedHeaderIndex)
         self.musicPicker.mpDelegate = self
         self.musicPicker.didMove(to: view)
         
@@ -294,7 +296,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
             label.horizontalAlignmentMode = .center
             label.position = CGPoint(x: self.frame.width * 3/4, y: self.frame.height - label.fontSize * 3/2)
             label.fontColor = SKColor.green
-            label.text = Difficulty.getDifficulty(garupaPlayLevel: musicPicker.selectedHeader.playLevel).rawValue
+            label.text = Difficulty.getDifficulty(garupaPlayLevel: selectedHeader.playLevel).rawValue
             
             self.addChild(label)
             return label
@@ -303,11 +305,11 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         selectedMusicLabel = {() -> SKLabelNode in
             let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            label.fontSize = self.frame.midX / CGFloat(musicPicker.selectedHeader.title.count)
+            label.fontSize = self.frame.midX / CGFloat(selectedHeader.title.count)
             label.horizontalAlignmentMode = .center
             label.position = CGPoint(x: self.frame.width * 3/4, y: self.frame.height * 2/3)
             label.fontColor = SKColor.black
-            label.text = musicPicker.selectedHeader.title
+            label.text = selectedHeader.title
             
             self.addChild(label)
             return label
@@ -521,32 +523,10 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
     }
     
     override func update(_ currentTime: TimeInterval) {
-        let selectedMusic = musicPicker.selectedHeader
+        musicPicker.update()
         
         speedLabel.text = String(setting.speedRatioInt) + "%"
         noteSizeLabel.text = String(setting.scaleRatioInt) + "%"
-        difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: selectedMusic.playLevel).rawValue
-        selectedMusicLabel.text = selectedMusic.title
-        selectedMusicLabel.fontSize = self.frame.midX / CGFloat(selectedMusic.title.count)
-
-        if selectedMusic.videoID.isEmpty && selectedMusic.videoID2.isEmpty {
-            youtubeSwitch.isOn = false
-            youtubeSwitch.isEnabled = false
-        } else {
-            youtubeSwitch.isOn = setting.isYouTube
-            youtubeSwitch.isEnabled = true
-        }
-        
-        let title: String = {
-            if mp3FilesToDownload.contains(where: { $0.name == selectedMusic.mp3FileName }) {
-                return "ダウンロード\nして遊ぶ"
-            } else {
-                return "この曲で遊ぶ"
-            }
-        }()
-        playButton.titleLabel?.numberOfLines = 2
-        playButton.setTitle(title, for: UIControl.State())
-        playButton.setTitle(title, for: UIControl.State.highlighted)
     }
     
     override func willMove(from view: SKView) {
@@ -557,9 +537,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
     }
     
     @objc func onClickPlayButton(_ sender : UIButton) {
-        let selectedMusic = musicPicker.selectedHeader
-        
-        setting.musicName = selectedMusic.title
+        setting.musicName = selectedHeader.title
         setting.isYouTube = youtubeSwitch.isOn
         setting.isAutoPlay = autoPlaySwitch.isOn
         setting.save()
@@ -570,7 +548,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
         
         let moveToGameScene = {
             // 移動
-            let scene = GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: selectedMusic)
+            let scene = GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.selectedHeader)
             let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
             skView?.showsFPS = true
             skView?.showsNodeCount = true
@@ -579,7 +557,7 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
             skView?.presentScene(scene)  // GameSceneに移動
         }
         
-        if let mp3File = mp3FilesToDownload.first(where: {$0.name == selectedMusic.mp3FileName}) {  // ダウンロード
+        if let mp3File = mp3FilesToDownload.first(where: {$0.name == selectedHeader.mp3FileName}) {  // ダウンロード
             dispatchGroup.enter()
             GDFileManager.getFileData(fileID: mp3File.identifier!, group: dispatchGroup)
             dispatchGroup.notify(queue: .main, execute: moveToGameScene)
@@ -713,5 +691,35 @@ class ChooseMusicScene: SKScene, MusicPickerDelegate {
     }
     @objc func fitSizeToLaneSwitchChanged(_ sender: UISwitch) {
         setting.isFitSizeToLane = sender.isOn
+    }
+}
+
+
+extension ChooseMusicScene: MusicPickerDelegate {
+    func selectedMusicDidChange(to selectedHeader: Header) {
+        self.selectedHeader = selectedHeader
+
+        difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: selectedHeader.playLevel).rawValue
+        selectedMusicLabel.text = selectedHeader.title
+        selectedMusicLabel.fontSize = self.frame.midX / CGFloat(selectedHeader.title.count)
+
+        if selectedHeader.videoID.isEmpty && selectedHeader.videoID2.isEmpty {
+            youtubeSwitch.isOn = false
+            youtubeSwitch.isEnabled = false
+        } else {
+            youtubeSwitch.isOn = setting.isYouTube
+            youtubeSwitch.isEnabled = true
+        }
+
+        let title: String = {
+            if mp3FilesToDownload.contains(where: { $0.name == selectedHeader.mp3FileName }) {
+                return "ダウンロード\nして遊ぶ"
+            } else {
+                return "この曲で遊ぶ"
+            }
+        }()
+        playButton.titleLabel?.numberOfLines = 2
+        playButton.setTitle(title, for: UIControl.State())
+        playButton.setTitle(title, for: UIControl.State.highlighted)
     }
 }
