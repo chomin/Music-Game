@@ -127,6 +127,7 @@ class ChooseMusicScene: SKScene {
     var setting = Setting()
     var headers: [Header] = []
     var selectedHeader: Header!
+    let musicSelectSoundPlayer = MusicSelectSoundPlayer()
     var mp3FilesToDownload: [GTLRDrive_File] = []
     
     override func didMove(to view: SKView) {
@@ -698,6 +699,7 @@ class ChooseMusicScene: SKScene {
 extension ChooseMusicScene: MusicPickerDelegate {
     func selectedMusicDidChange(to selectedHeader: Header) {
         self.selectedHeader = selectedHeader
+        musicSelectSoundPlayer.play()
 
         difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: selectedHeader.playLevel).rawValue
         selectedMusicLabel.text = selectedHeader.title
