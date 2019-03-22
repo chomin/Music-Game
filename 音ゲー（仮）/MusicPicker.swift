@@ -116,7 +116,7 @@ extension MusicPicker: UICollectionViewDataSource {
     // セルを作成
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MusicNameCell", for: indexPath) as! MusicNameCell
-        cell.titleLabel.text = self.headers[indexPath.item % numMusics].title
+        cell.configure(header: headers[indexPath.item % numMusics])
         self.collectionView.animateCell(cell)
 
         // Cell が一つでも生成されてないと scrollToItem() が使えないみたいなのでフラグで制御
@@ -146,14 +146,23 @@ class MusicNameCell: GeminiCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setup()
-    }
-    
-    private func setup() {
-        titleLabel = UILabel(frame: self.contentView.frame)
+        self.titleLabel = UILabel(frame: self.contentView.frame)
         titleLabel.textColor = UIColor.black
-        titleLabel.backgroundColor = .lightGray
         titleLabel.textAlignment = .center
         self.contentView.addSubview(titleLabel)
+    }
+
+    fileprivate func configure(header: Header) {
+        titleLabel.text = header.title
+
+        switch header.group {
+        case "BDGP": titleLabel.backgroundColor = UIColor(red: 1.0, green: 0.3, blue: 0.3, alpha: 0.5)
+        case "CGSS": titleLabel.backgroundColor = UIColor(red: 0.5, green: 0.7, blue: 1.0, alpha: 0.5)
+        case "MLTD": titleLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 0.0, alpha: 0.7)
+        case "ORIG": titleLabel.backgroundColor = UIColor(red: 0.5, green: 1.0, blue: 0.3, alpha: 0.7)
+        default:
+            print("unknown group")
+        }
+
     }
 }
