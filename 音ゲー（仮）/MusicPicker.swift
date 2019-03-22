@@ -67,10 +67,10 @@ class MusicPicker: NSObject {
         if let cell = collectionView.visibleCells.min(by: {
             abs($0.center.y - contentOffsetCenterY) < abs($1.center.y - contentOffsetCenterY)
         }), cell != centerCell {
-            if let indexPath = collectionView.indexPath(for: cell) {
+            if let indexPath = collectionView.indexPath(for: cell), centerCell != nil {
                 mpDelegate?.selectedMusicDidChange(to: headers[indexPath.item % numMusics])
-                self.centerCell = cell
             }
+            self.centerCell = cell
         }
     }
 
