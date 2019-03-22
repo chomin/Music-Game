@@ -250,7 +250,6 @@ class GameViewController: UIViewController {
             authGoogleDriveInBrowser()
         }
 
-        
         // 寸法に関する定数をセット
         Dimensions.createInstance(frame: view.frame)
         

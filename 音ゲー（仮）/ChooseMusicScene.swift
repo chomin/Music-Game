@@ -41,16 +41,18 @@ class ChooseMusicScene: SKScene {
         }
     }
     
+    var musicPicker: MusicPicker!
+
     // 初期画面のボタンなど
-    var picker: PickerKeyboard!
-    var playButton       = UIButton()
-//    var randomSelectButton = UIButton()
-    var settingButton    = UIButton()
-    var autoPlaySwitch   = UISwitch()
-    var YouTubeSwitch    = UISwitch()
-    var autoPlayLabel    = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "自動演奏"
-    var YouTubeLabel     = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "YouTube"
-    var difficultyLabel  = SKLabelNode(fontNamed: "HiraginoSans-W6")  // "地獄級"
+    var playButton:         UIButton!
+//    var randomSelectButton: UIButton!
+    var settingButton:      UIButton!
+    var autoPlaySwitch:     UISwitch!
+    var youtubeSwitch:      UISwitch!
+    var selectedMusicLabel: SKLabelNode!
+    var autoPlayLabel:      SKLabelNode!  // "自動演奏"
+    var youtubeLabel:       SKLabelNode!  // "YouTube"
+    var difficultyLabel:    SKLabelNode!  // "地獄級"
     var mainButtons: [UIButton] {
         var contents: [UIButton] = []
         contents.append(playButton)
@@ -62,11 +64,11 @@ class ChooseMusicScene: SKScene {
         get {
             var contents: [UIResponder] = []
             mainButtons.forEach({contents.append($0)})
-            contents.append(picker)
             contents.append(autoPlaySwitch)
-            contents.append(YouTubeSwitch)
+            contents.append(youtubeSwitch)
+            contents.append(selectedMusicLabel)
             contents.append(autoPlayLabel)
-            contents.append(YouTubeLabel)
+            contents.append(youtubeLabel)
             contents.append(difficultyLabel)
             return contents
         }
@@ -130,20 +132,22 @@ class ChooseMusicScene: SKScene {
     var sizesPosY:  CGFloat!
     
     var setting = Setting()
-    var headers: [Header] = []    // picker.selectedRowとindexを対応させる
+    var headers: [Header] = []
+    var selectedHeader: Header!
+    let musicSelectSoundPlayer = MusicSelectSoundPlayer()
     var mp3FilesToDownload: [GTLRDrive_File] = []
     
     override func didMove(to view: SKView) {
         
-        speedsPosY = Dimensions.iconButtonSize*3
-        sizesPosY  = speedsPosY*2
+        speedsPosY = Dimensions.iconButtonSize * 3
+        sizesPosY  = speedsPosY * 2
         
         backgroundColor = .white
         
         do {
             // クラウドストレージの更新確認(mp3)
-            for file in GDFileManager.mp3FileList {
-                if !file.isDownloaded() || file.isRenewed() { mp3FilesToDownload.append(file) }
+            mp3FilesToDownload += GDFileManager.mp3FileList.filter { file in
+                !file.isDownloaded() || file.isRenewed()
             }
             
             // Headerについて、/Library/Cachesのbmsファイル探索→db更新→読み込み
@@ -192,82 +196,77 @@ class ChooseMusicScene: SKScene {
         
         // ソート
         headers.sort(by: {
-            
             if ($0.group == $1.group) { return $0.playLevel < $1.playLevel }
-            
             return $0.group < $1.group
-            
         })
-        
-        // ピッカーキーボードの設置
-        let rect = CGRect(origin:CGPoint(x:self.frame.midX - self.frame.width/6,y:self.frame.height/3) ,size:CGSize(width:self.frame.width/3 ,height:50))
-        picker = PickerKeyboard(frame: rect, firstText: setting.musicName, headers: headers)
-        picker.backgroundColor = .gray
-        picker.isHidden = false
-        picker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)
-        
-        self.view?.addSubview(picker!)
+        let selectedHeaderIndex = headers.firstIndex(where: { $0.title == setting.musicName })!
+        self.selectedHeader = headers[selectedHeaderIndex]
+        self.musicPicker = MusicPicker(headers: headers, initialIndex: selectedHeaderIndex)
+        self.musicPicker.mpDelegate = self
+        self.musicPicker.didMove(to: view)
         
         
         /*--------- ボタンなどの設定 ---------*/
         // 初期画面のボタン
         playButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.addTarget(self, action: #selector(didTapPlayButton(_:)), for: .touchUpInside)
-            Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
-            Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-            Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
-            Button.backgroundColor = UIColor.red
-            Button.layer.masksToBounds = true
-            Button.setTitleColor(UIColor.white, for: UIControl.State())
-            Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
-            Button.isHidden = false
-            Button.layer.cornerRadius = 20.0
-            Button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72)
-            self.view?.addSubview(Button)
+            button.addTarget(self, action: #selector(didTapPlayButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
+            button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+            button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
+            button.backgroundColor = UIColor.red
+            button.layer.masksToBounds = true
+            button.setTitleColor(UIColor.white, for: UIControl.State())
+            button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
+            button.isHidden = false
+            button.layer.cornerRadius = 20.0
+            button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/4, y: self.frame.height * 4/5)
+            self.view?.addSubview(button)
             
-            return Button
+            return button
         }()
         
 //        randomSelectButton = {() -> UIButton in
-//            let Button = UIButton()
+//            let button = UIButton()
 //
-//            Button.addTarget(self, action: #selector(didTapRandomSelectButton(_:)), for: .touchUpInside)
-//            Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
-//            Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-//            Button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
-//            Button.backgroundColor = UIColor.green
-//            Button.layer.masksToBounds = true
-//            Button.setTitle("おまかせ選曲", for: UIControl.State())
-//            Button.setTitleColor(UIColor.white, for: UIControl.State())
-//            Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
-//            Button.isHidden = false
-//            Button.layer.cornerRadius = 20.0
-//            Button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72 + Button.frame.height*1.2)
-//            self.view?.addSubview(Button)
+//            button.addTarget(self, action: #selector(didTapRandomSelectButton(_:)), for: .touchUpInside)
+//            button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
+//            button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+//            button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
+//            button.backgroundColor = UIColor.green
+//            button.layer.masksToBounds = true
+//            button.setTitle("おまかせ選曲", for: UIControl.State())
+//            button.setTitleColor(UIColor.white, for: UIControl.State())
+//            button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
+//            button.isHidden = false
+//            button.layer.cornerRadius = 20.0
+//            button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72 + Button.frame.height*1.2)
+//            self.view?.addSubview(button)
 //
-//            return Button
+//            return button
 //        }()
         
         settingButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(settingImage, for: .normal)
-            Button.setImage(settingImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapSettingButton(_:)), for: .touchUpInside)
-            Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
-            Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-            
-            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)// yは上からの座標
-            Button.isHidden = false
-            self.view?.addSubview(Button)
-            return Button
+            button.setImage(settingImage, for: .normal)
+            button.setImage(settingImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(didTapSettingButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
+            button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+            button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize,
+                                  y: 0,
+                                  width: Dimensions.iconButtonSize,
+                                  height: Dimensions.iconButtonSize)  // yは上からの座標
+            button.isHidden = false
+            self.view?.addSubview(button)
+            return button
         }()
         
-        YouTubeSwitch = {() -> UISwitch in
+        youtubeSwitch = {() -> UISwitch in
             let swicth: UISwitch = UISwitch()
-            swicth.layer.position = CGPoint(x: self.frame.width/4, y: self.frame.height/3)
+            swicth.layer.position = CGPoint(x: self.frame.width * 4/5, y: self.frame.height * 1/2)
             swicth.tintColor = .black   // Swicthの枠線を表示する.
             swicth.isOn = setting.isYouTube
             swicth.addTarget(self, action: #selector(youTubeSwitchChanged(_:)), for: .valueChanged)
@@ -278,7 +277,7 @@ class ChooseMusicScene: SKScene {
         
         autoPlaySwitch = {() -> UISwitch in
             let swicth: UISwitch = UISwitch()
-            swicth.layer.position = CGPoint(x: self.frame.width/4, y: self.frame.height/3 + swicth.bounds.height*1.5)
+            swicth.layer.position = CGPoint(x: self.frame.width * 4/5, y: self.frame.height * 1/2 + swicth.bounds.height * 1.5)
             swicth.tintColor = .black   // Swicthの枠線を表示する.
             swicth.isOn = setting.isAutoPlay
             swicth.addTarget(self, action: #selector(autoPlaySwitchChanged(_:)), for: .valueChanged)
@@ -288,156 +287,169 @@ class ChooseMusicScene: SKScene {
         }()
         
         // スイッチの種類を示すラベル(スイッチに連動させるため、スイッチの設定後に行うこと)
-        YouTubeLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+        youtubeLabel = {() -> SKLabelNode in
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = YouTubeSwitch.bounds.height*2/3
-            Label.horizontalAlignmentMode = .right // 右寄せ
-            Label.position = convertPoint(fromView: YouTubeSwitch.layer.position)   // view形式の座標をscene形式に変換
-            Label.position.x -= YouTubeSwitch.bounds.width/2
-            Label.position.y -= YouTubeSwitch.bounds.height/5
-            Label.fontColor = SKColor.black
-            Label.text = "YouTube:"
+            label.fontSize = youtubeSwitch.bounds.height * 2/3
+            label.horizontalAlignmentMode = .right // 右寄せ
+            label.position = convertPoint(fromView: youtubeSwitch.layer.position)   // view形式の座標をscene形式に変換
+            label.position.x -= youtubeSwitch.bounds.width/2
+            label.position.y -= youtubeSwitch.bounds.height/5
+            label.fontColor = SKColor.black
+            label.text = "YouTube:"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         autoPlayLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = autoPlaySwitch.bounds.height*2/3
-            Label.horizontalAlignmentMode = .right // 右寄せ
-            Label.position = convertPoint(fromView: autoPlaySwitch.layer.position)
-            Label.position.x -= autoPlaySwitch.bounds.width/2
-            Label.position.y -= autoPlaySwitch.bounds.height/5
-            Label.fontColor = SKColor.black
-            Label.text = "自動演奏:"
+            label.fontSize = autoPlaySwitch.bounds.height * 2/3
+            label.horizontalAlignmentMode = .right // 右寄せ
+            label.position = convertPoint(fromView: autoPlaySwitch.layer.position)
+            label.position.x -= autoPlaySwitch.bounds.width/2
+            label.position.y -= autoPlaySwitch.bounds.height/5
+            label.fontColor = SKColor.black
+            label.text = "自動演奏:"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         difficultyLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = self.frame.height/10
-            Label.horizontalAlignmentMode = .center
-            Label.position = CGPoint(x: self.frame.width/2, y: self.frame.height/2 + Label.fontSize*2)
-            Label.fontColor = SKColor.green
-            Label.text = Difficulty.getDifficulty(garupaPlayLevel: headers[picker!.selectedRow].playLevel).rawValue
+            label.fontSize = self.frame.height/10
+            label.horizontalAlignmentMode = .center
+            label.position = CGPoint(x: self.frame.width * 3/4, y: self.frame.height - label.fontSize * 3/2)
+            label.fontColor = SKColor.green
+            label.text = Difficulty.getDifficulty(garupaPlayLevel: selectedHeader.playLevel).rawValue
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
+        }()
+        
+        selectedMusicLabel = {() -> SKLabelNode in
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            
+            label.fontSize = self.frame.midX / CGFloat(selectedHeader.title.count)
+            label.horizontalAlignmentMode = .center
+            label.position = CGPoint(x: self.frame.width * 3/4, y: self.frame.height * 2/3)
+            label.fontColor = SKColor.black
+            label.text = selectedHeader.title
+            
+            self.addChild(label)
+            return label
         }()
         
         // 設定画面のボタン
         spPlusButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(plusImage, for: .normal)
-            Button.setImage(plusImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapSPPlusButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(plusImage, for: .normal)
+            button.setImage(plusImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(didTapSPPlusButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         spPlus10Button = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(plus10Image, for: .normal)
-            Button.setImage(plus10ImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapSPPlus10Button(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(plus10Image, for: .normal)
+            button.setImage(plus10ImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(didTapSPPlus10Button(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         spMinusButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(minusImage, for: .normal)
-            Button.setImage(minusImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapSPMinusButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(minusImage, for: .normal)
+            button.setImage(minusImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(didTapSPMinusButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         spMinus10Button = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(minus10Image, for: .normal)
-            Button.setImage(minus10ImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapSPMinus10Button(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(minus10Image, for: .normal)
+            button.setImage(minus10ImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(didTapSPMinus10Button(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         siPlusButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(plusImage, for: .normal)
-            Button.setImage(plusImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapSIPlusButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(plusImage, for: .normal)
+            button.setImage(plusImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(didTapSIPlusButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         siPlus10Button = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(plus10Image, for: .normal)
-            Button.setImage(plus10ImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapSIPlus10Button(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(plus10Image, for: .normal)
+            button.setImage(plus10ImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(didTapSIPlus10Button(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         siMinusButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(minusImage, for: .normal)
-            Button.setImage(minusImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapSIMinusButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(minusImage, for: .normal)
+            button.setImage(minusImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(didTapSIMinusButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         siMinus10Button = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(minus10Image, for: .normal)
-            Button.setImage(minus10ImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapSIMinus10Button(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(minus10Image, for: .normal)
+            button.setImage(minus10ImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(didTapSIMinus10Button(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         saveAndBackButton = {() -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
             
-            Button.setImage(saveAndBackImage, for: .normal)
-            Button.setImage(saveAndBackImageSelected, for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapSaveAndBackButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.width*9.4/10, y: self.frame.height - Dimensions.iconButtonSize, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
-            self.view?.addSubview(Button)
-            Button.isHidden = true
-            return Button
+            button.setImage(saveAndBackImage, for: .normal)
+            button.setImage(saveAndBackImageSelected, for: .highlighted)
+            button.addTarget(self, action: #selector(didTapSaveAndBackButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.width*9.4/10, y: self.frame.height - Dimensions.iconButtonSize, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
+            self.view?.addSubview(button)
+            button.isHidden = true
+            return button
         }()
         
         fitSizeToLaneSwitch = {() -> UISwitch in
@@ -455,189 +467,130 @@ class ChooseMusicScene: SKScene {
         
         // ラベルの設定
         settingLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = self.frame.height/13
-            Label.horizontalAlignmentMode = .center //中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - settingLabel.fontSize*3/2)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
-            Label.text = "設定画面"
+            label.fontSize = self.frame.height/13
+            label.horizontalAlignmentMode = .center //中央寄せ
+            label.position = CGPoint(x:self.frame.midX, y:self.frame.height - settingLabel.fontSize*3/2)
+            label.fontColor = SKColor.black
+            label.isHidden = true
+            label.text = "設定画面"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         speedLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = Dimensions.iconButtonSize * 0.8
-            Label.horizontalAlignmentMode = .center//中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY - Dimensions.iconButtonSize*0.8)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
+            label.fontSize = Dimensions.iconButtonSize * 0.8
+            label.horizontalAlignmentMode = .center//中央寄せ
+            label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY - Dimensions.iconButtonSize*0.8)
+            label.fontColor = SKColor.black
+            label.isHidden = true
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         speedTitleLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = Dimensions.iconButtonSize * 0.6
-            Label.horizontalAlignmentMode = .center //中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
-            Label.text = "速さ"
+            label.fontSize = Dimensions.iconButtonSize * 0.6
+            label.horizontalAlignmentMode = .center //中央寄せ
+            label.position = CGPoint(x:self.frame.midX, y:self.frame.height - speedsPosY)
+            label.fontColor = SKColor.black
+            label.isHidden = true
+            label.text = "速さ"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         noteSizeLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = Dimensions.iconButtonSize * 0.8
-            Label.horizontalAlignmentMode = .center//中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - sizesPosY - Dimensions.iconButtonSize*0.8)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
+            label.fontSize = Dimensions.iconButtonSize * 0.8
+            label.horizontalAlignmentMode = .center  // 中央寄せ
+            label.position = CGPoint(x:self.frame.midX, y:self.frame.height - sizesPosY - Dimensions.iconButtonSize*0.8)
+            label.fontColor = SKColor.black
+            label.isHidden = true
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         noteSizeTitleLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = Dimensions.iconButtonSize * 0.6
-            Label.horizontalAlignmentMode = .center //中央寄せ
-            Label.position = CGPoint(x:self.frame.midX, y:self.frame.height - sizesPosY)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
-            Label.text = "大きさ"
+            label.fontSize = Dimensions.iconButtonSize * 0.6
+            label.horizontalAlignmentMode = .center  // 中央寄せ
+            label.position = CGPoint(x:self.frame.midX, y:self.frame.height - sizesPosY)
+            label.fontColor = SKColor.black
+            label.isHidden = true
+            label.text = "大きさ"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
         
         fstlSwitchLabel = {() -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
             
-            Label.fontSize = Dimensions.iconButtonSize * 0.3
-            Label.horizontalAlignmentMode = .center //中央寄せ
-            Label.position = CGPoint(x:self.frame.midX + Dimensions.iconButtonSize*5.5, y:self.frame.height - sizesPosY)
-            Label.fontColor = SKColor.black
-            Label.isHidden = true
-            Label.numberOfLines = 2
-            Label.text = "ノーツの大きさを\nレーン幅に合わせる"
+            label.fontSize = Dimensions.iconButtonSize * 0.3
+            label.horizontalAlignmentMode = .center  // 中央寄せ
+            label.position = CGPoint(x: self.frame.midX + Dimensions.iconButtonSize*5.5, y: self.frame.height - sizesPosY)
+            label.fontColor = SKColor.black
+            label.isHidden = true
+            label.numberOfLines = 2
+            label.text = "ノーツの大きさを\nレーン幅に合わせる"
             
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
     }
     
     override func update(_ currentTime: TimeInterval) {
+        musicPicker.update()
         
         speedLabel.text = String(setting.speedRatioInt) + "%"
         noteSizeLabel.text = String(setting.scaleRatioInt) + "%"
-        difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: headers[picker!.selectedRow].playLevel).rawValue
-        
-        guard picker != nil else { return }
-        
-        if headers[picker.selectedRow].videoID.isEmpty && headers[picker.selectedRow].videoID2.isEmpty {
-            YouTubeSwitch.isOn = false
-            YouTubeSwitch.isEnabled = false
-        } else {
-            YouTubeSwitch.isOn = setting.isYouTube
-            YouTubeSwitch.isEnabled = true
-        }
-        
-        var selectedMusicName = headers[picker.selectedRow].title
-        if selectedMusicName.hasSuffix("(expert)") || selectedMusicName.hasSuffix("(special)") { // BDGP曲で新たな難易度を実装する際には適宜追加
-            let startIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
-            let lastIndex  = selectedMusicName.index(before: selectedMusicName.lastIndex(of: ")")!)
-            selectedMusicName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
-            let insertIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
-            selectedMusicName.insert(contentsOf: "BDGP", at: insertIndex)
-        }
-        
-        var title = ""
-        if mp3FilesToDownload.contains(where: {$0.name == "\(selectedMusicName).mp3"}) {
-            title =
-            """
-            ダウンロード
-            して遊ぶ
-            """
-        } else {
-            title = "この曲で遊ぶ"
-        }
-        playButton.titleLabel?.numberOfLines = 2
-        playButton.setTitle(title, for: UIControl.State())
-        playButton.setTitle(title, for: UIControl.State.highlighted)
-        
-        
     }
     
     override func willMove(from view: SKView) {
         // 消す
         hideMainContents()
-        picker.resignFirstResponder()   // FirstResponderを放棄
-    }
-    
-    func enableButtons() {
-        for button in mainButtons {
-            button.isEnabled = true
-        }
+        musicPicker.removeFromParent()
+//        picker.resignFirstResponder()   // FirstResponderを放棄
     }
     
     @objc func didTapPlayButton(_ sender : UIButton) {
-        
-        setting.musicName = picker.textStore
-        setting.isYouTube = YouTubeSwitch.isOn
+        setting.musicName = selectedHeader.title
+        setting.isYouTube = youtubeSwitch.isOn
         setting.isAutoPlay = autoPlaySwitch.isOn
         setting.save()
-        
-        let index = picker.selectedRow
-        
-        var selectedMusicName = headers[index].title
-        if selectedMusicName.hasSuffix("(expert)") || selectedMusicName.hasSuffix("(special)") {
-            let startIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
-            let lastIndex  = selectedMusicName.index(before: selectedMusicName.lastIndex(of: ")")!)
-            selectedMusicName.removeSubrange(startIndex ... lastIndex)                            // "曲名()"になる
-            let insertIndex = selectedMusicName.index(after:  selectedMusicName.lastIndex(of: "(")!)
-            selectedMusicName.insert(contentsOf: "BDGP", at: insertIndex)
-        }
         
         let dispatchGroup = DispatchGroup()
         // 直列キュー / attibutes指定なし
 //        let dispatchQueue = DispatchQueue.main
         
-        if mp3FilesToDownload.contains(where: {$0.name == "\(selectedMusicName).mp3"}) { // ダウンロード
-            let file = mp3FilesToDownload.first(where: {$0.name == "\(selectedMusicName).mp3"})
-            dispatchGroup.enter()
-            GDFileManager.getFileData(fileID: file!.identifier!, group: dispatchGroup)
-            
-            dispatchGroup.notify(queue: .main) {
-                // 移動
-                let scene = GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.headers[index])
-                let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
-                skView?.showsFPS = true
-                skView?.showsNodeCount = true
-                skView?.ignoresSiblingOrder = true
-                scene.scaleMode = .resizeFill
-                skView?.presentScene(scene)  // GameSceneに移動
-            }
-        } else {
+        let moveToGameScene = {
             // 移動
-            let scene = GameScene(size: (view?.bounds.size)!, setting: setting, header: headers[index])
-            let skView = view as SKView?    // このviewはGameViewControllerのskView2
+            let scene = GameScene(size: (self.view?.bounds.size)!, setting: self.setting, header: self.selectedHeader)
+            let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
             skView?.showsFPS = true
             skView?.showsNodeCount = true
             skView?.ignoresSiblingOrder = true
             scene.scaleMode = .resizeFill
             skView?.presentScene(scene)  // GameSceneに移動
+        }
+        
+        if let mp3File = mp3FilesToDownload.first(where: {$0.name == selectedHeader.mp3FileName}) {  // ダウンロード
+            dispatchGroup.enter()
+            GDFileManager.getFileData(fileID: mp3File.identifier!, group: dispatchGroup)
+            dispatchGroup.notify(queue: .main, execute: moveToGameScene)
+        } else {
+            moveToGameScene()
         }
     }
     
@@ -777,19 +730,35 @@ class ChooseMusicScene: SKScene {
     @objc func fitSizeToLaneSwitchChanged(_ sender: UISwitch) {
         setting.isFitSizeToLane = sender.isOn
     }
-    
-    // picker
-    /// 呼び出される条件が不明
-    ///
-    /// - Parameter sender: <#sender description#>
-    @objc func pickerChanged(_ sender: PickerKeyboard) {
-//        setting.musicName = sender.textStore
-//        if headers[sender.selectedRow].videoID == "" && headers[sender.selectedRow].videoID2 == "" {
-//            YouTubeSwitch.isOn = false
-//            YouTubeSwitch.isEnabled = false
-//        } else {
-//            YouTubeSwitch.isEnabled = true
-//            print(headers[sender.selectedRow].videoID)
-//        }
+}
+
+
+extension ChooseMusicScene: MusicPickerDelegate {
+    func selectedMusicDidChange(to selectedHeader: Header) {
+        self.selectedHeader = selectedHeader
+        musicSelectSoundPlayer.play()
+
+        difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: selectedHeader.playLevel).rawValue
+        selectedMusicLabel.text = selectedHeader.title
+        selectedMusicLabel.fontSize = self.frame.midX / CGFloat(selectedHeader.title.count)
+
+        if selectedHeader.videoID.isEmpty && selectedHeader.videoID2.isEmpty {
+            youtubeSwitch.isOn = false
+            youtubeSwitch.isEnabled = false
+        } else {
+            youtubeSwitch.isOn = setting.isYouTube
+            youtubeSwitch.isEnabled = true
+        }
+
+        let title: String = {
+            if mp3FilesToDownload.contains(where: { $0.name == selectedHeader.mp3FileName }) {
+                return "ダウンロード\nして遊ぶ"
+            } else {
+                return "この曲で遊ぶ"
+            }
+        }()
+        playButton.titleLabel?.numberOfLines = 2
+        playButton.setTitle(title, for: UIControl.State())
+        playButton.setTitle(title, for: UIControl.State.highlighted)
     }
 }

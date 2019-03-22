@@ -208,3 +208,29 @@ class ActionSoundPlayers {
         kara2.stop()
     }
 }
+
+class MusicSelectSoundPlayer {
+    private let source1: SoundSource
+    private let source2: SoundSource
+    private let source3: SoundSource
+    private let source4: SoundSource
+
+    init() {
+        alureInitDevice(nil, nil)
+        
+        // サウンドファイルのパスを生成
+        let path = Bundle.main.path(forResource: "Sounds/music_select", ofType: "wav")!     // mp3,m4a,ogg は不可
+        
+        source1 = SoundSource(fullFilePath: path) ?? SoundSource()
+        source2 = SoundSource(fullFilePath: path) ?? SoundSource()
+        source3 = SoundSource(fullFilePath: path) ?? SoundSource()
+        source4 = SoundSource(fullFilePath: path) ?? SoundSource()
+    }
+    
+    func play() {
+        if      !source1.isPlaying { source1.play() }
+        else if !source2.isPlaying { source2.play() }
+        else if !source3.isPlaying { source3.play() }
+        else if !source4.isPlaying { source4.play() }
+    }
+}
