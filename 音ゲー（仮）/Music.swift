@@ -122,7 +122,9 @@ class Music {
     ///
     /// - Parameter userSpeedRatio: ユーザー設定によるスピード倍率
     /// - Returns: 単ノーツ及びロングノーツの始点にあたるNoteオブジェクトの配列
-    func generateNotes(setting: Setting, duration: TimeInterval) -> [Note] {
+    func generateNotes(duration: TimeInterval) -> [Note] {
+
+        let setting = Setting.instance
 
         guard !BPMs.isEmpty else {
             print("空のBPM配列")
