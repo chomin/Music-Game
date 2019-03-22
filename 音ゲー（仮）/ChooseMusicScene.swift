@@ -45,6 +45,7 @@ class ChooseMusicScene: SKScene {
 
     // 初期画面のボタンなど
     var playButton:         UIButton!
+//    var randomSelectButton: UIButton!
     var settingButton:      UIButton!
     var autoPlaySwitch:     UISwitch!
     var youtubeSwitch:      UISwitch!
@@ -52,11 +53,17 @@ class ChooseMusicScene: SKScene {
     var autoPlayLabel:      SKLabelNode!  // "自動演奏"
     var youtubeLabel:       SKLabelNode!  // "YouTube"
     var difficultyLabel:    SKLabelNode!  // "地獄級"
+    var mainButtons: [UIButton] {
+        var contents: [UIButton] = []
+        contents.append(playButton)
+//        contents.append(randomSelectButton)
+        contents.append(settingButton)
+        return contents
+    }
     var mainContents: [UIResponder] {
         get {
             var contents: [UIResponder] = []
-            contents.append(playButton)
-            contents.append(settingButton)
+            mainButtons.forEach({contents.append($0)})
             contents.append(autoPlaySwitch)
             contents.append(youtubeSwitch)
             contents.append(selectedMusicLabel)
@@ -204,8 +211,8 @@ class ChooseMusicScene: SKScene {
         playButton = {() -> UIButton in
             let button = UIButton()
             
-            button.addTarget(self, action: #selector(onClickPlayButton(_:)), for: .touchUpInside)
-            button.addTarget(self, action: #selector(onPlayButton(_:)), for: .touchDown)
+            button.addTarget(self, action: #selector(didTapPlayButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
             button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
             button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
             button.backgroundColor = UIColor.red
@@ -220,13 +227,33 @@ class ChooseMusicScene: SKScene {
             return button
         }()
         
+//        randomSelectButton = {() -> UIButton in
+//            let button = UIButton()
+//
+//            button.addTarget(self, action: #selector(didTapRandomSelectButton(_:)), for: .touchUpInside)
+//            button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
+//            button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+//            button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
+//            button.backgroundColor = UIColor.green
+//            button.layer.masksToBounds = true
+//            button.setTitle("おまかせ選曲", for: UIControl.State())
+//            button.setTitleColor(UIColor.white, for: UIControl.State())
+//            button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
+//            button.isHidden = false
+//            button.layer.cornerRadius = 20.0
+//            button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72 + Button.frame.height*1.2)
+//            self.view?.addSubview(button)
+//
+//            return button
+//        }()
+        
         settingButton = {() -> UIButton in
             let button = UIButton()
             
             button.setImage(settingImage, for: .normal)
             button.setImage(settingImageSelected, for: .highlighted)
-            button.addTarget(self, action: #selector(onClickSettingButton(_:)), for: .touchUpInside)
-            button.addTarget(self, action: #selector(onSettingButton(_:)), for: .touchDown)
+            button.addTarget(self, action: #selector(didTapSettingButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
             button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
             button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize,
                                   y: 0,
@@ -322,7 +349,7 @@ class ChooseMusicScene: SKScene {
             
             button.setImage(plusImage, for: .normal)
             button.setImage(plusImageSelected, for: .highlighted)
-            button.addTarget(self, action: #selector(onClickSPPlusButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(didTapSPPlusButton(_:)), for: .touchUpInside)
             button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(button)
             button.isHidden = true
@@ -334,7 +361,7 @@ class ChooseMusicScene: SKScene {
             
             button.setImage(plus10Image, for: .normal)
             button.setImage(plus10ImageSelected, for: .highlighted)
-            button.addTarget(self, action: #selector(onClickSPPlus10Button(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(didTapSPPlus10Button(_:)), for: .touchUpInside)
             button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(button)
             button.isHidden = true
@@ -346,7 +373,7 @@ class ChooseMusicScene: SKScene {
             
             button.setImage(minusImage, for: .normal)
             button.setImage(minusImageSelected, for: .highlighted)
-            button.addTarget(self, action: #selector(onClickSPMinusButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(didTapSPMinusButton(_:)), for: .touchUpInside)
             button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(button)
             button.isHidden = true
@@ -358,7 +385,7 @@ class ChooseMusicScene: SKScene {
             
             button.setImage(minus10Image, for: .normal)
             button.setImage(minus10ImageSelected, for: .highlighted)
-            button.addTarget(self, action: #selector(onClickSPMinus10Button(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(didTapSPMinus10Button(_:)), for: .touchUpInside)
             button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: speedsPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(button)
             button.isHidden = true
@@ -370,7 +397,7 @@ class ChooseMusicScene: SKScene {
             
             button.setImage(plusImage, for: .normal)
             button.setImage(plusImageSelected, for: .highlighted)
-            button.addTarget(self, action: #selector(onClickSIPlusButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(didTapSIPlusButton(_:)), for: .touchUpInside)
             button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*1.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(button)
             button.isHidden = true
@@ -382,7 +409,7 @@ class ChooseMusicScene: SKScene {
             
             button.setImage(plus10Image, for: .normal)
             button.setImage(plus10ImageSelected, for: .highlighted)
-            button.addTarget(self, action: #selector(onClickSIPlus10Button(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(didTapSIPlus10Button(_:)), for: .touchUpInside)
             button.frame = CGRect(x: self.frame.midX + Dimensions.iconButtonSize*2.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(button)
             button.isHidden = true
@@ -394,7 +421,7 @@ class ChooseMusicScene: SKScene {
             
             button.setImage(minusImage, for: .normal)
             button.setImage(minusImageSelected, for: .highlighted)
-            button.addTarget(self, action: #selector(onClickSIMinusButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(didTapSIMinusButton(_:)), for: .touchUpInside)
             button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*2.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(button)
             button.isHidden = true
@@ -406,7 +433,7 @@ class ChooseMusicScene: SKScene {
             
             button.setImage(minus10Image, for: .normal)
             button.setImage(minus10ImageSelected, for: .highlighted)
-            button.addTarget(self, action: #selector(onClickSIMinus10Button(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(didTapSIMinus10Button(_:)), for: .touchUpInside)
             button.frame = CGRect(x: self.frame.midX - Dimensions.iconButtonSize*3.5, y: sizesPosY, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(button)
             button.isHidden = true
@@ -418,7 +445,7 @@ class ChooseMusicScene: SKScene {
             
             button.setImage(saveAndBackImage, for: .normal)
             button.setImage(saveAndBackImageSelected, for: .highlighted)
-            button.addTarget(self, action: #selector(onClickSaveAndBackButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(didTapSaveAndBackButton(_:)), for: .touchUpInside)
             button.frame = CGRect(x: self.frame.width*9.4/10, y: self.frame.height - Dimensions.iconButtonSize, width:Dimensions.iconButtonSize, height: Dimensions.iconButtonSize)//yは上からの座標
             self.view?.addSubview(button)
             button.isHidden = true
@@ -537,7 +564,7 @@ class ChooseMusicScene: SKScene {
 //        picker.resignFirstResponder()   // FirstResponderを放棄
     }
     
-    @objc func onClickPlayButton(_ sender : UIButton) {
+    @objc func didTapPlayButton(_ sender : UIButton) {
         setting.musicName = selectedHeader.title
         setting.isYouTube = youtubeSwitch.isOn
         setting.isAutoPlay = autoPlaySwitch.isOn
@@ -566,6 +593,14 @@ class ChooseMusicScene: SKScene {
             moveToGameScene()
         }
     }
+    
+//    @objc func didTapRandomSelectButton(_ sender : UIButton) {
+//        if let pickerView = picker.inputView as? UIPickerView {
+//            pickerView.selectRow(Int.random(in: 0..<picker.musicNameArray.count), inComponent: 0, animated: false)
+//        } else {
+//            print("ダウンキャスト失敗")
+//        }
+//    }
     
     func showMainContents() {
         for content in mainContents {
@@ -622,47 +657,47 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-    @objc func onClickSettingButton(_ sender : UIButton) {
+    @objc func didTapSettingButton(_ sender : UIButton) {
         
         hideMainContents()
         showSettingContents()
     }
     
-    @objc func onClickSPPlusButton(_ sender : UIButton) {
+    @objc func didTapSPPlusButton(_ sender : UIButton) {
         setting.speedRatioInt += 1
     }
     
-    @objc func onClickSPPlus10Button(_ sender : UIButton) {
+    @objc func didTapSPPlus10Button(_ sender : UIButton) {
         setting.speedRatioInt += 10
     }
     
-    @objc func onClickSPMinusButton(_ sender : UIButton) {
+    @objc func didTapSPMinusButton(_ sender : UIButton) {
         if setting.speedRatioInt > 0 { setting.speedRatioInt -= 1 }
     }
     
-    @objc func onClickSPMinus10Button(_ sender : UIButton) {
+    @objc func didTapSPMinus10Button(_ sender : UIButton) {
         if setting.speedRatioInt > 10 { setting.speedRatioInt -= 10 }
         else 			              { setting.speedRatioInt  =  0 }
     }
     
-    @objc func onClickSIPlusButton(_ sender : UIButton) {
+    @objc func didTapSIPlusButton(_ sender : UIButton) {
         setting.scaleRatioInt += 1
     }
     
-    @objc func onClickSIPlus10Button(_ sender : UIButton) {
+    @objc func didTapSIPlus10Button(_ sender : UIButton) {
         setting.scaleRatioInt += 10
     }
     
-    @objc func onClickSIMinusButton(_ sender : UIButton) {
+    @objc func didTapSIMinusButton(_ sender : UIButton) {
         if setting.scaleRatioInt > 0 { setting.scaleRatioInt -= 1 }
     }
     
-    @objc func onClickSIMinus10Button(_ sender : UIButton) {
+    @objc func didTapSIMinus10Button(_ sender : UIButton) {
         if setting.scaleRatioInt > 10 { setting.scaleRatioInt -= 10 }
         else                             { setting.scaleRatioInt  =  0 }
     }
     
-    @objc func onClickSaveAndBackButton(_ sender : UIButton) {
+    @objc func didTapSaveAndBackButton(_ sender : UIButton) {
         //保存
         setting.save()
         
@@ -672,15 +707,17 @@ class ChooseMusicScene: SKScene {
     }
     
     // 同時押し対策
-    @objc func onSettingButton(_ sender : UIButton) {
-        playButton.isEnabled = false
+    @objc func onButton(_ sender : UIButton) {
+        for button in mainButtons {
+            guard button != sender else { continue }
+            button.isEnabled = false
+        }
     }
-    @objc func onPlayButton(_ sender : UIButton) {
-        settingButton.isEnabled = false
-    }
+    
     @objc func touchUpOutsideButton(_ sender : UIButton) {
-        playButton.isEnabled = true
-        settingButton.isEnabled = true
+        for button in mainButtons {
+            button.isEnabled = true
+        }
     }
     
     // switch

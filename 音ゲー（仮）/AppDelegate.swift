@@ -78,7 +78,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         googleDriveServiceDrive.authorizer = googleDriveAuthorization
         // GoogleDriveサインイン状態を変更する。
         googleDriveSignInStateChanged()
-        
     }
     
     /**
