@@ -98,24 +98,22 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ。一定
     var lanes: [Lane] = []      // レーン
     
-    var setting: Setting
+    let setting = Setting.instance
     
     var result = Result()
     
-    init(size: CGSize, setting: Setting, header: Header) {
+    init(size: CGSize, header: Header) {
 
         self.playMode = setting.playMode
         self.isAutoPlay = setting.isAutoPlay
-        self.setting = setting
         self.music = Music(header: header, playMode: setting.playMode)
 
         super.init(size: size)
     }
-    init(size: CGSize, setting: Setting, music: Music) {
+    init(size: CGSize, music: Music) {
 
         self.playMode = setting.playMode
         self.isAutoPlay = setting.isAutoPlay
-        self.setting = setting
         self.music = music
 
         super.init(size: size)
@@ -182,7 +180,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
         
         // Noteクラスのクラスプロパティを設定
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration      // BGMまたは映像の長さ
-        self.notes = music.generateNotes(setting: setting, duration: duration)      // ノーツ生成
+        self.notes = music.generateNotes(duration: duration)      // ノーツ生成
         
         // ボタンの設定
         pauseButton = { () -> UIButton in
@@ -460,7 +458,7 @@ class GameScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAppDele
     /// BGMモードへ移行
     private func reloadSceneAsBGMMode() {
         
-        let scene = GameScene(size: (self.view?.bounds.size)!, setting: setting, music: music)
+        let scene = GameScene(size: (self.view?.bounds.size)!, music: music)
         let skView = view as SKView?    // このviewはGameViewControllerのskView2
         skView?.showsFPS = true
         skView?.showsNodeCount = true
