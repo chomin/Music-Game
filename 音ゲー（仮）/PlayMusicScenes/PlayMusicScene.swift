@@ -80,7 +80,7 @@ class PlayMusicScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAp
     private var startTime: TimeInterval = 0.0       // 譜面再生開始時刻
     var passedTime: TimeInterval = 0.0              // 経過時間
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ + (Header.offsetまたはyouTubeoffset)*headerOffsetUnit。一定
-    private let headerOffsetUnit = 0.05
+    private let headerOffsetUnit = 0.01
     var lanes: [Lane] = []      // レーン
 
     var setting: Setting
@@ -436,7 +436,8 @@ class PlayMusicScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAp
     override func willMove(from view: SKView) {
         pauseButton?.removeFromSuperview()
         pauseView?.removeFromSuperview()
-        playerView?.view.removeFromSuperview()
+        playerView?.stopVideo()
+        playerView?.view.removeFromSuperview() // 解放されてない？
     }
 
     /// 判定ラベルのテキストを更新（アニメーション付き）
