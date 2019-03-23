@@ -62,15 +62,15 @@ class ChooseMusicScene: SKScene {
     }
     var mainContents: [UIResponder] {
         
-            var contents: [UIResponder] = []
-            mainButtons.forEach({contents.append($0)})
-            contents.append(autoPlaySwitch)
-            contents.append(youtubeSwitch)
-            contents.append(selectedMusicLabel)
-            contents.append(autoPlayLabel)
-            contents.append(youtubeLabel)
-            contents.append(difficultyLabel)
-            return contents
+        var contents: [UIResponder] = []
+        mainButtons.forEach({contents.append($0)})
+        contents.append(autoPlaySwitch)
+        contents.append(youtubeSwitch)
+        contents.append(selectedMusicLabel)
+        contents.append(autoPlayLabel)
+        contents.append(youtubeLabel)
+        contents.append(difficultyLabel)
+        return contents
     }
     
     let settingImage             = UIImage(named: ImageName.setting.rawValue)
