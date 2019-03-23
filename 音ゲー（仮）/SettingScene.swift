@@ -29,27 +29,26 @@ class SettingScene: SKScene {
     var noteSizeTitleLabel  : SKLabelNode!  // "ノーツの大きさ"
     var fstlSwitchLabel     : SKLabelNode!  // "ノーツの大きさをレーン幅に合わせる"
     var settingContents: [UIResponder] {
-        get {
-            var contents: [UIResponder] = []
-            contents.append(spPlusButton)
-            contents.append(spPlus10Button)
-            contents.append(spMinusButton)
-            contents.append(spMinus10Button)
-            contents.append(siPlusButton)
-            contents.append(siPlus10Button)
-            contents.append(siMinusButton)
-            contents.append(siMinus10Button)
-            contents.append(fitSizeToLaneSwitch)
-            contents.append(saveAndBackButton)
-            contents.append(settingLabel)
-            contents.append(speedLabel)
-            contents.append(speedTitleLabel)
-            contents.append(noteSizeLabel)
-            contents.append(noteSizeTitleLabel)
-            contents.append(fstlSwitchLabel)
-
-            return contents
-        }
+        
+        var contents: [UIResponder] = []
+        contents.append(spPlusButton)
+        contents.append(spPlus10Button)
+        contents.append(spMinusButton)
+        contents.append(spMinus10Button)
+        contents.append(siPlusButton)
+        contents.append(siPlus10Button)
+        contents.append(siMinusButton)
+        contents.append(siMinus10Button)
+        contents.append(fitSizeToLaneSwitch)
+        contents.append(saveAndBackButton)
+        contents.append(settingLabel)
+        contents.append(speedLabel)
+        contents.append(speedTitleLabel)
+        contents.append(noteSizeLabel)
+        contents.append(noteSizeTitleLabel)
+        contents.append(fstlSwitchLabel)
+        
+        return contents
     }
 
     let plusImage                = UIImage(named: ImageName.plus.rawValue)
@@ -288,12 +287,11 @@ class SettingScene: SKScene {
     func removeSettingContents() {
 
         for content in settingContents {
-            if let view = content as? UIView {
-                view.removeFromSuperview()
-            } else if let node = content as? SKNode {
-                node.removeFromParent()
-            } else {
-                print("settingContentsの振り分け漏れ: \(content)")
+            
+            switch content {
+            case let view as UIView: view.removeFromSuperview()
+            case let node as SKNode: node.removeFromParent()
+            default: print("settingContentsの振り分け漏れ: \(content)")
             }
         }
     }

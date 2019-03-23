@@ -61,7 +61,7 @@ class ChooseMusicScene: SKScene {
         return contents
     }
     var mainContents: [UIResponder] {
-        get {
+        
             var contents: [UIResponder] = []
             mainButtons.forEach({contents.append($0)})
             contents.append(autoPlaySwitch)
@@ -71,15 +71,13 @@ class ChooseMusicScene: SKScene {
             contents.append(youtubeLabel)
             contents.append(difficultyLabel)
             return contents
-        }
     }
     
     let settingImage             = UIImage(named: ImageName.setting.rawValue)
     let settingImageSelected     = UIImage(named: ImageName.settingSelected.rawValue)
     
-
     var setting = Setting.instance
-    var headers: [Header] = []    // picker.selectedRowとindexを対応させる
+    var headers: [Header] = []
     var selectedHeader: Header!
     let musicSelectSoundPlayer = MusicSelectSoundPlayer()
     var mp3FilesToDownload: [GTLRDrive_File] = []
@@ -294,41 +292,35 @@ class ChooseMusicScene: SKScene {
 
     func removeMainContents() {
         for content in mainContents {
-            if let view = content as? UIView {
-                view.removeFromSuperview()
-            } else if let node = content as? SKNode {
-                node.removeFromParent()
-            } else if let uiswitch = content as? UISwitch {
-                uiswitch.removeFromSuperview()
-            } else {
-                print("mainContentsの振り分け漏れ: \(content)")
+            switch content {
+            case let view     as UIView   : view.removeFromSuperview()
+            case let node     as SKNode   : node.removeFromParent()
+            case let uiswitch as UISwitch : uiswitch.removeFromSuperview()
+            default: print("mainContentsの振り分け漏れ: \(content)")
             }
         }
     }
+    
+    func saveSetting() {
+        setting.musicName = selectedHeader.title
+        setting.isYouTube = youtubeSwitch.isOn
+        setting.isAutoPlay = autoPlaySwitch.isOn
+        setting.save()
+    }
 
     override func willMove(from view: SKView) {
+        saveSetting()
         // 消す
         removeMainContents()
         musicPicker.removeFromParent()
     }
     
-    func enableButtons() {
-        for button in mainButtons {
-            button.isEnabled = true
-        }
-    }
-    
     @objc func didTapPlayButton(_ sender : UIButton) {
-        setting.musicName = selectedHeader.title
-        setting.isYouTube = youtubeSwitch.isOn
-        setting.isAutoPlay = autoPlaySwitch.isOn
-        setting.save()
         
         let dispatchGroup = DispatchGroup()
         // 直列キュー / attibutes指定なし
 //        let dispatchQueue = DispatchQueue.main
         
-
         let moveToGameScene = {
             // 移動
             let scene = GameScene(size: (self.view?.bounds.size)!, header: self.selectedHeader)
@@ -373,22 +365,6 @@ class ChooseMusicScene: SKScene {
 //    }
 //
 
-    
-//    func showSettingContents() {
-//
-//        for content in settingContents {
-//            if let view = content as? UIView {
-//                view.isHidden = false
-//            } else if let node = content as? SKNode {
-//                node.isHidden = false
-//            } else {
-//                print("settingContentsの振り分け漏れ: \(content)")
-//            }
-//        }
-//    }
-//
-
-
     func moveToSettingScene() {
         // 移動
         let scene = SettingScene(size: size)
@@ -414,9 +390,7 @@ class ChooseMusicScene: SKScene {
     }
     
     @objc func touchUpOutsideButton(_ sender : UIButton) {
-        for button in mainButtons {
-            button.isEnabled = true
-        }
+        mainButtons.forEach({$0.isEnabled = true})
     }
     
     // switch
