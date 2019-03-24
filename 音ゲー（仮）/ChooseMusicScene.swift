@@ -166,7 +166,7 @@ class ChooseMusicScene: SKScene {
             button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
             button.isHidden = false
             button.layer.cornerRadius = 20.0
-            button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/4, y: self.frame.height * 4/5)
+            button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/6, y: self.frame.height * 4/5)
             button.titleLabel?.numberOfLines = 2
             self.view?.addSubview(button)
             
@@ -179,15 +179,15 @@ class ChooseMusicScene: SKScene {
             button.addTarget(self, action: #selector(didTapPlayButton(_:)), for: .touchUpInside)
             button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
             button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-            button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
+            button.frame = CGRect(x: 0,y: 0, width:self.frame.width/6, height: 60)
             button.backgroundColor = UIColor.green
             button.layer.masksToBounds = true
-            button.setTitle("この曲を調整する", for: UIControl.State())
+            button.setTitle("調整する", for: UIControl.State())
             button.setTitleColor(UIColor.white, for: UIControl.State())
             button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
             button.isHidden = false
             button.layer.cornerRadius = 20.0
-            button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72 + button.frame.height*1.2)
+            button.layer.position = CGPoint(x: self.playButton.layer.position.x + self.playButton.frame.width, y: self.playButton.layer.position.y)
             self.view?.addSubview(button)
 
             return button
@@ -326,7 +326,7 @@ class ChooseMusicScene: SKScene {
         // 直列キュー / attibutes指定なし
         //        let dispatchQueue = DispatchQueue.main
         
-        let moveToGameScene = {
+        let moveToScene = {
             // 移動
             var scene = SKScene()
             switch sender {
@@ -347,9 +347,9 @@ class ChooseMusicScene: SKScene {
         if let mp3File = mp3FilesToDownload.first(where: {$0.name == selectedHeader.mp3FileName}) {  // ダウンロード
             dispatchGroup.enter()
             GDFileManager.getFileData(fileID: mp3File.identifier!, group: dispatchGroup)
-            dispatchGroup.notify(queue: .main, execute: moveToGameScene)
+            dispatchGroup.notify(queue: .main, execute: moveToScene)
         } else {
-            moveToGameScene()
+            moveToScene()
         }
     }
     
