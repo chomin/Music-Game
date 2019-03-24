@@ -82,22 +82,21 @@ class PlayMusicScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAp
     private var mediaOffsetTime: TimeInterval = 0.0 // 経過時間と、BGM.currentTimeまたはplayerView.currentTime()のずれ + (Header.offsetまたはyouTubeoffset)*headerOffsetUnit。一定
     private let headerOffsetUnit = 0.01
     var lanes: [Lane] = []      // レーン
-
-    var setting: Setting
+    
+    let setting = Setting.instance
+    
     var result = Result()
-
-    init(size: CGSize, setting: Setting, header: Header) {
+    
+    init(size: CGSize, header: Header) {
 
         self.playMode = setting.playMode
-        self.setting = setting
         self.music = Music(header: header, playMode: setting.playMode)
 
         super.init(size: size)
     }
-    init(size: CGSize, setting: Setting, music: Music) {
+    init(size: CGSize, music: Music) {
 
         self.playMode = setting.playMode
-        self.setting = setting
         self.music = music
 
         super.init(size: size)
@@ -230,8 +229,8 @@ class PlayMusicScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAp
 
         // Noteクラスのクラスプロパティを設定
         let duration = (playMode == .BGM) ? BGM.duration : playerView.duration      // BGMまたは映像の長さ
-        self.notes = music.generateNotes(setting: setting, duration: duration)      // ノーツ生成
 
+        self.notes = music.generateNotes(duration: duration)      // ノーツ生成
         // ボタンの設定
         pauseButton = { () -> UIButton in
             let Button = UIButton()
@@ -474,11 +473,11 @@ class PlayMusicScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAp
         var scene = SKScene()
         switch self {
         case is GameScene:
-            scene = GameScene(size: (self.view?.bounds.size)!, setting: setting, music: nextMusic)
+            scene = GameScene(size: (self.view?.bounds.size)!, music: nextMusic)
         case is AutoPlayScene:
-            scene = AutoPlayScene(size: (self.view?.bounds.size)!, setting: setting, music: nextMusic)
+            scene = AutoPlayScene(size: (self.view?.bounds.size)!, music: nextMusic)
         case is OffsetScene:
-            scene = OffsetScene(size: (self.view?.bounds.size)!, setting: setting, music: nextMusic)
+            scene = OffsetScene(size: (self.view?.bounds.size)!, music: nextMusic)
         default: break
         }
 
