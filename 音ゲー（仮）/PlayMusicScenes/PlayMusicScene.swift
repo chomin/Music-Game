@@ -704,65 +704,65 @@ class PlayMusicScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAp
                 return view
             }()
             self.returnButton = { () -> UIButton in
-                let Button = UIButton()
+                let button = UIButton()
 
-                Button.addTarget(self, action: #selector(didTapReturnButton(_:)), for: .touchUpInside)
-                Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
-                Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-                Button.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
-                Button.backgroundColor = .red
-                Button.layer.masksToBounds = true
-                Button.setTitle("中断する", for: UIControl.State())
-                Button.setTitleColor(UIColor.white, for: UIControl.State())
-                Button.setTitle("中断する", for: UIControl.State.highlighted)
-                Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
-                Button.isHidden = false
-                Button.layer.cornerRadius = 20.0
-                Button.layer.position = CGPoint(x: self.frame.midX + Button.frame.width*2/3, y: self.frame.midY - Button.frame.height*0.6)
-                self.pauseView?.addSubview(Button)
+                button.addTarget(self, action: #selector(didTapReturnButton(_:)), for: .touchUpInside)
+                button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
+                button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+                button.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
+                button.backgroundColor = .red
+                button.layer.masksToBounds = true
+                button.setTitle("中断する", for: UIControl.State())
+                button.setTitleColor(UIColor.white, for: UIControl.State())
+                button.setTitle("中断する", for: UIControl.State.highlighted)
+                button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
+                button.isHidden = false
+                button.layer.cornerRadius = 20.0
+                button.layer.position = CGPoint(x: self.frame.midX + button.frame.width*2/3, y: self.frame.midY - button.frame.height*0.6)
+                self.pauseView?.addSubview(button)
 
-                return Button
+                return button
             }()
             self.continueButton = { () -> UIButton in
-                let Button = UIButton()
+                let button = UIButton()
 
-                Button.addTarget(self, action: #selector(didTapContinueButton(_:)), for: .touchUpInside)
-                Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
-                Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-                Button.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
-                Button.backgroundColor = .green
-                Button.layer.masksToBounds = true
-                Button.setTitle("続ける", for: UIControl.State())
-                Button.setTitleColor(UIColor.white, for: UIControl.State())
-                Button.setTitle("続ける", for: UIControl.State.highlighted)
-                Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
-                Button.isHidden = false
-                Button.layer.cornerRadius = 20.0
-                Button.layer.position = CGPoint(x: self.frame.midX - Button.frame.width*2/3, y: self.frame.midY - Button.frame.height*0.6)
-                self.pauseView?.addSubview(Button)
+                button.addTarget(self, action: #selector(didTapContinueButton(_:)), for: .touchUpInside)
+                button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
+                button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+                button.frame = CGRect(x: 0, y: 0, width: self.frame.width/5, height: 50)
+                button.backgroundColor = .green
+                button.layer.masksToBounds = true
+                button.setTitle("続ける", for: UIControl.State())
+                button.setTitleColor(UIColor.white, for: UIControl.State())
+                button.setTitle("続ける", for: UIControl.State.highlighted)
+                button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
+                button.isHidden = false
+                button.layer.cornerRadius = 20.0
+                button.layer.position = CGPoint(x: self.frame.midX - button.frame.width*2/3, y: self.frame.midY - button.frame.height*0.6)
+                self.pauseView?.addSubview(button)
 
-                return Button
+                return button
             }()
 
             self.switchIsYouTubeButton = { () -> UIButton in
-                let Button = UIButton()
+                let button = UIButton()
 
-                Button.addTarget(self, action: #selector(didTapSwitchIsYouTubeButton(_:)), for: .touchUpInside)
-                Button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
-                Button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-                Button.frame = CGRect(x: 0, y: 0, width: self.frame.width/4, height: 50)
-                Button.backgroundColor = .orange
-                Button.layer.masksToBounds = true
-                if setting.isYouTube { Button.setTitle("BGMに切り替え"    , for: UIControl.State()) }
-                else                 { Button.setTitle("YouTubeに切り替え", for: UIControl.State()) }
-                Button.setTitleColor(UIColor.white, for: UIControl.State())
-                Button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
-                Button.isHidden = !music.youTubeExists
-                Button.layer.cornerRadius = 20.0
-                Button.layer.position = CGPoint(x: self.frame.midX, y: self.frame.midY + Button.frame.height*0.6)
-                self.pauseView?.addSubview(Button)
+                button.addTarget(self, action: #selector(didTapSwitchIsYouTubeButton(_:)), for: .touchUpInside)
+                button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
+                button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+                button.frame = CGRect(x: 0, y: 0, width: self.frame.width/4, height: 50)
+                button.backgroundColor = .orange
+                button.layer.masksToBounds = true
+                if setting.isYouTube { button.setTitle("BGMに切り替え"    , for: UIControl.State()) }
+                else                 { button.setTitle("YouTubeに切り替え", for: UIControl.State()) }
+                button.setTitleColor(UIColor.white, for: UIControl.State())
+                button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
+                button.isHidden = !music.hasYouTube
+                button.layer.cornerRadius = 20.0
+                button.layer.position = CGPoint(x: self.frame.midX, y: self.frame.midY + button.frame.height*0.6)
+                self.pauseView?.addSubview(button)
 
-                return Button
+                return button
             }()
         }
         self.view?.superview?.addSubview(pauseView!)

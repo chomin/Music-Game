@@ -90,7 +90,7 @@ class Music {
     var bmsNameWithExtension: String { return header.bmsNameWithExtension }
     var offset:               Int    { return header.offset               }
     var youTubeOffset:        Int    { return header.youTubeOffset        }
-    var youTubeExists:        Bool   { return header.youTubeExists        }
+    var hasYouTube:           Bool   { return header.hasYouTube           }
 
     init(header: Header, playMode: PlayMode) {
         self.header = header
