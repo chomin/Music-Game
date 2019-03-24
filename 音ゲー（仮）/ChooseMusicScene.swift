@@ -152,18 +152,22 @@ class ChooseMusicScene: SKScene {
         // 初期画面のボタン
         playButton = {() -> UIButton in
             let button = UIButton()
-            
+
             button.addTarget(self, action: #selector(didTapPlayButton(_:)), for: .touchUpInside)
             button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
             button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
             button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
             button.backgroundColor = UIColor.red
             button.layer.masksToBounds = true
+            let title = mp3FilesToDownload.contains(where: { $0.name == selectedHeader.mp3FileName }) ? "ダウンロード\nして遊ぶ" : "この曲で遊ぶ"
+            button.setTitle(title, for: UIControl.State())
+            button.setTitle(title, for: UIControl.State.highlighted)
             button.setTitleColor(UIColor.white, for: UIControl.State())
             button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
             button.isHidden = false
             button.layer.cornerRadius = 20.0
             button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/4, y: self.frame.height * 4/5)
+            button.titleLabel?.numberOfLines = 2
             self.view?.addSubview(button)
             
             return button
@@ -424,14 +428,7 @@ extension ChooseMusicScene: MusicPickerDelegate {
             youtubeSwitch.isEnabled = true
         }
 
-        let title: String = {
-            if mp3FilesToDownload.contains(where: { $0.name == selectedHeader.mp3FileName }) {
-                return "ダウンロード\nして遊ぶ"
-            } else {
-                return "この曲で遊ぶ"
-            }
-        }()
-        playButton.titleLabel?.numberOfLines = 2
+        let title = mp3FilesToDownload.contains(where: { $0.name == selectedHeader.mp3FileName }) ? "ダウンロード\nして遊ぶ" : "この曲で遊ぶ"
         playButton.setTitle(title, for: UIControl.State())
         playButton.setTitle(title, for: UIControl.State.highlighted)
     }
