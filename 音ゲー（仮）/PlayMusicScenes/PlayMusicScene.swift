@@ -233,40 +233,40 @@ class PlayMusicScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAp
         self.notes = music.generateNotes(duration: duration)      // ノーツ生成
         // ボタンの設定
         pauseButton = { () -> UIButton in
-            let Button = UIButton()
+            let button = UIButton()
 
-            Button.setImage(UIImage(named: ImageName.pause.rawValue), for: .normal)
-            Button.setImage(UIImage(named: ImageName.pauseSelected.rawValue), for: .highlighted)
-            Button.addTarget(self, action: #selector(didTapPauseButton(_:)), for: .touchUpInside)
-            Button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize) // yは上からの座標
-            self.view?.addSubview(Button)
+            button.setImage(UIImage(named: ImageName.pause.rawValue), for: .normal)
+            button.setImage(UIImage(named: ImageName.pauseSelected.rawValue), for: .highlighted)
+            button.addTarget(self, action: #selector(didTapPauseButton(_:)), for: .touchUpInside)
+            button.frame = CGRect(x: self.frame.width - Dimensions.iconButtonSize, y: 0, width: Dimensions.iconButtonSize, height: Dimensions.iconButtonSize) // yは上からの座標
+            self.view?.addSubview(button)
 
-            return Button
+            return button
         }()
 
         // ラベルの設定
         judgeLabel = { () -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
 
-            Label.fontSize = self.frame.width / 36
-            Label.horizontalAlignmentMode = .center // 中央寄せ
-            Label.position = CGPoint(x: self.frame.midX, y: Dimensions.judgeLineY * 2)
-            Label.fontColor = SKColor.yellow
+            label.fontSize = self.frame.width / 36
+            label.horizontalAlignmentMode = .center // 中央寄せ
+            label.position = CGPoint(x: self.frame.midX, y: Dimensions.judgeLineY * 2)
+            label.fontColor = SKColor.yellow
 
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
 
         comboLabel = { () -> SKLabelNode in
-            let Label = SKLabelNode(fontNamed: "HiraginoSans-W6")
+            let label = SKLabelNode(fontNamed: "HiraginoSans-W6")
 
-            Label.fontSize = self.frame.width / 18
-            Label.horizontalAlignmentMode = .center // 中央寄せ
-            Label.position = CGPoint(x: self.frame.width - Label.fontSize*2, y: self.frame.height*3/4)
-            Label.fontColor = SKColor.white
+            label.fontSize = self.frame.width / 18
+            label.horizontalAlignmentMode = .center // 中央寄せ
+            label.position = CGPoint(x: self.frame.width - label.fontSize*2, y: self.frame.height*3/4)
+            label.fontColor = SKColor.white
 
-            self.addChild(Label)
-            return Label
+            self.addChild(label)
+            return label
         }()
 
         // 全ノーツ及び関連画像をGameSceneにaddChild
@@ -771,8 +771,6 @@ class PlayMusicScene: SKScene, AVAudioPlayerDelegate, YTPlayerViewDelegate, GSAp
         self.isUserInteractionEnabled = false
 
         pauseViewButtons.forEach({ $0.isEnabled = true })
-
-
     }
 }
 

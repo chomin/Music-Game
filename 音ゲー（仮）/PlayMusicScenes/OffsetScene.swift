@@ -129,19 +129,19 @@ class OffsetScene: PlayMusicScene {
                 try! realm.write {
                     if setting.isYouTube {
                         switch sender {
-                        case plusButton   : DBHeader.youTubeOffset += 1
-                        case plus10Button : DBHeader.youTubeOffset += 10
-                        case minusButton  : DBHeader.youTubeOffset -= 1
-                        case minus10Button: DBHeader.youTubeOffset -= 10
+                        case plusButton    : DBHeader.youTubeOffset += 1
+                        case plus10Button  : DBHeader.youTubeOffset += 10
+                        case minusButton   : DBHeader.youTubeOffset -= 1
+                        case minus10Button : DBHeader.youTubeOffset -= 10
                         default: print("ボタン抜け@OffsetScene")
                         }
                         reloadSceneAsYouTubeMode()
                     } else {
                         switch sender {
-                        case plusButton   : DBHeader.offset += 1
-                        case plus10Button : DBHeader.offset += 10
-                        case minusButton  : DBHeader.offset -= 1
-                        case minus10Button: DBHeader.offset -= 10
+                        case plusButton    : DBHeader.offset += 1
+                        case plus10Button  : DBHeader.offset += 10
+                        case minusButton   : DBHeader.offset -= 1
+                        case minus10Button : DBHeader.offset -= 10
                         default: print("ボタン抜け@OffsetScene")
                         }
                         reloadSceneAsBGMMode()
@@ -174,11 +174,8 @@ class OffsetScene: PlayMusicScene {
         if player as AVAudioPlayer? == BGM {
             BGM = nil   // 別のシーンでアプリを再開したときに鳴るのを防止
 
-            if setting.isYouTube {
-                reloadSceneAsYouTubeMode()
-            } else {
-                reloadSceneAsBGMMode()
-            }
+            if setting.isYouTube { reloadSceneAsYouTubeMode() }
+            else                 { reloadSceneAsBGMMode()     }
         }
     }
 }
