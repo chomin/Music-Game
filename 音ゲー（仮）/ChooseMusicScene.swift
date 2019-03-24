@@ -326,7 +326,7 @@ class ChooseMusicScene: SKScene {
         // 直列キュー / attibutes指定なし
         //        let dispatchQueue = DispatchQueue.main
         
-        let moveToScene = {
+        let moveToPlayScene = {
             // 移動
             var scene = SKScene()
             switch sender {
@@ -347,9 +347,9 @@ class ChooseMusicScene: SKScene {
         if let mp3File = mp3FilesToDownload.first(where: {$0.name == selectedHeader.mp3FileName}) {  // ダウンロード
             dispatchGroup.enter()
             GDFileManager.getFileData(fileID: mp3File.identifier!, group: dispatchGroup)
-            dispatchGroup.notify(queue: .main, execute: moveToScene)
+            dispatchGroup.notify(queue: .main, execute: moveToPlayScene)
         } else {
-            moveToScene()
+            moveToPlayScene()
         }
     }
     
