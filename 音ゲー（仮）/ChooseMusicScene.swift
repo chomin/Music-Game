@@ -66,7 +66,7 @@ class ChooseMusicScene: SKScene {
               selectedMusicLabel,
               autoPlayLabel,
               youtubeLabel,
-              difficultyLabel    ]
+              difficultyLabel     ]
     }
     
     let settingImage             = UIImage(named: ImageName.setting.rawValue)
