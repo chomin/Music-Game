@@ -54,29 +54,25 @@ class ChooseMusicScene: SKScene {
     var youtubeLabel:       SKLabelNode!  // "YouTube"
     var difficultyLabel:    SKLabelNode!  // "地獄級"
     var mainButtons: [UIButton] {
-        var contents: [UIButton] = []
-        contents.append(playButton)
-        contents.append(offsetButton)
-        contents.append(settingButton)
-        return contents
+        return [ playButton,
+                 offsetButton,
+                 settingButton ]
     }
     var mainContents: [UIResponder] {
         
-        var contents: [UIResponder] = []
-        mainButtons.forEach({contents.append($0)})
-        contents.append(autoPlaySwitch)
-        contents.append(youtubeSwitch)
-        contents.append(selectedMusicLabel)
-        contents.append(autoPlayLabel)
-        contents.append(youtubeLabel)
-        contents.append(difficultyLabel)
-        return contents
+        return mainButtons +
+            [ autoPlaySwitch,
+              youtubeSwitch,
+              selectedMusicLabel,
+              autoPlayLabel,
+              youtubeLabel,
+              difficultyLabel    ]
     }
     
     let settingImage             = UIImage(named: ImageName.setting.rawValue)
     let settingImageSelected     = UIImage(named: ImageName.settingSelected.rawValue)
     
-    var setting = Setting.instance
+    let setting = Setting.instance
     var headers: [Header] = []
     var selectedHeader: Header!
     let musicSelectSoundPlayer = MusicSelectSoundPlayer()
@@ -179,7 +175,7 @@ class ChooseMusicScene: SKScene {
             button.addTarget(self, action: #selector(didTapPlayButton(_:)), for: .touchUpInside)
             button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
             button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-            button.frame = CGRect(x: 0,y: 0, width:self.frame.width/6, height: 60)
+            button.frame = CGRect(x: 0, y: 0, width:self.frame.width/6, height: 60)
             button.backgroundColor = UIColor.green
             button.layer.masksToBounds = true
             button.setTitle("調整する", for: UIControl.State())
@@ -328,14 +324,19 @@ class ChooseMusicScene: SKScene {
         
         let moveToPlayScene = {
             // 移動
-            var scene = SKScene()
-            switch sender {
-            case self.playButton:
-                scene = self.autoPlaySwitch.isOn ? AutoPlayScene(size: (self.view?.bounds.size)!, header: self.selectedHeader) : GameScene(size: (self.view?.bounds.size)!, header: self.selectedHeader)
-            case self.offsetButton:
-                scene = OffsetScene(size: (self.view?.bounds.size)!, header: self.selectedHeader)
-            default: break
-            }
+            let scene: SKScene = {
+            
+                switch sender {
+                case self.playButton where self.autoPlaySwitch.isOn:
+                    return AutoPlayScene(size: self.view!.bounds.size, header: self.selectedHeader)
+                case self.playButton where !self.autoPlaySwitch.isOn:
+                    return GameScene(size: self.view!.bounds.size, header: self.selectedHeader)
+                case self.offsetButton:
+                    return OffsetScene(size: (self.view?.bounds.size)!, header: self.selectedHeader)
+                default: return SKScene()
+                }
+            }()
+            
             let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
             skView?.showsFPS = true
             skView?.showsNodeCount = true

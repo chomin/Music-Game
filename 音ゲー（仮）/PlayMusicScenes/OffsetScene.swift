@@ -9,18 +9,16 @@ import RealmSwift
 
 class OffsetScene: PlayMusicScene {
 
-    var plusButton  : UIButton!
-    var minusButton : UIButton!
+    var plusButton    : UIButton!
+    var minusButton   : UIButton!
     var plus10Button  : UIButton!
     var minus10Button : UIButton!
-    var offsetLabel : SKLabelNode!  // "+1"などmusic.offsetの値
+    var offsetLabel   : SKLabelNode!  // "+1"などmusic.offsetの値
     var buttons: [UIButton] {
-        var buttons: [UIButton] = []
-        buttons.append(plusButton)
-        buttons.append(minusButton)
-        buttons.append(plus10Button)
-        buttons.append(minus10Button)
-        return buttons
+        return [ plusButton,
+                 minusButton,
+                 plus10Button,
+                 minus10Button ]
     }
 
     override func didMove(to view: SKView) {
@@ -118,7 +116,7 @@ class OffsetScene: PlayMusicScene {
         buttons.forEach({ $0.removeFromSuperview() })
     }
     
-    @objc func didTapButton(_ sender : UIButton) {
+    @objc func didTapButton(_ sender: UIButton) {
         
         do {
             let realm = try Realm()
@@ -129,19 +127,27 @@ class OffsetScene: PlayMusicScene {
                 try! realm.write {
                     if setting.isYouTube {
                         switch sender {
-                        case plusButton    : DBHeader.youTubeOffset += 1
-                        case plus10Button  : DBHeader.youTubeOffset += 10
-                        case minusButton   : DBHeader.youTubeOffset -= 1
-                        case minus10Button : DBHeader.youTubeOffset -= 10
+                        case plusButton:
+                            DBHeader.youTubeOffset += 1
+                        case plus10Button:
+                            DBHeader.youTubeOffset += 10
+                        case minusButton:
+                            DBHeader.youTubeOffset -= 1
+                        case minus10Button:
+                            DBHeader.youTubeOffset -= 10
                         default: print("ボタン抜け@OffsetScene")
                         }
                         reloadSceneAsYouTubeMode()
                     } else {
                         switch sender {
-                        case plusButton    : DBHeader.offset += 1
-                        case plus10Button  : DBHeader.offset += 10
-                        case minusButton   : DBHeader.offset -= 1
-                        case minus10Button : DBHeader.offset -= 10
+                        case plusButton:
+                            DBHeader.offset += 1
+                        case plus10Button:
+                            DBHeader.offset += 10
+                        case minusButton:
+                            DBHeader.offset -= 1
+                        case minus10Button:
+                            DBHeader.offset -= 10
                         default: print("ボタン抜け@OffsetScene")
                         }
                         reloadSceneAsBGMMode()
@@ -159,14 +165,14 @@ class OffsetScene: PlayMusicScene {
     }
 
     // 同時押し対策
-    @objc func onOffsetButton(_ sender : UIButton) {
+    @objc func onOffsetButton(_ sender: UIButton) {
         for button in buttons {
             guard button != sender else { continue }
             button.isEnabled = false
         }
     }
     
-    @objc func touchUpOutsideOffsetButton(_ sender : UIButton) {
+    @objc func touchUpOutsideOffsetButton(_ sender: UIButton) {
         buttons.forEach({ $0.isEnabled = true })
     }
     /// AVAudioPlayerの再生終了時の呼び出しメソッド
