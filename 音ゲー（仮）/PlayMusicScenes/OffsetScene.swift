@@ -9,11 +9,11 @@ import RealmSwift
 
 class OffsetScene: PlayMusicScene {
 
-    var plusButton    : UIButton!
-    var minusButton   : UIButton!
-    var plus10Button  : UIButton!
-    var minus10Button : UIButton!
-    var offsetLabel   : SKLabelNode!  // "+1"などmusic.offsetの値
+    var plusButton:    UIButton!
+    var minusButton:   UIButton!
+    var plus10Button:  UIButton!
+    var minus10Button: UIButton!
+    var offsetLabel: SKLabelNode!  // "+1"などmusic.offsetの値
     var buttons: [UIButton] {
         return [ plusButton,
                  minusButton,
