@@ -73,6 +73,10 @@ class YTPlayerViewHolder {
         baseline = nil
     }
     
+    func stopVideo() {
+        self.view.stopVideo()
+    }
+    
     func playerState() -> YTPlayerState {
         return self.view.playerState
     }

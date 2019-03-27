@@ -13,8 +13,8 @@ extension GameScene {
     // タッチ関係(恐らく、同フレーム内でupdate()等の後に呼び出されている)
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        guard !isAutoPlay else { return }
-            
+//        guard !isAutoPlay else { return }
+        
             uiTouchLoop: for uiTouch in touches {  // すべてのタッチに対して処理する（同時押しなどもあるため）
                 let pos = uiTouch.location(in: self.view?.superview)
                 // フリック判定したかを示すBoolを加えてallTouchにタッチ情報を付加
@@ -78,7 +78,7 @@ extension GameScene {
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        guard !isAutoPlay else { return }
+//        guard !isAutoPlay else { return }
         
             for i in self.lanes {
                 guard i.isTimeLagSet else { return }
@@ -205,8 +205,8 @@ extension GameScene {
     // touchMovedと似てる。TapEndの判定をするかだけが違う
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        guard !isAutoPlay else { return }
-            
+//        guard !isAutoPlay else { return }
+        
             for touch in touches {
                 
                 var isAllLanesTimeLagSet = true
@@ -271,72 +271,12 @@ extension GameScene {
     override func touchesEstimatedPropertiesUpdated(_ touches: Set<UITouch>) {
         print("touchesEstimatedPropertiesUpdated")
     }
-    
-    
+
     enum NoteType {
         case tap, flick, tapStart, middle, tapEnd, flickEnd
     }
     
     
-    
-    // 受け取ったLaneの先頭ノーツを判定する。失敗したらfalseを返す。引数でtimeLagを渡すのは（judge呼び出し時ではなく）タッチされた時のものを使用するため。
-    ///受け取ったLaneの先頭ノーツを判定する。
-    ///
-    /// - Parameters:
-    ///   - lane: 判定対象のレーン
-    ///   - timeLag: 判定したいノーツの正しい時間と実際に叩かれた時間との差。（judge呼び出し時ではなく）タッチされた時のものを使用する。
-    ///   - gsTouch: ノーツを叩いたGSTouchインスタンス。GameSceneから解放されていたらnilを入れること。
-    /// - Returns: 成否をBoolで返す
-    func judge(lane: Lane, timeLag: TimeInterval, gsTouch: GSTouch?) -> Bool {
-        
-        guard !(lane.isEmpty),
-            lane.isJudgeRange else {
-                print("laneが空、あるいは判定時間圏内にノーツがありません. laneIndex: \(lane.laneIndex)")
-                return false
-        }
-        
-        guard lane.headNote!.isJudgeable else {
-            print("判定対象ノーツ.isJudgeableがfalseです. laneIndex: \(lane.laneIndex)")
-            return false
-        }
-        
-        // 以下は判定が確定しているものとする
-        
-        // 音を鳴らす
-        switch lane.headNote! {
-        case is Flick, is FlickEnd          : self.actionSoundSet.play(type: .flick)
-        case is Middle                      : self.actionSoundSet.play(type: .middle)
-        case is Tap, is TapStart, is TapEnd : self.actionSoundSet.play(type: .tap)
-        default                             : print("ノーツの型の見落とし")
-        }
-        
-        // 必要ならgsTouch関係の処理
-        switch lane.headNote! {
-        case is Flick, is FlickEnd:
-            gsTouch?.isJudgeableFlick = false    // このタッチでのフリック判定を禁止
-            gsTouch?.isJudgeableFlickEnd = false
-            
-            // storedFlickJudgeに関する処理
-            gsTouch?.storedFlickJudgeLaneIndex = nil
-            lane.storedFlickJudgeInformation = nil
-            
-        case is Tap:
-            gsTouch?.isJudgeableFlick = false
-            gsTouch?.isJudgeableFlickEnd = false
-            
-        case is TapStart, is Middle:
-            gsTouch?.isJudgeableFlick = false
-            gsTouch?.isJudgeableFlickEnd = true
-            
-        default: break
-        }
-        
-        let judgeTimeState = lane.getJudgeTimeState(timeLag: timeLag)
-        setJudgeLabelText(judgeType: judgeTimeState)
-        result.countUp(judgeType: judgeTimeState)
-        lane.setHeadNoteJudged()
-        return true
-    }
     
     /// perfect終了時(laneからのdelegate)または指が外れた時に呼び出される。
     func storedFlickJudge(lane: Lane) {

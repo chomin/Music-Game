@@ -45,7 +45,7 @@ class ChooseMusicScene: SKScene {
 
     // 初期画面のボタンなど
     var playButton:         UIButton!
-//    var randomSelectButton: UIButton!
+    var offsetButton:       UIButton!
     var settingButton:      UIButton!
     var autoPlaySwitch:     UISwitch!
     var youtubeSwitch:      UISwitch!
@@ -54,29 +54,25 @@ class ChooseMusicScene: SKScene {
     var youtubeLabel:       SKLabelNode!  // "YouTube"
     var difficultyLabel:    SKLabelNode!  // "地獄級"
     var mainButtons: [UIButton] {
-        var contents: [UIButton] = []
-        contents.append(playButton)
-//        contents.append(randomSelectButton)
-        contents.append(settingButton)
-        return contents
+        return [ playButton,
+                 offsetButton,
+                 settingButton ]
     }
     var mainContents: [UIResponder] {
         
-        var contents: [UIResponder] = []
-        mainButtons.forEach({contents.append($0)})
-        contents.append(autoPlaySwitch)
-        contents.append(youtubeSwitch)
-        contents.append(selectedMusicLabel)
-        contents.append(autoPlayLabel)
-        contents.append(youtubeLabel)
-        contents.append(difficultyLabel)
-        return contents
+        return mainButtons +
+            [ autoPlaySwitch,
+              youtubeSwitch,
+              selectedMusicLabel,
+              autoPlayLabel,
+              youtubeLabel,
+              difficultyLabel     ]
     }
     
     let settingImage             = UIImage(named: ImageName.setting.rawValue)
     let settingImageSelected     = UIImage(named: ImageName.settingSelected.rawValue)
     
-    var setting = Setting.instance
+    let setting = Setting.instance
     var headers: [Header] = []
     var selectedHeader: Header!
     let musicSelectSoundPlayer = MusicSelectSoundPlayer()
@@ -166,32 +162,32 @@ class ChooseMusicScene: SKScene {
             button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
             button.isHidden = false
             button.layer.cornerRadius = 20.0
-            button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/4, y: self.frame.height * 4/5)
+            button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/6, y: self.frame.height * 4/5)
             button.titleLabel?.numberOfLines = 2
             self.view?.addSubview(button)
             
             return button
         }()
         
-//        randomSelectButton = {() -> UIButton in
-//            let button = UIButton()
-//
-//            button.addTarget(self, action: #selector(didTapRandomSelectButton(_:)), for: .touchUpInside)
-//            button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
-//            button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
-//            button.frame = CGRect(x: 0,y: 0, width:self.frame.width/4, height: 60)
-//            button.backgroundColor = UIColor.green
-//            button.layer.masksToBounds = true
-//            button.setTitle("おまかせ選曲", for: UIControl.State())
-//            button.setTitleColor(UIColor.white, for: UIControl.State())
-//            button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
-//            button.isHidden = false
-//            button.layer.cornerRadius = 20.0
-//            button.layer.position = CGPoint(x: self.frame.midX + self.frame.width/3, y:self.frame.height*29/72 + Button.frame.height*1.2)
-//            self.view?.addSubview(button)
-//
-//            return button
-//        }()
+        offsetButton = {() -> UIButton in
+            let button = UIButton()
+
+            button.addTarget(self, action: #selector(didTapPlayButton(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(onButton(_:)), for: .touchDown)
+            button.addTarget(self, action: #selector(touchUpOutsideButton(_:)), for: .touchUpOutside)
+            button.frame = CGRect(x: 0, y: 0, width:self.frame.width/6, height: 60)
+            button.backgroundColor = UIColor.green
+            button.layer.masksToBounds = true
+            button.setTitle("調整する", for: UIControl.State())
+            button.setTitleColor(UIColor.white, for: UIControl.State())
+            button.setTitleColor(UIColor.black, for: UIControl.State.highlighted)
+            button.isHidden = false
+            button.layer.cornerRadius = 20.0
+            button.layer.position = CGPoint(x: self.playButton.layer.position.x + self.playButton.frame.width, y: self.playButton.layer.position.y)
+            self.view?.addSubview(button)
+
+            return button
+        }()
         
         settingButton = {() -> UIButton in
             let button = UIButton()
@@ -321,13 +317,26 @@ class ChooseMusicScene: SKScene {
     
     @objc func didTapPlayButton(_ sender : UIButton) {
         
+        
         let dispatchGroup = DispatchGroup()
         // 直列キュー / attibutes指定なし
-//        let dispatchQueue = DispatchQueue.main
+        //        let dispatchQueue = DispatchQueue.main
         
-        let moveToGameScene = {
+        let moveToPlayScene = {
             // 移動
-            let scene = GameScene(size: (self.view?.bounds.size)!, header: self.selectedHeader)
+            let scene: SKScene = {
+            
+                switch sender {
+                case self.playButton where self.autoPlaySwitch.isOn:
+                    return AutoPlayScene(size: self.view!.bounds.size, header: self.selectedHeader)
+                case self.playButton where !self.autoPlaySwitch.isOn:
+                    return GameScene(size: self.view!.bounds.size, header: self.selectedHeader)
+                case self.offsetButton:
+                    return OffsetScene(size: (self.view?.bounds.size)!, header: self.selectedHeader)
+                default: return SKScene()
+                }
+            }()
+            
             let skView = self.view as SKView?    // このviewはGameViewControllerのskView2
             skView?.showsFPS = true
             skView?.showsNodeCount = true
@@ -339,9 +348,9 @@ class ChooseMusicScene: SKScene {
         if let mp3File = mp3FilesToDownload.first(where: {$0.name == selectedHeader.mp3FileName}) {  // ダウンロード
             dispatchGroup.enter()
             GDFileManager.getFileData(fileID: mp3File.identifier!, group: dispatchGroup)
-            dispatchGroup.notify(queue: .main, execute: moveToGameScene)
+            dispatchGroup.notify(queue: .main, execute: moveToPlayScene)
         } else {
-            moveToGameScene()
+            moveToPlayScene()
         }
     }
     

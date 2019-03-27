@@ -9,8 +9,9 @@
 import Foundation
 import RealmSwift
 
+
 class Header: Object {
-    
+
     // ファイルエラー定義列挙型
     enum FileError: Error {
         case invalidName(String)
@@ -29,6 +30,11 @@ class Header: Object {
     @objc dynamic var playLevel = 0     // 難易度
     @objc dynamic var volWav = 100      // 音量を現段階のn%として出力するか(TODO: 未実装)
     @objc dynamic var laneNum = 7
+    @objc dynamic var offset = 0        // 曲と譜面のずれを調整するための値（+1でplayMusicScene.mediaOffsetTimeを+playMusicScene.headerOffsetUnitする） OffsetSceneでのみ変更、保存可能
+    @objc dynamic var youTubeOffset = 0
+    var hasYouTube: Bool {
+        return !(videoID.isEmpty && videoID2.isEmpty)
+    }
     
     var mp3FileName: String {
         var title = self.title
