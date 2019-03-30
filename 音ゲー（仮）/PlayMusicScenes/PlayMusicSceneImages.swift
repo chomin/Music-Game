@@ -9,7 +9,7 @@
 
 import SpriteKit
 
-extension GameScene {
+extension PlayMusicScene {
     // GameScene初期化時に呼ばれる画像設定用関数
     func setImages() {
         

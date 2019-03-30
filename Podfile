@@ -13,4 +13,6 @@ target '音ゲー（仮）' do
   pod "GTMAppAuth"
   pod "GoogleAPIClientForREST/Drive", "~> 1.2.1"
   pod 'SVProgressHUD', :git => 'https://github.com/SVProgressHUD/SVProgressHUD.git'
+  pod "Gemini"
+
 end

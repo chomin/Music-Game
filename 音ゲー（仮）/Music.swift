@@ -80,14 +80,17 @@ class Music {
     var musicStartPos: Double = 0                       // BGM開始の拍
     var duration: TimeInterval?                         // 楽曲継続時間(楽曲終了命令があれば設定される)
     
-    var laneNum:   Int    { return header.laneNum   }   // レーン数(デフォルトは7)
-    var genre:     String { return header.genre     }   // ジャンル
-    var title:     String { return header.title     }   // タイトル(正式名称。ファイル名は文字の制約があるためこっちを正式とする)
-    var artist:    String { return header.artist    }   // アーティスト
-    var group:     String { return header.group     }
-    var playLevel: Int    { return header.playLevel }   // 難易度
-    var volWav:    Int    { return header.volWav    }   // 音量を現段階のn%として出力するか(TODO: 未実装)
+    var laneNum:              Int    { return header.laneNum              }   // レーン数(デフォルトは7)
+    var genre:                String { return header.genre                }   // ジャンル
+    var title:                String { return header.title                }   // タイトル(正式名称。ファイル名は文字の制約があるためこっちを正式とする)
+    var artist:               String { return header.artist               }   // アーティスト
+    var group:                String { return header.group                }
+    var playLevel:            Int    { return header.playLevel            }   // 難易度
+    var volWav:               Int    { return header.volWav               }   // 音量を現段階のn%として出力するか(TODO: 未実装)
     var bmsNameWithExtension: String { return header.bmsNameWithExtension }
+    var offset:               Int    { return header.offset               }
+    var youTubeOffset:        Int    { return header.youTubeOffset        }
+    var hasYouTube:           Bool   { return header.hasYouTube           }
 
     init(header: Header, playMode: PlayMode) {
         self.header = header
@@ -117,12 +120,17 @@ class Music {
         catch { print("未知のエラー") }
     }
 
+    convenience init(music: Music, playMode: PlayMode) {
+        self.init(header: music.header, playMode: playMode)
+    }
 
     /// BMSファイルから得たノーツの中間表現からNoteオブジェクトを生成
     ///
     /// - Parameter userSpeedRatio: ユーザー設定によるスピード倍率
     /// - Returns: 単ノーツ及びロングノーツの始点にあたるNoteオブジェクトの配列
-    func generateNotes(setting: Setting, duration: TimeInterval) -> [Note] {
+    func generateNotes(duration: TimeInterval) -> [Note] {
+
+        let setting = Setting.instance
 
         guard !BPMs.isEmpty else {
             print("空のBPM配列")

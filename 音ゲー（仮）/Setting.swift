@@ -19,7 +19,8 @@ class Setting {
         case userIsFitToLane
         case userLastChosenMusicStr
     }
-    
+
+    static let instance = Setting()
     private var speedRatioIntP:  UInt    // privateのP
     private var speedRatioP:     Double
     private var scaleRatioIntP:  UInt
@@ -41,7 +42,7 @@ class Setting {
     
     let defaults = UserDefaults.standard
     
-    init() {
+    private init() {
         // 設定をロード
         defaults.register(defaults: [ Keys.userSpeedRatioInt.rawValue      : 100                       ])    // 初期値を設定(値がすでに入ってる場合は無視される)
         defaults.register(defaults: [ Keys.userNoteSizeRatioInt.rawValue   : 100                       ])
@@ -71,8 +72,9 @@ class Setting {
         
         speedRatio = Double(speedRatioInt)/100
     }
-    
+
     /* ----- getter, setter -----*/
+
     var speedRatioInt: UInt {
         get {
             return speedRatioIntP
