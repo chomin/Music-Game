@@ -88,6 +88,10 @@ class MusicPicker: NSObject {
     func removeFromParent() {
         collectionView.removeFromSuperview()
     }
+    
+    func fix() {
+        collectionView.isScrollEnabled = false
+    }
 }
 
 

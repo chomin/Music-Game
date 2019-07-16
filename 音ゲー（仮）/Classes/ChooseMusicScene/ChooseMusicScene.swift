@@ -310,17 +310,16 @@ class ChooseMusicScene: SKScene {
 
     override func willMove(from view: SKView) {
         saveSetting()
-        // 消す
         removeMainContents()
         musicPicker.removeFromParent()
     }
     
     @objc func didTapPlayButton(_ sender : UIButton) {
         
+        // pickerだけはダウンロード中に触らせないようにする
+        musicPicker.fix()
         
         let dispatchGroup = DispatchGroup()
-        // 直列キュー / attibutes指定なし
-        //        let dispatchQueue = DispatchQueue.main
         
         let moveToPlayScene = {
             // 移動
@@ -354,30 +353,6 @@ class ChooseMusicScene: SKScene {
         }
     }
     
-//    @objc func didTapRandomSelectButton(_ sender : UIButton) {
-//        if let pickerView = picker.inputView as? UIPickerView {
-//            pickerView.selectRow(Int.random(in: 0..<picker.musicNameArray.count), inComponent: 0, animated: false)
-//        } else {
-//            print("ダウンキャスト失敗")
-//        }
-//    }
-    
-//    func showMainContents() {
-//            for content in mainContents {
-//                if let view = content as? UIControl {
-//                    view.isHidden = false
-//                    view.isEnabled = true
-//                } else if let node = content as? SKNode {
-//                    node.isHidden = false
-//                } else if let uiswitch = content as? UISwitch {
-//                    uiswitch.isHidden = true
-//                } else {
-//                    print("mainContentsの振り分け漏れ: \(content)")
-//                }
-//            }
-//    }
-//
-
     func moveToSettingScene() {
         // 移動
         let scene = SettingScene(size: size)

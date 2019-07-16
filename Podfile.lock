@@ -27,7 +27,7 @@ DEPENDENCIES:
   - GoogleAPIClientForREST/Drive (~> 1.2.1)
   - GTMAppAuth
   - RealmSwift
-  - SVProgressHUD (from `https://github.com/SVProgressHUD/SVProgressHUD.git`)
+  - SVProgressHUD
   - youtube-ios-player-helper-swift
 
 SPEC REPOS:
@@ -39,16 +39,8 @@ SPEC REPOS:
     - GTMSessionFetcher
     - Realm
     - RealmSwift
+    - SVProgressHUD
     - youtube-ios-player-helper-swift
-
-EXTERNAL SOURCES:
-  SVProgressHUD:
-    :git: https://github.com/SVProgressHUD/SVProgressHUD.git
-
-CHECKOUT OPTIONS:
-  SVProgressHUD:
-    :commit: e2a6aaa12321962cbe9fbecc370475f369c6566c
-    :git: https://github.com/SVProgressHUD/SVProgressHUD.git
 
 SPEC CHECKSUMS:
   AppAuth: 137f6bb6fc9dfbaf2cf9f6fcff1d336ff0163bc6
@@ -61,6 +53,6 @@ SPEC CHECKSUMS:
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   youtube-ios-player-helper-swift: 51a3c5325317c8271d0c7985c1bbe5a252ffb2fd
 
-PODFILE CHECKSUM: 055d62ac036e3416d57091d7da6c858946cf64f3
+PODFILE CHECKSUM: 0c912dbe9ae1cfe83b58e35941ab27535dc3d44a
 
 COCOAPODS: 1.7.3
