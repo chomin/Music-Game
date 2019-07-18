@@ -77,6 +77,16 @@ class ChooseMusicScene: SKScene {
     var selectedHeader: Header!
     let musicSelectSoundPlayer = MusicSelectSoundPlayer()
     var mp3FilesToDownload: [GTLRDrive_File] = []
+
+    // Haptic Feedback Generator
+    private let feedbackGenerator: UIImpactFeedbackGenerator? = {
+        if #available(iOS 10.0, *) {
+            let generator: UIImpactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+            return generator
+        } else {
+            return nil
+        }
+    }()
     
     override func didMove(to view: SKView) {
 
@@ -284,6 +294,9 @@ class ChooseMusicScene: SKScene {
             self.addChild(label)
             return label
         }()
+
+        // prepare feedback
+        feedbackGenerator?.prepare()
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -415,5 +428,10 @@ extension ChooseMusicScene: MusicPickerDelegate {
         let title = mp3FilesToDownload.contains(where: { $0.name == selectedHeader.mp3FileName }) ? "ダウンロード\nして遊ぶ" : "この曲で遊ぶ"
         playButton.setTitle(title, for: UIControl.State())
         playButton.setTitle(title, for: UIControl.State.highlighted)
+
+        // Haptic Feedback
+        if #available(iOS 10.0, *), let generator = feedbackGenerator {
+            generator.impactOccurred()
+        }
     }
 }
