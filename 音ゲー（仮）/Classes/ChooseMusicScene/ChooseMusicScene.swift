@@ -416,7 +416,7 @@ extension ChooseMusicScene: MusicPickerDelegate {
         difficultyLabel.text = Difficulty.getDifficulty(garupaPlayLevel: selectedHeader.playLevel).rawValue
         selectedMusicLabel.text = selectedHeader.title
         let titleSize10 = selectedHeader.title.size(withAttributes: [.font: UIFont(name: "HiraginoSans-W6", size: 10.0) ?? UIFont.systemFont(ofSize: 10.0)])
-        selectedMusicLabel.fontSize = min(self.frame.midX / titleSize10.width * 10, 35.0)
+        selectedMusicLabel.fontSize = self.frame.width / 2 * min(10 / titleSize10.width, 0.1)
 
         if selectedHeader.videoID.isEmpty && selectedHeader.videoID2.isEmpty {
             youtubeSwitch.isOn = false
