@@ -1,0 +1,4 @@
+github "realm/realm-cocoa"
+github "openid/AppAuth-iOS" ~> 0.95.0
+github "SVProgressHUD/SVProgressHUD"
+github "shoheiyokoyama/Gemini"

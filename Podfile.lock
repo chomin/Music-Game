@@ -1,6 +1,5 @@
 PODS:
   - AppAuth (0.95.1)
-  - Gemini (1.4.0)
   - GoogleAPIClientForREST/Core (1.2.1):
     - GTMSessionFetcher (>= 1.1.7)
   - GoogleAPIClientForREST/Drive (1.2.1):
@@ -9,51 +8,33 @@ PODS:
   - GTMAppAuth (0.7.1):
     - AppAuth (~> 0.95)
     - GTMSessionFetcher (~> 1.1)
-  - GTMSessionFetcher (1.2.2):
-    - GTMSessionFetcher/Full (= 1.2.2)
-  - GTMSessionFetcher/Core (1.2.2)
-  - GTMSessionFetcher/Full (1.2.2):
-    - GTMSessionFetcher/Core (= 1.2.2)
-  - Realm (3.19.0):
-    - Realm/Headers (= 3.19.0)
-  - Realm/Headers (3.19.0)
-  - RealmSwift (3.19.0):
-    - Realm (= 3.19.0)
-  - SVProgressHUD (2.2.5)
+  - GTMSessionFetcher (1.4.0):
+    - GTMSessionFetcher/Full (= 1.4.0)
+  - GTMSessionFetcher/Core (1.4.0)
+  - GTMSessionFetcher/Full (1.4.0):
+    - GTMSessionFetcher/Core (= 1.4.0)
   - youtube-ios-player-helper-swift (1.1)
 
 DEPENDENCIES:
-  - AppAuth (~> 0.95.0)
-  - Gemini
   - GoogleAPIClientForREST/Drive (~> 1.2.1)
   - GTMAppAuth (~> 0.7.1)
-  - RealmSwift
-  - SVProgressHUD
   - youtube-ios-player-helper-swift
 
 SPEC REPOS:
   trunk:
     - AppAuth
-    - Gemini
     - GoogleAPIClientForREST
     - GTMAppAuth
     - GTMSessionFetcher
-    - Realm
-    - RealmSwift
-    - SVProgressHUD
     - youtube-ios-player-helper-swift
 
 SPEC CHECKSUMS:
   AppAuth: cd34aac431e5c77c46ec7f03935377faa8c5808b
-  Gemini: 4ad915cca8805577fe3021e02feeca2b77dcdbfc
   GoogleAPIClientForREST: a8b95a252014ce2e618df6b75dc72eca2c00b4af
   GTMAppAuth: c5e41aaf039ac1ccc41543e6ea2ef7abd255ad41
-  GTMSessionFetcher: 61bb0f61a4cb560030f1222021178008a5727a23
-  Realm: 995d585bcf699aaff226715886c849a29dd3d07f
-  RealmSwift: 35f284a537989f2187b413e5917091948cb87a3f
-  SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+  GTMSessionFetcher: 6f5c8abbab8a9bce4bb3f057e317728ec6182b10
   youtube-ios-player-helper-swift: 51a3c5325317c8271d0c7985c1bbe5a252ffb2fd
 
-PODFILE CHECKSUM: d7859c782a3b09a647aeed7e621800c05aa814a3
+PODFILE CHECKSUM: ab1cc3b6e9af7668e1e01c431be23db39981f637
 
 COCOAPODS: 1.8.3
