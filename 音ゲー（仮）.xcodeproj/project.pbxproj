@@ -38,6 +38,7 @@
 		0FF43AB4222BE830001A8B53 /* Podfile.lock in Resources */ = {isa = PBXBuildFile; fileRef = 0FF43AB3222BE82F001A8B53 /* Podfile.lock */; };
 		0FFD1B511F5E6D2B0007E555 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0FFD1B501F5E6D2B0007E555 /* Assets.xcassets */; };
 		1E8394B822DD6CFE00C987D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1E8394B622DD6CFE00C987D8 /* Main.storyboard */; };
+		5D2CD63F250FA3FA00440129 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D2CD63E250FA3FA00440129 /* RealmSwift.framework */; };
 		5DE13EE424F25270002102AB /* alure.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE13EDE24F25269002102AB /* alure.o */; };
 		5DE13EE524F25270002102AB /* buffer.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE13EE224F2526A002102AB /* buffer.o */; };
 		5DE13EE624F25270002102AB /* codec_aiff.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE13EDC24F25269002102AB /* codec_aiff.o */; };
@@ -49,7 +50,6 @@
 		5DE13EF124F2528A002102AB /* AppAuth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE13EEC24F25289002102AB /* AppAuth.framework */; };
 		5DE13EF324F2528A002102AB /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE13EED24F25289002102AB /* Realm.framework */; };
 		5DE13EF524F2528A002102AB /* Gemini.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE13EEE24F2528A002102AB /* Gemini.framework */; };
-		5DE13EF724F2528A002102AB /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE13EEF24F2528A002102AB /* RealmSwift.framework */; };
 		5DE13EF924F2528A002102AB /* SVProgressHUD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE13EF024F2528A002102AB /* SVProgressHUD.framework */; };
 		F127323A1FB5BB9500D7F5C8 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F12732391FB5BB8B00D7F5C8 /* OpenAL.framework */; };
 		F1B16F7E1FBC90940036FEE2 /* Sounds in Resources */ = {isa = PBXBuildFile; fileRef = F1B16F7D1FBC90940036FEE2 /* Sounds */; };
@@ -91,6 +91,7 @@
 		0FFD1B501F5E6D2B0007E555 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0FFD1B551F5E6D2B0007E555 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1E8394B722DD6CFE00C987D8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Main.storyboard; sourceTree = "<group>"; };
+		5D2CD63E250FA3FA00440129 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 		5DE13EDC24F25269002102AB /* codec_aiff.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = codec_aiff.o; path = "alure-1.2/build/codec_aiff.o"; sourceTree = "<group>"; };
 		5DE13EDD24F25269002102AB /* stream.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = stream.o; path = "alure-1.2/build/stream.o"; sourceTree = "<group>"; };
 		5DE13EDE24F25269002102AB /* alure.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = alure.o; path = "alure-1.2/build/alure.o"; sourceTree = "<group>"; };
@@ -118,7 +119,6 @@
 			files = (
 				5DE13EF324F2528A002102AB /* Realm.framework in Frameworks */,
 				5DE13EEA24F25270002102AB /* streamdec.o in Frameworks */,
-				5DE13EF724F2528A002102AB /* RealmSwift.framework in Frameworks */,
 				5DE13EF124F2528A002102AB /* AppAuth.framework in Frameworks */,
 				5DE13EE824F25270002102AB /* istream.o in Frameworks */,
 				5DE13EE924F25270002102AB /* stream.o in Frameworks */,
@@ -128,6 +128,7 @@
 				0F746F541F5F917E00C1D040 /* AVFoundation.framework in Frameworks */,
 				F127323A1FB5BB9500D7F5C8 /* OpenAL.framework in Frameworks */,
 				5DE13EF524F2528A002102AB /* Gemini.framework in Frameworks */,
+				5D2CD63F250FA3FA00440129 /* RealmSwift.framework in Frameworks */,
 				5DE13EEB24F25270002102AB /* streamplay.o in Frameworks */,
 				5DE13EE524F25270002102AB /* buffer.o in Frameworks */,
 				5DE13EE724F25270002102AB /* codec_wav.o in Frameworks */,
@@ -253,6 +254,7 @@
 		0F746F521F5F917E00C1D040 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5D2CD63E250FA3FA00440129 /* RealmSwift.framework */,
 				5DE13EEC24F25289002102AB /* AppAuth.framework */,
 				5DE13EEE24F2528A002102AB /* Gemini.framework */,
 				5DE13EED24F25289002102AB /* Realm.framework */,
@@ -654,6 +656,7 @@
 					"\"${PODS_CONFIGURATION_BUILD_DIR}/youtube-ios-player-helper-swift\"",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Build/iOS",
 				);
 				GENERATE_PROFILING_CODE = NO;
 				INFOPLIST_FILE = "音ゲー（仮）/Info.plist";
@@ -701,6 +704,7 @@
 					"\"${PODS_CONFIGURATION_BUILD_DIR}/youtube-ios-player-helper-swift\"",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Build/iOS",
 				);
 				GENERATE_PROFILING_CODE = NO;
 				INFOPLIST_FILE = "音ゲー（仮）/Info.plist";
