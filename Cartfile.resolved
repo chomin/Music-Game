@@ -1,4 +1,4 @@
 github "SVProgressHUD/SVProgressHUD" "2.2.5"
 github "openid/AppAuth-iOS" "0.95.1"
-github "realm/realm-cocoa" "v5.3.5"
+github "realm/realm-cocoa" "v5.4.0"
 github "shoheiyokoyama/Gemini" "1.4.0"
