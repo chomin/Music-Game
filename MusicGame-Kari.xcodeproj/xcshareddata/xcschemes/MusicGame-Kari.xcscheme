@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1100"
+   LastUpgradeVersion = "1200"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0FFD1B3F1F5E6D2B0007E555"
-               BuildableName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;.app"
-               BlueprintName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;"
-               ReferencedContainer = "container:&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;.xcodeproj">
+               BuildableName = "MusicGame-Kari.app"
+               BlueprintName = "MusicGame-Kari"
+               ReferencedContainer = "container:MusicGame-Kari.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -31,9 +31,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0FFD1B3F1F5E6D2B0007E555"
-            BuildableName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;.app"
-            BlueprintName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;"
-            ReferencedContainer = "container:&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;.xcodeproj">
+            BuildableName = "MusicGame-Kari.app"
+            BlueprintName = "MusicGame-Kari"
+            ReferencedContainer = "container:MusicGame-Kari.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -44,7 +44,7 @@
                BlueprintIdentifier = "0FFD1B591F5E6D2B0007E555"
                BuildableName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;Tests.xctest"
                BlueprintName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;Tests"
-               ReferencedContainer = "container:&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;.xcodeproj">
+               ReferencedContainer = "container:MusicGame-Kari.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -54,7 +54,7 @@
                BlueprintIdentifier = "0FFD1B641F5E6D2B0007E555"
                BuildableName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;UITests.xctest"
                BlueprintName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;UITests"
-               ReferencedContainer = "container:&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;.xcodeproj">
+               ReferencedContainer = "container:MusicGame-Kari.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -74,9 +74,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0FFD1B3F1F5E6D2B0007E555"
-            BuildableName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;.app"
-            BlueprintName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;"
-            ReferencedContainer = "container:&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;.xcodeproj">
+            BuildableName = "MusicGame-Kari.app"
+            BlueprintName = "MusicGame-Kari"
+            ReferencedContainer = "container:MusicGame-Kari.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -91,9 +91,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0FFD1B3F1F5E6D2B0007E555"
-            BuildableName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;.app"
-            BlueprintName = "&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;"
-            ReferencedContainer = "container:&#x97f3;&#x30b1;&#x3099;&#x30fc;&#xff08;&#x4eee;&#xff09;.xcodeproj">
+            BuildableName = "MusicGame-Kari.app"
+            BlueprintName = "MusicGame-Kari"
+            ReferencedContainer = "container:MusicGame-Kari.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
